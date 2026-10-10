@@ -25,6 +25,9 @@ jobs:
       - run: pnpm check
       - run: pnpm test
       - run: pnpm build
+      # Browser tests open the build just made, on the stub API in e2e/stub.
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm e2e
 
   image:
     needs: check
