@@ -54,6 +54,7 @@ shared as a link.
 | `pnpm start`     | Run the production build           |
 | `pnpm typecheck` | TypeScript check                   |
 | `pnpm lint`      | ESLint                             |
+| `pnpm test`      | Unit tests (vitest)                |
 | `pnpm format`    | Prettier and ESLint fixes          |
 
 ## Configuration

@@ -25,24 +25,7 @@ import { ACCEPTED, PAGE_SIZE } from '#/lib/api'
 import type { Purchase, Role } from '#/lib/api'
 import { count, day, lei, leiShort } from '#/lib/format'
 import { entityQuery, purchasesQuery } from '#/lib/queries'
-
-// Search params shared by the institution and the supplier page.
-export type EntitySearch = { pagina?: number; ordine?: 'valoare' }
-
-export function validateEntitySearch(
-  search: Record<string, unknown>,
-): EntitySearch {
-  const page = Number(search.pagina)
-  return {
-    pagina: Number.isInteger(page) && page > 1 ? page : undefined,
-    ordine: search.ordine === 'valoare' ? 'valoare' : undefined,
-  }
-}
-
-// A CUI has at most ten digits; anything else in the address is not a page.
-export function parseCui(text: string) {
-  return /^\d{1,10}$/.test(text) ? Number(text) : null
-}
+import type { EntitySearch } from '#/lib/urls'
 
 // SEAP's states in the words a citizen would use. Green marks a finished deal, not a verdict.
 const STATES: Record<number, string> = {

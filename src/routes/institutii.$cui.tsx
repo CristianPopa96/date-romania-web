@@ -1,17 +1,14 @@
 import { createFileRoute, notFound } from '@tanstack/react-router'
 
-import {
-  EntityView,
-  parseCui,
-  validateEntitySearch,
-} from '#/components/EntityView'
+import { EntityView } from '#/components/EntityView'
 import { entityQuery, purchasesQuery } from '#/lib/queries'
+import { cuiFromPath, validateEntitySearch } from '#/lib/urls'
 
 export const Route = createFileRoute('/institutii/$cui')({
   validateSearch: validateEntitySearch,
   loaderDeps: ({ search }) => search,
   loader: async ({ context, params, deps }) => {
-    const cui = parseCui(params.cui)
+    const cui = cuiFromPath(params.cui)
     if (cui === null) throw notFound()
     const [page] = await Promise.all([
       context.queryClient.ensureQueryData(entityQuery('institutions', cui)),
