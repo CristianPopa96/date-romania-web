@@ -1,3 +1,5 @@
 package-lock.json
 pnpm-lock.yaml
-yarn.locke2e/stub/answers.json
+yarn.lock
+# A byte-for-byte copy of a file in date-romania-api; see the README.
+e2e/stub/answers.json
