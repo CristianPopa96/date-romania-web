@@ -13,6 +13,7 @@ import {
   Text,
 } from '@radix-ui/themes'
 
+import { Figure } from '#/components/Figure'
 import { AboveLimitNote, PeriodNote, Unavailable } from '#/components/Notes'
 import { SearchBox } from '#/components/SearchBox'
 import { SourceLine } from '#/components/SourceLine'
@@ -54,19 +55,29 @@ function Home() {
             <Heading size="4">Achiziții directe</Heading>
             <Grid columns={{ initial: '2', sm: '4' }} gap="3">
               <Figure
+                size="5"
                 label="Valoare acceptată"
                 value={leiShort(summary.value)}
                 detail={lei(summary.value)}
               />
               <Figure
+                size="5"
                 label="Achiziții acceptate"
                 value={count(summary.accepted)}
               />
-              <Figure label="Instituții" value={count(stats.institutions)} />
-              <Figure label="Furnizori" value={count(stats.suppliers)} />
+              <Figure
+                size="5"
+                label="Instituții"
+                value={count(stats.institutions)}
+              />
+              <Figure
+                size="5"
+                label="Furnizori"
+                value={count(stats.suppliers)}
+              />
             </Grid>
             <PeriodNote summary={summary} />
-            <AboveLimitNote summary={summary} limit={stats.limit} />
+            <AboveLimitNote summary={summary} />
             <Flex justify="between" align="center" gap="3" wrap="wrap">
               <SourceLine source={stats.source} />
               <Link asChild size="2">
@@ -102,33 +113,5 @@ function Home() {
         </Card>
       </Flex>
     </Container>
-  )
-}
-
-function Figure({
-  label,
-  value,
-  detail,
-}: {
-  label: string
-  value: string
-  detail?: string
-}) {
-  return (
-    <Card>
-      <Flex direction="column" gap="1">
-        <Text size="2" color="gray">
-          {label}
-        </Text>
-        <Text size="5" weight="bold">
-          {value}
-        </Text>
-        {detail ? (
-          <Text size="1" color="gray">
-            {detail}
-          </Text>
-        ) : null}
-      </Flex>
-    </Card>
   )
 }

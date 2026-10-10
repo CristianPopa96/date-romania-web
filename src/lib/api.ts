@@ -99,6 +99,13 @@ export type Role = 'institutions' | 'suppliers'
 
 export const PAGE_SIZE = 20
 
+// SEAP's state for a purchase whose offer was accepted: the only ones that are money spent.
+export const ACCEPTED = 7
+
+// The highest legal limit for a direct purchase (the one for works), in lei without VAT.
+// The API uses the same value for `above_limit`; one constant keeps every page in agreement.
+export const DIRECT_PURCHASE_LIMIT = 900_400
+
 export const getApiHealth = createServerFn({ method: 'GET' }).handler(
   async (): Promise<ApiHealth | null> => {
     try {
@@ -146,6 +153,9 @@ export const getPurchases = createServerFn({ method: 'GET' })
     const found = await getJson<PurchasePage>('/v1/direct-purchases', {
       [data.role === 'institutions' ? 'buyer' : 'supplier']: data.cui,
       sort: data.byValue ? 'value' : 'newest',
+      // The largest are ranked among accepted purchases only: a refused offer can carry
+      // any value and is not money spent.
+      state: data.byValue ? ACCEPTED : undefined,
       limit: PAGE_SIZE,
       offset: (data.page - 1) * PAGE_SIZE,
     })

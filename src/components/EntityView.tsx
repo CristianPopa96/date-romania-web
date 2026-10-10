@@ -18,9 +18,10 @@ import {
 
 import { BarList } from '#/components/BarList'
 import { EntityLink } from '#/components/EntityLink'
+import { Figure } from '#/components/Figure'
 import { AboveLimitNote, PeriodNote } from '#/components/Notes'
 import { SourceLine } from '#/components/SourceLine'
-import { PAGE_SIZE } from '#/lib/api'
+import { ACCEPTED, PAGE_SIZE } from '#/lib/api'
 import type { Purchase, Role } from '#/lib/api'
 import { count, day, lei, leiShort } from '#/lib/format'
 import { entityQuery, purchasesQuery } from '#/lib/queries'
@@ -142,7 +143,8 @@ export function EntityView({
         <Flex direction="column" gap="3">
           <Flex justify="between" align="center" gap="3" wrap="wrap">
             <Heading size="4">
-              Achiziții directe ({count(purchases.total)})
+              {byValue ? 'Achiziții directe acceptate' : 'Achiziții directe'} (
+              {count(purchases.total)})
             </Heading>
             <SegmentedControl.Root
               size="1"
@@ -157,7 +159,7 @@ export function EntityView({
                 Cele mai recente
               </SegmentedControl.Item>
               <SegmentedControl.Item value="valoare">
-                Cele mai mari
+                Cele mai mari acceptate
               </SegmentedControl.Item>
             </SegmentedControl.Root>
           </Flex>
@@ -217,39 +219,11 @@ export function EntityView({
   )
 }
 
-function Figure({
-  label,
-  value,
-  detail,
-}: {
-  label: string
-  value: string
-  detail?: string
-}) {
-  return (
-    <Card>
-      <Flex direction="column" gap="1">
-        <Text size="2" color="gray">
-          {label}
-        </Text>
-        <Text size="6" weight="bold">
-          {value}
-        </Text>
-        {detail ? (
-          <Text size="1" color="gray">
-            {detail}
-          </Text>
-        ) : null}
-      </Flex>
-    </Card>
-  )
-}
-
 function PurchaseRow({ purchase, other }: { purchase: Purchase; other: Role }) {
   const party = other === 'suppliers' ? purchase.supplier : purchase.buyer
   const partyText =
     other === 'suppliers' ? purchase.supplier_text : purchase.buyer_text
-  const accepted = purchase.state_id === 7
+  const accepted = purchase.state_id === ACCEPTED
 
   return (
     <Table.Row>
@@ -300,8 +274,20 @@ function PurchaseRow({ purchase, other }: { purchase: Purchase; other: Role }) {
         </Badge>
       </Table.Cell>
       <Table.Cell justify="end" style={{ whiteSpace: 'nowrap' }}>
-        {purchase.value === null ? 'Nepublicat' : lei(purchase.value)}
-        {purchase.above_limit ? (
+        {purchase.value === null ? (
+          'Nepublicat'
+        ) : accepted ? (
+          lei(purchase.value)
+        ) : (
+          // An offer that was refused or never answered is not money spent.
+          <Text color="gray">{lei(purchase.value)}</Text>
+        )}
+        {!accepted && purchase.value !== null ? (
+          <Text as="div" size="1" color="gray">
+            neacceptată, nu intră în total
+          </Text>
+        ) : null}
+        {accepted && purchase.above_limit ? (
           <Text as="div" size="1" color="amber">
             peste plafon, nu intră în total
           </Text>

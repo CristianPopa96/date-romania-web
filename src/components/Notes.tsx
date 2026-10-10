@@ -1,6 +1,7 @@
 import { InfoCircledIcon } from '@radix-ui/react-icons'
 import { Callout, Text } from '@radix-ui/themes'
 
+import { DIRECT_PURCHASE_LIMIT } from '#/lib/api'
 import type { Summary } from '#/lib/api'
 import { count, lei, period } from '#/lib/format'
 
@@ -16,13 +17,7 @@ export function PeriodNote({ summary }: { summary: Summary }) {
 }
 
 // Stated as what SEAP publishes, never as an error or a breach.
-export function AboveLimitNote({
-  summary,
-  limit = 900400,
-}: {
-  summary: Summary
-  limit?: number
-}) {
+export function AboveLimitNote({ summary }: { summary: Summary }) {
   if (summary.above_limit === 0) return null
   const one = summary.above_limit === 1
   return (
@@ -34,8 +29,8 @@ export function AboveLimitNote({
         {one
           ? 'O achiziție acceptată este publicată'
           : `${count(summary.above_limit)} achiziții acceptate sunt publicate`}{' '}
-        în SEAP cu o valoare peste {lei(limit)}, plafonul legal cel mai mare
-        pentru o achiziție directă.{' '}
+        în SEAP cu o valoare peste {lei(DIRECT_PURCHASE_LIMIT)}, plafonul legal
+        cel mai mare pentru o achiziție directă.{' '}
         {one ? 'Nu este inclusă' : 'Nu sunt incluse'} în total:{' '}
         {lei(summary.above_limit_value)}. Tipar observat, nu o acuzație.
       </Callout.Text>
