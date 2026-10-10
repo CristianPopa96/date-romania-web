@@ -32,6 +32,19 @@ pnpm install
 pnpm dev          # http://localhost:3000, API_URL defaults to http://localhost:8000
 ```
 
+## Pages
+
+| Address             | What it shows                                                           |
+| ------------------- | ----------------------------------------------------------------------- |
+| `/`                 | Search box and the headline figures for direct purchases                |
+| `/cautare?q=`       | Institutions and companies found by name or CUI                         |
+| `/institutii/{cui}` | An institution as a buyer: totals, its suppliers, its purchases         |
+| `/furnizori/{cui}`  | A company as a supplier: totals, the institutions it sold to, its sales |
+| `/clasamente`       | The largest suppliers and institutions by accepted value                |
+
+Paging and sorting live in the address (`?pagina=2&ordine=valoare`), so any view can be
+shared as a link.
+
 ## Scripts
 
 | Command          | What it does                       |
@@ -56,6 +69,8 @@ pnpm dev          # http://localhost:3000, API_URL defaults to http://localhost:
 - Numbers use Romanian format (`Intl.NumberFormat("ro-RO")`), dates `dd.mm.yyyy`.
 - Every figure shows its source. Gaps in public data are shown, not hidden.
 - Theme settings live in one place, `src/routes/__root.tsx`.
+- Server calls are in `src/lib/api.ts`, their query options in `src/lib/queries.ts`,
+  number and date formats in `src/lib/format.ts`, shared pieces in `src/components/`.
 
 ## Licence
 

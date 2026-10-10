@@ -4,7 +4,18 @@ import {
   Scripts,
   createRootRouteWithContext,
 } from '@tanstack/react-router'
-import { Theme } from '@radix-ui/themes'
+import {
+  Box,
+  Container,
+  Flex,
+  Heading,
+  Link,
+  Text,
+  Theme,
+} from '@radix-ui/themes'
+
+import { Unavailable } from '#/components/Notes'
+import { TopBar } from '#/components/TopBar'
 
 import radixCss from '@radix-ui/themes/styles.css?url'
 import appCss from '../styles.css?url'
@@ -28,6 +39,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       ],
     }),
     shellComponent: RootDocument,
+    notFoundComponent: NotFound,
+    errorComponent: Failed,
   },
 )
 
@@ -47,10 +60,61 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           scaling="100%"
           panelBackground="solid"
         >
-          {children}
+          <TopBar />
+          <Box asChild style={{ minHeight: '70vh' }}>
+            <main>{children}</main>
+          </Box>
+          <Footer />
         </Theme>
         <Scripts />
       </body>
     </html>
+  )
+}
+
+function Footer() {
+  return (
+    <Box style={{ borderTop: '1px solid var(--gray-a5)' }}>
+      <Container size="3" px="5" py="4">
+        <Flex direction="column" gap="1">
+          <Text size="1" color="gray">
+            Datele provin din surse publice și pot fi refolosite sub licența CC
+            BY 4.0. Fiecare cifră își arată sursa.
+          </Text>
+          <Text size="1" color="gray">
+            Codul este public:{' '}
+            <Link href="https://github.com/CristianPopa96/date-romania-web">
+              site
+            </Link>{' '}
+            și{' '}
+            <Link href="https://github.com/CristianPopa96/date-romania-api">
+              API
+            </Link>
+            .
+          </Text>
+        </Flex>
+      </Container>
+    </Box>
+  )
+}
+
+function NotFound() {
+  return (
+    <Container size="3" px="5" py="9">
+      <Flex direction="column" gap="2">
+        <Heading size="6">Pagina nu există</Heading>
+        <Text size="2" color="gray">
+          Verifică adresa sau caută instituția ori firma după nume sau CUI.
+        </Text>
+      </Flex>
+    </Container>
+  )
+}
+
+function Failed() {
+  return (
+    <Container size="3" px="5" py="9">
+      <Unavailable />
+    </Container>
   )
 }

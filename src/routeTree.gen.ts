@@ -10,33 +10,80 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CautareRouteImport } from './routes/cautare'
+import { Route as ClasamenteRouteImport } from './routes/clasamente'
+import { Route as FurnizoriCuiRouteImport } from './routes/furnizori.$cui'
+import { Route as InstitutiiCuiRouteImport } from './routes/institutii.$cui'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CautareRoute = CautareRouteImport.update({
+  id: '/cautare',
+  path: '/cautare',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClasamenteRoute = ClasamenteRouteImport.update({
+  id: '/clasamente',
+  path: '/clasamente',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FurnizoriCuiRoute = FurnizoriCuiRouteImport.update({
+  id: '/furnizori/$cui',
+  path: '/furnizori/$cui',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InstitutiiCuiRoute = InstitutiiCuiRouteImport.update({
+  id: '/institutii/$cui',
+  path: '/institutii/$cui',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/cautare': typeof CautareRoute
+  '/clasamente': typeof ClasamenteRoute
+  '/furnizori/$cui': typeof FurnizoriCuiRoute
+  '/institutii/$cui': typeof InstitutiiCuiRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/cautare': typeof CautareRoute
+  '/clasamente': typeof ClasamenteRoute
+  '/furnizori/$cui': typeof FurnizoriCuiRoute
+  '/institutii/$cui': typeof InstitutiiCuiRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/cautare': typeof CautareRoute
+  '/clasamente': typeof ClasamenteRoute
+  '/furnizori/$cui': typeof FurnizoriCuiRoute
+  '/institutii/$cui': typeof InstitutiiCuiRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    '/' | '/cautare' | '/clasamente' | '/furnizori/$cui' | '/institutii/$cui'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/cautare' | '/clasamente' | '/furnizori/$cui' | '/institutii/$cui'
+  id:
+    | '__root__'
+    | '/'
+    | '/cautare'
+    | '/clasamente'
+    | '/furnizori/$cui'
+    | '/institutii/$cui'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CautareRoute: typeof CautareRoute
+  ClasamenteRoute: typeof ClasamenteRoute
+  FurnizoriCuiRoute: typeof FurnizoriCuiRoute
+  InstitutiiCuiRoute: typeof InstitutiiCuiRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +95,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cautare': {
+      id: '/cautare'
+      path: '/cautare'
+      fullPath: '/cautare'
+      preLoaderRoute: typeof CautareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/clasamente': {
+      id: '/clasamente'
+      path: '/clasamente'
+      fullPath: '/clasamente'
+      preLoaderRoute: typeof ClasamenteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/furnizori/$cui': {
+      id: '/furnizori/$cui'
+      path: '/furnizori/$cui'
+      fullPath: '/furnizori/$cui'
+      preLoaderRoute: typeof FurnizoriCuiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/institutii/$cui': {
+      id: '/institutii/$cui'
+      path: '/institutii/$cui'
+      fullPath: '/institutii/$cui'
+      preLoaderRoute: typeof InstitutiiCuiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CautareRoute: CautareRoute,
+  ClasamenteRoute: ClasamenteRoute,
+  FurnizoriCuiRoute: FurnizoriCuiRoute,
+  InstitutiiCuiRoute: InstitutiiCuiRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
