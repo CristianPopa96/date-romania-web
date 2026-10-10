@@ -15,6 +15,7 @@ export default [
     },
   },
   {
-    ignores: ['eslint.config.js', 'prettier.config.js'],
+    // Build output is not ours to lint.
+    ignores: ['eslint.config.js', 'prettier.config.js', '.output/**'],
   },
 ]

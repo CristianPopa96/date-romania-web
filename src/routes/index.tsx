@@ -1,32 +1,39 @@
-import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
-import { MagnifyingGlassIcon } from '@radix-ui/react-icons'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import { Link as RouterLink, createFileRoute } from '@tanstack/react-router'
+import { ArrowRightIcon } from '@radix-ui/react-icons'
 import {
   Badge,
   Box,
   Card,
   Container,
   Flex,
+  Grid,
   Heading,
+  Link,
   Text,
-  TextField,
 } from '@radix-ui/themes'
 
-import { getApiHealth } from '#/lib/api'
-
-const healthQuery = queryOptions({
-  queryKey: ['health'],
-  queryFn: () => getApiHealth(),
-})
+import { Figure } from '#/components/Figure'
+import { AboveLimitNote, PeriodNote, Unavailable } from '#/components/Notes'
+import { SearchBox } from '#/components/SearchBox'
+import { SourceLine } from '#/components/SourceLine'
+import { count, lei, leiShort } from '#/lib/format'
+import { healthQuery, statsQuery } from '#/lib/queries'
 
 export const Route = createFileRoute('/')({
-  loader: ({ context }) => context.queryClient.ensureQueryData(healthQuery),
+  loader: ({ context }) =>
+    Promise.all([
+      context.queryClient.ensureQueryData(healthQuery),
+      context.queryClient.ensureQueryData(statsQuery),
+    ]),
   component: Home,
 })
 
 function Home() {
   const { data: health } = useSuspenseQuery(healthQuery)
+  const { data: stats } = useSuspenseQuery(statsQuery)
   const apiUp = health?.status === 'ok'
+  const summary = stats?.direct_purchases
 
   return (
     <Container size="3" px="5" py="9">
@@ -41,15 +48,51 @@ function Home() {
           </Text>
         </Flex>
 
-        <TextField.Root
-          size="3"
-          placeholder="Caută o instituție, o firmă sau un CUI"
-          aria-label="Caută"
-        >
-          <TextField.Slot>
-            <MagnifyingGlassIcon height="16" width="16" />
-          </TextField.Slot>
-        </TextField.Root>
+        <SearchBox />
+
+        {stats && summary && summary.purchases > 0 ? (
+          <Flex direction="column" gap="3">
+            <Heading size="4">Achiziții directe</Heading>
+            <Grid columns={{ initial: '2', sm: '4' }} gap="3">
+              <Figure
+                size="5"
+                label="Valoare acceptată"
+                value={leiShort(summary.value)}
+                detail={lei(summary.value)}
+              />
+              <Figure
+                size="5"
+                label="Achiziții acceptate"
+                value={count(summary.accepted)}
+              />
+              <Figure
+                size="5"
+                label="Instituții"
+                value={count(stats.institutions)}
+              />
+              <Figure
+                size="5"
+                label="Furnizori"
+                value={count(stats.suppliers)}
+              />
+            </Grid>
+            <PeriodNote summary={summary} />
+            <AboveLimitNote summary={summary} />
+            <Flex justify="between" align="center" gap="3" wrap="wrap">
+              <SourceLine source={stats.source} />
+              <Link asChild size="2">
+                <RouterLink to="/clasamente">
+                  <Flex align="center" gap="1">
+                    Vezi clasamentele
+                    <ArrowRightIcon />
+                  </Flex>
+                </RouterLink>
+              </Link>
+            </Flex>
+          </Flex>
+        ) : (
+          <Unavailable />
+        )}
 
         <Card>
           <Flex justify="between" align="center" gap="3">
