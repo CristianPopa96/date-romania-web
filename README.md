@@ -55,7 +55,23 @@ shared as a link.
 | `pnpm typecheck` | TypeScript check                   |
 | `pnpm lint`      | ESLint                             |
 | `pnpm test`      | Unit tests (vitest)                |
+| `pnpm e2e`       | Browser tests (Playwright)         |
 | `pnpm format`    | Prettier and ESLint fixes          |
+
+## Tests
+
+- **Unit tests** (`pnpm test`): vitest, next to the code as `src/**/*.test.ts`, for the
+  logic in `src/lib/`.
+- **Browser tests** (`pnpm build`, then `pnpm e2e`): Playwright opens the built site in
+  Chromium. The first time, run `pnpm exec playwright install chromium`.
+
+The site fetches from the server, so the browser tests cannot mock requests in the page.
+They start a small stub API (`e2e/stub/server.mjs`) and point the site at it. The stub's
+answers (`e2e/stub/answers.json`) are not written by hand: they are a copy of
+`tests/fixtures/site_stub.json` in date-romania-api, which a test there keeps equal to
+what the API answers. When that file changes, copy it here and run the browser tests. A
+call with no saved answer gets a 501, so a page that starts asking for something new fails
+instead of showing an empty state.
 
 ## Configuration
 
