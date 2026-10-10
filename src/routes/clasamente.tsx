@@ -6,6 +6,7 @@ import { BarList } from '#/components/BarList'
 import { PeriodNote, Unavailable } from '#/components/Notes'
 import { SourceLine } from '#/components/SourceLine'
 import type { Role } from '#/lib/api'
+import { pageTitle } from '#/lib/copy'
 import { rankingQuery, statsQuery } from '#/lib/queries'
 
 export const Route = createFileRoute('/clasamente')({
@@ -15,7 +16,7 @@ export const Route = createFileRoute('/clasamente')({
       context.queryClient.ensureQueryData(rankingQuery('suppliers')),
       context.queryClient.ensureQueryData(rankingQuery('institutions')),
     ]),
-  head: () => ({ meta: [{ title: 'Clasamente · Date România' }] }),
+  head: () => ({ meta: [{ title: pageTitle('Clasamente') }] }),
   component: Rankings,
 })
 

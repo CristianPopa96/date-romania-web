@@ -17,6 +17,7 @@ import { Figure } from '#/components/Figure'
 import { AboveLimitNote, PeriodNote, Unavailable } from '#/components/Notes'
 import { SearchBox } from '#/components/SearchBox'
 import { SourceLine } from '#/components/SourceLine'
+import { SITE_NAME, TAGLINE } from '#/lib/copy'
 import { count, lei, leiShort } from '#/lib/format'
 import { healthQuery, statsQuery } from '#/lib/queries'
 
@@ -40,11 +41,10 @@ function Home() {
       <Flex direction="column" gap="6">
         <Flex direction="column" gap="2">
           <Heading size="8" weight="bold">
-            Date România
+            {SITE_NAME}
           </Heading>
           <Text size="3" color="gray">
-            Unde merg banii publici: achiziții, contracte și plăți, cu sursa
-            fiecărei cifre.
+            {TAGLINE}
           </Text>
         </Flex>
 

@@ -1,6 +1,7 @@
 import { createFileRoute, notFound } from '@tanstack/react-router'
 
 import { EntityView } from '#/components/EntityView'
+import { pageTitle } from '#/lib/copy'
 import { entityQuery, purchasesQuery } from '#/lib/queries'
 import { cuiFromPath, validateEntitySearch } from '#/lib/urls'
 
@@ -25,7 +26,7 @@ export const Route = createFileRoute('/furnizori/$cui')({
     return { name: page.entity.name }
   },
   head: ({ loaderData }) => ({
-    meta: [{ title: `${loaderData?.name ?? 'Furnizor'} · Date România` }],
+    meta: [{ title: pageTitle(loaderData?.name ?? 'Furnizor') }],
   }),
   component: Supplier,
 })

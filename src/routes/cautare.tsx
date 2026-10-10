@@ -12,6 +12,7 @@ import {
 
 import { EntityLink, roleOfKind } from '#/components/EntityLink'
 import { SearchBox } from '#/components/SearchBox'
+import { pageTitle } from '#/lib/copy'
 import { searchQuery } from '#/lib/queries'
 
 export const Route = createFileRoute('/cautare')({
@@ -21,7 +22,7 @@ export const Route = createFileRoute('/cautare')({
   loaderDeps: ({ search }) => ({ q: search.q }),
   loader: ({ context, deps }) =>
     context.queryClient.ensureQueryData(searchQuery(deps.q)),
-  head: () => ({ meta: [{ title: 'Căutare · Date România' }] }),
+  head: () => ({ meta: [{ title: pageTitle('Căutare') }] }),
   component: Search,
 })
 
