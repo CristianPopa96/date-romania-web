@@ -16,6 +16,7 @@ import {
 
 import { Unavailable } from '#/components/Notes'
 import { TopBar } from '#/components/TopBar'
+import { SITE_NAME, TAGLINE } from '#/lib/copy'
 
 import radixCss from '@radix-ui/themes/styles.css?url'
 import appCss from '../styles.css?url'
@@ -26,12 +27,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       meta: [
         { charSet: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { title: 'Date România' },
-        {
-          name: 'description',
-          content:
-            'Unde merg banii publici: achiziții, contracte și plăți, cu sursa fiecărei cifre.',
-        },
+        { title: SITE_NAME },
+        { name: 'description', content: TAGLINE },
       ],
       links: [
         { rel: 'stylesheet', href: radixCss },

@@ -29,7 +29,7 @@ To work on the site alone, with the API running on port 8000:
 
 ```bash
 pnpm install
-pnpm dev          # http://localhost:3000, API_URL defaults to http://localhost:8000
+pnpm dev          # http://localhost:3000, API_URL defaults to http://127.0.0.1:8000
 ```
 
 ## Pages
@@ -61,7 +61,7 @@ shared as a link.
 
 | Variable  | Default                 | Meaning                          |
 | --------- | ----------------------- | -------------------------------- |
-| `API_URL` | `http://localhost:8000` | Where the server reaches the API |
+| `API_URL` | `http://127.0.0.1:8000` | Where the server reaches the API |
 | `PORT`    | `3000`                  | Port of the production server    |
 
 ## Conventions

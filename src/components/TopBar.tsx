@@ -2,6 +2,8 @@ import { Link as RouterLink } from '@tanstack/react-router'
 import { BarChartIcon } from '@radix-ui/react-icons'
 import { Box, Container, Flex, Link, Text } from '@radix-ui/themes'
 
+import { SITE_NAME } from '#/lib/copy'
+
 export function TopBar() {
   return (
     <Box style={{ borderBottom: '1px solid var(--gray-a5)' }}>
@@ -10,7 +12,7 @@ export function TopBar() {
           <Link asChild underline="none" highContrast>
             <RouterLink to="/">
               <Text size="4" weight="bold">
-                Date România
+                {SITE_NAME}
               </Text>
             </RouterLink>
           </Link>

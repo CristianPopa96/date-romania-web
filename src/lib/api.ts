@@ -1,9 +1,10 @@
 import { createServerFn } from '@tanstack/react-start'
 
 // The site talks to the FastAPI back end only from the server, so the API
-// address stays internal and the browser never needs CORS.
+// address stays internal and the browser never needs CORS. The default is 127.0.0.1, not
+// localhost: Docker publishes the API on IPv4 only, and localhost can try IPv6 first.
 function apiUrl(path: string) {
-  const base = process.env.API_URL ?? 'http://localhost:8000'
+  const base = process.env.API_URL ?? 'http://127.0.0.1:8000'
   return new URL(path, base)
 }
 
