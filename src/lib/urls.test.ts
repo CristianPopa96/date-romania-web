@@ -11,8 +11,21 @@ import {
   validateEntitySearch,
   validatePageSearch,
   validateRankingSearch,
+  validateSourcesSearch,
   validateSearchSearch,
 } from '#/lib/urls'
+
+describe('validateSourcesSearch', () => {
+  it('keeps the methodology tab and drops anything else', () => {
+    expect(validateSourcesSearch({ fila: 'metodologie' })).toEqual({
+      fila: 'metodologie',
+    })
+    expect(validateSourcesSearch({ fila: 'surse' })).toEqual({
+      fila: undefined,
+    })
+    expect(validateSourcesSearch({ fila: 7 })).toEqual({ fila: undefined })
+  })
+})
 
 describe('validateEntitySearch', () => {
   it('keeps a page number and the value order', () => {

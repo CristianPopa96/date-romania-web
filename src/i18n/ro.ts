@@ -59,6 +59,7 @@ export const ro = {
   nav: {
     label: 'Secțiuni',
     rankings: 'Clasamente',
+    sources: 'Surse',
   },
 
   notFound: {
@@ -95,6 +96,7 @@ export const ro = {
     institutions: 'Instituții',
     suppliers: 'Furnizori',
     seeRankings: 'Vezi clasamentele',
+    seeSources: 'Vezi sursele și cum numărăm',
   },
 
   // What the site is built on, one row per source.
@@ -115,6 +117,111 @@ export const ro = {
     } as Record<string, string | undefined>,
     complete: 'completă',
     incomplete: 'listă incompletă',
+  },
+
+  // The sources page: what we hold, what is still to come, how the data may be used.
+  sources: {
+    eyebrow: 'Surse și metodologie',
+    title: 'De unde vin datele',
+    lead: 'Fiecare cifră de pe site are o sursă publică. Aici vezi ce am preluat, pentru ce zile, când am citit sursa ultima dată și ce nu știm.',
+    tabSources: (count: string) => `Surse (${count})`,
+    tabMethod: 'Metodologie',
+    heldTitle: 'Surse preluate',
+    source: 'Sursa',
+    period: 'Perioada',
+    fetched: 'Preluat ultima dată',
+    rows: 'Ce avem',
+    limits: 'Limite cunoscute',
+    brings: {
+      'seap-direct': 'cumpărări sub pragul de licitație, cu furnizor și CUI',
+      'seap-awards': 'contracte atribuite prin proceduri de achiziție',
+    } as Record<string, string | undefined>,
+    limitsOf: {
+      'seap-direct': [
+        'fără linie bugetară',
+        'fără produsele cumpărate și condițiile de plată, încă',
+      ],
+      'seap-awards': [
+        'fără linie bugetară',
+        'numărul de oferte nu e publicat',
+        'contractele apar la săptămâni după semnare',
+      ],
+    } as Record<string, Array<string> | undefined>,
+    daysRead: (full: string, expected: number, expectedText: string) =>
+      `${full} din ${counted(expected, expectedText, 'o zi', 'zile')} citite complet`,
+    daysPartial: (n: number, text: string) =>
+      `${counted(n, text, 'o zi', 'zile')} citite parțial`,
+    daysMissing: (n: number, text: string) =>
+      `${counted(n, text, 'o zi', 'zile')} necitite`,
+    purchases: (n: number, text: string) =>
+      counted(n, text, 'o achiziție', 'achiziții'),
+    accepted: (count: string) => `${count} acceptate`,
+    notices: (n: number, text: string) =>
+      counted(n, text, 'un anunț', 'anunțuri'),
+    contractsHeld: (contracts: string, signed: string) =>
+      `${contracts}, din care ${signed} semnate în perioadă`,
+    frozen:
+      'Am preluat doar zilele din perioada arătată. Deocamdată nu preluăm alte zile.',
+    toComeTitle: 'Surse pe care nu le-am preluat încă',
+    toComeLead:
+      'Aceste surse sunt publice și intră în plan. Până le preluăm, cifrele care depind de ele apar pe site ca „Încă necolectat”.',
+    toCome: [
+      {
+        name: 'Execuția bugetară (Forexebug)',
+        brings: 'cât a cheltuit fiecare instituție, pe capitole de buget',
+      },
+      {
+        name: 'MDLPA · plăți Anghel Saligny',
+        brings: 'plăți către primării, cu constructorul și CUI-ul lui',
+      },
+      {
+        name: 'MIPE · fonduri europene',
+        brings: 'cât s-a plătit din fiecare program',
+      },
+      {
+        name: 'ANAF',
+        brings: 'județul și localitatea instituțiilor și firmelor',
+      },
+      {
+        name: 'TED',
+        brings: 'anunțurile publicate în Jurnalul Oficial al UE',
+      },
+    ],
+    reuseTitle: 'Cum poți folosi datele',
+    reuse:
+      'Datele pot fi refolosite sub licența CC BY 4.0, cu menționarea sursei. Fiecare rând exportat își păstrează sursa și data la care a fost preluat.',
+    exportContracts: 'Exportă contractele din perioadă (CSV)',
+  },
+
+  // How the figures are counted, in words. The rules live in the API.
+  method: {
+    title: 'Cum numărăm',
+    acceptedTitle: 'Doar achizițiile acceptate sunt bani cheltuiți',
+    accepted:
+      'O achiziție directă intră în totaluri doar dacă oferta a fost acceptată. Cele refuzate sau anulate apar în liste, dar nu se adună.',
+    limitTitle: 'Achiziții peste plafon',
+    limit: (limit: string) =>
+      `O achiziție acceptată publicată peste ${limit}, cel mai mare plafon legal pentru o achiziție directă, nu intră în totaluri și e arătată separat. Este ceea ce publică SEAP; nu spunem că e o greșeală.`,
+    noticeTitle: 'Un anunț nu este un contract',
+    notice:
+      'Un anunț de atribuire poate avea mai multe contracte, iar SEAP îl republică de fiecare dată când se adaugă unul. Numărăm contractele după data semnării, nu după ziua publicării anunțului.',
+    frameworkTitle: 'Acordurile-cadru nu se adună',
+    associationTitle: 'Asocieri',
+    association:
+      'La o firmă arătăm separat ce a câștigat singură și ce a câștigat în asociere și nu adunăm cele două cifre.',
+    apartTitle: 'Contracte și achiziții directe',
+    apart:
+      'Nu le adunăm niciodată. Au cifre separate, liste separate și clasamente separate.',
+    vatTitle: 'Sume fără TVA',
+    vat: 'Toate sumele sunt în lei, fără TVA, așa cum le publică SEAP.',
+    personalTitle: 'Date personale',
+    personal:
+      'O persoană fizică autorizată poate apărea în SEAP cu codul numeric personal. Îl ascundem înainte de a salva rândul: pe site apare ca [CNP].',
+    rawTitle: 'Păstrăm originalul',
+    raw: (n: number, text: string) =>
+      `Fiecare răspuns primit de la o sursă e păstrat neschimbat, cu amprenta lui, înainte de a fi citit. Până acum sunt ${counted(n, text, 'un răspuns', 'răspunsuri')}.`,
+    gapTitle: 'De ce nu se vede tot drumul banilor',
+    gap: 'Bugetul, contractele și plățile sunt publicate de sisteme diferite, care nu au un identificator comun. Contractele nu spun din ce linie de buget sunt plătite, iar plățile către firme nu sunt publicate, cu puține excepții. De aceea arătăm capetele pe care le putem citi și spunem ce lipsește între ele.',
   },
 
   search: {
