@@ -18,3 +18,18 @@ export function validateEntitySearch(
 export function cuiFromPath(text: string) {
   return /^\d{1,10}$/.test(text) ? Number(text) : null
 }
+
+// Search params of a page whose list is paged and nothing else.
+export type PageSearch = { pagina?: number }
+
+export function validatePageSearch(
+  search: Record<string, unknown>,
+): PageSearch {
+  return { pagina: validateEntitySearch(search).pagina }
+}
+
+// SEAP's own id in an address like /contracte/100660503. Only the shape is checked; the
+// API knows which records exist.
+export function idFromPath(text: string) {
+  return /^\d{1,12}$/.test(text) ? Number(text) : null
+}

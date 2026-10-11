@@ -158,4 +158,94 @@ export const ro = {
         n === 1 ? 'Nu este inclusă' : 'Nu sunt incluse'
       } în total: ${value}. Tipar observat, nu o acuzație.`,
   },
+
+  // The two reasons a value is missing, never mixed (DataState in the design system).
+  dataState: {
+    notPublished: 'Nepublicat',
+    notCollected: 'Încă necolectat',
+    explain:
+      '{notPublished} înseamnă că sursa nu dă informația. {notCollected} înseamnă că sursa există, dar nu am preluat-o încă.',
+  },
+
+  notice: {
+    fallbackTitle: 'Anunț de atribuire',
+    kind: 'Anunț de atribuire',
+    typeAndCpv: (type: string, cpv: string) => `${type} · CPV ${cpv}`,
+    contractsBadge: (n: number, text: string) =>
+      counted(n, text, 'un contract', 'contracte'),
+    buyer: 'Autoritate contractantă',
+    published: 'Publicat',
+    firstPublished: 'Publicat prima dată',
+    lastPublished: 'Republicat ultima dată',
+    latestVersion:
+      'SEAP republică anunțul când se adaugă sau se modifică un contract; arătăm ultima versiune',
+    contractsIn: 'Contracte în anunț',
+    ordinary: (n: number, text: string) =>
+      counted(n, text, 'un contract obișnuit', 'contracte obișnuite'),
+    frameworks: (n: number, text: string) =>
+      counted(n, text, 'un acord-cadru', 'acorduri-cadru'),
+    subsequent: (n: number, text: string) =>
+      counted(n, text, 'un contract subsecvent', 'contracte subsecvente'),
+    contractsBreakdown: (total: string, parts: string) => `${total} · ${parts}`,
+    offers: 'Oferte primite',
+    financing: 'Finanțare',
+    contractsTitle: 'Contractele din anunț',
+    total: 'Total atribuit {value} · contracte obișnuite și subsecvente',
+    contract: 'Contract',
+    winner: 'Câștigător',
+    value: 'Valoare fără TVA',
+    date: 'Data',
+    contractNo: (number: string) => `Contract ${number}`,
+    kinds: {
+      1: 'contract obișnuit',
+      2: 'acord-cadru',
+      3: 'contract subsecvent acordului-cadru',
+    } as Record<number, string | undefined>,
+    ceiling: 'Acord-cadru · plafon · nu intră în total',
+    association: (members: string) => `Asociere · ${members} membri`,
+    moreMembers: (n: number, text: string) =>
+      plural(n, {
+        one: '+ încă un membru',
+        few: `+ încă ${text} membri`,
+        other: `+ încă ${text} de membri`,
+      }),
+    empty:
+      'SEAP nu listează niciun contract pentru acest anunț. De obicei, procedura a fost anulată.',
+    whyTitle: 'De ce totalul nu e suma rândurilor.',
+    whyFramework:
+      'Un acord-cadru arată doar plafonul maxim, nu bani cheltuiți; banii apar în contractele subsecvente, pe care le numărăm.',
+    whyAssociation:
+      'Când câștigă o asociere, SEAP dă o singură valoare pentru tot contractul și nu spune care membru e lider. Arătăm valoarea o dată, pe rândul contractului, cu membrii în ordinea din SEAP.',
+    notPublicTitle: 'Ce nu este public',
+    notPublic: [
+      'Contractele și actele adiționale',
+      'Numărul de oferte primite',
+      'Ordinele de plată',
+      'Lista subcontractorilor',
+      'Procesele-verbale de recepție',
+    ],
+  },
+
+  purchase: {
+    fallbackTitle: 'Achiziție directă',
+    kind: 'Achiziție directă',
+    buyer: 'Cumpărător',
+    supplier: 'Furnizor',
+    value: 'Valoare',
+    valueWithoutVat: (amount: string) => `${amount} fără TVA`,
+    state: 'Stare',
+    date: 'Data achiziției',
+    payment: 'Condiții de plată',
+    delivery: 'Livrare',
+    notAccepted: 'Neacceptată · nu intră în total',
+    aboveLimit: 'Peste plafon · nu intră în total',
+    bought: 'Ce s-a cumpărat',
+    boughtNotCollected:
+      'Produsele și serviciile din această achiziție, cu cantități și prețuri, sunt publicate în SEAP. Nu le-am preluat încă.',
+    whatTitle: 'Ce e o achiziție directă.',
+    what: 'O cumpărare mică, fără licitație, făcută din catalogul SEAP, sub pragul legal pentru tipul ei de contract. Nu există oferte concurente de comparat.',
+    samePair: 'Același furnizor, același cumpărător',
+    samePairFigure: (n: number, text: string, value: string, days: string) =>
+      `${counted(n, text, 'o achiziție directă acceptată', 'achiziții directe acceptate')} · ${value} · ${days}`,
+  },
 }
