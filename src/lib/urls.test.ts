@@ -1,15 +1,21 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  contractsCsvPath,
+  csvFilterFromSearch,
   cuiFromPath,
+  entityList,
+  entityListSearch,
   idFromPath,
   validateEntitySearch,
   validatePageSearch,
+  validateRankingSearch,
 } from '#/lib/urls'
 
 describe('validateEntitySearch', () => {
   it('keeps a page number and the value order', () => {
     expect(validateEntitySearch({ pagina: 3, ordine: 'valoare' })).toEqual({
+      lista: undefined,
       pagina: 3,
       ordine: 'valoare',
     })
@@ -83,5 +89,85 @@ describe('idFromPath', () => {
     for (const text of ['', 'abc', '12a', '-5', '1.5', '1234567890123']) {
       expect(idFromPath(text)).toBeNull()
     }
+  })
+})
+
+describe('the list of an entity page', () => {
+  it('keeps a list named in the address and drops anything else', () => {
+    expect(validateEntitySearch({ lista: 'achizitii' }).lista).toBe('achizitii')
+    expect(validateEntitySearch({ lista: 'contracte' }).lista).toBe('contracte')
+    expect(validateEntitySearch({ lista: 'plati' }).lista).toBeUndefined()
+  })
+
+  it('opens on contracts when there are any, else on direct purchases', () => {
+    expect(entityList({}, true)).toBe('contracte')
+    expect(entityList({}, false)).toBe('achizitii')
+  })
+
+  it('shows the list the address names, whatever the entity has', () => {
+    expect(entityList({ lista: 'achizitii' }, true)).toBe('achizitii')
+    expect(entityList({ lista: 'contracte' }, false)).toBe('contracte')
+  })
+
+  it('leaves the default list out of the address', () => {
+    expect(entityListSearch('contracte', true)).toEqual({ lista: undefined })
+    expect(entityListSearch('achizitii', true)).toEqual({ lista: 'achizitii' })
+    expect(entityListSearch('achizitii', false)).toEqual({ lista: undefined })
+    expect(entityListSearch('contracte', false)).toEqual({ lista: 'contracte' })
+  })
+})
+
+describe('validateRankingSearch', () => {
+  it('keeps the plain address for the largest contracts', () => {
+    expect(validateRankingSearch({})).toEqual({})
+    expect(validateRankingSearch({ clasament: 'contracte' })).toEqual({})
+    expect(validateRankingSearch({ clasament: 'tipare' })).toEqual({})
+  })
+
+  it('keeps a ranking that exists', () => {
+    expect(validateRankingSearch({ clasament: 'achizitii' }).clasament).toBe(
+      'achizitii',
+    )
+  })
+
+  it('reads how contracts were won only for the ranking of winners', () => {
+    expect(
+      validateRankingSearch({ clasament: 'furnizori', castigate: 'asociere' }),
+    ).toEqual({ clasament: 'furnizori', castigate: 'asociere' })
+    expect(
+      validateRankingSearch({ clasament: 'institutii', castigate: 'asociere' })
+        .castigate,
+    ).toBeUndefined()
+    expect(
+      validateRankingSearch({ clasament: 'furnizori', castigate: 'singur' })
+        .castigate,
+    ).toBeUndefined()
+  })
+})
+
+describe('the address of a CSV file', () => {
+  const read = (query: string) =>
+    csvFilterFromSearch(new URLSearchParams(query))
+
+  it('names the institution or the company whose contracts it holds', () => {
+    expect(contractsCsvPath({ buyer: 4981310 })).toBe(
+      '/contracte.csv?institutie=4981310',
+    )
+    expect(contractsCsvPath({ supplier: 17886786 })).toBe(
+      '/contracte.csv?furnizor=17886786',
+    )
+    expect(contractsCsvPath({})).toBe('/contracte.csv')
+  })
+
+  it('is read back into the same filter', () => {
+    expect(read('institutie=4981310')).toEqual({ buyer: 4981310 })
+    expect(read('furnizor=17886786')).toEqual({ supplier: 17886786 })
+    expect(read('')).toEqual({})
+  })
+
+  it('refuses anything that is not one CUI', () => {
+    expect(read('institutie=abc')).toBeNull()
+    expect(read('furnizor=1;drop')).toBeNull()
+    expect(read('institutie=4981310&furnizor=17886786')).toBeNull()
   })
 })

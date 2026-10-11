@@ -1,23 +1,48 @@
-import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import { Card, Container, Flex, Grid, Heading, Text } from '@radix-ui/themes'
+import { Container, Flex, Heading, Tabs, Text } from '@radix-ui/themes'
 
-import { BarList } from '#/components/BarList'
-import { PeriodNote, Unavailable } from '#/components/Notes'
-import { SourceLine } from '#/components/SourceLine'
+import {
+  ContractRanking,
+  DirectRankings,
+  LargestContracts,
+} from '#/components/Rankings'
 import { messagesFor } from '#/i18n'
 import { useI18n } from '#/i18n/context'
-import type { Role } from '#/lib/api'
 import { pageTitle } from '#/lib/copy'
-import { rankingQuery, statsQuery } from '#/lib/queries'
+import {
+  contractRankingQuery,
+  largestContractsQuery,
+  rankingQuery,
+  statsQuery,
+} from '#/lib/queries'
+import { RANKINGS, validateRankingSearch } from '#/lib/urls'
+import type { RankingTab } from '#/lib/urls'
 
 export const Route = createFileRoute('/clasamente')({
-  loader: ({ context }) =>
-    Promise.all([
-      context.queryClient.ensureQueryData(statsQuery),
-      context.queryClient.ensureQueryData(rankingQuery('suppliers')),
-      context.queryClient.ensureQueryData(rankingQuery('institutions')),
-    ]),
+  validateSearch: validateRankingSearch,
+  loaderDeps: ({ search }) => search,
+  // Only the ranking the address asks for is read.
+  loader: ({ context: { queryClient }, deps }) => {
+    switch (deps.clasament) {
+      case 'furnizori':
+        return queryClient.ensureQueryData(
+          contractRankingQuery(
+            'suppliers',
+            deps.castigate === 'asociere' ? 'association' : 'alone',
+          ),
+        )
+      case 'institutii':
+        return queryClient.ensureQueryData(contractRankingQuery('institutions'))
+      case 'achizitii':
+        return Promise.all([
+          queryClient.ensureQueryData(statsQuery),
+          queryClient.ensureQueryData(rankingQuery('suppliers')),
+          queryClient.ensureQueryData(rankingQuery('institutions')),
+        ])
+      default:
+        return queryClient.ensureQueryData(largestContractsQuery)
+    }
+  },
   head: ({ match }) => ({
     meta: [
       { title: pageTitle(messagesFor(match.context.locale).rankings.title) },
@@ -27,8 +52,10 @@ export const Route = createFileRoute('/clasamente')({
 })
 
 function Rankings() {
-  const { data: stats } = useSuspenseQuery(statsQuery)
   const { t } = useI18n()
+  const search = Route.useSearch()
+  const navigate = Route.useNavigate()
+  const tab = search.clasament ?? 'contracte'
 
   return (
     <Container size="4" px="5" py="7">
@@ -38,33 +65,45 @@ function Rankings() {
           <Text size="2" color="gray">
             {t.rankings.intro}
           </Text>
-          {stats ? <PeriodNote summary={stats.direct_purchases} /> : null}
         </Flex>
-        <Grid columns={{ initial: '1', md: '2' }} gap="5">
-          <Ranking role="suppliers" title={t.rankings.suppliers} />
-          <Ranking role="institutions" title={t.rankings.institutions} />
-        </Grid>
+
+        <Tabs.Root
+          value={tab}
+          onValueChange={(value) =>
+            void navigate({
+              search: { clasament: value as RankingTab },
+              resetScroll: false,
+            })
+          }
+        >
+          <Tabs.List>
+            {RANKINGS.map((name) => (
+              <Tabs.Trigger key={name} value={name}>
+                {t.rankings.tabs[name]}
+              </Tabs.Trigger>
+            ))}
+          </Tabs.List>
+        </Tabs.Root>
+
+        {tab === 'contracte' ? <LargestContracts /> : null}
+        {tab === 'furnizori' ? (
+          <ContractRanking
+            role="suppliers"
+            won={search.castigate === 'asociere' ? 'association' : 'alone'}
+            onWon={(won) =>
+              void navigate({
+                search: {
+                  clasament: 'furnizori',
+                  castigate: won === 'association' ? 'asociere' : undefined,
+                },
+                resetScroll: false,
+              })
+            }
+          />
+        ) : null}
+        {tab === 'achizitii' ? <DirectRankings /> : null}
+        {tab === 'institutii' ? <ContractRanking role="institutions" /> : null}
       </Flex>
     </Container>
-  )
-}
-
-function Ranking({ role, title }: { role: Role; title: string }) {
-  const { data } = useSuspenseQuery(rankingQuery(role))
-
-  return (
-    <Flex direction="column" gap="3">
-      <Heading size="4">{title}</Heading>
-      {data && data.items.length > 0 ? (
-        <>
-          <Card>
-            <BarList rows={data.items} role={role} numbered />
-          </Card>
-          <SourceLine source={data.source} />
-        </>
-      ) : (
-        <Unavailable />
-      )}
-    </Flex>
   )
 }

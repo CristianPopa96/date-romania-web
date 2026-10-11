@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { formatFor } from '#/lib/format'
 
-const { count, day, lei, leiShort, period } = formatFor('ro')
+const { count, day, lei, leiShort, period, span } = formatFor('ro')
 
 describe('count and lei', () => {
   it('groups thousands with a dot', () => {
@@ -63,5 +63,26 @@ describe('period', () => {
   it('is null when a day is missing, so the page can say "Nepublicat"', () => {
     expect(period(null, '2026-10-06')).toBeNull()
     expect(period('2026-10-06', null)).toBeNull()
+  })
+})
+
+describe('span', () => {
+  it('drops the year of the first day when it is the year of the last', () => {
+    expect(span('2026-09-01', '2026-10-10')).toEqual({
+      from: '01.09',
+      to: '10.10.2026',
+    })
+  })
+
+  it('keeps both years when the period crosses a new year', () => {
+    expect(span('2025-12-20', '2026-01-05')).toEqual({
+      from: '20.12.2025',
+      to: '05.01.2026',
+    })
+  })
+
+  it('is nothing until both ends are known', () => {
+    expect(span(null, '2026-10-10')).toBeNull()
+    expect(span('2026-09-01', null)).toBeNull()
   })
 })

@@ -4,6 +4,7 @@ import { Callout, Text } from '@radix-ui/themes'
 import { useI18n } from '#/i18n/context'
 import { DIRECT_PURCHASE_LIMIT } from '#/lib/api'
 import type { Summary } from '#/lib/api'
+import type { Period } from '#/lib/api-contracts'
 
 // We hold only the days collected so far, so every total says which days it covers.
 export function PeriodNote({ summary }: { summary: Summary }) {
@@ -46,6 +47,25 @@ export function Unavailable() {
         <InfoCircledIcon />
       </Callout.Icon>
       <Callout.Text>{t.common.unavailable}</Callout.Text>
+    </Callout.Root>
+  )
+}
+
+// Said once on every page that adds contracts up: the list behind the figures is not
+// complete, and why (the callout half of PeriodNote in the design system).
+export function IncompleteContracts({ period }: { period: Period | null }) {
+  const { t, f } = useI18n()
+  const days = period && f.span(period.first_day, period.last_day)
+  if (!days) return null
+  return (
+    <Callout.Root color="gray" variant="surface" size="1">
+      <Callout.Icon>
+        <InfoCircledIcon />
+      </Callout.Icon>
+      <Callout.Text>
+        <Text weight="bold">{t.period.incompleteTitle}</Text>{' '}
+        {t.period.incomplete(days.from, days.to)}
+      </Callout.Text>
     </Callout.Root>
   )
 }

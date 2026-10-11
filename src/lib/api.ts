@@ -22,6 +22,17 @@ export async function getJson<T>(path: string, params: Params = {}) {
   return (await response.json()) as T
 }
 
+// A file the API writes (a CSV export), passed on as text.
+export async function getText(path: string, params: Params = {}) {
+  const url = apiUrl(path)
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined) url.searchParams.set(key, String(value))
+  }
+  const response = await fetch(url)
+  if (!response.ok) throw new Error(`API ${response.status} for ${path}`)
+  return response.text()
+}
+
 export type ApiHealth = { status: string; database: string; version: string }
 
 export type Source = {

@@ -50,8 +50,28 @@ function build(locale: Locale) {
 
   // Accepts a day ("2026-10-06") or a full timestamp; the day shown is the Romanian one.
   function day(value: string) {
-    const date = new Date(value.length === 10 ? `${value}T12:00:00Z` : value)
-    return dayFormat.format(date)
+    return dayFormat.format(instant(value))
+  }
+
+  const dayOfYearFormat = new Intl.DateTimeFormat(tag, {
+    timeZone: 'Europe/Bucharest',
+    day: '2-digit',
+    month: '2-digit',
+  })
+
+  function instant(value: string) {
+    return new Date(value.length === 10 ? `${value}T12:00:00Z` : value)
+  }
+
+  // The two ends of a period, for "01.09–10.10.2026" and "între 01.09 și 10.10.2026":
+  // the first day drops its year when it is the year of the last.
+  function span(first: string | null, last: string | null) {
+    if (!first || !last) return null
+    const sameYear = first.slice(0, 4) === last.slice(0, 4)
+    return {
+      from: sameYear ? dayOfYearFormat.format(instant(first)) : day(first),
+      to: day(last),
+    }
   }
 
   const listFormat = new Intl.ListFormat(tag, { type: 'conjunction' })
@@ -66,5 +86,5 @@ function build(locale: Locale) {
     return first === last ? day(first) : `${day(first)} – ${day(last)}`
   }
 
-  return { count, lei, leiShort, day, period, list }
+  return { count, lei, leiShort, day, period, span, list }
 }

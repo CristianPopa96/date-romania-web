@@ -1,8 +1,9 @@
 import { expect, test } from '@playwright/test'
 
 // Smoke tests: each page opens in a real browser and shows the figures the API gave.
-// The data is the handful of purchases in e2e/stub/answers.json: one town hall, one
-// hospital, two suppliers, one refused offer and one purchase above the legal limit.
+// The data is the handful of records in e2e/stub/answers.json: one town hall, one
+// hospital, two suppliers, one refused offer, one purchase above the legal limit, and
+// three award notices with five contracts between them.
 
 const TOWN_HALL = 'Comuna Țânțăreni (Primăria Țânțăreni)'
 
@@ -46,8 +47,65 @@ test('a search with no result says where we looked', async ({ page }) => {
   await expect(page.getByText('Niciun rezultat pentru „zzzz”')).toBeVisible()
 })
 
-test('an institution page counts only accepted purchases', async ({ page }) => {
+test('an institution page keeps contracts and direct purchases apart', async ({
+  page,
+}) => {
   await page.goto('/institutii/4981310')
+
+  const main = page.getByRole('main')
+  // Two figures, never added. The contract figure says its list is incomplete.
+  await expect(main.getByText('6,3 mil. lei')).toHaveCount(2)
+  await expect(
+    main.getByText('2 contracte · semnate 05.10–07.10.2026 · listă incompletă'),
+  ).toHaveCount(2)
+  await expect(
+    main.getByText('3 achiziții · 05.10–07.10.2026 · completă'),
+  ).toBeVisible()
+  await expect(main.getByText('Lista contractelor nu e completă.')).toHaveCount(
+    1,
+  )
+  await expect(
+    main.getByText('Numărăm contractele semnate între 05.10 și 07.10.2026.'),
+  ).toBeVisible()
+  // Budget execution and named payments are published, and not collected yet.
+  await expect(main.getByText('Încă necolectat', { exact: true })).toHaveCount(
+    2,
+  )
+  await expect(
+    main.getByText('Sursa contractelor: SEAP · preluat 07.10.2026'),
+  ).toBeVisible()
+  await expect(
+    main.getByText('Sursa achizițiilor directe: SEAP · preluat 07.10.2026'),
+  ).toBeVisible()
+
+  // It opens on its contracts; the framework agreement of the notice is not among them.
+  await expect(main.getByRole('tab', { name: /Contracte/ })).toHaveAttribute(
+    'aria-selected',
+    'true',
+  )
+  await expect(main.getByRole('row')).toHaveCount(3)
+  const together = main.getByRole('row').filter({ hasText: 'Contract 101' })
+  await expect(together).toContainText('Asociere · 2 membri')
+  await expect(together).toContainText('6.120.000 lei')
+  await expect(together).toContainText('Procedura simplificata')
+  await expect(
+    together.getByRole('link', { name: 'Contract 101' }),
+  ).toHaveAttribute('href', '/contracte/9001')
+  await expect(main.getByRole('link', { name: 'Exportă CSV' })).toHaveAttribute(
+    'href',
+    '/contracte.csv?institutie=4981310',
+  )
+  await expect(page.getByRole('button', { name: /Cere/ })).toHaveCount(0)
+
+  await main.getByRole('tab', { name: /Achiziții directe/ }).click()
+  await expect(page).toHaveURL(/\/institutii\/4981310\?lista=achizitii$/)
+  await expect(
+    main.getByRole('heading', { name: 'Achiziții directe (4)' }),
+  ).toBeVisible()
+})
+
+test('an institution page counts only accepted purchases', async ({ page }) => {
+  await page.goto('/institutii/4981310?lista=achizitii')
 
   await expect(page).toHaveTitle(`${TOWN_HALL} · Date România`)
   const main = page.getByRole('main')
@@ -68,10 +126,12 @@ test('an institution page counts only accepted purchases', async ({ page }) => {
 })
 
 test('sorting by value keeps the choice in the address', async ({ page }) => {
-  await page.goto('/institutii/4981310')
+  await page.goto('/institutii/4981310?lista=achizitii')
   await page.getByRole('radio', { name: 'Cele mai mari acceptate' }).click()
 
-  await expect(page).toHaveURL(/\/institutii\/4981310\?ordine=valoare$/)
+  await expect(page).toHaveURL(
+    /\/institutii\/4981310\?lista=achizitii&ordine=valoare$/,
+  )
   const main = page.getByRole('main')
   await expect(
     main.getByRole('heading', { name: 'Achiziții directe acceptate (3)' }),
@@ -83,7 +143,7 @@ test('sorting by value keeps the choice in the address', async ({ page }) => {
 test('a supplier page keeps the purchase above the limit out of the total', async ({
   page,
 }) => {
-  await page.goto('/furnizori/17886786')
+  await page.goto('/furnizori/17886786?lista=achizitii')
 
   const main = page.getByRole('main')
   await expect(
@@ -97,9 +157,43 @@ test('a supplier page keeps the purchase above the limit out of the total', asyn
   ).toHaveAttribute('href', '/institutii/4491342')
 })
 
-test('the rankings list suppliers and institutions by accepted value', async ({
+test('a supplier page never adds what was won alone to what was won together', async ({
   page,
 }) => {
+  await page.goto('/furnizori/17886786')
+
+  const main = page.getByRole('main')
+  await expect(main.getByText('Câștigate singur')).toBeVisible()
+  await expect(main.getByText('210.000 lei').first()).toBeVisible()
+  await expect(
+    main.getByText('un contract · semnate 05.10–07.10.2026 · listă incompletă'),
+  ).toHaveCount(2)
+  await expect(main.getByText('Câștigate în asociere')).toBeVisible()
+  await expect(main.getByText('6,1 mil. lei')).toBeVisible()
+  await expect(
+    main.getByText('valoarea întreagă a contractelor, nedivizată între membri'),
+  ).toBeVisible()
+  await expect(main.getByText('Achiziții directe acceptate')).toBeVisible()
+  // No sum of the two, and no gap panel: that one is about an institution's budget.
+  await expect(main.getByText('6,3 mil. lei')).toHaveCount(0)
+  await expect(main.getByText('Încă necolectat')).toHaveCount(0)
+
+  const alone = main.getByRole('row').filter({ hasText: 'Contract 103' })
+  await expect(alone).toContainText('singur')
+  await expect(alone.getByRole('link', { name: TOWN_HALL })).toHaveAttribute(
+    'href',
+    '/institutii/4981310',
+  )
+  const together = main.getByRole('row').filter({ hasText: 'Contract 101' })
+  await expect(together).toContainText('Asociere · 2 membri')
+  await expect(main).not.toContainText('lider')
+  await expect(main.getByRole('link', { name: 'Exportă CSV' })).toHaveAttribute(
+    'href',
+    '/contracte.csv?furnizor=17886786',
+  )
+})
+
+test('the rankings open on the largest contracts', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('link', { name: 'Vezi clasamentele' }).click()
 
@@ -109,14 +203,75 @@ test('the rankings list suppliers and institutions by accepted value', async ({
   await expect(
     main.getByText('nu spune nimic despre corectitudinea achizițiilor'),
   ).toBeVisible()
+  await expect(
+    main.getByText('Lista contractelor nu e completă.'),
+  ).toBeVisible()
+  // Largest first, with the buyer and every winner; the framework agreement is not listed.
+  const first = main.getByRole('row').nth(1)
+  await expect(first).toContainText('Contract 101')
+  await expect(first).toContainText('6.120.000 lei')
+  await expect(first).toContainText(TOWN_HALL)
+  await expect(first).toContainText('ALFA CONSTRUCT S.R.L., Beta Birotică SRL')
+  await expect(main.getByRole('row')).toHaveCount(4)
+  await expect(main.getByText('Contract 102')).toHaveCount(0)
+  await expect(main.getByRole('tab', { name: 'Tipare' })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: /Cere/ })).toHaveCount(0)
+})
+
+test('winners are ranked by what they won alone or in associations', async ({
+  page,
+}) => {
+  await page.goto('/clasamente')
+  const main = page.getByRole('main')
+  await main.getByRole('tab', { name: 'Furnizori' }).click()
+
+  await expect(page).toHaveURL(/\/clasamente\?clasament=furnizori$/)
+  await expect(main.getByText('1. ALFA CONSTRUCT S.R.L.')).toBeVisible()
+  await expect(main.getByText('210.000 lei')).toBeVisible()
+  await expect(main.getByText('Beta Birotică SRL')).toHaveCount(0)
+
+  await main.getByRole('radio', { name: 'În asociere' }).click()
+  await expect(page).toHaveURL(
+    /\/clasamente\?clasament=furnizori&castigate=asociere$/,
+  )
+  // Every member carries the whole value of the contract, and the page says so.
+  await expect(
+    main.getByText(
+      'Un contract câștigat în asociere apare la fiecare membru, cu valoarea întreagă.',
+    ),
+  ).toBeVisible()
+  await expect(main.getByText('2. Beta Birotică SRL')).toBeVisible()
+  await expect(main.getByText('6.120.000 lei')).toHaveCount(2)
+})
+
+test('direct purchases and institutions have rankings of their own', async ({
+  page,
+}) => {
+  await page.goto('/clasamente?clasament=achizitii')
+  const main = page.getByRole('main')
+  await expect(
+    main.getByText('După valoarea achizițiilor directe acceptate.'),
+  ).toBeVisible()
   await expect(main.getByText('1. ALFA CONSTRUCT S.R.L.')).toBeVisible()
   await expect(main.getByText(`1. ${TOWN_HALL}`)).toBeVisible()
+  // No contract figure here, so no note about the list of contracts.
+  await expect(main.getByText('Lista contractelor nu e completă.')).toHaveCount(
+    0,
+  )
+
+  await main.getByRole('tab', { name: 'Instituții' }).click()
+  await expect(page).toHaveURL(/\/clasamente\?clasament=institutii$/)
+  await expect(main.getByText(`1. ${TOWN_HALL}`)).toBeVisible()
+  await expect(main.getByText('6.330.000 lei')).toBeVisible()
+  await expect(
+    main.getByText('2. SPITALUL JUDETEAN DE URGENTA CLUJ'),
+  ).toBeVisible()
 })
 
 test('a purchase opens its own page, with what is not collected marked as such', async ({
   page,
 }) => {
-  await page.goto('/institutii/4981310')
+  await page.goto('/institutii/4981310?lista=achizitii')
   await page.getByRole('link', { name: 'Purchase 4' }).click()
 
   await expect(page).toHaveURL(/\/achizitii-directe\/4$/)
