@@ -1,6 +1,8 @@
-import { createFileRoute, notFound } from '@tanstack/react-router'
+import { createFileRoute, notFound, redirect } from '@tanstack/react-router'
 
 import { NoticeView } from '#/components/NoticeView'
+import { NOTICE_PAGE_SIZE } from '#/lib/api-contracts'
+import { pageCount } from '#/lib/contracts'
 import { messagesFor } from '#/i18n'
 import { pageTitle } from '#/lib/copy'
 import { noticeContractsQuery, noticeQuery } from '#/lib/queries'
@@ -15,9 +17,19 @@ export const Route = createFileRoute('/contracte/$id')({
     if (id === null) throw notFound()
     const notice = await context.queryClient.ensureQueryData(noticeQuery(id))
     if (!notice) throw notFound()
-    await context.queryClient.ensureQueryData(
-      noticeContractsQuery(id, deps.pagina ?? 1),
+    const page = deps.pagina ?? 1
+    const contracts = await context.queryClient.ensureQueryData(
+      noticeContractsQuery(id, page),
     )
+    // A page past the end of the list goes to the last one that has rows.
+    const last = pageCount(contracts.total, NOTICE_PAGE_SIZE)
+    if (page > last) {
+      throw redirect({
+        to: '/contracte/$id',
+        params,
+        search: { pagina: last > 1 ? last : undefined },
+      })
+    }
     return { title: notice.title }
   },
   head: ({ loaderData, match }) => ({

@@ -177,6 +177,7 @@ export const ro = {
     published: 'Publicat',
     firstPublished: 'Publicat prima dată',
     lastPublished: 'Republicat ultima dată',
+    heldVersion: 'versiunea pe care o avem',
     latestVersion:
       'SEAP republică anunțul când se adaugă sau se modifică un contract; arătăm ultima versiune',
     contractsIn: 'Contracte în anunț',
@@ -202,6 +203,9 @@ export const ro = {
       3: 'contract subsecvent acordului-cadru',
     } as Record<number, string | undefined>,
     ceiling: 'Acord-cadru · plafon · nu intră în total',
+    notCounted: 'Nu intră în total',
+    foreign: (amount: string, currency: string) => `${amount} ${currency}`,
+    noLei: 'SEAP nu dă valoarea în lei',
     association: (members: string) => `Asociere · ${members} membri`,
     moreMembers: (n: number, text: string) =>
       plural(n, {

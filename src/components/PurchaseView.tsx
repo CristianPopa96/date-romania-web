@@ -42,8 +42,12 @@ export function PurchaseView({ id }: { id: number }) {
             ) : (
               purchase.buyer_text
             )}
-            {' / '}
-            <Code variant="ghost">{purchase.code}</Code>
+            {(purchase.buyer || purchase.buyer_text) && purchase.code
+              ? ' / '
+              : null}
+            {purchase.code ? (
+              <Code variant="ghost">{purchase.code}</Code>
+            ) : null}
           </Text>
           <Flex gap="2" wrap="wrap">
             <Badge color="gray">{t.purchase.kind}</Badge>

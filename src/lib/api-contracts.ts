@@ -62,7 +62,11 @@ export type Contract = {
   // False for a framework agreement: a ceiling, never added to a total.
   counted: boolean
   lots: string | null
+  // In lei. Null when SEAP gives no value in lei, even if it gives one below.
   value: number | null
+  // The value as the contract states it, in `currency` ("RON", "EUR").
+  original_value: number | null
+  currency: string | null
   buyer: EntityRef | null
   buyer_text: string | null
   procedure_type: string | null

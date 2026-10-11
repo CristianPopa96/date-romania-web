@@ -21,6 +21,29 @@ export function foldWinners(winners: Array<Winner>, open: boolean) {
   }
 }
 
+// The amount a contract row shows. SEAP gives some contracts no value in lei, only the
+// value the contract states; that one is published, so it is shown, in its own currency.
+//   null                       no value published at all
+//   { currency: null }         lei
+//   { currency: 'EUR' }        another currency, with no lei value from SEAP
+export function shownValue(contract: Contract) {
+  if (contract.value !== null) {
+    return { amount: contract.value, currency: null }
+  }
+  if (contract.original_value === null || contract.currency === null) {
+    return null
+  }
+  return {
+    amount: contract.original_value,
+    currency: contract.currency === 'RON' ? null : contract.currency,
+  }
+}
+
+// How many pages a list of `total` rows has; a list with no rows still has one.
+export function pageCount(total: number, size: number) {
+  return Math.max(Math.ceil(total / size), 1)
+}
+
 // What the page can say about when a notice was published.
 //   'unknown'  the versions are not collected yet: we know only the copy we hold
 //   'once'     SEAP lists one publication

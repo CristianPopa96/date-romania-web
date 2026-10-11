@@ -5,7 +5,9 @@ import {
   financing,
   foldWinners,
   isAssociation,
+  pageCount,
   publication,
+  shownValue,
 } from '#/lib/contracts'
 
 const winner = (name: string): Winner => ({
@@ -61,6 +63,41 @@ describe('publication', () => {
   it('tells one publication from a republished notice', () => {
     expect(publication(notice({ versions: 1 }))).toBe('once')
     expect(publication(notice({ versions: 15 }))).toBe('again')
+  })
+})
+
+describe('shownValue', () => {
+  const contract = (over: Partial<Contract>) =>
+    ({ value: null, original_value: null, currency: null, ...over }) as Contract
+
+  it('shows the value in lei when SEAP gives one', () => {
+    expect(
+      shownValue(
+        contract({ value: 500, original_value: 100, currency: 'EUR' }),
+      ),
+    ).toEqual({ amount: 500, currency: null })
+  })
+
+  it('falls back to the value the contract states, in its currency', () => {
+    expect(
+      shownValue(contract({ original_value: 100, currency: 'EUR' })),
+    ).toEqual({ amount: 100, currency: 'EUR' })
+    expect(
+      shownValue(contract({ original_value: 100, currency: 'RON' })),
+    ).toEqual({ amount: 100, currency: null })
+  })
+
+  it('says nothing when no value is published', () => {
+    expect(shownValue(contract({}))).toBeNull()
+    expect(shownValue(contract({ original_value: 100 }))).toBeNull()
+  })
+})
+
+describe('pageCount', () => {
+  it('counts whole pages, and one for an empty list', () => {
+    expect(pageCount(0, 50)).toBe(1)
+    expect(pageCount(50, 50)).toBe(1)
+    expect(pageCount(51, 50)).toBe(2)
   })
 })
 

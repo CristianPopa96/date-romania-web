@@ -208,6 +208,16 @@ test('a notice not yet read in detail, and one without contracts, say so', async
     3,
   )
   await expect(main.getByText('ATU1 Lab GmbH')).toBeVisible()
+  // With no versions read, the page does not claim the notice was republished.
+  await expect(main.getByText('Republicat ultima dată')).toHaveCount(0)
+  await expect(
+    main.getByText('07.10.2026 · versiunea pe care o avem'),
+  ).toBeVisible()
+
+  // A page past the end of the list lands on the last page that has rows.
+  await page.goto('/contracte/9002?pagina=7')
+  await expect(page).toHaveURL(/\/contracte\/9002$/)
+  await expect(main.getByText('ATU1 Lab GmbH')).toBeVisible()
 
   await page.goto('/contracte/9003')
   await expect(
