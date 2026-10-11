@@ -2,7 +2,7 @@ import { queryOptions } from '@tanstack/react-query'
 import type { QueryClient } from '@tanstack/react-query'
 
 import {
-  getApiHealth,
+  getDatasets,
   getEntityPage,
   getPurchases,
   getRanking,
@@ -24,9 +24,9 @@ import { contractCount } from '#/lib/contracts'
 import { entityList } from '#/lib/urls'
 import type { EntitySearch } from '#/lib/urls'
 
-export const healthQuery = queryOptions({
-  queryKey: ['health'],
-  queryFn: () => getApiHealth(),
+export const datasetsQuery = queryOptions({
+  queryKey: ['datasets'],
+  queryFn: () => getDatasets(),
 })
 
 export const statsQuery = queryOptions({

@@ -9,11 +9,13 @@ export function UrlTabs<TTab extends string>({
   value,
   tabs,
   onChange,
+  gap = '5',
   children,
 }: {
   value: TTab
   tabs: Array<{ value: TTab; label: ReactNode }>
   onChange: (value: TTab) => void
+  gap?: '3' | '5'
   children: ReactNode
 }) {
   return (
@@ -32,7 +34,7 @@ export function UrlTabs<TTab extends string>({
       {tabs.map((tab) => (
         <Tabs.Content key={tab.value} value={tab.value}>
           {tab.value === value ? (
-            <Flex direction="column" gap="5" pt="5">
+            <Flex direction="column" gap={gap} pt={gap}>
               {children}
             </Flex>
           ) : null}

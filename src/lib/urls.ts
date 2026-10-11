@@ -115,3 +115,29 @@ export function csvFilterFromSearch(params: URLSearchParams): CsvFilter | null {
   }
   return {}
 }
+
+// The search page: the words searched, and one kind of result when a tab narrows them.
+export type SearchKind = 'institutii' | 'firme'
+// `q` is a number when the address carries one (a CUI): written back as text it would
+// come out in quotes, `?q="4981310"`.
+export type SearchSearch = { q: string | number; tip?: SearchKind }
+
+// What the search box puts in the address for the words typed.
+export function searchParam(text: string): string | number {
+  return /^[1-9]\d{0,14}$/.test(text) ? Number(text) : text
+}
+
+export function validateSearchSearch(
+  search: Record<string, unknown>,
+): SearchSearch {
+  return {
+    q:
+      typeof search.q === 'string' || typeof search.q === 'number'
+        ? search.q
+        : '',
+    tip:
+      search.tip === 'institutii' || search.tip === 'firme'
+        ? search.tip
+        : undefined,
+  }
+}
