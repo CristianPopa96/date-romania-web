@@ -3,6 +3,7 @@ import {
   HeadContent,
   Scripts,
   createRootRouteWithContext,
+  useRouter,
 } from '@tanstack/react-router'
 import {
   Box,
@@ -16,35 +17,44 @@ import {
 
 import { Unavailable } from '#/components/Notes'
 import { TopBar } from '#/components/TopBar'
-import { SITE_NAME, TAGLINE } from '#/lib/copy'
+import { messagesFor } from '#/i18n'
+import type { Locale } from '#/i18n'
+import { I18nProvider, useI18n } from '#/i18n/context'
+import { rich } from '#/i18n/rich'
+import { SITE_NAME } from '#/lib/copy'
 
 import radixCss from '@radix-ui/themes/styles.css?url'
 import appCss from '../styles.css?url'
 
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
-  {
-    head: () => ({
-      meta: [
-        { charSet: 'utf-8' },
-        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { title: SITE_NAME },
-        { name: 'description', content: TAGLINE },
-      ],
-      links: [
-        { rel: 'stylesheet', href: radixCss },
-        { rel: 'stylesheet', href: appCss },
-      ],
-    }),
-    shellComponent: RootDocument,
-    notFoundComponent: NotFound,
-    errorComponent: Failed,
-  },
-)
+export const Route = createRootRouteWithContext<{
+  queryClient: QueryClient
+  locale: Locale
+}>()({
+  head: ({ match }) => ({
+    meta: [
+      { charSet: 'utf-8' },
+      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      { title: SITE_NAME },
+      {
+        name: 'description',
+        content: messagesFor(match.context.locale).site.tagline,
+      },
+    ],
+    links: [
+      { rel: 'stylesheet', href: radixCss },
+      { rel: 'stylesheet', href: appCss },
+    ],
+  }),
+  shellComponent: RootDocument,
+  notFoundComponent: NotFound,
+  errorComponent: Failed,
+})
 
 // Theme values come from the Date România design system.
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const { locale } = useRouter().options.context
   return (
-    <html lang="ro">
+    <html lang={locale}>
       <head>
         <HeadContent />
       </head>
@@ -57,11 +67,13 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           scaling="100%"
           panelBackground="solid"
         >
-          <TopBar />
-          <Box asChild style={{ minHeight: '70vh' }}>
-            <main>{children}</main>
-          </Box>
-          <Footer />
+          <I18nProvider locale={locale}>
+            <TopBar />
+            <Box asChild style={{ minHeight: '70vh' }}>
+              <main>{children}</main>
+            </Box>
+            <Footer />
+          </I18nProvider>
         </Theme>
         <Scripts />
       </body>
@@ -70,24 +82,33 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 }
 
 function Footer() {
+  const { t } = useI18n()
   return (
     <Box style={{ borderTop: '1px solid var(--gray-a5)' }}>
       <Container size="3" px="5" py="4">
         <Flex direction="column" gap="1">
           <Text size="1" color="gray">
-            Datele provin din surse publice și pot fi refolosite sub licența CC
-            BY 4.0. Fiecare cifră își arată sursa.
+            {t.site.footerData}
           </Text>
           <Text size="1" color="gray">
-            Codul este public:{' '}
-            <Link href="https://github.com/CristianPopa96/date-romania-web">
-              site
-            </Link>{' '}
-            și{' '}
-            <Link href="https://github.com/CristianPopa96/date-romania-api">
-              API
-            </Link>
-            .
+            {rich(t.site.footerCode, {
+              site: (
+                <Link
+                  key="site"
+                  href="https://github.com/CristianPopa96/date-romania-web"
+                >
+                  {t.site.footerSite}
+                </Link>
+              ),
+              api: (
+                <Link
+                  key="api"
+                  href="https://github.com/CristianPopa96/date-romania-api"
+                >
+                  {t.site.footerApi}
+                </Link>
+              ),
+            })}
           </Text>
         </Flex>
       </Container>
@@ -96,12 +117,13 @@ function Footer() {
 }
 
 function NotFound() {
+  const { t } = useI18n()
   return (
     <Container size="3" px="5" py="9">
       <Flex direction="column" gap="2">
-        <Heading size="6">Pagina nu există</Heading>
+        <Heading size="6">{t.notFound.title}</Heading>
         <Text size="2" color="gray">
-          Verifică adresa sau caută instituția ori firma după nume sau CUI.
+          {t.notFound.hint}
         </Text>
       </Flex>
     </Container>

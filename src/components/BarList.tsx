@@ -1,8 +1,9 @@
 import { Box, Code, Flex, Text } from '@radix-ui/themes'
 
 import { EntityLink } from '#/components/EntityLink'
+import { useI18n } from '#/i18n/context'
+import { rich } from '#/i18n/rich'
 import type { Partner, Role } from '#/lib/api'
-import { count, lei } from '#/lib/format'
 
 // Names with their value, each over a bar scaled to the largest value in the list.
 export function BarList({
@@ -14,6 +15,7 @@ export function BarList({
   role: Role
   numbered?: boolean
 }) {
+  const { t, f } = useI18n()
   const largest = Math.max(...rows.map((row) => row.value), 1)
 
   return (
@@ -29,7 +31,7 @@ export function BarList({
                 </EntityLink>
               </Text>
               <Text size="2" weight="medium" style={{ whiteSpace: 'nowrap' }}>
-                {lei(row.value)}
+                {f.lei(row.value)}
               </Text>
             </Flex>
             <Box
@@ -50,10 +52,14 @@ export function BarList({
               />
             </Box>
             <Text size="1" color="gray">
-              CUI <Code variant="ghost">{row.cui}</Code> ·{' '}
-              {row.accepted === 1
-                ? 'o achiziție acceptată'
-                : `${count(row.accepted)} achiziții acceptate`}
+              {rich(t.common.cui, {
+                cui: (
+                  <Code key="cui" variant="ghost">
+                    {row.cui}
+                  </Code>
+                ),
+              })}{' '}
+              · {t.partners.accepted(row.accepted, f.count(row.accepted))}
             </Text>
           </li>
         ))}

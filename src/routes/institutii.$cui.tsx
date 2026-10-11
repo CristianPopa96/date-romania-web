@@ -1,6 +1,7 @@
 import { createFileRoute, notFound } from '@tanstack/react-router'
 
 import { EntityView } from '#/components/EntityView'
+import { messagesFor } from '#/i18n'
 import { pageTitle } from '#/lib/copy'
 import { entityQuery, purchasesQuery } from '#/lib/queries'
 import { cuiFromPath, validateEntitySearch } from '#/lib/urls'
@@ -25,8 +26,15 @@ export const Route = createFileRoute('/institutii/$cui')({
     if (!page) throw notFound()
     return { name: page.entity.name }
   },
-  head: ({ loaderData }) => ({
-    meta: [{ title: pageTitle(loaderData?.name ?? 'Instituție') }],
+  head: ({ loaderData, match }) => ({
+    meta: [
+      {
+        title: pageTitle(
+          loaderData?.name ??
+            messagesFor(match.context.locale).common.institution,
+        ),
+      },
+    ],
   }),
   component: Institution,
 })
