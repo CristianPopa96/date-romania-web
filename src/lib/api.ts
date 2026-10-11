@@ -11,7 +11,7 @@ function apiUrl(path: string) {
 type Params = Record<string, string | number | undefined>
 
 // Null means the API answered "not found"; any other failure is thrown.
-async function getJson<T>(path: string, params: Params = {}) {
+export async function getJson<T>(path: string, params: Params = {}) {
   const url = apiUrl(path)
   for (const [key, value] of Object.entries(params)) {
     if (value !== undefined) url.searchParams.set(key, String(value))

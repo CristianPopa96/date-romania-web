@@ -1,9 +1,9 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
+import { Link as RouterLink } from '@tanstack/react-router'
 import { ExternalLinkIcon } from '@radix-ui/react-icons'
 import {
   Badge,
   Box,
-  Button,
   Code,
   Flex,
   Heading,
@@ -14,6 +14,7 @@ import {
 } from '@radix-ui/themes'
 
 import { EntityLink } from '#/components/EntityLink'
+import { Pager } from '#/components/Pager'
 import { useI18n } from '#/i18n/context'
 import { rich } from '#/i18n/rich'
 import { ACCEPTED, PAGE_SIZE } from '#/lib/api'
@@ -95,32 +96,13 @@ export function PurchaseTable({
         </Table.Body>
       </Table.Root>
 
-      {pages > 1 ? (
-        <Flex justify="between" align="center">
-          <Button
-            variant="soft"
-            disabled={page <= 1}
-            onClick={() =>
-              onSearch({
-                ...search,
-                pagina: page > 2 ? page - 1 : undefined,
-              })
-            }
-          >
-            {t.common.back}
-          </Button>
-          <Text size="2" color="gray">
-            {t.common.page(f.count(page), f.count(pages))}
-          </Text>
-          <Button
-            variant="soft"
-            disabled={page >= pages}
-            onClick={() => onSearch({ ...search, pagina: page + 1 })}
-          >
-            {t.common.forward}
-          </Button>
-        </Flex>
-      ) : null}
+      <Pager
+        page={page}
+        pages={pages}
+        onPage={(next) =>
+          onSearch({ ...search, pagina: next > 1 ? next : undefined })
+        }
+      />
     </Flex>
   )
 }
@@ -142,7 +124,14 @@ function PurchaseRow({ purchase, other }: { purchase: Purchase; other: Role }) {
       <Table.Cell>
         <Box style={{ maxWidth: 360 }}>
           <Text as="div" size="2">
-            {purchase.name ?? t.common.notPublished}
+            <Link asChild>
+              <RouterLink
+                to="/achizitii-directe/$id"
+                params={{ id: String(purchase.id) }}
+              >
+                {purchase.name ?? t.common.notPublished}
+              </RouterLink>
+            </Link>
           </Text>
           <Flex gap="2" align="center" wrap="wrap">
             {purchase.source.url ? (

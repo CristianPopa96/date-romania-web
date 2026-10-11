@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { cuiFromPath, validateEntitySearch } from '#/lib/urls'
+import {
+  cuiFromPath,
+  idFromPath,
+  validateEntitySearch,
+  validatePageSearch,
+} from '#/lib/urls'
 
 describe('validateEntitySearch', () => {
   it('keeps a page number and the value order', () => {
@@ -56,6 +61,27 @@ describe('cuiFromPath', () => {
       '12345678901',
     ]) {
       expect(cuiFromPath(text)).toBeNull()
+    }
+  })
+})
+
+describe('validatePageSearch', () => {
+  it('keeps a page above one and nothing else', () => {
+    expect(validatePageSearch({ pagina: '3', ordine: 'valoare' })).toEqual({
+      pagina: 3,
+    })
+    expect(validatePageSearch({ pagina: 1 })).toEqual({ pagina: undefined })
+  })
+})
+
+describe('idFromPath', () => {
+  it("reads SEAP's id from an address", () => {
+    expect(idFromPath('100660503')).toBe(100660503)
+  })
+
+  it('rejects anything that is not a plain number', () => {
+    for (const text of ['', 'abc', '12a', '-5', '1.5', '1234567890123']) {
+      expect(idFromPath(text)).toBeNull()
     }
   })
 })

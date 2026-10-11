@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CautareRouteImport } from './routes/cautare'
 import { Route as ClasamenteRouteImport } from './routes/clasamente'
+import { Route as AchizitiiDirecteIdRouteImport } from './routes/achizitii-directe.$id'
+import { Route as ContracteIdRouteImport } from './routes/contracte.$id'
 import { Route as FurnizoriCuiRouteImport } from './routes/furnizori.$cui'
 import { Route as InstitutiiCuiRouteImport } from './routes/institutii.$cui'
 
@@ -30,6 +32,16 @@ const ClasamenteRoute = ClasamenteRouteImport.update({
   path: '/clasamente',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AchizitiiDirecteIdRoute = AchizitiiDirecteIdRouteImport.update({
+  id: '/achizitii-directe/$id',
+  path: '/achizitii-directe/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContracteIdRoute = ContracteIdRouteImport.update({
+  id: '/contracte/$id',
+  path: '/contracte/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FurnizoriCuiRoute = FurnizoriCuiRouteImport.update({
   id: '/furnizori/$cui',
   path: '/furnizori/$cui',
@@ -45,6 +57,8 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/cautare': typeof CautareRoute
   '/clasamente': typeof ClasamenteRoute
+  '/achizitii-directe/$id': typeof AchizitiiDirecteIdRoute
+  '/contracte/$id': typeof ContracteIdRoute
   '/furnizori/$cui': typeof FurnizoriCuiRoute
   '/institutii/$cui': typeof InstitutiiCuiRoute
 }
@@ -52,6 +66,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/cautare': typeof CautareRoute
   '/clasamente': typeof ClasamenteRoute
+  '/achizitii-directe/$id': typeof AchizitiiDirecteIdRoute
+  '/contracte/$id': typeof ContracteIdRoute
   '/furnizori/$cui': typeof FurnizoriCuiRoute
   '/institutii/$cui': typeof InstitutiiCuiRoute
 }
@@ -60,20 +76,37 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/cautare': typeof CautareRoute
   '/clasamente': typeof ClasamenteRoute
+  '/achizitii-directe/$id': typeof AchizitiiDirecteIdRoute
+  '/contracte/$id': typeof ContracteIdRoute
   '/furnizori/$cui': typeof FurnizoriCuiRoute
   '/institutii/$cui': typeof InstitutiiCuiRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/cautare' | '/clasamente' | '/furnizori/$cui' | '/institutii/$cui'
+    | '/'
+    | '/cautare'
+    | '/clasamente'
+    | '/achizitii-directe/$id'
+    | '/contracte/$id'
+    | '/furnizori/$cui'
+    | '/institutii/$cui'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/cautare' | '/clasamente' | '/furnizori/$cui' | '/institutii/$cui'
+  to:
+    | '/'
+    | '/cautare'
+    | '/clasamente'
+    | '/achizitii-directe/$id'
+    | '/contracte/$id'
+    | '/furnizori/$cui'
+    | '/institutii/$cui'
   id:
     | '__root__'
     | '/'
     | '/cautare'
     | '/clasamente'
+    | '/achizitii-directe/$id'
+    | '/contracte/$id'
     | '/furnizori/$cui'
     | '/institutii/$cui'
   fileRoutesById: FileRoutesById
@@ -82,6 +115,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CautareRoute: typeof CautareRoute
   ClasamenteRoute: typeof ClasamenteRoute
+  AchizitiiDirecteIdRoute: typeof AchizitiiDirecteIdRoute
+  ContracteIdRoute: typeof ContracteIdRoute
   FurnizoriCuiRoute: typeof FurnizoriCuiRoute
   InstitutiiCuiRoute: typeof InstitutiiCuiRoute
 }
@@ -109,6 +144,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClasamenteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/achizitii-directe/$id': {
+      id: '/achizitii-directe/$id'
+      path: '/achizitii-directe/$id'
+      fullPath: '/achizitii-directe/$id'
+      preLoaderRoute: typeof AchizitiiDirecteIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contracte/$id': {
+      id: '/contracte/$id'
+      path: '/contracte/$id'
+      fullPath: '/contracte/$id'
+      preLoaderRoute: typeof ContracteIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/furnizori/$cui': {
       id: '/furnizori/$cui'
       path: '/furnizori/$cui'
@@ -130,6 +179,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CautareRoute: CautareRoute,
   ClasamenteRoute: ClasamenteRoute,
+  AchizitiiDirecteIdRoute: AchizitiiDirecteIdRoute,
+  ContracteIdRoute: ContracteIdRoute,
   FurnizoriCuiRoute: FurnizoriCuiRoute,
   InstitutiiCuiRoute: InstitutiiCuiRoute,
 }

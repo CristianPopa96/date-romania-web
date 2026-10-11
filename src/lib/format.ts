@@ -54,10 +54,17 @@ function build(locale: Locale) {
     return dayFormat.format(date)
   }
 
+  const listFormat = new Intl.ListFormat(tag, { type: 'conjunction' })
+
+  // "un contract obișnuit, un acord-cadru și un contract subsecvent"
+  function list(parts: Array<string>) {
+    return listFormat.format(parts)
+  }
+
   function period(first: string | null, last: string | null) {
     if (!first || !last) return null
     return first === last ? day(first) : `${day(first)} – ${day(last)}`
   }
 
-  return { count, lei, leiShort, day, period }
+  return { count, lei, leiShort, day, period, list }
 }
