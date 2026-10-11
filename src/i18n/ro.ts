@@ -57,6 +57,7 @@ export const ro = {
   },
 
   nav: {
+    label: 'Secțiuni',
     rankings: 'Clasamente',
   },
 
@@ -77,25 +78,53 @@ export const ro = {
   },
 
   home: {
+    headline: 'Urmărește banii publici, de la buget la contract.',
+    // Only what the site holds today; it grows with each source added.
+    lead: 'Contracte și achiziții publicate de instituțiile statului, puse cap la cap. Unde datele se opresc, îți arătăm ce lipsește.',
+    examples: 'Exemple:',
+    // Words that find something in any period: kinds of institution, not names.
+    exampleSearches: [
+      'primăria',
+      'consiliul județean',
+      'spitalul județean',
+      'universitatea',
+    ],
     directPurchases: 'Achiziții directe',
     acceptedValue: 'Valoare acceptată',
     acceptedPurchases: 'Achiziții acceptate',
     institutions: 'Instituții',
     suppliers: 'Furnizori',
     seeRankings: 'Vezi clasamentele',
-    systemStatus: 'Starea sistemului',
-    systemStatusHint: 'Legătura dintre site, API și baza de date',
-    apiUp: (version: string, database: string) =>
-      `API ${version} · bază de date ${database}`,
-    apiDown: 'API indisponibil',
+  },
+
+  // What the site is built on, one row per source.
+  datasets: {
+    title: 'Ce date avem',
+    source: 'Sursa',
+    period: 'Perioada',
+    records: 'Înregistrări',
+    fetched: 'Preluat ultima dată',
+    names: {
+      'seap-direct': 'achiziții directe',
+      'seap-awards': 'anunțuri de atribuire',
+    } as Record<string, string | undefined>,
+    name: (publisher: string, what: string) => `${publisher} · ${what}`,
+    complete: 'completă',
+    incomplete: 'contracte semnate în perioadă · listă incompletă',
   },
 
   search: {
     title: 'Căutare',
     placeholder: 'Caută o instituție, o firmă sau un CUI',
+    placeholderShort: 'Caută instituție, firmă, CUI…',
     tooShort: 'Scrie cel puțin două litere sau cifre.',
     none: (q: string) =>
-      `Niciun rezultat pentru „${q}”. Căutăm doar printre instituțiile și firmele care apar în achizițiile directe preluate până acum.`,
+      `Niciun rezultat pentru „${q}”. Căutăm doar printre instituțiile și firmele care apar în achizițiile directe și în anunțurile de atribuire preluate.`,
+    cuiHint: 'Un CUI valid te duce direct la pagina instituției sau a firmei.',
+    all: 'Toate',
+    institutions: 'Instituții',
+    companies: 'Firme',
+    noneOfKind: 'Niciun rezultat de acest tip.',
     found: (n: number, text: string, q: string) =>
       `${counted(n, text, 'Un rezultat', 'rezultate')} pentru „${q}”`,
   },

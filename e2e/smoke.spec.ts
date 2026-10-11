@@ -14,6 +14,11 @@ test('the home page shows the totals, their period and their source', async ({
 
   await expect(page).toHaveTitle('Date România')
   const main = page.getByRole('main')
+  await expect(
+    main.getByRole('heading', {
+      name: 'Urmărește banii publici, de la buget la contract.',
+    }),
+  ).toBeVisible()
   await expect(main.getByText('4.200 lei').first()).toBeVisible()
   await expect(main.getByText('05.10.2026 – 07.10.2026')).toBeVisible()
   // The purchase above the limit is told apart, as a fact and not as an accusation.
@@ -22,7 +27,100 @@ test('the home page shows the totals, their period and their source', async ({
   ).toBeVisible()
   await expect(main.getByText('Tipar observat, nu o acuzație')).toBeVisible()
   await expect(main.getByText('Sursa: SEAP · preluat 07.10.2026')).toBeVisible()
-  await expect(main.getByText('API 0.1.0 · bază de date ok')).toBeVisible()
+})
+
+test('the home page says what data the site is built on', async ({ page }) => {
+  await page.goto('/')
+  const main = page.getByRole('main')
+
+  await expect(
+    main.getByRole('heading', { name: 'Ce date avem' }),
+  ).toBeVisible()
+  const direct = main.getByRole('row').filter({ hasText: 'achiziții directe' })
+  await expect(direct).toContainText('SEAP · achiziții directe')
+  await expect(direct).toContainText('05.10–07.10.2026')
+  await expect(direct).toContainText('completă')
+  await expect(direct).toContainText('07.10.2026')
+  // Notices are held in full; the contracts of the period in them never are.
+  const awards = main
+    .getByRole('row')
+    .filter({ hasText: 'anunțuri de atribuire' })
+  await expect(awards).toContainText('listă incompletă')
+  // How the site itself is doing is not something a reader came for.
+  await expect(main.getByText('Starea sistemului')).toHaveCount(0)
+})
+
+test('the top bar lists only what exists, and searches from every page but home', async ({
+  page,
+}) => {
+  await page.goto('/')
+  const bar = page.getByRole('navigation', { name: 'Secțiuni' })
+  await expect(bar.getByRole('link')).toHaveCount(1)
+  await expect(bar.getByRole('link', { name: 'Clasamente' })).toBeVisible()
+  // On the home page the large search box is the page.
+  await expect(page.getByRole('textbox', { name: 'Caută' })).toHaveCount(1)
+  await expect(page.getByRole('link', { name: 'Caută' })).toHaveCount(0)
+
+  await bar.getByRole('link', { name: 'Clasamente' }).click()
+  await expect(bar.getByRole('link', { name: 'Clasamente' })).toHaveAttribute(
+    'aria-current',
+    'page',
+  )
+  const compact = page
+    .getByRole('banner')
+    .getByRole('textbox', { name: 'Caută' })
+  await compact.fill('tantareni')
+  await compact.press('Enter')
+  await expect(page).toHaveURL(/\/cautare\?q=tantareni$/)
+  await expect(page.getByText('Un rezultat pentru „tantareni”')).toBeVisible()
+})
+
+test('an example on the home page is a search', async ({ page }) => {
+  await page.goto('/')
+  await expect(
+    page.getByRole('main').getByRole('link', { name: 'primăria' }),
+  ).toHaveAttribute('href', /\/cautare\?q=prim/)
+})
+
+test('a valid CUI opens the page of the institution or of the company', async ({
+  page,
+}) => {
+  await page.goto('/cautare?q=4981310')
+  await expect(page).toHaveURL(/\/institutii\/4981310$/)
+  await expect(page.getByRole('heading', { name: TOWN_HALL })).toBeVisible()
+
+  await page.goto('/cautare?q=RO17886786')
+  await expect(page).toHaveURL(/\/furnizori\/17886786$/)
+  await expect(
+    page.getByRole('heading', { name: 'ALFA CONSTRUCT S.R.L.' }),
+  ).toBeVisible()
+})
+
+test('a valid CUI we do not hold stays on the search page', async ({
+  page,
+}) => {
+  await page.goto('/cautare?q=12345674')
+  await expect(page).toHaveURL(/\/cautare\?q=12345674$/)
+  await expect(
+    page.getByText('Niciun rezultat pentru „12345674”'),
+  ).toBeVisible()
+})
+
+test('search results can be narrowed to one kind', async ({ page }) => {
+  await page.goto('/cautare?q=tantareni')
+  const main = page.getByRole('main')
+  await expect(
+    main.getByText(
+      'Un CUI valid te duce direct la pagina instituției sau a firmei.',
+    ),
+  ).toBeVisible()
+  await expect(main.getByRole('tab')).toHaveCount(3)
+  await expect(main.getByRole('tab', { name: /Instituții/ })).toContainText('1')
+
+  await main.getByRole('tab', { name: /Firme/ }).click()
+  await expect(page).toHaveURL(/\/cautare\?q=tantareni&tip=firme$/)
+  await expect(main.getByText('Niciun rezultat de acest tip.')).toBeVisible()
+  await expect(main.getByRole('link', { name: TOWN_HALL })).toHaveCount(0)
 })
 
 test('a search without diacritics finds the town hall and leads to its page', async ({

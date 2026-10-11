@@ -3,8 +3,6 @@ import { Link as RouterLink, createFileRoute } from '@tanstack/react-router'
 import { ArrowRightIcon } from '@radix-ui/react-icons'
 import {
   Badge,
-  Box,
-  Card,
   Container,
   Flex,
   Grid,
@@ -13,43 +11,53 @@ import {
   Text,
 } from '@radix-ui/themes'
 
+import { DatasetTable } from '#/components/DatasetTable'
 import { Figure } from '#/components/Figure'
 import { AboveLimitNote, PeriodNote, Unavailable } from '#/components/Notes'
 import { SearchBox } from '#/components/SearchBox'
 import { SourceLine } from '#/components/SourceLine'
 import { useI18n } from '#/i18n/context'
-import { SITE_NAME } from '#/lib/copy'
-import { healthQuery, statsQuery } from '#/lib/queries'
+import { datasetsQuery, statsQuery } from '#/lib/queries'
 
 export const Route = createFileRoute('/')({
   loader: ({ context }) =>
     Promise.all([
-      context.queryClient.ensureQueryData(healthQuery),
       context.queryClient.ensureQueryData(statsQuery),
+      context.queryClient.ensureQueryData(datasetsQuery),
     ]),
   component: Home,
 })
 
 function Home() {
-  const { data: health } = useSuspenseQuery(healthQuery)
   const { data: stats } = useSuspenseQuery(statsQuery)
+  const { data: datasets } = useSuspenseQuery(datasetsQuery)
   const { t, f } = useI18n()
-  const apiUp = health?.status === 'ok'
   const summary = stats?.direct_purchases
 
   return (
     <Container size="3" px="5" py="9">
-      <Flex direction="column" gap="6">
-        <Flex direction="column" gap="2">
+      <Flex direction="column" gap="7">
+        <Flex direction="column" gap="4">
           <Heading size="8" weight="bold">
-            {SITE_NAME}
+            {t.home.headline}
           </Heading>
-          <Text size="3" color="gray">
-            {t.site.tagline}
+          <Text size="3" color="gray" style={{ maxWidth: '62ch' }}>
+            {t.home.lead}
           </Text>
+          <SearchBox />
+          <Flex gap="2" align="center" wrap="wrap">
+            <Text size="1" color="gray">
+              {t.home.examples}
+            </Text>
+            {t.home.exampleSearches.map((example) => (
+              <Badge key={example} color="gray" asChild>
+                <RouterLink to="/cautare" search={{ q: example }}>
+                  {example}
+                </RouterLink>
+              </Badge>
+            ))}
+          </Flex>
         </Flex>
-
-        <SearchBox />
 
         {stats && summary && summary.purchases > 0 ? (
           <Flex direction="column" gap="3">
@@ -95,23 +103,7 @@ function Home() {
           <Unavailable />
         )}
 
-        <Card>
-          <Flex justify="between" align="center" gap="3">
-            <Box>
-              <Text as="div" size="2" weight="bold">
-                {t.home.systemStatus}
-              </Text>
-              <Text as="div" size="2" color="gray">
-                {t.home.systemStatusHint}
-              </Text>
-            </Box>
-            <Badge color={apiUp ? 'green' : 'red'} size="2">
-              {apiUp
-                ? t.home.apiUp(health.version, health.database)
-                : t.home.apiDown}
-            </Badge>
-          </Flex>
-        </Card>
+        <DatasetTable datasets={datasets} />
       </Flex>
     </Container>
   )

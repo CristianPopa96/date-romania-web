@@ -33,8 +33,6 @@ export async function getText(path: string, params: Params = {}) {
   return response.text()
 }
 
-export type ApiHealth = { status: string; database: string; version: string }
-
 export type Source = {
   publisher: string
   record: string | null
@@ -118,12 +116,26 @@ export const ACCEPTED = 7
 // The API uses the same value for `above_limit`; one constant keeps every page in agreement.
 export const DIRECT_PURCHASE_LIMIT = 900_400
 
-export const getApiHealth = createServerFn({ method: 'GET' }).handler(
-  async (): Promise<ApiHealth | null> => {
+// One source as we hold it: its days, how many records, when it was last read.
+export type Dataset = {
+  key: string
+  publisher: string
+  first_day: string | null
+  last_day: string | null
+  records: number
+  // False when the source publishes late, so the list of the period is never whole.
+  complete: boolean
+  fetched_at: string | null
+}
+
+// Like the totals, the table of what we hold must not take the home page down.
+export const getDatasets = createServerFn({ method: 'GET' }).handler(
+  async (): Promise<Array<Dataset>> => {
     try {
-      return await getJson<ApiHealth>('/v1/health')
+      const found = await getJson<{ items: Array<Dataset> }>('/v1/datasets')
+      return found?.items ?? []
     } catch {
-      return null
+      return []
     }
   },
 )
