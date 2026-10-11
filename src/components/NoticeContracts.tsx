@@ -9,7 +9,7 @@ import { useI18n } from '#/i18n/context'
 import { rich } from '#/i18n/rich'
 import { FRAMEWORK, NOTICE_PAGE_SIZE } from '#/lib/api-contracts'
 import type { Contract, Notice } from '#/lib/api-contracts'
-import { isAssociation } from '#/lib/contracts'
+import { isAssociation, pageCount, shownValue } from '#/lib/contracts'
 import { noticeContractsQuery } from '#/lib/queries'
 
 // Every contract of one notice, whatever its date, with the notice's own total above.
@@ -24,7 +24,7 @@ export function NoticeContracts({
 }) {
   const { t, f } = useI18n()
   const { data } = useSuspenseQuery(noticeContractsQuery(notice.id, page))
-  const pages = Math.max(Math.ceil(data.total / NOTICE_PAGE_SIZE), 1)
+  const pages = pageCount(data.total, NOTICE_PAGE_SIZE)
   const explainAssociation = data.items.some(isAssociation)
 
   return (
@@ -91,6 +91,15 @@ export function NoticeContracts({
 function ContractRow({ contract }: { contract: Contract }) {
   const { t, f } = useI18n()
   const framework = contract.kind === FRAMEWORK
+  const shown = shownValue(contract)
+  // What the API left out of the notice's total, and why, in one line under the value.
+  const aside = framework
+    ? t.notice.ceiling
+    : shown?.currency
+      ? t.notice.noLei
+      : !contract.counted
+        ? t.notice.notCounted
+        : null
 
   return (
     <Table.Row>
@@ -111,17 +120,21 @@ function ContractRow({ contract }: { contract: Contract }) {
         <Winners winners={contract.winners} />
       </Table.Cell>
       <Table.Cell justify="end" style={{ whiteSpace: 'nowrap' }}>
-        {contract.value === null ? (
+        {shown === null ? (
           <DataState kind="notPublished" />
-        ) : framework ? (
-          // A ceiling, not money committed: shown muted and never added up.
-          <Text color="gray">{f.lei(contract.value)}</Text>
         ) : (
-          f.lei(contract.value)
+          // Muted when it is not in the total: a ceiling, or a value with no lei amount.
+          <Text
+            color={contract.counted && !shown.currency ? undefined : 'gray'}
+          >
+            {shown.currency
+              ? t.notice.foreign(f.count(shown.amount), shown.currency)
+              : f.lei(shown.amount)}
+          </Text>
         )}
-        {framework ? (
+        {shown !== null && aside ? (
           <Text as="div" size="1" color="gray">
-            {t.notice.ceiling}
+            {aside}
           </Text>
         ) : null}
       </Table.Cell>

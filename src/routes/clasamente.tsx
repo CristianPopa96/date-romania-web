@@ -1,11 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Container, Flex, Heading, Tabs, Text } from '@radix-ui/themes'
+import { Container, Flex, Heading, Text } from '@radix-ui/themes'
 
 import {
   ContractRanking,
   DirectRankings,
   LargestContracts,
 } from '#/components/Rankings'
+import { UrlTabs } from '#/components/UrlTabs'
 import { messagesFor } from '#/i18n'
 import { useI18n } from '#/i18n/context'
 import { pageTitle } from '#/lib/copy'
@@ -16,7 +17,6 @@ import {
   statsQuery,
 } from '#/lib/queries'
 import { RANKINGS, validateRankingSearch } from '#/lib/urls'
-import type { RankingTab } from '#/lib/urls'
 
 export const Route = createFileRoute('/clasamente')({
   validateSearch: validateRankingSearch,
@@ -67,42 +67,40 @@ function Rankings() {
           </Text>
         </Flex>
 
-        <Tabs.Root
+        <UrlTabs
           value={tab}
-          onValueChange={(value) =>
+          tabs={RANKINGS.map((name) => ({
+            value: name,
+            label: t.rankings.tabs[name],
+          }))}
+          onChange={(value) =>
             void navigate({
-              search: { clasament: value as RankingTab },
+              search: { clasament: value },
               resetScroll: false,
             })
           }
         >
-          <Tabs.List>
-            {RANKINGS.map((name) => (
-              <Tabs.Trigger key={name} value={name}>
-                {t.rankings.tabs[name]}
-              </Tabs.Trigger>
-            ))}
-          </Tabs.List>
-        </Tabs.Root>
-
-        {tab === 'contracte' ? <LargestContracts /> : null}
-        {tab === 'furnizori' ? (
-          <ContractRanking
-            role="suppliers"
-            won={search.castigate === 'asociere' ? 'association' : 'alone'}
-            onWon={(won) =>
-              void navigate({
-                search: {
-                  clasament: 'furnizori',
-                  castigate: won === 'association' ? 'asociere' : undefined,
-                },
-                resetScroll: false,
-              })
-            }
-          />
-        ) : null}
-        {tab === 'achizitii' ? <DirectRankings /> : null}
-        {tab === 'institutii' ? <ContractRanking role="institutions" /> : null}
+          {tab === 'contracte' ? <LargestContracts /> : null}
+          {tab === 'furnizori' ? (
+            <ContractRanking
+              role="suppliers"
+              won={search.castigate === 'asociere' ? 'association' : 'alone'}
+              onWon={(won) =>
+                void navigate({
+                  search: {
+                    clasament: 'furnizori',
+                    castigate: won === 'association' ? 'asociere' : undefined,
+                  },
+                  resetScroll: false,
+                })
+              }
+            />
+          ) : null}
+          {tab === 'achizitii' ? <DirectRankings /> : null}
+          {tab === 'institutii' ? (
+            <ContractRanking role="institutions" />
+          ) : null}
+        </UrlTabs>
       </Flex>
     </Container>
   )

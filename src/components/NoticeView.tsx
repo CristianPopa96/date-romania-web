@@ -51,8 +51,12 @@ export function NoticeView({
             ) : (
               notice.buyer_text
             )}
-            {' / '}
-            <Code variant="ghost">{notice.notice_no}</Code>
+            {(notice.buyer || notice.buyer_text) && notice.notice_no
+              ? ' / '
+              : null}
+            {notice.notice_no ? (
+              <Code variant="ghost">{notice.notice_no}</Code>
+            ) : null}
           </Text>
           <Flex gap="2" wrap="wrap">
             <Badge color="gray">{t.notice.kind}</Badge>
@@ -187,11 +191,22 @@ function Facts({ notice }: { notice: Notice }) {
               )}
             </DataList.Value>
           </DataList.Item>
+          {/* Without the versions we cannot say the notice was republished. */}
           <DataList.Item>
-            <DataList.Label>{t.notice.lastPublished}</DataList.Label>
+            <DataList.Label>
+              {published === 'again'
+                ? t.notice.lastPublished
+                : t.notice.published}
+            </DataList.Label>
             <DataList.Value>
               <Text>
-                {latest} <Text color="gray">· {t.notice.latestVersion}</Text>
+                {latest}{' '}
+                <Text color="gray">
+                  ·{' '}
+                  {published === 'again'
+                    ? t.notice.latestVersion
+                    : t.notice.heldVersion}
+                </Text>
               </Text>
             </DataList.Value>
           </DataList.Item>
