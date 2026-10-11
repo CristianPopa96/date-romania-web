@@ -57,6 +57,7 @@ export function PurchaseTable({
           value={byValue ? 'valoare' : 'recente'}
           onValueChange={(value) =>
             onSearch({
+              lista: search.lista,
               ordine: value === 'valoare' ? 'valoare' : undefined,
             })
           }

@@ -67,6 +67,11 @@ export const ro = {
 
   source: {
     line: (parts: string) => `Sursa: ${parts}`,
+    // Where two sources stand side by side, each says what it is the source of.
+    of: {
+      contracts: (parts: string) => `Sursa contractelor: ${parts}`,
+      purchases: (parts: string) => `Sursa achizițiilor directe: ${parts}`,
+    },
     fetched: (day: string) => `preluat ${day}`,
     open: 'Vezi la sursă',
   },
@@ -95,19 +100,71 @@ export const ro = {
       `${counted(n, text, 'Un rezultat', 'rezultate')} pentru „${q}”`,
   },
 
+  // Which period a figure covers and whether the list behind it is complete (PeriodNote
+  // in the design system). The dates always come from the data held.
+  period: {
+    range: (from: string, to: string) => `${from}–${to}`,
+    signed: (count: string, range: string) =>
+      `${count} · semnate ${range} · listă incompletă`,
+    complete: (count: string, range: string) =>
+      `${count} · ${range} · completă`,
+    incompleteTitle: 'Lista contractelor nu e completă.',
+    incomplete: (from: string, to: string) =>
+      `Numărăm contractele semnate între ${from} și ${to}. SEAP publică multe contracte la câteva săptămâni după semnare, așa că o parte din cele semnate în această perioadă lipsesc.`,
+  },
+
   entity: {
-    acceptedValue: 'Valoarea achizițiilor directe acceptate',
-    accepted: 'Achiziții acceptate',
-    finalized: 'Achiziții finalizate, cu orice rezultat',
+    awarded: 'Contracte atribuite',
+    wonAlone: 'Câștigate singur',
+    wonTogether: 'Câștigate în asociere',
+    undivided: 'valoarea întreagă a contractelor, nedivizată între membri',
+    directAccepted: 'Achiziții directe acceptate',
+    withoutVat: 'Sumele sunt fără TVA.',
+    lists: 'Contracte și achiziții',
+    tabContracts: 'Contracte',
+    tabPurchases: 'Achiziții directe',
+    purchasesCount: (n: number, text: string) =>
+      counted(n, text, 'o achiziție', 'achiziții'),
+  },
+
+  // The two ends of public money on an institution's page (GapPanel in the design
+  // system). Only the middle is held today.
+  gap: {
+    title: 'Cele două capete ale banilor',
+    spent: 'Cheltuieli de capital executate',
+    awarded: 'Contracte atribuite',
+    awardedNote: 'SEAP · fără linie bugetară',
+    paid: 'Plăți pe care le putem numi',
+    whyTitle: 'Ce se vede deocamdată.',
+    why: 'Contractele arată cui s-au atribuit banii, dar nu din ce linie de buget. Execuția bugetară, care arată cât s-a cheltuit, și plățile publicate cu numele celui plătit există la sursă, dar nu le-am preluat încă.',
+  },
+
+  contracts: {
+    count: (n: number, text: string) =>
+      counted(n, text, 'un contract', 'contracte'),
+    object: 'Obiect',
+    contract: 'Contract',
+    supplier: 'Furnizor',
+    buyer: 'Cumpărător',
+    winner: 'Câștigător',
+    procedure: 'Procedură',
+    won: 'Câștigat',
+    alone: 'singur',
+    value: 'Valoare fără TVA',
+    date: 'Data semnării',
+    rank: 'Loc',
+    none: (range: string) =>
+      `Niciun contract semnat în perioada ${range} nu apare în anunțurile de atribuire preluate.`,
+    export: 'Exportă CSV',
   },
 
   partners: {
     institutions: {
-      title: 'Furnizori, după valoare',
+      title: 'Furnizori la achiziții directe, după valoare',
       none: 'Nicio achiziție acceptată în această perioadă.',
     },
     suppliers: {
-      title: 'Instituții cărora le-a vândut, după valoare',
+      title: 'Instituții cărora le-a vândut direct, după valoare',
       none: 'Nicio vânzare acceptată în această perioadă.',
     },
     accepted: (n: number, text: string) =>
@@ -140,9 +197,25 @@ export const ro = {
   rankings: {
     title: 'Clasamente',
     intro:
-      'După valoarea achizițiilor directe acceptate. Un loc în clasament arată doar cât s-a cumpărat sau s-a vândut, nu spune nimic despre corectitudinea achizițiilor.',
+      'Fapte măsurabile, fiecare cu sursa ei. Un loc în clasament arată doar cât s-a contractat, s-a cumpărat sau s-a vândut, nu spune nimic despre corectitudinea achizițiilor.',
     suppliers: 'Furnizori',
     institutions: 'Instituții',
+    tabs: {
+      contracte: 'Cele mai mari contracte',
+      furnizori: 'Furnizori',
+      achizitii: 'Achiziții directe',
+      institutii: 'Instituții',
+    },
+    wonAlone: 'Singur',
+    wonTogether: 'În asociere',
+    wonLabel: 'Cum au fost câștigate contractele',
+    // A member's place says what the contracts were worth, not what the member received.
+    associationNote:
+      'Un contract câștigat în asociere apare la fiecare membru, cu valoarea întreagă.',
+    bySuppliers: 'Furnizori, după valoarea contractelor câștigate',
+    byInstitutions: 'Instituții, după valoarea contractelor atribuite',
+    directIntro: 'După valoarea achizițiilor directe acceptate.',
+    none: 'Niciun contract semnat în această perioadă nu apare în anunțurile preluate.',
   },
 
   notes: {

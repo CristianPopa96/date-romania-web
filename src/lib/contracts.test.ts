@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest'
 
 import type { Contract, Notice, Winner } from '#/lib/api-contracts'
 import {
+  contractCount,
   financing,
   foldWinners,
   isAssociation,
+  listSource,
   pageCount,
   publication,
   shownValue,
@@ -119,5 +121,71 @@ describe('financing', () => {
         }),
       ),
     ).toEqual(['Program / Proiect', 'Programul Regional'])
+  })
+})
+
+describe('contractCount', () => {
+  const frame = {
+    period: { first_day: '2026-09-01', last_day: '2026-10-10' },
+    source: {
+      publisher: 'SEAP',
+      record: null,
+      url: null,
+      fetched_at: null,
+      document_id: null,
+    },
+  }
+
+  it('is what an institution awarded', () => {
+    expect(
+      contractCount({
+        ...frame,
+        role: 'institutions',
+        awarded: { contracts: 2, value: 6_330_000 },
+      }),
+    ).toBe(2)
+  })
+
+  it('adds the contracts a company won alone and with others', () => {
+    expect(
+      contractCount({
+        ...frame,
+        role: 'suppliers',
+        alone: { contracts: 1, value: 210_000 },
+        association: { contracts: 3, value: 6_120_000 },
+      }),
+    ).toBe(4)
+  })
+})
+
+describe('listSource', () => {
+  const from = (fetched_at: string | null) =>
+    ({
+      source: {
+        publisher: 'SEAP',
+        record: 'CAN1',
+        url: 'https://example.test',
+        fetched_at,
+        document_id: 1,
+      },
+    }) as Contract
+
+  it('is nothing for an empty list', () => {
+    expect(listSource([])).toBeNull()
+  })
+
+  it('names the publisher and the last time any row was fetched', () => {
+    const source = listSource([
+      from('2026-10-05T04:30:00Z'),
+      from('2026-10-07T04:30:00Z'),
+      from(null),
+    ])
+    expect(source).toEqual({
+      publisher: 'SEAP',
+      record: null,
+      url: null,
+      fetched_at: '2026-10-07T04:30:00Z',
+      document_id: null,
+    })
   })
 })

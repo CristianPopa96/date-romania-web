@@ -1,4 +1,5 @@
 import { queryOptions } from '@tanstack/react-query'
+import type { QueryClient } from '@tanstack/react-query'
 
 import {
   getApiHealth,
@@ -10,11 +11,18 @@ import {
 } from '#/lib/api'
 import type { Role } from '#/lib/api'
 import {
+  getContractRanking,
+  getContracts,
+  getEntityContracts,
   getNotice,
   getNoticeContracts,
   getPairSummary,
   getPurchase,
 } from '#/lib/api-contracts'
+import type { Won } from '#/lib/api-contracts'
+import { contractCount } from '#/lib/contracts'
+import { entityList } from '#/lib/urls'
+import type { EntitySearch } from '#/lib/urls'
 
 export const healthQuery = queryOptions({
   queryKey: ['health'],
@@ -78,3 +86,52 @@ export const pairSummaryQuery = (buyer: number, supplier: number) =>
     queryKey: ['pair-summary', buyer, supplier],
     queryFn: () => getPairSummary({ data: { buyer, supplier } }),
   })
+
+export const entityContractsQuery = (role: Role, cui: number) =>
+  queryOptions({
+    queryKey: ['entity-contracts', role, cui],
+    queryFn: () => getEntityContracts({ data: { role, cui } }),
+  })
+
+export const contractsQuery = (role: Role, cui: number, page: number) =>
+  queryOptions({
+    queryKey: ['contracts', role, cui, page],
+    queryFn: () => getContracts({ data: { role, cui, page } }),
+  })
+
+export const largestContractsQuery = queryOptions({
+  queryKey: ['contracts', 'largest'],
+  queryFn: () => getContracts({ data: { page: 1 } }),
+})
+
+export const contractRankingQuery = (role: Role, won?: Won) =>
+  queryOptions({
+    queryKey: ['contract-ranking', role, won ?? null],
+    queryFn: () => getContractRanking({ data: { role, won } }),
+  })
+
+// Everything the page of an institution or a supplier reads, for the list its address
+// asks for. Null when the API knows no entity with this CUI.
+export async function loadEntityPage(
+  client: QueryClient,
+  role: Role,
+  cui: number,
+  search: EntitySearch,
+) {
+  const [page, totals] = await Promise.all([
+    client.ensureQueryData(entityQuery(role, cui)),
+    client.ensureQueryData(entityContractsQuery(role, cui)),
+    client.ensureQueryData(statsQuery),
+  ])
+  if (!page || !totals) return null
+  const list = entityList(search, contractCount(totals) > 0)
+  const pageNumber = search.pagina ?? 1
+  if (list === 'contracte') {
+    await client.ensureQueryData(contractsQuery(role, cui, pageNumber))
+  } else {
+    await client.ensureQueryData(
+      purchasesQuery(role, cui, pageNumber, search.ordine === 'valoare'),
+    )
+  }
+  return page
+}

@@ -3,16 +3,19 @@ import { Box, Code, Flex, Text } from '@radix-ui/themes'
 import { EntityLink } from '#/components/EntityLink'
 import { useI18n } from '#/i18n/context'
 import { rich } from '#/i18n/rich'
-import type { Partner, Role } from '#/lib/api'
+import type { EntityRef, Role } from '#/lib/api'
 
 // Names with their value, each over a bar scaled to the largest value in the list.
-export function BarList({
+// `note` says what the value adds up, in the words of the list it is in.
+export function BarList<TRow extends EntityRef & { value: number }>({
   rows,
   role,
+  note,
   numbered = false,
 }: {
-  rows: Array<Partner>
+  rows: Array<TRow>
   role: Role
+  note: (row: TRow) => string
   numbered?: boolean
 }) {
   const { t, f } = useI18n()
@@ -59,7 +62,7 @@ export function BarList({
                   </Code>
                 ),
               })}{' '}
-              · {t.partners.accepted(row.accepted, f.count(row.accepted))}
+              · {note(row)}
             </Text>
           </li>
         ))}

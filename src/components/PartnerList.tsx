@@ -13,7 +13,7 @@ export function PartnerList({
   role: Role
   partners: Array<Partner>
 }) {
-  const { t } = useI18n()
+  const { t, f } = useI18n()
   const text = t.partners[role]
   const other: Role = role === 'institutions' ? 'suppliers' : 'institutions'
 
@@ -22,7 +22,13 @@ export function PartnerList({
       <Heading size="4">{text.title}</Heading>
       {partners.length > 0 ? (
         <Card>
-          <BarList rows={partners} role={other} />
+          <BarList
+            rows={partners}
+            role={other}
+            note={(row) =>
+              t.partners.accepted(row.accepted, f.count(row.accepted))
+            }
+          />
         </Card>
       ) : (
         <Text size="2" color="gray">

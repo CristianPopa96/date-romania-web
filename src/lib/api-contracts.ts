@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 
-import { getJson } from '#/lib/api'
-import type { EntityRef, Purchase, Source, Summary } from '#/lib/api'
+import { PAGE_SIZE, getJson } from '#/lib/api'
+import type { EntityRef, Purchase, Role, Source, Summary } from '#/lib/api'
 
 // Award notices, their contracts, and one direct purchase: the calls behind the pages of
 // single records. See api.ts for how the site reaches the API.
@@ -118,4 +118,82 @@ export const getPairSummary = createServerFn({ method: 'GET' })
       buyer: data.buyer,
       supplier: data.supplier,
     }),
+  )
+
+export type ContractTotals = { contracts: number; value: number }
+
+// What an institution awarded, or what a company won, among the contracts signed in the
+// period we hold. For a company the two figures are never added: `association` is the
+// whole value of contracts won with others, which SEAP does not split between members.
+export type EntityContracts = { period: Period; source: Source } & (
+  | { role: 'institutions'; awarded: ContractTotals }
+  | { role: 'suppliers'; alone: ContractTotals; association: ContractTotals }
+)
+
+type InstitutionAnswer = ContractTotals & { period: Period; source: Source }
+type SupplierAnswer = {
+  period: Period
+  alone: ContractTotals
+  association: ContractTotals
+  source: Source
+}
+
+export const getEntityContracts = createServerFn({ method: 'GET' })
+  .inputValidator((data: { role: Role; cui: number }) => data)
+  .handler(async ({ data }): Promise<EntityContracts | null> => {
+    const path = `/v1/${data.role}/${data.cui}/contracts`
+    if (data.role === 'suppliers') {
+      const found = await getJson<SupplierAnswer>(path)
+      return found && { role: 'suppliers', ...found }
+    }
+    const found = await getJson<InstitutionAnswer>(path)
+    return (
+      found && {
+        role: 'institutions',
+        period: found.period,
+        source: found.source,
+        awarded: { contracts: found.contracts, value: found.value },
+      }
+    )
+  })
+
+// Contracts signed in the period, without framework agreements: those of one buyer or
+// one winner, newest first, or with no entity the largest of all.
+export const getContracts = createServerFn({ method: 'GET' })
+  .inputValidator((data: { role?: Role; cui?: number; page: number }) => data)
+  .handler(async ({ data }): Promise<ContractPage> => {
+    const found = await getJson<ContractPage>('/v1/award-contracts', {
+      [data.role === 'suppliers' ? 'supplier' : 'buyer']: data.cui,
+      sort: data.cui === undefined ? 'value' : 'newest',
+      limit: PAGE_SIZE,
+      offset: (data.page - 1) * PAGE_SIZE,
+    })
+    return found ?? { total: 0, period: null, items: [] }
+  })
+
+export type Won = 'alone' | 'association'
+export type ContractRankingRow = EntityRef & {
+  rank: number
+  contracts: number
+  value: number
+}
+export type ContractRanking = {
+  period: Period
+  won: Won | null
+  items: Array<ContractRankingRow>
+  source: Source
+}
+
+// Winners by what they won alone or in associations; institutions by what they awarded.
+export const getContractRanking = createServerFn({ method: 'GET' })
+  .inputValidator((data: { role: Role; won?: Won }) => data)
+  .handler(({ data }) =>
+    data.role === 'suppliers'
+      ? getJson<ContractRanking>('/v1/rankings/contract-suppliers', {
+          won: data.won ?? 'alone',
+          limit: 20,
+        })
+      : getJson<ContractRanking>('/v1/rankings/contract-institutions', {
+          limit: 20,
+        }),
   )

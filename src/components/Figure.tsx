@@ -1,6 +1,6 @@
 import { Card, Flex, Text } from '@radix-ui/themes'
 
-// One headline number with its label, and an optional line of detail under it.
+// One headline number with its label, and optional lines of detail under it.
 export function Figure({
   label,
   value,
@@ -9,9 +9,10 @@ export function Figure({
 }: {
   label: string
   value: string
-  detail?: string
+  detail?: string | Array<string>
   size?: '5' | '6'
 }) {
+  const lines = typeof detail === 'string' ? [detail] : (detail ?? [])
   return (
     <Card>
       <Flex direction="column" gap="1">
@@ -21,11 +22,11 @@ export function Figure({
         <Text size={size} weight="bold">
           {value}
         </Text>
-        {detail ? (
-          <Text size="1" color="gray">
-            {detail}
+        {lines.map((line) => (
+          <Text key={line} size="1" color="gray">
+            {line}
           </Text>
-        ) : null}
+        ))}
       </Flex>
     </Card>
   )
