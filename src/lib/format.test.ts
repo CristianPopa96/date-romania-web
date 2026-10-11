@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
-import { count, day, lei, leiShort, period } from '#/lib/format'
+import { formatFor } from '#/lib/format'
+
+const { count, day, lei, leiShort, period } = formatFor('ro')
 
 describe('count and lei', () => {
   it('groups thousands with a dot', () => {

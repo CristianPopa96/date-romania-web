@@ -1,18 +1,8 @@
 import { Card, Flex, Heading, Text } from '@radix-ui/themes'
 
 import { BarList } from '#/components/BarList'
+import { useI18n } from '#/i18n/context'
 import type { Partner, Role } from '#/lib/api'
-
-const TEXT = {
-  institutions: {
-    title: 'Furnizori, după valoare',
-    none: 'Nicio achiziție acceptată în această perioadă.',
-  },
-  suppliers: {
-    title: 'Instituții cărora le-a vândut, după valoare',
-    none: 'Nicio vânzare acceptată în această perioadă.',
-  },
-}
 
 // The other side of an entity's accepted purchases: the suppliers of an institution, or
 // the institutions a supplier sold to.
@@ -23,7 +13,8 @@ export function PartnerList({
   role: Role
   partners: Array<Partner>
 }) {
-  const text = TEXT[role]
+  const { t } = useI18n()
+  const text = t.partners[role]
   const other: Role = role === 'institutions' ? 'suppliers' : 'institutions'
 
   return (

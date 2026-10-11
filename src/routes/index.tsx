@@ -17,8 +17,8 @@ import { Figure } from '#/components/Figure'
 import { AboveLimitNote, PeriodNote, Unavailable } from '#/components/Notes'
 import { SearchBox } from '#/components/SearchBox'
 import { SourceLine } from '#/components/SourceLine'
-import { SITE_NAME, TAGLINE } from '#/lib/copy'
-import { count, lei, leiShort } from '#/lib/format'
+import { useI18n } from '#/i18n/context'
+import { SITE_NAME } from '#/lib/copy'
 import { healthQuery, statsQuery } from '#/lib/queries'
 
 export const Route = createFileRoute('/')({
@@ -33,6 +33,7 @@ export const Route = createFileRoute('/')({
 function Home() {
   const { data: health } = useSuspenseQuery(healthQuery)
   const { data: stats } = useSuspenseQuery(statsQuery)
+  const { t, f } = useI18n()
   const apiUp = health?.status === 'ok'
   const summary = stats?.direct_purchases
 
@@ -44,7 +45,7 @@ function Home() {
             {SITE_NAME}
           </Heading>
           <Text size="3" color="gray">
-            {TAGLINE}
+            {t.site.tagline}
           </Text>
         </Flex>
 
@@ -52,28 +53,28 @@ function Home() {
 
         {stats && summary && summary.purchases > 0 ? (
           <Flex direction="column" gap="3">
-            <Heading size="4">Achiziții directe</Heading>
+            <Heading size="4">{t.home.directPurchases}</Heading>
             <Grid columns={{ initial: '2', sm: '4' }} gap="3">
               <Figure
                 size="5"
-                label="Valoare acceptată"
-                value={leiShort(summary.value)}
-                detail={lei(summary.value)}
+                label={t.home.acceptedValue}
+                value={f.leiShort(summary.value)}
+                detail={f.lei(summary.value)}
               />
               <Figure
                 size="5"
-                label="Achiziții acceptate"
-                value={count(summary.accepted)}
+                label={t.home.acceptedPurchases}
+                value={f.count(summary.accepted)}
               />
               <Figure
                 size="5"
-                label="Instituții"
-                value={count(stats.institutions)}
+                label={t.home.institutions}
+                value={f.count(stats.institutions)}
               />
               <Figure
                 size="5"
-                label="Furnizori"
-                value={count(stats.suppliers)}
+                label={t.home.suppliers}
+                value={f.count(stats.suppliers)}
               />
             </Grid>
             <PeriodNote summary={summary} />
@@ -83,7 +84,7 @@ function Home() {
               <Link asChild size="2">
                 <RouterLink to="/clasamente">
                   <Flex align="center" gap="1">
-                    Vezi clasamentele
+                    {t.home.seeRankings}
                     <ArrowRightIcon />
                   </Flex>
                 </RouterLink>
@@ -98,16 +99,16 @@ function Home() {
           <Flex justify="between" align="center" gap="3">
             <Box>
               <Text as="div" size="2" weight="bold">
-                Starea sistemului
+                {t.home.systemStatus}
               </Text>
               <Text as="div" size="2" color="gray">
-                Legătura dintre site, API și baza de date
+                {t.home.systemStatusHint}
               </Text>
             </Box>
             <Badge color={apiUp ? 'green' : 'red'} size="2">
               {apiUp
-                ? `API ${health.version} · bază de date ${health.database}`
-                : 'API indisponibil'}
+                ? t.home.apiUp(health.version, health.database)
+                : t.home.apiDown}
             </Badge>
           </Flex>
         </Card>

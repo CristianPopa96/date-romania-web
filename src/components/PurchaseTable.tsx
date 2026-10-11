@@ -14,23 +14,12 @@ import {
 } from '@radix-ui/themes'
 
 import { EntityLink } from '#/components/EntityLink'
+import { useI18n } from '#/i18n/context'
+import { rich } from '#/i18n/rich'
 import { ACCEPTED, PAGE_SIZE } from '#/lib/api'
 import type { Purchase, Role } from '#/lib/api'
-import { count, day, lei } from '#/lib/format'
 import { purchasesQuery } from '#/lib/queries'
 import type { EntitySearch } from '#/lib/urls'
-
-// SEAP's states in the words a citizen would use. Green marks a finished deal, not a verdict.
-const STATES: Record<number, string> = {
-  3: 'Refuzată de furnizor',
-  4: 'Fără răspuns de la furnizor',
-  6: 'Refuzată de instituție',
-  7: 'Ofertă acceptată',
-  8: 'Fără răspuns de la instituție',
-}
-
-// The column that names the other side of each purchase.
-const OTHER_SIDE = { institutions: 'Furnizor', suppliers: 'Instituție' }
 
 // The direct purchases of one institution or supplier, a page at a time.
 export function PurchaseTable({
@@ -44,6 +33,7 @@ export function PurchaseTable({
   search: EntitySearch
   onSearch: (search: EntitySearch) => void
 }) {
+  const { t, f } = useI18n()
   const page = search.pagina ?? 1
   const byValue = search.ordine === 'valoare'
   const { data: purchases } = useSuspenseQuery(
@@ -56,8 +46,10 @@ export function PurchaseTable({
     <Flex direction="column" gap="3">
       <Flex justify="between" align="center" gap="3" wrap="wrap">
         <Heading size="4">
-          {byValue ? 'Achiziții directe acceptate' : 'Achiziții directe'} (
-          {count(purchases.total)})
+          {t.purchases.heading(
+            byValue ? t.purchases.titleAccepted : t.purchases.title,
+            f.count(purchases.total),
+          )}
         </Heading>
         <SegmentedControl.Root
           size="1"
@@ -69,10 +61,10 @@ export function PurchaseTable({
           }
         >
           <SegmentedControl.Item value="recente">
-            Cele mai recente
+            {t.purchases.newest}
           </SegmentedControl.Item>
           <SegmentedControl.Item value="valoare">
-            Cele mai mari acceptate
+            {t.purchases.largest}
           </SegmentedControl.Item>
         </SegmentedControl.Root>
       </Flex>
@@ -80,12 +72,19 @@ export function PurchaseTable({
       <Table.Root variant="surface" size="1">
         <Table.Header>
           <Table.Row>
-            <Table.ColumnHeaderCell>Data</Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell>Achiziție</Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell>{OTHER_SIDE[role]}</Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell>Stare</Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell>{t.purchases.date}</Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell>
+              {t.purchases.purchase}
+            </Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell>
+              {/* The column that names the other side of each purchase. */}
+              {role === 'institutions'
+                ? t.common.supplier
+                : t.common.institution}
+            </Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell>{t.purchases.state}</Table.ColumnHeaderCell>
             <Table.ColumnHeaderCell justify="end">
-              Valoare
+              {t.purchases.value}
             </Table.ColumnHeaderCell>
           </Table.Row>
         </Table.Header>
@@ -108,17 +107,17 @@ export function PurchaseTable({
               })
             }
           >
-            Înapoi
+            {t.common.back}
           </Button>
           <Text size="2" color="gray">
-            Pagina {count(page)} din {count(pages)}
+            {t.common.page(f.count(page), f.count(pages))}
           </Text>
           <Button
             variant="soft"
             disabled={page >= pages}
             onClick={() => onSearch({ ...search, pagina: page + 1 })}
           >
-            Înainte
+            {t.common.forward}
           </Button>
         </Flex>
       ) : null}
@@ -131,16 +130,19 @@ function PurchaseRow({ purchase, other }: { purchase: Purchase; other: Role }) {
   const partyText =
     other === 'suppliers' ? purchase.supplier_text : purchase.buyer_text
   const accepted = purchase.state_id === ACCEPTED
+  const { t, f } = useI18n()
 
   return (
     <Table.Row>
       <Table.Cell style={{ whiteSpace: 'nowrap' }}>
-        {purchase.finalized_at ? day(purchase.finalized_at) : 'Nepublicat'}
+        {purchase.finalized_at
+          ? f.day(purchase.finalized_at)
+          : t.common.notPublished}
       </Table.Cell>
       <Table.Cell>
         <Box style={{ maxWidth: 360 }}>
           <Text as="div" size="2">
-            {purchase.name ?? 'Nepublicat'}
+            {purchase.name ?? t.common.notPublished}
           </Text>
           <Flex gap="2" align="center" wrap="wrap">
             {purchase.source.url ? (
@@ -152,13 +154,25 @@ function PurchaseRow({ purchase, other }: { purchase: Purchase; other: Role }) {
               >
                 <Flex align="center" gap="1">
                   <ExternalLinkIcon />
-                  <Code variant="ghost">{purchase.code}</Code> în SEAP
+                  {rich(t.purchases.seapLink, {
+                    code: (
+                      <Code key="code" variant="ghost">
+                        {purchase.code}
+                      </Code>
+                    ),
+                  })}
                 </Flex>
               </Link>
             ) : null}
             {purchase.cpv_code ? (
               <Text size="1" color="gray">
-                CPV <Code variant="ghost">{purchase.cpv_code}</Code>
+                {rich(t.common.cpv, {
+                  code: (
+                    <Code key="code" variant="ghost">
+                      {purchase.cpv_code}
+                    </Code>
+                  ),
+                })}
               </Text>
             ) : null}
           </Flex>
@@ -170,33 +184,34 @@ function PurchaseRow({ purchase, other }: { purchase: Purchase; other: Role }) {
             {party.name}
           </EntityLink>
         ) : (
-          (partyText ?? 'Nepublicat')
+          (partyText ?? t.common.notPublished)
         )}
       </Table.Cell>
       <Table.Cell>
+        {/* Green marks a finished deal, not a verdict. */}
         <Badge color={accepted ? 'green' : 'gray'}>
-          {(purchase.state_id && STATES[purchase.state_id]) ||
+          {(purchase.state_id && t.purchases.states[purchase.state_id]) ||
             purchase.state ||
-            'Nepublicat'}
+            t.common.notPublished}
         </Badge>
       </Table.Cell>
       <Table.Cell justify="end" style={{ whiteSpace: 'nowrap' }}>
         {purchase.value === null ? (
-          'Nepublicat'
+          t.common.notPublished
         ) : accepted ? (
-          lei(purchase.value)
+          f.lei(purchase.value)
         ) : (
           // An offer that was refused or never answered is not money spent.
-          <Text color="gray">{lei(purchase.value)}</Text>
+          <Text color="gray">{f.lei(purchase.value)}</Text>
         )}
         {!accepted && purchase.value !== null ? (
           <Text as="div" size="1" color="gray">
-            neacceptată, nu intră în total
+            {t.purchases.notAccepted}
           </Text>
         ) : null}
         {accepted && purchase.above_limit ? (
           <Text as="div" size="1" color="amber">
-            peste plafon, nu intră în total
+            {t.purchases.aboveLimit}
           </Text>
         ) : null}
       </Table.Cell>

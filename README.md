@@ -82,8 +82,12 @@ instead of showing an empty state.
 
 ## Conventions
 
-- Interface text is Romanian, plain and in the second person singular.
-- Numbers use Romanian format (`Intl.NumberFormat("ro-RO")`), dates `dd.mm.yyyy`.
+- Interface text is Romanian, plain and in the second person singular. All of it lives in
+  `src/i18n/ro.ts`; components read it with `useI18n()` and never hold text themselves.
+  A second language is a file of the same shape and an entry in `src/i18n/index.ts`.
+  Route paths stay Romanian in every language, and data is never translated.
+- Numbers use Romanian format (`Intl.NumberFormat("ro-RO")`), dates `dd.mm.yyyy`. They are
+  formatted by `f` from `useI18n()`, never typed into a message.
 - Every figure shows its source. Gaps in public data are shown, not hidden.
 - Theme settings live in one place, `src/routes/__root.tsx`.
 - Server calls are in `src/lib/api.ts`, their query options in `src/lib/queries.ts`,

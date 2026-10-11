@@ -3,6 +3,8 @@ import { useNavigate } from '@tanstack/react-router'
 import { MagnifyingGlassIcon } from '@radix-ui/react-icons'
 import { Button, Flex, TextField } from '@radix-ui/themes'
 
+import { useI18n } from '#/i18n/context'
+
 export function SearchBox({
   initial = '',
   size = '3',
@@ -12,6 +14,7 @@ export function SearchBox({
 }) {
   const [q, setQ] = useState(initial)
   const navigate = useNavigate()
+  const { t } = useI18n()
 
   return (
     <form
@@ -29,15 +32,15 @@ export function SearchBox({
           style={{ flexGrow: 1 }}
           value={q}
           onChange={(event) => setQ(event.target.value)}
-          placeholder="Caută o instituție, o firmă sau un CUI"
-          aria-label="Caută"
+          placeholder={t.search.placeholder}
+          aria-label={t.common.search}
         >
           <TextField.Slot>
             <MagnifyingGlassIcon height="16" width="16" />
           </TextField.Slot>
         </TextField.Root>
         <Button size={size} type="submit">
-          Caută
+          {t.common.search}
         </Button>
       </Flex>
     </form>

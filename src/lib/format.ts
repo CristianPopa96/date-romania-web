@@ -1,40 +1,63 @@
-// Romanian formats for everything the site shows: "6.120.000 lei", "48,2 mil. lei",
-// "06.10.2026".
+// Numbers, amounts and dates in the format of one language. In Romanian: "6.120.000 lei",
+// "48,2 mil. lei", "06.10.2026".
 
-const whole = new Intl.NumberFormat('ro-RO', { maximumFractionDigits: 0 })
-const oneDecimal = new Intl.NumberFormat('ro-RO', {
-  minimumFractionDigits: 1,
-  maximumFractionDigits: 1,
-})
-const dayFormat = new Intl.DateTimeFormat('ro-RO', {
-  timeZone: 'Europe/Bucharest',
-  day: '2-digit',
-  month: '2-digit',
-  year: 'numeric',
-})
+import { LOCALES, messagesFor } from '#/i18n'
+import type { Locale } from '#/i18n'
 
-export function count(value: number) {
-  return whole.format(value)
+export type Format = ReturnType<typeof build>
+
+const formats = new Map<Locale, Format>()
+
+export function formatFor(locale: Locale): Format {
+  let format = formats.get(locale)
+  if (!format) {
+    format = build(locale)
+    formats.set(locale, format)
+  }
+  return format
 }
 
-export function lei(value: number) {
-  return `${whole.format(value)} lei`
-}
+function build(locale: Locale) {
+  const { tag } = LOCALES[locale]
+  const { money } = messagesFor(locale)
+  const whole = new Intl.NumberFormat(tag, { maximumFractionDigits: 0 })
+  const oneDecimal = new Intl.NumberFormat(tag, {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  })
+  // Days are Romanian days in every language: the data is Romanian.
+  const dayFormat = new Intl.DateTimeFormat(tag, {
+    timeZone: 'Europe/Bucharest',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  })
 
-// For headline figures: "1,5 mld. lei", "48,2 mil. lei". Small amounts stay whole.
-export function leiShort(value: number) {
-  if (value >= 1e9) return `${oneDecimal.format(value / 1e9)} mld. lei`
-  if (value >= 1e6) return `${oneDecimal.format(value / 1e6)} mil. lei`
-  return lei(value)
-}
+  function count(value: number) {
+    return whole.format(value)
+  }
 
-// Accepts a day ("2026-10-06") or a full timestamp; the day shown is the Romanian one.
-export function day(value: string) {
-  const date = new Date(value.length === 10 ? `${value}T12:00:00Z` : value)
-  return dayFormat.format(date)
-}
+  function lei(value: number) {
+    return money.lei(whole.format(value))
+  }
 
-export function period(first: string | null, last: string | null) {
-  if (!first || !last) return null
-  return first === last ? day(first) : `${day(first)} – ${day(last)}`
+  // For headline figures: "1,5 mld. lei", "48,2 mil. lei". Small amounts stay whole.
+  function leiShort(value: number) {
+    if (value >= 1e9) return money.billion(oneDecimal.format(value / 1e9))
+    if (value >= 1e6) return money.million(oneDecimal.format(value / 1e6))
+    return lei(value)
+  }
+
+  // Accepts a day ("2026-10-06") or a full timestamp; the day shown is the Romanian one.
+  function day(value: string) {
+    const date = new Date(value.length === 10 ? `${value}T12:00:00Z` : value)
+    return dayFormat.format(date)
+  }
+
+  function period(first: string | null, last: string | null) {
+    if (!first || !last) return null
+    return first === last ? day(first) : `${day(first)} – ${day(last)}`
+  }
+
+  return { count, lei, leiShort, day, period }
 }
