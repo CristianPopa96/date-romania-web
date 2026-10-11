@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { getText } from '#/lib/api'
+import { getFile } from '#/lib/api'
 import { csvFilterFromSearch } from '#/lib/urls'
 
 // The contracts of one institution or one company, or of the whole period, as a CSV
@@ -12,7 +12,7 @@ export const Route = createFileRoute('/contracte.csv')({
         const filter = csvFilterFromSearch(new URL(request.url).searchParams)
         if (!filter) return new Response('Not found', { status: 404 })
         const cui = filter.buyer ?? filter.supplier
-        const file = await getText('/v1/award-contracts', {
+        const file = await getFile('/v1/award-contracts', {
           ...filter,
           // One entity's contracts read best by date; the whole period, largest first.
           sort: cui === undefined ? 'value' : 'newest',

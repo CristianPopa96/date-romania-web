@@ -223,7 +223,13 @@ test('winners are ranked by what they won alone or in associations', async ({
 }) => {
   await page.goto('/clasamente')
   const main = page.getByRole('main')
-  await main.getByRole('tab', { name: 'Furnizori' }).click()
+  // Every tab has its panel, and an arrow key moves between tabs without opening one.
+  await expect(main.getByRole('tabpanel')).toHaveCount(1)
+  await main.getByRole('tab', { name: 'Contracte' }).focus()
+  await page.keyboard.press('ArrowRight')
+  await expect(main.getByRole('tab', { name: 'Furnizori' })).toBeFocused()
+  await expect(page).toHaveURL(/\/clasamente$/)
+  await page.keyboard.press('Enter')
 
   await expect(page).toHaveURL(/\/clasamente\?clasament=furnizori$/)
   await expect(main.getByText('1. ALFA CONSTRUCT S.R.L.')).toBeVisible()
@@ -362,6 +368,16 @@ test('a notice not yet read in detail, and one without contracts, say so', async
   await expect(main.getByText('Încă necolectat', { exact: true })).toHaveCount(
     3,
   )
+  await expect(main.getByText('ATU1 Lab GmbH')).toBeVisible()
+  // With no versions read, the page does not claim the notice was republished.
+  await expect(main.getByText('Republicat ultima dată')).toHaveCount(0)
+  await expect(
+    main.getByText('07.10.2026 · versiunea pe care o avem'),
+  ).toBeVisible()
+
+  // A page past the end of the list lands on the last page that has rows.
+  await page.goto('/contracte/9002?pagina=7')
+  await expect(page).toHaveURL(/\/contracte\/9002$/)
   await expect(main.getByText('ATU1 Lab GmbH')).toBeVisible()
 
   await page.goto('/contracte/9003')

@@ -1,26 +1,19 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
-import {
-  Badge,
-  Code,
-  Container,
-  Flex,
-  Heading,
-  Tabs,
-  Text,
-} from '@radix-ui/themes'
+import { Badge, Code, Container, Flex, Heading, Text } from '@radix-ui/themes'
 
 import { EntityContractList } from '#/components/EntityContractList'
 import { EntityFigures } from '#/components/EntityFigures'
 import { GapPanel } from '#/components/GapPanel'
 import { PartnerList } from '#/components/PartnerList'
 import { PurchaseTable } from '#/components/PurchaseTable'
+import { UrlTabs } from '#/components/UrlTabs'
 import { useI18n } from '#/i18n/context'
 import { rich } from '#/i18n/rich'
 import type { Role } from '#/lib/api'
 import { contractCount } from '#/lib/contracts'
 import { entityContractsQuery, entityQuery, statsQuery } from '#/lib/queries'
 import { entityList, entityListSearch } from '#/lib/urls'
-import type { EntityList, EntitySearch } from '#/lib/urls'
+import type { EntitySearch } from '#/lib/urls'
 
 // The page of one institution (as a buyer) or one supplier (as a seller): its contracts
 // and its direct purchases, as separate figures and separate lists.
@@ -83,48 +76,51 @@ export function EntityView({
           />
         </Flex>
 
-        <Tabs.Root
+        <UrlTabs
           value={list}
-          onValueChange={(value) =>
-            onSearch(entityListSearch(value as EntityList, held > 0))
-          }
+          tabs={[
+            {
+              value: 'contracte',
+              label: (
+                <Flex gap="2" align="center">
+                  {t.entity.tabContracts}
+                  <Badge color="gray">{f.count(held)}</Badge>
+                </Flex>
+              ),
+            },
+            {
+              value: 'achizitii',
+              label: (
+                <Flex gap="2" align="center">
+                  {t.entity.tabPurchases}
+                  <Badge color="gray">{f.count(summary.purchases)}</Badge>
+                </Flex>
+              ),
+            },
+          ]}
+          onChange={(value) => onSearch(entityListSearch(value, held > 0))}
         >
-          <Tabs.List>
-            <Tabs.Trigger value="contracte">
-              <Flex gap="2" align="center">
-                {t.entity.tabContracts}
-                <Badge color="gray">{f.count(held)}</Badge>
-              </Flex>
-            </Tabs.Trigger>
-            <Tabs.Trigger value="achizitii">
-              <Flex gap="2" align="center">
-                {t.entity.tabPurchases}
-                <Badge color="gray">{f.count(summary.purchases)}</Badge>
-              </Flex>
-            </Tabs.Trigger>
-          </Tabs.List>
-        </Tabs.Root>
-
-        {list === 'contracte' ? (
-          <EntityContractList
-            role={role}
-            cui={cui}
-            page={search.pagina ?? 1}
-            onPage={(page) =>
-              onSearch({ ...search, pagina: page > 1 ? page : undefined })
-            }
-          />
-        ) : (
-          <>
-            <PartnerList role={role} partners={data.partners} />
-            <PurchaseTable
+          {list === 'contracte' ? (
+            <EntityContractList
               role={role}
               cui={cui}
-              search={search}
-              onSearch={onSearch}
+              page={search.pagina ?? 1}
+              onPage={(page) =>
+                onSearch({ ...search, pagina: page > 1 ? page : undefined })
+              }
             />
-          </>
-        )}
+          ) : (
+            <>
+              <PartnerList role={role} partners={data.partners} />
+              <PurchaseTable
+                role={role}
+                cui={cui}
+                search={search}
+                onSearch={onSearch}
+              />
+            </>
+          )}
+        </UrlTabs>
       </Flex>
     </Container>
   )

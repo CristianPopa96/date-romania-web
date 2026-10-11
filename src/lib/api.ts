@@ -22,15 +22,16 @@ export async function getJson<T>(path: string, params: Params = {}) {
   return (await response.json()) as T
 }
 
-// A file the API writes (a CSV export), passed on as text.
-export async function getText(path: string, params: Params = {}) {
+// A file the API writes (a CSV export), passed on byte for byte. Reading it as text
+// would drop the mark at its start that makes spreadsheet programs read the diacritics.
+export async function getFile(path: string, params: Params = {}) {
   const url = apiUrl(path)
   for (const [key, value] of Object.entries(params)) {
     if (value !== undefined) url.searchParams.set(key, String(value))
   }
   const response = await fetch(url)
   if (!response.ok) throw new Error(`API ${response.status} for ${path}`)
-  return response.text()
+  return response.arrayBuffer()
 }
 
 export type ApiHealth = { status: string; database: string; version: string }
