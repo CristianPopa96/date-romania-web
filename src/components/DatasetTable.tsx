@@ -42,9 +42,14 @@ export function DatasetTable({ datasets }: { datasets: Array<Dataset> }) {
                 <Table.Cell justify="end">
                   <Text as="div">{f.count(dataset.records)}</Text>
                   <Text as="div" size="1" color="gray">
-                    {dataset.complete
-                      ? t.datasets.complete
-                      : t.datasets.incomplete}
+                    {[
+                      t.datasets.counts[dataset.key],
+                      dataset.complete
+                        ? t.datasets.complete
+                        : t.datasets.incomplete,
+                    ]
+                      .filter((part) => part !== undefined)
+                      .join(' · ')}
                   </Text>
                 </Table.Cell>
                 <Table.Cell>

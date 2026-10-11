@@ -109,8 +109,12 @@ export const ro = {
       'seap-awards': 'anunțuri de atribuire',
     } as Record<string, string | undefined>,
     name: (publisher: string, what: string) => `${publisher} · ${what}`,
+    // What the count of a source counts, where the word "records" is not enough.
+    counts: {
+      'seap-awards': 'contracte semnate în perioadă',
+    } as Record<string, string | undefined>,
     complete: 'completă',
-    incomplete: 'contracte semnate în perioadă · listă incompletă',
+    incomplete: 'listă incompletă',
   },
 
   search: {

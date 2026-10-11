@@ -109,6 +109,8 @@ test('a valid CUI we do not hold stays on the search page', async ({
 test('search results can be narrowed to one kind', async ({ page }) => {
   await page.goto('/cautare?q=tantareni')
   const main = page.getByRole('main')
+  // The page has its own search box, so the top bar does not repeat it.
+  await expect(page.getByRole('textbox', { name: 'Caută' })).toHaveCount(1)
   await expect(
     main.getByText(
       'Un CUI valid te duce direct la pagina instituției sau a firmei.',

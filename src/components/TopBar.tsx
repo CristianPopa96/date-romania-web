@@ -12,8 +12,9 @@ import { SITE_NAME } from '#/lib/copy'
 export function TopBar() {
   const { t } = useI18n()
   const path = useRouterState({ select: (state) => state.location.pathname })
-  // On the home page the large search box is the page.
-  const home = path === '/'
+  // The home page and the search page have the large search box; a second field next
+  // to it would be the same field twice.
+  const ownSearch = path === '/' || path === '/cautare'
 
   return (
     <Box asChild style={{ borderBottom: '1px solid var(--gray-a5)' }}>
@@ -46,7 +47,7 @@ export function TopBar() {
               </nav>
             </Flex>
             {/* The key empties the field once a search has been sent. */}
-            {home ? null : <SearchBox key={path} compact />}
+            {ownSearch ? null : <SearchBox key={path} compact />}
           </Flex>
         </Container>
       </header>

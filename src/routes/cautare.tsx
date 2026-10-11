@@ -7,12 +7,12 @@ import {
   Container,
   Flex,
   Heading,
-  Tabs,
   Text,
 } from '@radix-ui/themes'
 
 import { EntityLink, roleOfKind } from '#/components/EntityLink'
 import { SearchBox } from '#/components/SearchBox'
+import { UrlTabs } from '#/components/UrlTabs'
 import { messagesFor } from '#/i18n'
 import { useI18n } from '#/i18n/context'
 import { rich } from '#/i18n/rich'
@@ -95,9 +95,21 @@ function Search() {
               {t.search.found(found.length, f.count(found.length), q)}{' '}
               {t.search.cuiHint}
             </Text>
-            <Tabs.Root
+            <UrlTabs
               value={tip ?? 'toate'}
-              onValueChange={(value) =>
+              gap="3"
+              tabs={tabs.map((tab) => ({
+                value: tab.value,
+                label: (
+                  <Flex gap="2" align="center">
+                    {tab.label}
+                    <Badge color="gray">
+                      {f.count(ofKind(found, tab.kind).length)}
+                    </Badge>
+                  </Flex>
+                ),
+              }))}
+              onChange={(value) =>
                 void navigate({
                   search: {
                     q: search.q,
@@ -107,54 +119,42 @@ function Search() {
                 })
               }
             >
-              <Tabs.List>
-                {tabs.map((tab) => (
-                  <Tabs.Trigger key={tab.value} value={tab.value}>
-                    <Flex gap="2" align="center">
-                      {tab.label}
-                      <Badge color="gray">
-                        {f.count(ofKind(found, tab.kind).length)}
-                      </Badge>
+              {shown.length === 0 ? (
+                <Text size="2" color="gray">
+                  {t.search.noneOfKind}
+                </Text>
+              ) : null}
+              {shown.map((entity) => (
+                <Card key={entity.cui}>
+                  <Flex justify="between" align="center" gap="3">
+                    <Flex direction="column" gap="1">
+                      <Text size="3" weight="medium">
+                        <EntityLink
+                          role={roleOfKind(entity.kind)}
+                          cui={entity.cui}
+                        >
+                          {entity.name}
+                        </EntityLink>
+                      </Text>
+                      <Text size="1" color="gray">
+                        {rich(t.common.cui, {
+                          cui: (
+                            <Code key="cui" variant="ghost">
+                              {entity.cui}
+                            </Code>
+                          ),
+                        })}
+                      </Text>
                     </Flex>
-                  </Tabs.Trigger>
-                ))}
-              </Tabs.List>
-            </Tabs.Root>
-            {shown.length === 0 ? (
-              <Text size="2" color="gray">
-                {t.search.noneOfKind}
-              </Text>
-            ) : null}
-            {shown.map((entity) => (
-              <Card key={entity.cui}>
-                <Flex justify="between" align="center" gap="3">
-                  <Flex direction="column" gap="1">
-                    <Text size="3" weight="medium">
-                      <EntityLink
-                        role={roleOfKind(entity.kind)}
-                        cui={entity.cui}
-                      >
-                        {entity.name}
-                      </EntityLink>
-                    </Text>
-                    <Text size="1" color="gray">
-                      {rich(t.common.cui, {
-                        cui: (
-                          <Code key="cui" variant="ghost">
-                            {entity.cui}
-                          </Code>
-                        ),
-                      })}
-                    </Text>
+                    <Badge color="gray">
+                      {entity.kind === 'authority'
+                        ? t.common.institution
+                        : t.common.company}
+                    </Badge>
                   </Flex>
-                  <Badge color="gray">
-                    {entity.kind === 'authority'
-                      ? t.common.institution
-                      : t.common.company}
-                  </Badge>
-                </Flex>
-              </Card>
-            ))}
+                </Card>
+              ))}
+            </UrlTabs>
           </Flex>
         )}
       </Flex>
