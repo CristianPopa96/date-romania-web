@@ -1,7 +1,7 @@
 import { ArrowRightIcon, InfoCircledIcon } from '@radix-ui/react-icons'
 import { Box, Callout, Flex, Grid, Heading, Text } from '@radix-ui/themes'
 
-import { DataState } from '#/components/DataState'
+import { DataState, NOT_COLLECTED_OUTLINE } from '#/components/DataState'
 import { useI18n } from '#/i18n/context'
 import type { ContractTotals, Period } from '#/lib/api-contracts'
 
@@ -71,7 +71,7 @@ function Cell({
         borderRadius: 'var(--radius-3)',
         border:
           value === undefined
-            ? '1px dotted var(--gray-9)'
+            ? NOT_COLLECTED_OUTLINE
             : '1px solid var(--gray-a6)',
       }}
     >
