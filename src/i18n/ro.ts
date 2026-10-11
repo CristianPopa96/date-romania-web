@@ -284,6 +284,7 @@ export const ro = {
     firstPublished: 'Publicat prima dată',
     lastPublished: 'Republicat ultima dată',
     heldVersion: 'versiunea pe care o avem',
+    callNotice: 'Anunț de participare',
     latestVersion:
       'SEAP republică anunțul când se adaugă sau se modifică un contract; arătăm ultima versiune',
     contractsIn: 'Contracte în anunț',

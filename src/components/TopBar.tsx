@@ -6,6 +6,37 @@ import { SearchBox } from '#/components/SearchBox'
 import { useI18n } from '#/i18n/context'
 import { SITE_NAME } from '#/lib/copy'
 
+// There is no logo yet: the name stands beside a small tile with three bars. The tile
+// is decoration; the name is the link's text.
+function LogoMark() {
+  return (
+    <Flex
+      align="center"
+      justify="center"
+      aria-hidden
+      style={{
+        width: 24,
+        height: 24,
+        borderRadius: 'var(--radius-2)',
+        background: 'var(--accent-9)',
+        color: 'var(--accent-contrast)',
+      }}
+    >
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 15 15"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      >
+        <path d="M3 12V8M7.5 12V3M12 12V6" />
+      </svg>
+    </Flex>
+  )
+}
+
 // On every page: the logo, the sections that exist, and a compact search. A section
 // joins the bar when its page ships, never as a placeholder. The search field is the way
 // in to search, so there is no "Caută" item next to it.
@@ -23,9 +54,12 @@ export function TopBar() {
           <Flex align="center" gap="5" wrap="wrap">
             <Link asChild underline="none" highContrast>
               <RouterLink to="/">
-                <Text size="4" weight="bold">
-                  {SITE_NAME}
-                </Text>
+                <Flex align="center" gap="2">
+                  <LogoMark />
+                  <Text size="4" weight="bold">
+                    {SITE_NAME}
+                  </Text>
+                </Flex>
               </RouterLink>
             </Link>
             <Flex asChild gap="4" align="center" flexGrow="1">

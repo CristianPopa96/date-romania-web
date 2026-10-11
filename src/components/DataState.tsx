@@ -6,6 +6,10 @@ import { useI18n } from '#/i18n/context'
 //   notPublished  dashed outline: the source does not give the value
 //   notCollected  dotted outline: the source publishes it, we do not hold it yet
 // Never a dash, a zero or "necunoscut" in place of a missing value.
+// The two outlines differ in width as well as style: at 1px both read as one grey line.
+export const NOT_PUBLISHED_OUTLINE = '1.5px dashed var(--gray-8)'
+export const NOT_COLLECTED_OUTLINE = '2px dotted var(--gray-9)'
+
 export function DataState({ kind }: { kind: 'notPublished' | 'notCollected' }) {
   const { t } = useI18n()
   return (
@@ -18,8 +22,8 @@ export function DataState({ kind }: { kind: 'notPublished' | 'notCollected' }) {
         borderRadius: 'var(--radius-2)',
         border:
           kind === 'notPublished'
-            ? '1px dashed var(--gray-8)'
-            : '1px dotted var(--gray-9)',
+            ? NOT_PUBLISHED_OUTLINE
+            : NOT_COLLECTED_OUTLINE,
         whiteSpace: 'nowrap',
       }}
     >

@@ -213,6 +213,24 @@ function Facts({ notice }: { notice: Notice }) {
         </>
       )}
 
+      {/* The notice that opened the procedure; an award that follows none has no row. */}
+      {notice.detail?.call_notice_no ? (
+        <DataList.Item>
+          <DataList.Label>{t.notice.callNotice}</DataList.Label>
+          <DataList.Value>
+            <Text>
+              <Code variant="ghost">{notice.detail.call_notice_no}</Code>
+              {notice.detail.call_published_at ? (
+                <Text color="gray">
+                  {' '}
+                  · {f.day(notice.detail.call_published_at)}
+                </Text>
+              ) : null}
+            </Text>
+          </DataList.Value>
+        </DataList.Item>
+      ) : null}
+
       <DataList.Item>
         <DataList.Label>{t.notice.contractsIn}</DataList.Label>
         <DataList.Value>

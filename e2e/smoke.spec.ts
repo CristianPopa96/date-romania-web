@@ -426,6 +426,9 @@ test('a notice lists every contract and keeps the ceiling out of its total', asy
   await expect(facts.filter({ hasText: 'Publicat prima dată' })).toBeVisible()
   await expect(main.getByText('20.03.2024')).toBeVisible()
   await expect(main.getByText('06.10.2026 · SEAP republică')).toBeVisible()
+  // The notice that opened the procedure, with its day.
+  await expect(facts.filter({ hasText: 'Anunț de participare' })).toBeVisible()
+  await expect(main.getByText('SCN0000009 · 10.01.2024')).toBeVisible()
   await expect(
     main.getByText(
       '4 · 2 contracte obișnuite, un acord-cadru și un contract subsecvent',
@@ -469,6 +472,7 @@ test('a notice not yet read in detail, and one without contracts, say so', async
     3,
   )
   await expect(main.getByText('ATU1 Lab GmbH')).toBeVisible()
+  await expect(main.getByText('Anunț de participare')).toHaveCount(0)
   // With no versions read, the page does not claim the notice was republished.
   await expect(main.getByText('Republicat ultima dată')).toHaveCount(0)
   await expect(
