@@ -55,7 +55,8 @@ test('the top bar lists only what exists, and searches from every page but home'
 }) => {
   await page.goto('/')
   const bar = page.getByRole('navigation', { name: 'Secțiuni' })
-  await expect(bar.getByRole('link')).toHaveCount(1)
+  await expect(bar.getByRole('link')).toHaveCount(2)
+  await expect(bar.getByRole('link', { name: 'Surse' })).toBeVisible()
   await expect(bar.getByRole('link', { name: 'Clasamente' })).toBeVisible()
   // On the home page the large search box is the page.
   await expect(page.getByRole('textbox', { name: 'Caută' })).toHaveCount(1)
@@ -507,3 +508,53 @@ for (const path of [
     ).toBeVisible()
   })
 }
+
+test('the sources page says what is held, what is to come and how it is counted', async ({
+  page,
+}) => {
+  await page.goto('/')
+  await page.getByRole('link', { name: 'Vezi sursele și cum numărăm' }).click()
+  await expect(page).toHaveURL(/\/surse$/)
+  await expect(page).toHaveTitle('De unde vin datele · Date România')
+  const main = page.getByRole('main')
+
+  // A notice is not a contract: what is held is more than what the totals count.
+  const awards = main
+    .getByRole('row')
+    .filter({ hasText: 'SEAP · anunțuri de atribuire' })
+  await expect(awards).toContainText('3 anunțuri')
+  await expect(awards).toContainText(
+    '5 contracte, din care 3 semnate în perioadă',
+  )
+  await expect(awards).toContainText('05.10–07.10.2026')
+  await expect(awards).toContainText('3 din 3 zile citite complet')
+  await expect(awards).toContainText('numărul de oferte nu e publicat')
+  const direct = main
+    .getByRole('row')
+    .filter({ hasText: 'SEAP · achiziții directe' })
+  await expect(direct).toContainText('6 achiziții')
+  await expect(direct).toContainText('5 acceptate')
+  await expect(direct).toContainText('1 peste plafon, nu intră în total')
+
+  // Sources still to come carry the dotted state and no figure.
+  const budget = main.getByRole('row').filter({ hasText: 'Forexebug' })
+  await expect(budget).toContainText('Încă necolectat')
+  await expect(
+    main.getByRole('link', { name: 'Exportă contractele din perioadă (CSV)' }),
+  ).toHaveAttribute('href', '/contracte.csv')
+
+  await main.getByRole('tab', { name: 'Metodologie' }).click()
+  await expect(page).toHaveURL(/\/surse\?fila=metodologie$/)
+  await expect(
+    main.getByText('Un anunț nu este un contract', { exact: true }),
+  ).toBeVisible()
+  await expect(main.getByText('publicată peste 900.400 lei')).toBeVisible()
+  await expect(main.getByText('Până acum sunt 2 răspunsuri.')).toBeVisible()
+  await expect(main.getByText(/vinovat|ascuns/)).toHaveCount(0)
+
+  await expect(
+    page
+      .getByRole('navigation', { name: 'Secțiuni' })
+      .getByRole('link', { name: 'Surse' }),
+  ).toHaveAttribute('aria-current', 'page')
+})

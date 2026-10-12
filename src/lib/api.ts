@@ -127,6 +127,13 @@ export type Dataset = {
   // False when the source publishes late, so the list of the period is never whole.
   complete: boolean
   fetched_at: string | null
+  // Days read in full, and days the source would not give in full.
+  days_collected: number
+  days_partial: number
+  // Raw answers kept from the source.
+  documents: number
+  // What is held, by kind of row; `records` is the one the totals use.
+  counts: Record<string, number | undefined>
 }
 
 // Like the totals, the table of what we hold must not take the home page down.

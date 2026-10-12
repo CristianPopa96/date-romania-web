@@ -103,7 +103,17 @@ function Home() {
           <Unavailable />
         )}
 
-        <DatasetTable datasets={datasets} />
+        <Flex direction="column" gap="3" align="start">
+          <DatasetTable datasets={datasets} />
+          <Link asChild size="2">
+            <RouterLink to="/surse">
+              <Flex align="center" gap="1">
+                {t.home.seeSources}
+                <ArrowRightIcon />
+              </Flex>
+            </RouterLink>
+          </Link>
+        </Flex>
       </Flex>
     </Container>
   )

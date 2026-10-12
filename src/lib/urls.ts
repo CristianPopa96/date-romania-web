@@ -86,6 +86,15 @@ export function validateRankingSearch(
   }
 }
 
+// /surse?fila=metodologie; the sources themselves are the page's plain address.
+export type SourcesSearch = { fila?: 'metodologie' }
+
+export function validateSourcesSearch(
+  search: Record<string, unknown>,
+): SourcesSearch {
+  return { fila: search.fila === 'metodologie' ? 'metodologie' : undefined }
+}
+
 // Whose contracts a CSV file holds: /contracte.csv?institutie=4981310, ?furnizor=...,
 // or with neither, every contract of the period.
 export type CsvFilter = { buyer?: number; supplier?: number }

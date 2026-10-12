@@ -1,5 +1,5 @@
 import { Link as RouterLink, useRouterState } from '@tanstack/react-router'
-import { BarChartIcon } from '@radix-ui/react-icons'
+import { BarChartIcon, FileTextIcon } from '@radix-ui/react-icons'
 import { Box, Container, Flex, Link, Text } from '@radix-ui/themes'
 
 import { SearchBox } from '#/components/SearchBox'
@@ -46,6 +46,10 @@ export function TopBar() {
   // The home page and the search page have the large search box; a second field next
   // to it would be the same field twice.
   const ownSearch = path === '/' || path === '/cautare'
+  const sections = [
+    { to: '/clasamente', label: t.nav.rankings, icon: <BarChartIcon /> },
+    { to: '/surse', label: t.nav.sources, icon: <FileTextIcon /> },
+  ] as const
 
   return (
     <Box asChild style={{ borderBottom: '1px solid var(--gray-a5)' }}>
@@ -64,20 +68,23 @@ export function TopBar() {
             </Link>
             <Flex asChild gap="4" align="center" flexGrow="1">
               <nav aria-label={t.nav.label}>
-                <Link
-                  asChild
-                  color={path === '/clasamente' ? undefined : 'gray'}
-                >
-                  <RouterLink
-                    to="/clasamente"
-                    aria-current={path === '/clasamente' ? 'page' : undefined}
+                {sections.map((section) => (
+                  <Link
+                    key={section.to}
+                    asChild
+                    color={path === section.to ? undefined : 'gray'}
                   >
-                    <Flex align="center" gap="1">
-                      <BarChartIcon />
-                      {t.nav.rankings}
-                    </Flex>
-                  </RouterLink>
-                </Link>
+                    <RouterLink
+                      to={section.to}
+                      aria-current={path === section.to ? 'page' : undefined}
+                    >
+                      <Flex align="center" gap="1">
+                        {section.icon}
+                        {section.label}
+                      </Flex>
+                    </RouterLink>
+                  </Link>
+                ))}
               </nav>
             </Flex>
             {/* The key empties the field once a search has been sent. */}
