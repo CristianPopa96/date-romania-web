@@ -21,8 +21,7 @@ import { PAGE_SIZE } from '#/lib/api'
 import { MATCHES } from '#/lib/api-programme'
 import type { Programme, ProjectPage } from '#/lib/api-programme'
 import { pageCount } from '#/lib/contracts'
-import { MATCH_PARAMS, countySlug, matchParam } from '#/lib/programme'
-import type { MatchParam } from '#/lib/programme'
+import { countySlug, isMatchParam, matchParam } from '#/lib/programme'
 import type { ProgrammeSearch } from '#/lib/urls'
 
 const ALL = 'toate'
@@ -57,7 +56,9 @@ export function ProjectFinder({
   return (
     <Flex direction="column" gap="3" id={PROJECTS_ANCHOR}>
       <Flex justify="between" align="center" gap="3" wrap="wrap">
-        <Heading size="5">{p.findTitle}</Heading>
+        <Heading as="h2" size="5">
+          {p.findTitle}
+        </Heading>
         <Flex gap="2" align="center" wrap="wrap">
           <Select.Root
             value={search.judet ?? ALL}
@@ -79,8 +80,7 @@ export function ProjectFinder({
             value={search.legatura ?? ALL}
             onValueChange={(value) =>
               change({
-                legatura:
-                  value in MATCH_PARAMS ? (value as MatchParam) : undefined,
+                legatura: isMatchParam(value) ? value : undefined,
               })
             }
           >

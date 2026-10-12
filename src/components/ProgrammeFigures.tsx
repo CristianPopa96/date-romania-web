@@ -6,7 +6,8 @@ import type { Programme } from '#/lib/api-programme'
 import { tiedShare } from '#/lib/programme'
 
 // The programme in four figures: what was paid, for how many projects, to how many town
-// halls, and how much of it we could tie to a SEAP contract.
+// halls, and how much of it we could tie to one SEAP contract. The last one rests on
+// both sources, and is a probable link, never a sure one.
 export function ProgrammeFigures({ programme }: { programme: Programme }) {
   const { t, f } = useI18n()
   const p = t.programme
@@ -42,13 +43,21 @@ export function ProgrammeFigures({ programme }: { programme: Programme }) {
               value={f.percent(share.ofAmount)}
               detail={[
                 p.tiedDetail(f.percent(share.ofCount)),
-                p.tiedOf(share.named.count, f.count(share.named.count)),
+                p.tiedOf(share.named, f.count(share.named)),
+                ...(share.several > 0
+                  ? [p.tiedSeveral(share.several, f.count(share.several))]
+                  : []),
               ]}
               share={share.ofAmount}
             />
           ) : null}
         </Grid>
-        <SourceLine source={programme.source} />
+        <Flex direction="column" gap="1">
+          <SourceLine source={programme.source} of="payments" />
+          {share ? (
+            <SourceLine source={programme.contracts_source} of="contracts" />
+          ) : null}
+        </Flex>
       </Flex>
     </Card>
   )

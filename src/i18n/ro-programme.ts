@@ -17,10 +17,12 @@ export const programme = {
   projectsDetail: 'drumuri, apă, canalizare, gaze',
   townHalls: 'Primării și consilii județene',
   townHallsDetail: 'care au primit plăți',
-  tied: 'Legat de un contract SEAP',
+  tied: 'Legat, probabil, de un singur contract SEAP',
   tiedDetail: (ofCount: string) => `din sumă · ${ofCount} din plăți`,
   tiedOf: (n: number, text: string) =>
     `din ${counted(n, text, 'o plată care numește', 'plăți care numesc')} constructorul cu CUI`,
+  tiedSeveral: (n: number, text: string) =>
+    `${counted(n, text, 'o plată are', 'plăți au')} mai multe contracte posibile și nu ${n === 1 ? 'e numărată' : 'sunt numărate'} aici`,
 
   // Finding a project.
   findTitle: 'Urmărește un proiect',
@@ -47,8 +49,13 @@ export const programme = {
     none: 'Niciun contract găsit',
     unnamed: 'Constructor fără CUI',
   },
+  // One contract found: how sure the link is goes in front, never left out.
+  oneContract: {
+    probable: 'Probabil un singur contract',
+    possible: 'Posibil un singur contract',
+  },
   matchOfProject: {
-    one: 'Legat de un singur contract',
+    one: 'Probabil un singur contract',
     several: 'Mai multe contracte posibile',
     none: 'Niciun contract găsit',
     unnamed: 'Constructor numit doar cu numele',
@@ -56,8 +63,11 @@ export const programme = {
 
   // How the payments were tied.
   howTitle: 'Cum s-au legat plățile',
-  how: (from: string, to: string) =>
-    `O plată e legată de un contract când același constructor, după CUI, a câștigat în SEAP un contract de la o instituție cu numele primăriei. Am căutat în contractele publicate în SEAP între ${from} și ${to}. Legătura este probabilă, nu sigură: fișierul de plăți nu numește contractul.`,
+  how: 'O plată e legată de un contract de lucrări când același constructor, după CUI, l-a câștigat în SEAP de la o instituție cu numele primăriei. Nicio legătură nu este sigură: fișierul de plăți nu numește contractul. O numim probabilă când SEAP arată că instituția e din județul proiectului sau când nicio altă instituție nu poartă acel nume.',
+  howSearched: (from: string, to: string) =>
+    `Am căutat în contractele publicate în SEAP între ${from} și ${to}.`,
+  howPossible: (n: number, text: string) =>
+    `Pentru ${counted(n, text, 'o plată', 'plăți')}, legătura e doar posibilă: mai multe instituții poartă numele primăriei.`,
   matchDetail: {
     one: 'lanțul complet, până la contract',
     several: 'același constructor, aceeași primărie',
@@ -76,6 +86,8 @@ export const programme = {
   whyUnnamedTitle: 'De ce unele plăți nu pot fi legate.',
   whyUnnamed: (day: string) =>
     `Fișierele de plăți publicate înainte de ${day} dau doar numele constructorului, fără CUI. După nume nu legăm o plată de un contract. Într-un proiect, o astfel de plată stă lângă plățile care numesc aceeași firmă cu CUI.`,
+  whyUnnamedOlder:
+    'Fișierele de plăți mai vechi dau doar numele constructorului, fără CUI. După nume nu legăm o plată de un contract. Într-un proiect, o astfel de plată stă lângă plățile care numesc aceeași firmă cu CUI.',
   whyUnnamedAll:
     'Fișierele de plăți preluate dau doar numele constructorului, fără CUI. După nume nu legăm o plată de un contract.',
   filesTitle: 'Fișierele de plăți',
@@ -118,15 +130,35 @@ export const programme = {
   unnamedNote: 'constructorul nu are CUI în fișier',
   subcontractors: 'Subcontractori',
   subcontractorsNote: 'SEAP nu îi publică',
+  ceiling: (value: string) => `acord-cadru · plafon ${value}`,
   links: 'Legături:',
   linkPublished: 'din fișierul de plăți',
-  linkProbable: 'CUI constructor + nume primărie',
+  linkProbable: 'legătură probabilă: CUI constructor + nume primărie',
+  linkPossible: 'legătură posibilă: CUI constructor + nume primărie',
   linkNone: 'lanțul se oprește',
   chainOf: (name: string) => `Lanțul pentru ${name}`,
 
   // The contracts under the chain.
-  contractTitle: 'Contractul găsit',
+  contractTitle: {
+    probable: 'Contractul probabil',
+    possible: 'Contractul posibil',
+  },
+  contractLead:
+    'Fișierul de plăți nu numește contractul. Acesta este contractul de lucrări pe care constructorul l-a câștigat de la o instituție cu numele primăriei.',
   contractsTitle: 'Contractele posibile',
+  // What a link rests on, by the API's name for it.
+  evidence: {
+    'builder-cui+town-hall-name+county':
+      'Legătură probabilă: același constructor, după CUI; instituția are numele primăriei și e din același județ.',
+    'builder-cui+only-town-hall-of-that-name':
+      'Legătură probabilă: același constructor, după CUI; nicio altă instituție din SEAP nu poartă numele primăriei.',
+    'builder-cui+town-hall-name':
+      'Legătură posibilă: același constructor, după CUI; mai multe instituții din SEAP poartă numele primăriei.',
+  } as Record<string, string | undefined>,
+  confidence: {
+    probable: 'Legătură probabilă.',
+    possible: 'Legătură posibilă.',
+  },
   contractsLead:
     'Constructorul a câștigat mai multe contracte de la aceeași primărie. Fișierul de plăți nu spune pe care îl plătește, iar exporturile SEAP din 2023 încoace nu dau titlul contractului, așa că nu alegem unul.',
   notice: 'Anunț',
@@ -137,6 +169,8 @@ export const programme = {
   ofProject: 'Din valoarea proiectului',
   association: (names: string) =>
     `Câștigat în asociere cu ${names}. Valoarea este a întregului contract.`,
+  associationUnnamed:
+    'Câștigat în asociere. Valoarea este a întregului contract.',
   framework: 'Acord-cadru: valoarea este un plafon, nu bani cheltuiți.',
   lot: (lot: string) => `lotul ${lot}`,
 

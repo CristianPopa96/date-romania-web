@@ -3,15 +3,17 @@ import { Flex, Text } from '@radix-ui/themes'
 import type { Match } from '#/lib/api-programme'
 
 // How a mark is drawn for each match state. The shape and the words carry the meaning;
-// the colour only repeats it (ConfidenceBadge in the design system).
-//   one      solid dot         a single contract
-//   several  half-filled dot   several contracts, none picked
+// the colour only repeats it (the ConfidenceBadge pattern of the design system, which
+// this component stands in for on the programme pages).
+//   one      half-filled dot   a single contract, tied by us: probable, never sure
+//   several  amber ring        several contracts, none picked
 //   none     empty ring        nothing found
 //   unnamed  dashed ring       nothing to search with
+// No state gets the solid green dot: that one is for a link a source publishes.
 const MARKS: Record<Match, { color: string; fill: 'full' | 'half' | 'none' }> =
   {
-    one: { color: 'var(--green-9)', fill: 'full' },
-    several: { color: 'var(--amber-9)', fill: 'half' },
+    one: { color: 'var(--amber-9)', fill: 'half' },
+    several: { color: 'var(--amber-9)', fill: 'none' },
     none: { color: 'var(--gray-9)', fill: 'none' },
     unnamed: { color: 'var(--gray-9)', fill: 'none' },
   }

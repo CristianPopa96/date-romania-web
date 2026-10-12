@@ -47,7 +47,8 @@ export type Programme = {
   files: Array<ProgrammeFile>
   payments_match: MatchCounts
   projects_match: MatchCounts
-  confidence: string
+  // Of the payments tied, those whose links are all only possible.
+  payments_possible: MatchCount
   // The contracts searched were published in SEAP between these two days.
   contracts_first_day: string | null
   contracts_last_day: string | null
@@ -89,6 +90,13 @@ export type TraceParty = {
   entity: EntityRef | null
 }
 
+// How sure a link between a payment and a contract is. None is sure: the payment
+// files do not name the contract.
+//   probable  an export puts the buyer in the project's county, or no other buyer in
+//             SEAP's exports carries the town hall's name
+//   possible  other buyers carry the same name
+export type Confidence = 'probable' | 'possible'
+
 export type TraceContract = {
   notice_no: string | null
   // Our id of the award notice, when we also collected it from SEAP: it has a page.
@@ -104,6 +112,9 @@ export type TraceContract = {
   is_framework: boolean | null
   buyer: EntityRef | null
   buyer_text: string | null
+  confidence: Confidence
+  // What the link rests on, in the API's words.
+  method: string
   // The other winners of an association. The value is the whole contract's.
   partners: Array<TraceParty>
   // Contract value over the project's total value.
@@ -127,7 +138,8 @@ export type Project = ProjectRow & {
   items: Array<ProjectPayment>
   builders: Array<TraceBuilder>
   designers: Array<TraceParty>
-  confidence: string
+  // The weakest link among the contracts shown; null when there are none.
+  confidence: Confidence | null
   source: Source
   contracts_source: Source
 }

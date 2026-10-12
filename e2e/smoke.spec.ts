@@ -683,14 +683,40 @@ test('the programme page adds up the payment files and says how much was tied', 
     main.getByText('Plătit, în fișierele din 18.05–27.08.2026'),
   ).toBeVisible()
   await expect(main.getByText('7,2 mil. lei').first()).toBeVisible()
-  // Of the four payments that name the builder by tax ID, three found a contract.
-  await expect(main.getByText('din sumă · 75 % din plăți')).toBeVisible()
+  // Of the four payments that name the builder by tax ID, two found one contract. The
+  // one with two possible contracts is not counted as tied, and the figure says so.
+  await expect(
+    main.getByText('Legat, probabil, de un singur contract SEAP'),
+  ).toBeVisible()
+  await expect(main.getByText('70 %', { exact: true })).toBeVisible()
+  await expect(main.getByText('din sumă · 50 % din plăți')).toBeVisible()
+  await expect(
+    main.getByText(
+      'o plată are mai multe contracte posibile și nu e numărată aici',
+    ),
+  ).toBeVisible()
   await expect(
     main.getByText('din 4 plăți care numesc constructorul cu CUI'),
   ).toBeVisible()
+  // The figure rests on both sources, and both are named under it.
   await expect(
-    main.getByText('Sursa: data.gov.ro · MDLPA · Plăți PNIAS 2026-prezent'),
+    main
+      .getByText(
+        'Sursa plăților: data.gov.ro · MDLPA · Plăți PNIAS 2026-prezent',
+      )
+      .first(),
   ).toBeVisible()
+  await expect(
+    main
+      .getByText('Sursa contractelor: data.gov.ro · ADR · Achiziții publice')
+      .first(),
+  ).toBeVisible()
+  // No link is sure, and one payment's is only possible.
+  await expect(main.getByText('Nicio legătură nu este sigură')).toBeVisible()
+  await expect(
+    main.getByText('Pentru o plată, legătura e doar posibilă'),
+  ).toBeVisible()
+  await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1)
 
   // One card per outcome, and why two of them stop short.
   await expect(main.getByText('lanțul complet, până la contract')).toBeVisible()
@@ -729,9 +755,12 @@ test('a project is found by county, by words and by what was tied', async ({
   await expect(
     main.getByText('Niciun proiect nu se potrivește cu ce ai ales.'),
   ).toBeVisible()
-  // A filter the address does not know is dropped, not shown as an error.
-  await page.goto(`${PROGRAMME}?legatura=altceva`)
-  await expect(main.getByText('4 proiecte', { exact: true })).toBeVisible()
+  // A filter the address does not know is dropped, not shown as an error; so is a
+  // word every object answers to.
+  for (const unknown of ['altceva', 'toString']) {
+    await page.goto(`${PROGRAMME}?legatura=${unknown}`)
+    await expect(main.getByText('4 proiecte', { exact: true })).toBeVisible()
+  }
 })
 
 test('a project is traced from the ministry to its contract', async ({
@@ -745,7 +774,17 @@ test('a project is traced from the ministry to its contract', async ({
     })
     .click()
   await expect(page).toHaveURL(/\/programe\/anghel-saligny\/proiecte\/101$/)
-  await expect(main.getByText('Legat de un singur contract')).toBeVisible()
+  // The link to the contract is ours: the page says "probabil" wherever it shows it.
+  await expect(main.getByText('Probabil un singur contract')).toBeVisible()
+  await expect(
+    main.getByRole('heading', { name: 'Contractul probabil' }),
+  ).toBeVisible()
+  await expect(
+    main.getByText(
+      'Legătură probabilă: același constructor, după CUI; instituția are numele primăriei și e din același județ.',
+    ),
+  ).toBeVisible()
+  await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1)
   await expect(
     main.getByText('Contract de finanțare MDLPA 1872 din 18.05.2023'),
   ).toBeVisible()
@@ -775,7 +814,16 @@ test('a project is traced from the ministry to its contract', async ({
   // What SEAP does not publish ends the chain; nothing offers to request it yet.
   await expect(chain).toContainText('Nepublicat')
   await expect(main.getByText('Cere lista')).toHaveCount(0)
-  await expect(main.getByText('CUI constructor + nume primărie')).toBeVisible()
+  // The lines of the chain are drawings; each is also said in words, in the chain for
+  // a screen reader and in the legend under it.
+  await expect(chain).toContainText(
+    'legătură probabilă: CUI constructor + nume primărie: Contract SEAP',
+  )
+  await expect(
+    main
+      .getByText('legătură probabilă: CUI constructor + nume primărie')
+      .last(),
+  ).toBeVisible()
 
   // Won by two: one value, the partner named, never the word "lider".
   await expect(
@@ -807,6 +855,18 @@ test('a project with several contracts lists them and picks none', async ({
   await expect(
     main.getByRole('heading', { name: 'Contractele posibile' }),
   ).toBeVisible()
+  // Two buyers are named like the county council: the links are only possible.
+  await expect(
+    main
+      .getByText(
+        'Legătură posibilă: același constructor, după CUI; mai multe instituții din SEAP poartă numele primăriei.',
+      )
+      .first(),
+  ).toBeVisible()
+  await expect(chain).toContainText('legătură posibilă')
+  // A framework agreement is a ceiling: it gets no share of the project's value.
+  const framework = main.getByRole('row').filter({ hasText: 'CAN1070002' })
+  await expect(framework).not.toContainText('%')
   await expect(main.getByText('Modernizare DJ 109, lot 1')).toBeVisible()
   await expect(
     main.getByText('Acord-cadru: valoarea este un plafon, nu bani cheltuiți.'),

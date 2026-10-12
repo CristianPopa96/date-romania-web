@@ -82,8 +82,14 @@ export function TopBar() {
                   >
                     <RouterLink
                       to={section.to}
+                      // On a page under the section, the section is where the
+                      // reader is, not the page itself.
                       aria-current={
-                        isOpen(path, section.to) ? 'page' : undefined
+                        path === section.to
+                          ? 'page'
+                          : isOpen(path, section.to)
+                            ? 'location'
+                            : undefined
                       }
                     >
                       <Flex align="center" gap="1">

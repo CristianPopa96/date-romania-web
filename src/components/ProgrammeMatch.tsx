@@ -9,6 +9,7 @@ import {
   Text,
 } from '@radix-ui/themes'
 
+import { DataState } from '#/components/DataState'
 import { MatchBadge } from '#/components/MatchBadge'
 import { SourceLine } from '#/components/SourceLine'
 import { useI18n } from '#/i18n/context'
@@ -33,12 +34,20 @@ export function ProgrammeMatch({ programme }: { programme: Programme }) {
 
   return (
     <Flex direction="column" gap="3">
-      <Heading size="5">{p.howTitle}</Heading>
-      {searched ? (
-        <Text size="2" color="gray" style={{ maxWidth: '75ch' }}>
-          {p.how(searched.from, searched.to)}
-        </Text>
-      ) : null}
+      <Heading as="h2" size="5">
+        {p.howTitle}
+      </Heading>
+      {/* Said whatever else is known: no link here is sure. */}
+      <Text size="2" color="gray" style={{ maxWidth: '75ch' }}>
+        {p.how}
+        {searched ? ` ${p.howSearched(searched.from, searched.to)}` : null}
+        {programme.payments_possible.count > 0
+          ? ` ${p.howPossible(
+              programme.payments_possible.count,
+              f.count(programme.payments_possible.count),
+            )}`
+          : null}
+      </Text>
       <Grid columns={{ initial: '1', sm: '2', md: '4' }} gap="3">
         {MATCHES.map((match) => (
           <Card key={match}>
@@ -78,13 +87,15 @@ export function ProgrammeMatch({ programme }: { programme: Programme }) {
               <Text weight="bold">{p.whyUnnamedTitle}</Text>{' '}
               {firstNamed?.published_on
                 ? p.whyUnnamed(f.day(firstNamed.published_on))
-                : p.whyUnnamedAll}
+                : firstNamed
+                  ? p.whyUnnamedOlder
+                  : p.whyUnnamedAll}
             </Callout.Text>
           </Callout.Root>
         ) : null}
       </Flex>
 
-      <Heading size="4" mt="2">
+      <Heading as="h3" size="4" mt="2">
         {p.filesTitle}
       </Heading>
       <Table.Root variant="surface" size="1">
@@ -103,10 +114,14 @@ export function ProgrammeMatch({ programme }: { programme: Programme }) {
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {programme.files.map((file) => (
-            <Table.Row key={file.published_on ?? ''}>
+          {programme.files.map((file, index) => (
+            <Table.Row key={file.published_on ?? `file ${index}`}>
               <Table.RowHeaderCell>
-                {file.published_on ? f.day(file.published_on) : null}
+                {file.published_on ? (
+                  f.day(file.published_on)
+                ) : (
+                  <DataState kind="notPublished" />
+                )}
               </Table.RowHeaderCell>
               <Table.Cell justify="end">{f.count(file.payments)}</Table.Cell>
               <Table.Cell justify="end">{f.lei(file.amount)}</Table.Cell>

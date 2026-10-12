@@ -2,6 +2,7 @@
 // of the components so they can be tested.
 
 import type {
+  Confidence,
   Match,
   MatchCounts,
   TraceBuilder,
@@ -26,30 +27,49 @@ export const MATCH_PARAMS = {
 } as const satisfies Record<string, Match>
 export type MatchParam = keyof typeof MATCH_PARAMS
 
+// True for a name the address may carry. `in` would also say yes to "toString".
+export function isMatchParam(value: unknown): value is MatchParam {
+  return typeof value === 'string' && Object.hasOwn(MATCH_PARAMS, value)
+}
+
 export function matchParam(match: Match) {
   const names = Object.keys(MATCH_PARAMS) as Array<MatchParam>
   return names.find((name) => MATCH_PARAMS[name] === match)
 }
 
-// How much of what could be tied was tied. Only payments that name the builder by tax
-// ID can be tied at all, so the share is of those, never of every payment: the older
-// files give names only.
+// How much was tied to the contracts of one award notice, out of what could be tied
+// at all. Only payments that name the builder by tax ID can be tied, so the share is of
+// those, never of every payment: the older files give names only. A payment with several
+// possible notices is not counted as tied: we do not know which contract it settles.
 export function tiedShare(match: MatchCounts) {
-  const tied = {
-    count: match.one.count + match.several.count,
-    amount: match.one.amount + match.several.amount,
-  }
   const named = {
-    count: tied.count + match.none.count,
-    amount: tied.amount + match.none.amount,
+    count: match.one.count + match.several.count + match.none.count,
+    amount: match.one.amount + match.several.amount + match.none.amount,
   }
   if (named.count === 0 || named.amount === 0) return null
   return {
-    tied,
-    named,
-    ofCount: tied.count / named.count,
-    ofAmount: tied.amount / named.amount,
+    named: named.count,
+    several: match.several.count,
+    ofCount: match.one.count / named.count,
+    ofAmount: match.one.amount / named.amount,
   }
+}
+
+// The weakest link among contracts: one possible link makes the whole possible.
+export function weakest(
+  contracts: Array<Pick<TraceContract, 'confidence'>>,
+): Confidence | null {
+  if (contracts.length === 0) return null
+  return contracts.some((each) => each.confidence === 'possible')
+    ? 'possible'
+    : 'probable'
+}
+
+// The other winners of a contract by name, or by tax ID where SEAP gives no name.
+export function partnerNames(contract: TraceContract) {
+  return contract.partners
+    .map((partner) => partner.name ?? partner.cui?.toString() ?? null)
+    .filter((name) => name !== null)
 }
 
 // The progress of the works as a share, from what a town hall typed: "83,34", "64%",

@@ -6,9 +6,12 @@ import {
   countyKey,
   countySlug,
   isAssociation,
+  isMatchParam,
   matchParam,
+  partnerNames,
   progressShare,
   tiedShare,
+  weakest,
 } from '#/lib/programme'
 
 function contract(more: Partial<TraceContract> = {}): TraceContract {
@@ -26,6 +29,8 @@ function contract(more: Partial<TraceContract> = {}): TraceContract {
     is_framework: false,
     buyer: null,
     buyer_text: 'COMUNA TANTARENI',
+    confidence: 'probable',
+    method: 'builder-cui+town-hall-name+county',
     partners: [],
     ratio: 0.72,
     ...more,
@@ -70,12 +75,13 @@ describe('tiedShare', () => {
     unnamed: { count: 2757, amount: 4387.3 },
   }
 
-  it('is the share of the payments that name the builder by tax ID', () => {
+  it('counts one contract as tied, out of the payments that name the builder by tax ID', () => {
     const share = tiedShare(counts)
-    expect(share?.tied.count).toBe(971)
-    expect(share?.named.count).toBe(1064)
-    expect(share?.ofCount).toBeCloseTo(0.913, 3)
-    expect(share?.ofAmount).toBeCloseTo(0.884, 3)
+    expect(share?.named).toBe(1064)
+    // Several possible contracts is not "tied": we do not know which one is paid.
+    expect(share?.several).toBe(324)
+    expect(share?.ofCount).toBeCloseTo(647 / 1064, 5)
+    expect(share?.ofAmount).toBeCloseTo(892.9 / 1541, 5)
   })
 
   it('says nothing when no payment names its builder by tax ID', () => {
@@ -131,6 +137,39 @@ describe('chainEnd', () => {
     expect(
       chainEnd(builder({ cui: null, match: 'unnamed', contracts: [] })),
     ).toEqual({ kind: 'unnamed' })
+  })
+})
+
+describe('isMatchParam', () => {
+  it('takes the four names and nothing an object happens to have', () => {
+    expect(isMatchParam('mai-multe')).toBe(true)
+    expect(isMatchParam('toString')).toBe(false)
+    expect(isMatchParam('constructor')).toBe(false)
+    expect(isMatchParam(undefined)).toBe(false)
+  })
+})
+
+describe('weakest', () => {
+  it('is possible as soon as one link is', () => {
+    expect(weakest([])).toBeNull()
+    expect(weakest([contract()])).toBe('probable')
+    expect(weakest([contract(), contract({ confidence: 'possible' })])).toBe(
+      'possible',
+    )
+  })
+})
+
+describe('partnerNames', () => {
+  it('names a partner by its tax ID when SEAP gives no name, and never prints null', () => {
+    const partners = [
+      { cui: 30000011, name: 'GAMA ASFALT', entity: null },
+      { cui: 30000022, name: null, entity: null },
+      { cui: null, name: null, entity: null },
+    ]
+    expect(partnerNames(contract({ partners }))).toEqual([
+      'GAMA ASFALT',
+      '30000022',
+    ])
   })
 })
 

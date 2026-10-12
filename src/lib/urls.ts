@@ -1,5 +1,5 @@
 // What a shared address means: the parts of a URL that decide which page is shown.
-import { MATCH_PARAMS } from '#/lib/programme'
+import { isMatchParam } from '#/lib/programme'
 import type { MatchParam } from '#/lib/programme'
 import { sitePath } from '#/lib/reports'
 
@@ -193,11 +193,9 @@ export function validateProgrammeSearch(
         ? search.judet
         : undefined,
     q: q.length >= 2 ? q : undefined,
-    legatura:
-      typeof search.legatura === 'string' && search.legatura in MATCH_PARAMS
-        ? (search.legatura as MatchParam)
-        : undefined,
-    firma: builder ?? undefined,
+    legatura: isMatchParam(search.legatura) ? search.legatura : undefined,
+    // No company has the tax ID 0.
+    firma: builder || undefined,
     pagina: validateEntitySearch(search).pagina,
   }
 }

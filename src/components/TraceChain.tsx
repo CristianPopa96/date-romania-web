@@ -1,17 +1,19 @@
 import type { ReactNode } from 'react'
-import { Box, Flex, Text } from '@radix-ui/themes'
+import { Box, Flex, Text, VisuallyHidden } from '@radix-ui/themes'
 
 import { NOT_PUBLISHED_OUTLINE } from '#/components/DataState'
 
 // How two hops are connected, drawn on the line between them:
 //   published  solid green    both are named in the same published record
-//   probable   dashed amber   tied by us: builder tax ID and town hall name
+//   probable   dashed amber   tied by us, on evidence that makes it probable
+//   possible   dotted gray    tied by us, by a name other buyers carry too
 //   gap        dotted red     the chain stops here
-export type TraceLink = 'published' | 'probable' | 'gap'
+export type TraceLink = 'published' | 'probable' | 'possible' | 'gap'
 
 const LINES: Record<TraceLink, string> = {
   published: '2px solid var(--green-9)',
   probable: '2px dashed var(--amber-9)',
+  possible: '2px dotted var(--gray-9)',
   gap: '2px dotted var(--red-9)',
 }
 
@@ -19,8 +21,9 @@ export type TraceHop = {
   role: string
   name: ReactNode
   note?: ReactNode
-  // How this hop is reached from the one before; left out for the first.
-  link?: TraceLink
+  // How this hop is reached from the one before, and the same in words: the line is a
+  // drawing, so a screen reader is told what it means. Left out for the first hop.
+  link?: { kind: TraceLink; label: string }
   // The hop says something is missing: drawn with the dashed outline.
   missing?: boolean
 }
@@ -41,11 +44,17 @@ export function TraceChain({
           aria-label={label}
           style={{ listStyle: 'none', margin: 0, padding: 0 }}
         >
-          {hops.map((hop, index) => (
+          {hops.map((hop) => (
             <Flex key={hop.role} asChild align="stretch">
               <li>
-                {index > 0 ? (
-                  <Connector link={hop.link ?? 'published'} />
+                {hop.link ? (
+                  <Flex align="center">
+                    <Box
+                      aria-hidden
+                      style={{ width: 28, borderTop: LINES[hop.link.kind] }}
+                    />
+                    <VisuallyHidden>{hop.link.label}: </VisuallyHidden>
+                  </Flex>
                 ) : null}
                 <Flex
                   direction="column"
@@ -80,21 +89,13 @@ export function TraceChain({
   )
 }
 
-function Connector({ link }: { link: TraceLink }) {
-  return (
-    <Flex align="center" aria-hidden>
-      <Box style={{ width: 28, borderTop: LINES[link] }} />
-    </Flex>
-  )
-}
-
 // The key under a chain: what each kind of line means, in words.
 export function TraceLegend({
   title,
   items,
 }: {
   title: string
-  items: Array<{ link: TraceLink; label: string }>
+  items: Array<{ kind: TraceLink; label: string }>
 }) {
   return (
     <Flex gap="4" align="center" wrap="wrap">
@@ -102,8 +103,8 @@ export function TraceLegend({
         {title}
       </Text>
       {items.map((item) => (
-        <Flex key={item.link} align="center" gap="2">
-          <Box aria-hidden style={{ width: 24, borderTop: LINES[item.link] }} />
+        <Flex key={item.kind} align="center" gap="2">
+          <Box aria-hidden style={{ width: 24, borderTop: LINES[item.kind] }} />
           <Text size="1" color="gray">
             {item.label}
           </Text>

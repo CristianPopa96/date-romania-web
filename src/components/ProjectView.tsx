@@ -13,13 +13,14 @@ import {
   Text,
 } from '@radix-ui/themes'
 
+import { DataState } from '#/components/DataState'
 import { EntityLink } from '#/components/EntityLink'
 import { MatchBadge } from '#/components/MatchBadge'
 import { ProjectChain } from '#/components/ProjectChain'
 import { ProjectContracts } from '#/components/ProjectContracts'
 import { SourceLine } from '#/components/SourceLine'
 import { useI18n } from '#/i18n/context'
-import type { Project } from '#/lib/api-programme'
+import type { ProgrammeFile, Project } from '#/lib/api-programme'
 import { progressShare } from '#/lib/programme'
 import { programmeQuery, projectQuery } from '#/lib/queries'
 
@@ -82,7 +83,11 @@ export function ProjectView({ id }: { id: number }) {
               </Flex>
               <MatchBadge
                 match={project.match}
-                label={p.matchOfProject[project.match]}
+                label={
+                  project.match === 'one'
+                    ? p.oneContract[project.confidence ?? 'probable']
+                    : p.matchOfProject[project.match]
+                }
                 size="2"
               />
             </Flex>
@@ -100,7 +105,7 @@ export function ProjectView({ id }: { id: number }) {
                 <ProjectContracts builder={builder} />
               </Flex>
             ))}
-            <Why project={project} firstNamed={firstNamed(programme?.files)} />
+            <Why project={project} files={programme?.files ?? []} />
             <Designers project={project} />
             <SourceLine source={project.source} of="payments" />
             {project.builders.some((each) => each.contracts.length > 0) ? (
@@ -115,24 +120,19 @@ export function ProjectView({ id }: { id: number }) {
   )
 }
 
-// The day of the first payment file that names builders by tax ID.
-function firstNamed(
-  files: Array<{ published_on: string | null; with_tax_id: number }> = [],
-) {
-  return files.find((file) => file.with_tax_id > 0)?.published_on ?? null
-}
-
 // Said once, where the chain stops before a contract: what the reader is looking at.
 function Why({
   project,
-  firstNamed: day,
+  files,
 }: {
   project: Project
-  firstNamed: string | null
+  files: Array<ProgrammeFile>
 }) {
   const { t, f } = useI18n()
   const p = t.programme
   if (project.match !== 'none' && project.match !== 'unnamed') return null
+  // The first payment file that names builders by tax ID, if any does.
+  const named = files.find((file) => file.with_tax_id > 0)
   return (
     <Callout.Root color="gray" variant="surface" size="1">
       <Callout.Icon>
@@ -146,7 +146,11 @@ function Why({
       ) : (
         <Callout.Text>
           <Text weight="bold">{p.whyUnnamedTitle}</Text>{' '}
-          {day ? p.whyUnnamed(f.day(day)) : p.whyUnnamedAll}
+          {named?.published_on
+            ? p.whyUnnamed(f.day(named.published_on))
+            : named
+              ? p.whyUnnamedOlder
+              : p.whyUnnamedAll}
         </Callout.Text>
       )}
     </Callout.Root>
@@ -179,6 +183,8 @@ function Designers({ project }: { project: Project }) {
 function Payments({ project }: { project: Project }) {
   const { t, f } = useI18n()
   const p = t.programme
+  // A file that leaves a value out does not publish it: said, never left blank.
+  const missing = <DataState kind="notPublished" />
   return (
     <Flex direction="column" gap="3">
       <Heading as="h2" size="5">
@@ -208,17 +214,21 @@ function Payments({ project }: { project: Project }) {
             return (
               <Table.Row key={payment.id}>
                 <Table.RowHeaderCell>
-                  {payment.published_on ? f.day(payment.published_on) : null}
+                  {payment.published_on ? f.day(payment.published_on) : missing}
                 </Table.RowHeaderCell>
                 <Table.Cell>
                   <Code variant="ghost">{p.requestNo(String(payment.id))}</Code>
                 </Table.Cell>
                 <Table.Cell>
-                  {payment.registered_on ? f.day(payment.registered_on) : null}
+                  {payment.registered_on
+                    ? f.day(payment.registered_on)
+                    : missing}
                 </Table.Cell>
-                <Table.Cell>{payment.builder_text}</Table.Cell>
+                <Table.Cell>{payment.builder_text ?? missing}</Table.Cell>
                 <Table.Cell justify="end">
-                  {share !== null ? f.percent(share, 2) : payment.progress}
+                  {share !== null
+                    ? f.percent(share, 2)
+                    : (payment.progress ?? missing)}
                 </Table.Cell>
                 <Table.Cell justify="end" style={{ whiteSpace: 'nowrap' }}>
                   {f.lei(payment.amount)}
