@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ExternalLinkIcon, FileTextIcon } from '@radix-ui/react-icons'
 import {
   Button,
@@ -38,6 +38,10 @@ export function ReportForm({ about }: { about?: string }) {
   const [website, setWebsite] = useState('')
   const [state, setState] = useState<State>('idle')
   const messageField = useRef<HTMLTextAreaElement>(null)
+  // Until the page's script runs, sending would reload the page and lose what was
+  // typed, so the button waits for it.
+  const [ready, setReady] = useState(false)
+  useEffect(() => setReady(true), [])
 
   async function submit(event: React.FormEvent) {
     event.preventDefault()
@@ -188,7 +192,7 @@ export function ReportForm({ about }: { about?: string }) {
               <Text size="1" color="gray">
                 {t.report.public}
               </Text>
-              <Button type="submit" disabled={state === 'sending'}>
+              <Button type="submit" disabled={!ready || state === 'sending'}>
                 {state === 'sending' ? t.report.sending : t.report.send}
               </Button>
             </Flex>
