@@ -1,4 +1,6 @@
 // What a shared address means: the parts of a URL that decide which page is shown.
+import { MATCH_PARAMS } from '#/lib/programme'
+import type { MatchParam } from '#/lib/programme'
 import { sitePath } from '#/lib/reports'
 
 // Search params shared by the institution and the supplier page.
@@ -159,5 +161,43 @@ export function validateSearchSearch(
       search.tip === 'institutii' || search.tip === 'firme'
         ? search.tip
         : undefined,
+  }
+}
+
+// The programme page: /programe/anghel-saligny?judet=gorj&q=drum&legatura=mai-multe.
+// `firma` is a builder's CUI, for "every project this company builds".
+export type ProgrammeSearch = {
+  judet?: string
+  q?: string
+  legatura?: MatchParam
+  firma?: number
+  pagina?: number
+}
+
+export function validateProgrammeSearch(
+  search: Record<string, unknown>,
+): ProgrammeSearch {
+  // A number typed in the field arrives as a number, like a CUI in the search page.
+  const q =
+    typeof search.q === 'string' || typeof search.q === 'number'
+      ? String(search.q).trim().slice(0, 100)
+      : ''
+  const builder =
+    typeof search.firma === 'number' || typeof search.firma === 'string'
+      ? cuiFromPath(String(search.firma))
+      : null
+  return {
+    judet:
+      typeof search.judet === 'string' &&
+      /^[a-z]{2,20}(-[a-z]{2,20})?$/.test(search.judet)
+        ? search.judet
+        : undefined,
+    q: q.length >= 2 ? q : undefined,
+    legatura:
+      typeof search.legatura === 'string' && search.legatura in MATCH_PARAMS
+        ? (search.legatura as MatchParam)
+        : undefined,
+    firma: builder ?? undefined,
+    pagina: validateEntitySearch(search).pagina,
   }
 }

@@ -18,6 +18,9 @@ import { Route as AchizitiiDirecteIdRouteImport } from './routes/achizitii-direc
 import { Route as ContracteIdRouteImport } from './routes/contracte.$id'
 import { Route as FurnizoriCuiRouteImport } from './routes/furnizori.$cui'
 import { Route as InstitutiiCuiRouteImport } from './routes/institutii.$cui'
+import { Route as ProgrameIndexRouteImport } from './routes/programe.index'
+import { Route as ProgrameAnghelSalignyIndexRouteImport } from './routes/programe.anghel-saligny.index'
+import { Route as ProgrameAnghelSalignyProiecteIdRouteImport } from './routes/programe.anghel-saligny.proiecte.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -64,6 +67,23 @@ const InstitutiiCuiRoute = InstitutiiCuiRouteImport.update({
   path: '/institutii/$cui',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProgrameIndexRoute = ProgrameIndexRouteImport.update({
+  id: '/programe/',
+  path: '/programe/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProgrameAnghelSalignyIndexRoute =
+  ProgrameAnghelSalignyIndexRouteImport.update({
+    id: '/programe/anghel-saligny/',
+    path: '/programe/anghel-saligny/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProgrameAnghelSalignyProiecteIdRoute =
+  ProgrameAnghelSalignyProiecteIdRouteImport.update({
+    id: '/programe/anghel-saligny/proiecte/$id',
+    path: '/programe/anghel-saligny/proiecte/$id',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -75,6 +95,9 @@ export interface FileRoutesByFullPath {
   '/contracte/$id': typeof ContracteIdRoute
   '/furnizori/$cui': typeof FurnizoriCuiRoute
   '/institutii/$cui': typeof InstitutiiCuiRoute
+  '/programe/': typeof ProgrameIndexRoute
+  '/programe/anghel-saligny/': typeof ProgrameAnghelSalignyIndexRoute
+  '/programe/anghel-saligny/proiecte/$id': typeof ProgrameAnghelSalignyProiecteIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -86,6 +109,9 @@ export interface FileRoutesByTo {
   '/contracte/$id': typeof ContracteIdRoute
   '/furnizori/$cui': typeof FurnizoriCuiRoute
   '/institutii/$cui': typeof InstitutiiCuiRoute
+  '/programe': typeof ProgrameIndexRoute
+  '/programe/anghel-saligny': typeof ProgrameAnghelSalignyIndexRoute
+  '/programe/anghel-saligny/proiecte/$id': typeof ProgrameAnghelSalignyProiecteIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -98,6 +124,9 @@ export interface FileRoutesById {
   '/contracte/$id': typeof ContracteIdRoute
   '/furnizori/$cui': typeof FurnizoriCuiRoute
   '/institutii/$cui': typeof InstitutiiCuiRoute
+  '/programe/': typeof ProgrameIndexRoute
+  '/programe/anghel-saligny/': typeof ProgrameAnghelSalignyIndexRoute
+  '/programe/anghel-saligny/proiecte/$id': typeof ProgrameAnghelSalignyProiecteIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -111,6 +140,9 @@ export interface FileRouteTypes {
     | '/contracte/$id'
     | '/furnizori/$cui'
     | '/institutii/$cui'
+    | '/programe/'
+    | '/programe/anghel-saligny/'
+    | '/programe/anghel-saligny/proiecte/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -122,6 +154,9 @@ export interface FileRouteTypes {
     | '/contracte/$id'
     | '/furnizori/$cui'
     | '/institutii/$cui'
+    | '/programe'
+    | '/programe/anghel-saligny'
+    | '/programe/anghel-saligny/proiecte/$id'
   id:
     | '__root__'
     | '/'
@@ -133,6 +168,9 @@ export interface FileRouteTypes {
     | '/contracte/$id'
     | '/furnizori/$cui'
     | '/institutii/$cui'
+    | '/programe/'
+    | '/programe/anghel-saligny/'
+    | '/programe/anghel-saligny/proiecte/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -145,6 +183,9 @@ export interface RootRouteChildren {
   ContracteIdRoute: typeof ContracteIdRoute
   FurnizoriCuiRoute: typeof FurnizoriCuiRoute
   InstitutiiCuiRoute: typeof InstitutiiCuiRoute
+  ProgrameIndexRoute: typeof ProgrameIndexRoute
+  ProgrameAnghelSalignyIndexRoute: typeof ProgrameAnghelSalignyIndexRoute
+  ProgrameAnghelSalignyProiecteIdRoute: typeof ProgrameAnghelSalignyProiecteIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -212,6 +253,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InstitutiiCuiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/programe/': {
+      id: '/programe/'
+      path: '/programe'
+      fullPath: '/programe/'
+      preLoaderRoute: typeof ProgrameIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/programe/anghel-saligny/': {
+      id: '/programe/anghel-saligny/'
+      path: '/programe/anghel-saligny'
+      fullPath: '/programe/anghel-saligny/'
+      preLoaderRoute: typeof ProgrameAnghelSalignyIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/programe/anghel-saligny/proiecte/$id': {
+      id: '/programe/anghel-saligny/proiecte/$id'
+      path: '/programe/anghel-saligny/proiecte/$id'
+      fullPath: '/programe/anghel-saligny/proiecte/$id'
+      preLoaderRoute: typeof ProgrameAnghelSalignyProiecteIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -225,6 +287,9 @@ const rootRouteChildren: RootRouteChildren = {
   ContracteIdRoute: ContracteIdRoute,
   FurnizoriCuiRoute: FurnizoriCuiRoute,
   InstitutiiCuiRoute: InstitutiiCuiRoute,
+  ProgrameIndexRoute: ProgrameIndexRoute,
+  ProgrameAnghelSalignyIndexRoute: ProgrameAnghelSalignyIndexRoute,
+  ProgrameAnghelSalignyProiecteIdRoute: ProgrameAnghelSalignyProiecteIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

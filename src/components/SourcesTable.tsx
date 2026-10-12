@@ -28,7 +28,9 @@ export function SourcesTable({ datasets }: { datasets: Array<Dataset> }) {
         <Table.Body>
           {datasets.map((dataset) => {
             const days = f.span(dataset.first_day, dataset.last_day)
-            const read = coverage(dataset)
+            // A source that comes as files has no days to read or to miss.
+            const files = dataset.counts.files ?? 0
+            const read = files > 0 ? null : coverage(dataset)
             const limits = t.sources.limitsOf[dataset.key] ?? []
             return (
               <Table.Row key={dataset.key}>
@@ -47,6 +49,11 @@ export function SourcesTable({ datasets }: { datasets: Array<Dataset> }) {
                   <Text as="div" style={{ whiteSpace: 'nowrap' }}>
                     {days ? t.period.range(days.from, days.to) : null}
                   </Text>
+                  {files > 0 ? (
+                    <Text as="div" size="1" color="gray">
+                      {t.sources.files(files, f.count(files))}
+                    </Text>
+                  ) : null}
                   {read ? (
                     <Text as="div" size="1" color="gray">
                       {t.sources.daysRead(
@@ -135,6 +142,30 @@ function Held({ dataset }: { dataset: Dataset }) {
             t.contracts.count(n('contracts'), f.count(n('contracts'))),
             f.count(n('counted_contracts')),
           )}
+        </Text>
+      </>
+    )
+  }
+  if (dataset.key === 'pnias-payments') {
+    return (
+      <>
+        <Text as="div">
+          {t.sources.paymentsHeld(dataset.records, f.count(dataset.records))}
+        </Text>
+        <Text as="div" size="1" color="gray">
+          {t.sources.projectsHeld(n('projects'), f.count(n('projects')))}
+        </Text>
+      </>
+    )
+  }
+  if (dataset.key === 'seap-exports') {
+    return (
+      <>
+        <Text as="div">
+          {t.sources.exportRows(dataset.records, f.count(dataset.records))}
+        </Text>
+        <Text as="div" size="1" color="gray">
+          {t.sources.exportRowsNote}
         </Text>
       </>
     )

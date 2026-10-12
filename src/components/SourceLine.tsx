@@ -11,7 +11,7 @@ export function SourceLine({
   of,
 }: {
   source: Source
-  of?: 'contracts' | 'purchases'
+  of?: 'contracts' | 'purchases' | 'payments'
 }) {
   const { t, f } = useI18n()
   const parts = [

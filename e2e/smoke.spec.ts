@@ -55,7 +55,8 @@ test('the top bar lists only what exists, and searches from every page but home'
 }) => {
   await page.goto('/')
   const bar = page.getByRole('navigation', { name: 'Secțiuni' })
-  await expect(bar.getByRole('link')).toHaveCount(2)
+  await expect(bar.getByRole('link')).toHaveCount(3)
+  await expect(bar.getByRole('link', { name: 'Programe' })).toBeVisible()
   await expect(bar.getByRole('link', { name: 'Surse' })).toBeVisible()
   await expect(bar.getByRole('link', { name: 'Clasamente' })).toBeVisible()
   // On the home page the large search box is the page.
@@ -536,7 +537,25 @@ test('the sources page says what is held, what is to come and how it is counted'
   await expect(direct).toContainText('5 acceptate')
   await expect(direct).toContainText('1 peste plafon, nu intră în total')
 
-  // Sources still to come carry the dotted state and no figure.
+  // A source that comes as files says how many, not how many days were read.
+  const payments = main
+    .getByRole('row')
+    .filter({ hasText: 'data.gov.ro · plăți Anghel Saligny' })
+  await expect(payments).toContainText('18.05–27.08.2026')
+  await expect(payments).toContainText('2 fișiere')
+  await expect(payments).toContainText('6 plăți')
+  await expect(payments).toContainText('în 4 proiecte')
+  await expect(payments).not.toContainText('zile citite')
+  const exports = main
+    .getByRole('row')
+    .filter({ hasText: 'data.gov.ro · exporturi de contracte SEAP' })
+  await expect(exports).toContainText('5 rânduri')
+  await expect(exports).toContainText('nu intră în totaluri și clasamente')
+  await expect(main.getByRole('tab', { name: 'Surse (4)' })).toBeVisible()
+
+  // Sources still to come carry the dotted state and no figure. The payments of the
+  // programme are held now, so they are no longer among them.
+  await expect(main.getByText('MDLPA · plăți Anghel Saligny')).toHaveCount(0)
   const budget = main.getByRole('row').filter({ hasText: 'Forexebug' })
   await expect(budget).toContainText('Încă necolectat')
   await expect(
@@ -549,7 +568,7 @@ test('the sources page says what is held, what is to come and how it is counted'
     main.getByText('Un anunț nu este un contract', { exact: true }),
   ).toBeVisible()
   await expect(main.getByText('publicată peste 900.400 lei')).toBeVisible()
-  await expect(main.getByText('Până acum sunt 2 răspunsuri.')).toBeVisible()
+  await expect(main.getByText('Până acum sunt 5 răspunsuri.')).toBeVisible()
   await expect(main.getByText(/vinovat|ascuns/)).toHaveCount(0)
 
   await expect(
@@ -643,4 +662,184 @@ test('the corrections tab lists what was corrected, in our words', async ({
   // What the reader wrote is not published, and neither is a report still waiting.
   await expect(main.getByText('include TVA')).toHaveCount(0)
   await expect(main.getByText('/institutii/4981310')).toHaveCount(0)
+})
+
+// The Anghel Saligny programme: four projects in the stub, one per match state.
+const PROGRAMME = '/programe/anghel-saligny'
+
+test('the programme page adds up the payment files and says how much was tied', async ({
+  page,
+}) => {
+  await page.goto('/')
+  await page
+    .getByRole('navigation', { name: 'Secțiuni' })
+    .getByRole('link', { name: 'Programe' })
+    .click()
+  await expect(page).toHaveURL(/\/programe\/anghel-saligny$/)
+  await expect(page).toHaveTitle('Programul Anghel Saligny · Date România')
+  const main = page.getByRole('main')
+
+  await expect(
+    main.getByText('Plătit, în fișierele din 18.05–27.08.2026'),
+  ).toBeVisible()
+  await expect(main.getByText('7,2 mil. lei').first()).toBeVisible()
+  // Of the four payments that name the builder by tax ID, three found a contract.
+  await expect(main.getByText('din sumă · 75 % din plăți')).toBeVisible()
+  await expect(
+    main.getByText('din 4 plăți care numesc constructorul cu CUI'),
+  ).toBeVisible()
+  await expect(
+    main.getByText('Sursa: data.gov.ro · MDLPA · Plăți PNIAS 2026-prezent'),
+  ).toBeVisible()
+
+  // One card per outcome, and why two of them stop short.
+  await expect(main.getByText('lanțul complet, până la contract')).toBeVisible()
+  await expect(main.getByText('De ce nu găsim un contract.')).toBeVisible()
+  await expect(
+    main.getByText('Fișierele de plăți publicate înainte de 27.08.2026'),
+  ).toBeVisible()
+  const august = main.getByRole('row').filter({ hasText: '27.08.2026' })
+  await expect(august).toContainText('4.260.000 lei')
+})
+
+test('a project is found by county, by words and by what was tied', async ({
+  page,
+}) => {
+  await page.goto(PROGRAMME)
+  const main = page.getByRole('main')
+  await expect(main.getByText('4 proiecte', { exact: true })).toBeVisible()
+
+  await main.getByRole('combobox', { name: 'Județ' }).click()
+  await page.getByRole('option', { name: 'Gorj' }).click()
+  await expect(page).toHaveURL(/\?judet=gorj$/)
+  await expect(main.getByText('2 proiecte', { exact: true })).toBeVisible()
+  await expect(main.getByRole('cell', { name: 'TURCENI' })).toBeVisible()
+
+  await page.goto(`${PROGRAMME}?legatura=mai-multe`)
+  await expect(main.getByText('Un proiect', { exact: true })).toBeVisible()
+  await expect(main.getByText('județul Cluj', { exact: true })).toBeVisible()
+
+  await page.goto(PROGRAMME)
+  await main.getByRole('textbox', { name: 'Caută în proiecte' }).fill('turceni')
+  await main.getByRole('button', { name: 'Caută' }).click()
+  await expect(page).toHaveURL(/\?q=turceni$/)
+  await expect(main.getByText('Un proiect', { exact: true })).toBeVisible()
+
+  await page.goto(`${PROGRAMME}?q=zzzz`)
+  await expect(
+    main.getByText('Niciun proiect nu se potrivește cu ce ai ales.'),
+  ).toBeVisible()
+  // A filter the address does not know is dropped, not shown as an error.
+  await page.goto(`${PROGRAMME}?legatura=altceva`)
+  await expect(main.getByText('4 proiecte', { exact: true })).toBeVisible()
+})
+
+test('a project is traced from the ministry to its contract', async ({
+  page,
+}) => {
+  await page.goto(PROGRAMME)
+  const main = page.getByRole('main')
+  await main
+    .getByRole('link', {
+      name: /Modernizare drumuri comunale în comuna Țânțăreni/,
+    })
+    .click()
+  await expect(page).toHaveURL(/\/programe\/anghel-saligny\/proiecte\/101$/)
+  await expect(main.getByText('Legat de un singur contract')).toBeVisible()
+  await expect(
+    main.getByText('Contract de finanțare MDLPA 1872 din 18.05.2023'),
+  ).toBeVisible()
+
+  const chain = main.getByRole('list', {
+    name: 'Lanțul pentru ALFA CONSTRUCT S.R.L.',
+  })
+  await expect(chain.getByRole('listitem')).toHaveCount(6)
+  // The payment from the file without tax IDs goes with the two that name the builder.
+  await expect(chain).toContainText('3 plăți · 5,4 mil. lei')
+  await expect(chain.getByRole('link', { name: 'ȚÂNȚĂRENI' })).toHaveAttribute(
+    'href',
+    '/institutii/4981310',
+  )
+  await expect(chain).toContainText('progres 64 %')
+  await expect(
+    chain.getByRole('link', { name: 'ALFA CONSTRUCT S.R.L.' }),
+  ).toHaveAttribute('href', '/furnizori/17886786')
+  // The notice is one we also hold from SEAP, so it opens on its page.
+  await expect(chain.getByRole('link', { name: 'CAN0000001' })).toHaveAttribute(
+    'href',
+    '/contracte/9001',
+  )
+  await expect(chain).toContainText(
+    '6,1 mil. lei · 72 % din valoarea proiectului',
+  )
+  // What SEAP does not publish ends the chain; nothing offers to request it yet.
+  await expect(chain).toContainText('Nepublicat')
+  await expect(main.getByText('Cere lista')).toHaveCount(0)
+  await expect(main.getByText('CUI constructor + nume primărie')).toBeVisible()
+
+  // Won by two: one value, the partner named, never the word "lider".
+  await expect(
+    main.getByText(
+      'Câștigat în asociere cu GAMA ASFALT. Valoarea este a întregului contract.',
+    ),
+  ).toBeVisible()
+  await expect(main.getByText(/lider/i)).toHaveCount(0)
+  const total = main.getByRole('row').filter({ hasText: '3 plăți' })
+  await expect(total).toContainText('5.400.000 lei')
+  await expect(main.getByText('ASA4-25001')).toBeVisible()
+})
+
+test('a project with several contracts lists them and picks none', async ({
+  page,
+}) => {
+  await page.goto(`${PROGRAMME}/proiecte/102`)
+  const main = page.getByRole('main')
+  await expect(
+    main.getByText('Mai multe contracte posibile').first(),
+  ).toBeVisible()
+  const chain = main.getByRole('list', {
+    name: 'Lanțul pentru Delta Drumuri SRL',
+  })
+  await expect(chain).toContainText('Consiliul județean')
+  await expect(chain).toContainText('2 anunțuri posibile')
+  // A progress that is not a share is shown as the town hall wrote it.
+  await expect(chain).toContainText('progres: PT RECEPTIONAT SI APROBAT')
+  await expect(
+    main.getByRole('heading', { name: 'Contractele posibile' }),
+  ).toBeVisible()
+  await expect(main.getByText('Modernizare DJ 109, lot 1')).toBeVisible()
+  await expect(
+    main.getByText('Acord-cadru: valoarea este un plafon, nu bani cheltuiți.'),
+  ).toBeVisible()
+  // The builder has no page of its own, so its name is not a link.
+  await expect(
+    chain.getByRole('link', { name: 'Delta Drumuri SRL' }),
+  ).toHaveCount(0)
+})
+
+test('a chain that stops at the builder says why', async ({ page }) => {
+  await page.goto(`${PROGRAMME}/proiecte/103`)
+  const main = page.getByRole('main')
+  const chain = main.getByRole('list', { name: 'Lanțul pentru Omega Gaz SRL' })
+  await expect(chain.getByRole('listitem')).toHaveCount(5)
+  await expect(chain).toContainText('Niciun contract găsit')
+  await expect(chain).toContainText('căutat în SEAP, 03.06.2021–02.04.2024')
+  await expect(main.getByText('De ce nu găsim un contract.')).toBeVisible()
+  await expect(
+    main.getByText('finanțat și din fonduri europene (POIM)'),
+  ).toBeVisible()
+
+  await page.goto(`${PROGRAMME}/proiecte/104`)
+  const unnamed = main.getByRole('list', {
+    name: 'Lanțul pentru Sigma Canal SRL',
+  })
+  await expect(unnamed).toContainText('fără CUI în fișier')
+  await expect(unnamed).toContainText('Nu putem căuta')
+  await expect(
+    main.getByText('De ce unele plăți nu pot fi legate.'),
+  ).toBeVisible()
+
+  const missing = await page.goto(`${PROGRAMME}/proiecte/999`)
+  expect(missing?.status()).toBe(404)
+  await expect(main.getByText('Pagina nu există')).toBeVisible()
 })

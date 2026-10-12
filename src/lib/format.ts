@@ -37,6 +37,19 @@ function build(locale: Locale) {
     return whole.format(value)
   }
 
+  const shares = [0, 1, 2].map(
+    (digits) =>
+      new Intl.NumberFormat(tag, {
+        style: 'percent',
+        maximumFractionDigits: digits,
+      }),
+  )
+
+  // A share as a percentage: 0.913 is "91 %", and with two digits 0.8334 is "83,34 %".
+  function percent(value: number, digits: 0 | 1 | 2 = 0) {
+    return shares[digits].format(value)
+  }
+
   function lei(value: number) {
     return money.lei(whole.format(value))
   }
@@ -86,5 +99,5 @@ function build(locale: Locale) {
     return first === last ? day(first) : `${day(first)} – ${day(last)}`
   }
 
-  return { count, lei, leiShort, day, period, span, list }
+  return { count, percent, lei, leiShort, day, period, span, list }
 }

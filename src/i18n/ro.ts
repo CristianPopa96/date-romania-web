@@ -5,23 +5,8 @@
 // typed into a string here. A message that needs a link or a styled part inside it names
 // the place as `{part}` and is filled with `rich()`. Data is never translated.
 
-const rules = new Intl.PluralRules('ro')
-
-type Forms = { one: string; few: string; other: string }
-
-function plural(n: number, forms: Forms) {
-  const form = rules.select(n)
-  return form === 'one' || form === 'few' ? forms[form] : forms.other
-}
-
-// "5 achiziții", "20 de achiziții": Romanian puts "de" after numbers from 20 up.
-function counted(n: number, text: string, one: string, many: string) {
-  return plural(n, {
-    one,
-    few: `${text} ${many}`,
-    other: `${text} de ${many}`,
-  })
-}
+import { counted, plural } from '#/i18n/ro-plural'
+import { programme } from '#/i18n/ro-programme'
 
 export const ro = {
   common: {
@@ -59,9 +44,12 @@ export const ro = {
 
   nav: {
     label: 'Secțiuni',
+    programmes: 'Programe',
     rankings: 'Clasamente',
     sources: 'Surse',
   },
+
+  programme,
 
   notFound: {
     title: 'Pagina nu există',
@@ -74,6 +62,7 @@ export const ro = {
     of: {
       contracts: (parts: string) => `Sursa contractelor: ${parts}`,
       purchases: (parts: string) => `Sursa achizițiilor directe: ${parts}`,
+      payments: (parts: string) => `Sursa plăților: ${parts}`,
     },
     fetched: (day: string) => `preluat ${day}`,
     open: 'Vezi la sursă',
@@ -110,11 +99,15 @@ export const ro = {
     names: {
       'seap-direct': 'achiziții directe',
       'seap-awards': 'anunțuri de atribuire',
+      'pnias-payments': 'plăți Anghel Saligny',
+      'seap-exports': 'exporturi de contracte SEAP',
     } as Record<string, string | undefined>,
     name: (publisher: string, what: string) => `${publisher} · ${what}`,
     // What the count of a source counts, where the word "records" is not enough.
     counts: {
       'seap-awards': 'contracte semnate în perioadă',
+      'pnias-payments': 'plăți',
+      'seap-exports': 'rânduri, doar ale constructorilor din program',
     } as Record<string, string | undefined>,
     complete: 'completă',
     incomplete: 'listă incompletă',
@@ -136,6 +129,10 @@ export const ro = {
     brings: {
       'seap-direct': 'cumpărări sub pragul de licitație, cu furnizor și CUI',
       'seap-awards': 'contracte atribuite prin proceduri de achiziție',
+      'pnias-payments':
+        'plăți către primării, cu proiectul, constructorul și CUI-ul lui',
+      'seap-exports':
+        'contracte din SEAP din 2021 încoace, doar ale constructorilor din programul Anghel Saligny',
     } as Record<string, string | undefined>,
     limitsOf: {
       'seap-direct': [
@@ -147,7 +144,25 @@ export const ro = {
         'numărul de oferte nu e publicat',
         'contractele apar la săptămâni după semnare',
       ],
+      'pnias-payments': [
+        'fără ziua plății',
+        'primăria e numită doar cu numele',
+        'CUI-ul constructorului doar în fișierele recente',
+      ],
+      'seap-exports': [
+        'nu intră în totaluri și clasamente',
+        'fără titlul contractului din 2023 încoace',
+      ],
     } as Record<string, Array<string> | undefined>,
+    files: (n: number, text: string) =>
+      counted(n, text, 'un fișier', 'fișiere'),
+    paymentsHeld: (n: number, text: string) =>
+      counted(n, text, 'o plată', 'plăți'),
+    projectsHeld: (n: number, text: string) =>
+      `în ${counted(n, text, 'un proiect', 'proiecte')}`,
+    exportRows: (n: number, text: string) =>
+      counted(n, text, 'un rând', 'rânduri'),
+    exportRowsNote: 'un rând pentru fiecare câștigător și fiecare export',
     daysRead: (full: string, expected: number, expectedText: string) =>
       `${full} din ${counted(expected, expectedText, 'o zi', 'zile')} citite complet`,
     daysPartial: (n: number, text: string) =>
@@ -171,10 +186,6 @@ export const ro = {
       {
         name: 'Execuția bugetară (Forexebug)',
         brings: 'cât a cheltuit fiecare instituție, pe capitole de buget',
-      },
-      {
-        name: 'MDLPA · plăți Anghel Saligny',
-        brings: 'plăți către primării, cu constructorul și CUI-ul lui',
       },
       {
         name: 'MIPE · fonduri europene',
