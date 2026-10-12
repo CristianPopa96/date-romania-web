@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { ExternalLinkIcon, FileTextIcon } from '@radix-ui/react-icons'
 import {
   Button,
@@ -14,7 +14,13 @@ import {
 import { useI18n } from '#/i18n/context'
 import { sendReport } from '#/lib/api-reports'
 import type { ReportOutcome } from '#/lib/api-reports'
-import { MESSAGE_MAX, MESSAGE_MIN, checkReport } from '#/lib/reports'
+import {
+  EVIDENCE_MAX,
+  MESSAGE_MAX,
+  MESSAGE_MIN,
+  PAGE_MAX,
+  checkReport,
+} from '#/lib/reports'
 import type { ReportProblem } from '#/lib/reports'
 
 // Where the links "Raportează o eroare" land.
@@ -31,12 +37,17 @@ export function ReportForm({ about }: { about?: string }) {
   const [evidence, setEvidence] = useState('')
   const [website, setWebsite] = useState('')
   const [state, setState] = useState<State>('idle')
+  const messageField = useRef<HTMLTextAreaElement>(null)
 
   async function submit(event: React.FormEvent) {
     event.preventDefault()
     const fields = { page, message, evidence }
     const checked = checkReport(fields)
-    if (checked.problem) return setState(checked.problem)
+    if (checked.problem) {
+      setState(checked.problem)
+      messageField.current?.focus()
+      return
+    }
     setState('sending')
     let outcome: ReportOutcome
     try {
@@ -48,19 +59,26 @@ export function ReportForm({ about }: { about?: string }) {
       setMessage('')
       setEvidence('')
     }
+    if (outcome === 'invalid') messageField.current?.focus()
     setState(outcome)
   }
 
-  const problem =
-    state === 'tooShort' || state === 'invalid'
+  // What is wrong with the text itself, as against a report that could not be sent.
+  const textProblem =
+    state === 'tooShort'
       ? t.report.tooShort(f.count(MESSAGE_MIN))
       : state === 'tooLong'
         ? t.report.tooLong(f.count(MESSAGE_MAX))
-        : state === 'busy'
-          ? t.report.busy
-          : state === 'failed'
-            ? t.report.failed
-            : null
+        : state === 'invalid'
+          ? t.report.invalid
+          : null
+  const problem =
+    textProblem ??
+    (state === 'busy'
+      ? t.report.busy
+      : state === 'failed'
+        ? t.report.failed
+        : null)
 
   return (
     <Flex direction="column" gap="3" id={REPORT_ANCHOR}>
@@ -80,7 +98,7 @@ export function ReportForm({ about }: { about?: string }) {
               <TextField.Root
                 id="report-page"
                 value={page}
-                maxLength={300}
+                maxLength={PAGE_MAX}
                 placeholder={t.report.pageHint}
                 onChange={(event) => setPage(event.target.value)}
               >
@@ -99,14 +117,21 @@ export function ReportForm({ about }: { about?: string }) {
                 {t.report.message}
               </Text>
               <TextArea
+                ref={messageField}
                 id="report-message"
                 value={message}
                 rows={4}
                 maxLength={MESSAGE_MAX}
                 placeholder={t.report.messageHint}
+                aria-invalid={textProblem ? true : undefined}
+                aria-describedby={
+                  textProblem
+                    ? 'report-message-hint report-problem'
+                    : 'report-message-hint'
+                }
                 onChange={(event) => setMessage(event.target.value)}
               />
-              <Text size="1" color="gray">
+              <Text id="report-message-hint" size="1" color="gray">
                 {t.report.noPersonal}
               </Text>
             </Flex>
@@ -122,7 +147,7 @@ export function ReportForm({ about }: { about?: string }) {
               <TextField.Root
                 id="report-evidence"
                 value={evidence}
-                maxLength={500}
+                maxLength={EVIDENCE_MAX}
                 placeholder={t.report.evidenceHint}
                 onChange={(event) => setEvidence(event.target.value)}
               >
@@ -142,15 +167,23 @@ export function ReportForm({ about }: { about?: string }) {
               style={{ position: 'absolute', left: -9999, width: 1, height: 1 }}
             />
             {problem ? (
-              <Callout.Root color="amber" size="1" role="alert">
+              <Callout.Root
+                id="report-problem"
+                color="amber"
+                size="1"
+                role="alert"
+              >
                 <Callout.Text>{problem}</Callout.Text>
               </Callout.Root>
             ) : null}
-            {state === 'sent' ? (
-              <Callout.Root color="green" size="1" role="status">
-                <Callout.Text>{t.report.sent}</Callout.Text>
-              </Callout.Root>
-            ) : null}
+            {/* Always on the page, so a screen reader hears the text when it arrives. */}
+            <div role="status">
+              {state === 'sent' ? (
+                <Callout.Root color="green" size="1">
+                  <Callout.Text>{t.report.sent}</Callout.Text>
+                </Callout.Root>
+              ) : null}
+            </div>
             <Flex justify="between" align="center" gap="3" wrap="wrap">
               <Text size="1" color="gray">
                 {t.report.public}

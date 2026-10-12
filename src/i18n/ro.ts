@@ -215,6 +215,8 @@ export const ro = {
       `Scrie ce e greșit, în cel puțin ${min} caractere.`,
     tooLong: (max: string) =>
       `Textul e prea lung: cel mult ${max} de caractere.`,
+    invalid:
+      'Nu am putut primi textul așa cum e scris. Verifică-l și trimite din nou.',
     busy: 'Am primit prea multe raportări în ultima oră. Încearcă din nou mai târziu.',
     failed:
       'Nu am putut trimite raportarea. Încearcă din nou peste câteva minute.',

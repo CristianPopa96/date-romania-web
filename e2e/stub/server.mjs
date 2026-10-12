@@ -30,11 +30,24 @@ createServer((request, response) => {
     let body = ''
     request.on('data', (chunk) => (body += chunk))
     request.on('end', () => {
-      const full = JSON.parse(body).message.includes('coada plină')
-      response.writeHead(full ? 429 : 201, {
-        'content-type': 'application/json',
-      })
-      response.end(JSON.stringify(full ? { detail: 'Too many' } : { id: 1 }))
+      let message
+      try {
+        message = JSON.parse(body).message
+      } catch {
+        // Not JSON: refused below, like a body without a message.
+      }
+      const status =
+        typeof message !== 'string'
+          ? 422
+          : message.includes('coada plină')
+            ? 429
+            : message.includes('text refuzat')
+              ? 422
+              : 201
+      response.writeHead(status, { 'content-type': 'application/json' })
+      response.end(
+        JSON.stringify(status === 201 ? { id: 1 } : { detail: 'Refused' }),
+      )
     })
     return
   }

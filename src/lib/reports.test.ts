@@ -25,6 +25,24 @@ describe('checkReport', () => {
     ).toEqual({ problem: 'tooShort' })
   })
 
+  it('counts characters the way the API does', () => {
+    // Five emoji are ten units of a JavaScript string and five characters.
+    expect(
+      checkReport({ page: '', message: '😀'.repeat(5), evidence: '' }),
+    ).toEqual({ problem: 'tooShort' })
+    expect(
+      checkReport({ page: '', message: '😀'.repeat(4000), evidence: '' })
+        .problem,
+    ).toBeUndefined()
+    expect(
+      checkReport({
+        page: '😀'.repeat(301),
+        message: 'Valoarea include TVA.',
+        evidence: '',
+      }),
+    ).toMatchObject({ report: { page: '😀'.repeat(300) } })
+  })
+
   it('refuses a text longer than the API takes', () => {
     expect(
       checkReport({ page: '', message: 'x'.repeat(4001), evidence: '' }),

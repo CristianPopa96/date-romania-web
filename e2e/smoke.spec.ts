@@ -577,6 +577,24 @@ test('a reader reports an error from the page it is on', async ({ page }) => {
   await expect(main.getByRole('alert')).toHaveText(
     'Scrie ce e greșit, în cel puțin 10 caractere.',
   )
+  // The field says it is the one at fault, and is where the reader is put back.
+  await expect(main.getByLabel('Ce e greșit')).toHaveAttribute(
+    'aria-invalid',
+    'true',
+  )
+  await expect(main.getByLabel('Ce e greșit')).toBeFocused()
+  await expect(main.getByLabel('Ce e greșit')).toHaveAccessibleDescription(
+    /Nu scrie date personale.*cel puțin 10 caractere/,
+  )
+
+  // The API refuses the text itself: trying again later would not help.
+  await main
+    .getByLabel('Ce e greșit')
+    .fill('Valoarea e greșită (text refuzat).')
+  await main.getByRole('button', { name: 'Trimite' }).click()
+  await expect(main.getByRole('alert')).toContainText(
+    'Nu am putut primi textul așa cum e scris',
+  )
 
   // The queue is full: the reader is told to come back, and keeps what they wrote.
   await main.getByLabel('Ce e greșit').fill('Valoarea e greșită (coada plină).')
@@ -586,6 +604,9 @@ test('a reader reports an error from the page it is on', async ({ page }) => {
   )
   await expect(main.getByLabel('Ce e greșit')).toHaveValue(
     'Valoarea e greșită (coada plină).',
+  )
+  await expect(main.getByLabel('Ce e greșit')).not.toHaveAttribute(
+    'aria-invalid',
   )
 
   await main

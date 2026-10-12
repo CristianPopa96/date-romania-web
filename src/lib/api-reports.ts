@@ -1,4 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
+import { getRequestHeader, getRequestIP } from '@tanstack/react-start/server'
 
 import { getJson, postJson } from '#/lib/api'
 import { checkReport } from '#/lib/reports'
@@ -10,19 +11,31 @@ export type Correction = {
   corrected_on: string
 }
 
-// The sources page must still open when this list cannot be read.
+// The sources page must still open when this list cannot be read. Null says so: an
+// empty list would state that nothing was ever corrected.
 export const getCorrections = createServerFn({ method: 'GET' }).handler(
-  async (): Promise<Array<Correction>> => {
+  async (): Promise<Array<Correction> | null> => {
     try {
       const found = await getJson<{ items: Array<Correction> }>(
         '/v1/corrections',
       )
-      return found?.items ?? []
+      return found?.items ?? null
     } catch {
-      return []
+      return null
     }
   },
 )
+
+// The reader's address, passed on so the API can take a few reports an hour from each
+// reader instead of counting everyone together. The API keeps only a hash of it.
+// Cloudflare names the reader in its own header; `X-Forwarded-For` can be written by
+// the caller, so it is used only when nothing better is there.
+function readerAddress() {
+  return (
+    getRequestHeader('cf-connecting-ip') ??
+    getRequestIP({ xForwardedFor: true })
+  )
+}
 
 export type ReportOutcome = 'sent' | 'invalid' | 'busy' | 'failed'
 
@@ -40,8 +53,15 @@ export const sendReport = createServerFn({ method: 'POST' })
     const checked = checkReport(data)
     if (checked.problem) return 'invalid'
     try {
-      const status = await postJson('/v1/reports', checked.report)
+      const address = readerAddress()
+      const status = await postJson(
+        '/v1/reports',
+        checked.report,
+        address ? { 'x-forwarded-for': address } : {},
+      )
       if (status === 201) return 'sent'
+      // 422: the API refused the text itself, so trying again later would not help.
+      if (status === 422) return 'invalid'
       return status === 429 ? 'busy' : 'failed'
     } catch {
       return 'failed'

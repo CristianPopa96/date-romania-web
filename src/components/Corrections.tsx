@@ -1,11 +1,13 @@
 import { Flex, Heading, Link, Table, Text } from '@radix-ui/themes'
 
+import { Unavailable } from '#/components/Notes'
 import { useI18n } from '#/i18n/context'
 import type { Correction } from '#/lib/api-reports'
 import { sitePath } from '#/lib/reports'
 
-// What was corrected after a reader's report. The text is ours; the reader's is never shown.
-export function Corrections({ items }: { items: Array<Correction> }) {
+// What was corrected after a reader's report. The text is ours; the reader's is never
+// shown. `items` is null when the list could not be read.
+export function Corrections({ items }: { items: Array<Correction> | null }) {
   const { t, f } = useI18n()
 
   return (
@@ -16,7 +18,9 @@ export function Corrections({ items }: { items: Array<Correction> }) {
           {t.corrections.lead}
         </Text>
       </Flex>
-      {items.length === 0 ? (
+      {items === null ? (
+        <Unavailable />
+      ) : items.length === 0 ? (
         <Text size="2" color="gray">
           {t.corrections.none}
         </Text>
@@ -44,8 +48,9 @@ export function Corrections({ items }: { items: Array<Correction> }) {
                     {f.day(item.corrected_on)}
                   </Table.Cell>
                   <Table.Cell>
-                    {/* Any page of the site, so a plain link, not a typed route. */}
-                    {path ? <Link href={path}>{path}</Link> : item.page}
+                    {/* Any page of the site, so a plain link, not a typed route.
+                        Anything else is not shown: it would be a reader's own text. */}
+                    {path ? <Link href={path}>{path}</Link> : null}
                   </Table.Cell>
                   <Table.Cell>{item.correction}</Table.Cell>
                 </Table.Row>

@@ -67,7 +67,7 @@ function Sources() {
               {
                 value: 'corecturi',
                 label:
-                  corrections.length > 0
+                  corrections && corrections.length > 0
                     ? t.corrections.tabCounted(f.count(corrections.length))
                     : t.corrections.tab,
               },
