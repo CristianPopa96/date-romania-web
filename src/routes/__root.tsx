@@ -1,8 +1,10 @@
 import type { QueryClient } from '@tanstack/react-query'
 import {
   HeadContent,
+  Link as RouterLink,
   Scripts,
   createRootRouteWithContext,
+  useLocation,
   useRouter,
 } from '@tanstack/react-router'
 import {
@@ -16,6 +18,7 @@ import {
 } from '@radix-ui/themes'
 
 import { Unavailable } from '#/components/Notes'
+import { REPORT_ANCHOR } from '#/components/ReportForm'
 import { TopBar } from '#/components/TopBar'
 import { messagesFor } from '#/i18n'
 import type { Locale } from '#/i18n'
@@ -83,35 +86,55 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 
 function Footer() {
   const { t } = useI18n()
+  // The form is on the sources page; from any other page the link says which one.
+  const { pathname } = useLocation()
+  const about = pathname === '/surse' ? undefined : pathname
   return (
-    <Box style={{ borderTop: '1px solid var(--gray-a5)' }}>
-      <Container size="3" px="5" py="4">
-        <Flex direction="column" gap="1">
-          <Text size="1" color="gray">
-            {t.site.footerData}
-          </Text>
-          <Text size="1" color="gray">
-            {rich(t.site.footerCode, {
-              site: (
-                <Link
-                  key="site"
-                  href="https://github.com/CristianPopa96/date-romania-web"
-                >
-                  {t.site.footerSite}
-                </Link>
-              ),
-              api: (
-                <Link
-                  key="api"
-                  href="https://github.com/CristianPopa96/date-romania-api"
-                >
-                  {t.site.footerApi}
-                </Link>
-              ),
-            })}
-          </Text>
-        </Flex>
-      </Container>
+    <Box asChild style={{ borderTop: '1px solid var(--gray-a5)' }}>
+      <footer>
+        <Container size="3" px="5" py="4">
+          <Flex direction="column" gap="1">
+            <Text size="1" color="gray">
+              {t.site.footerData}
+            </Text>
+            <Text size="1" color="gray">
+              {rich(t.site.footerCode, {
+                site: (
+                  <Link
+                    key="site"
+                    href="https://github.com/CristianPopa96/date-romania-web"
+                  >
+                    {t.site.footerSite}
+                  </Link>
+                ),
+                api: (
+                  <Link
+                    key="api"
+                    href="https://github.com/CristianPopa96/date-romania-api"
+                  >
+                    {t.site.footerApi}
+                  </Link>
+                ),
+              })}
+            </Text>
+            <Text size="1" color="gray">
+              {rich(t.site.footerReport, {
+                link: (
+                  <Link key="link" asChild>
+                    <RouterLink
+                      to="/surse"
+                      search={{ despre: about }}
+                      hash={REPORT_ANCHOR}
+                    >
+                      {t.report.link}
+                    </RouterLink>
+                  </Link>
+                ),
+              })}
+            </Text>
+          </Flex>
+        </Container>
+      </footer>
     </Box>
   )
 }

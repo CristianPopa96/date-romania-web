@@ -3,21 +3,27 @@ import { createFileRoute } from '@tanstack/react-router'
 import { DownloadIcon } from '@radix-ui/react-icons'
 import { Button, Container, Flex, Heading, Text } from '@radix-ui/themes'
 
+import { Corrections } from '#/components/Corrections'
 import { Methodology } from '#/components/Methodology'
 import { Unavailable } from '#/components/Notes'
+import { ReportForm } from '#/components/ReportForm'
 import { SourcesTable, SourcesToCome } from '#/components/SourcesTable'
 import { UrlTabs } from '#/components/UrlTabs'
 import { messagesFor } from '#/i18n'
 import { useI18n } from '#/i18n/context'
 import { pageTitle } from '#/lib/copy'
-import { datasetsQuery } from '#/lib/queries'
+import { correctionsQuery, datasetsQuery } from '#/lib/queries'
 import { contractsCsvPath, validateSourcesSearch } from '#/lib/urls'
 
-// Where the data comes from: the sources we hold, the ones still to come, and how the
-// figures are counted.
+// Where the data comes from: the sources we hold, the ones still to come, how the
+// figures are counted, and what readers reported and we corrected.
 export const Route = createFileRoute('/surse')({
   validateSearch: validateSourcesSearch,
-  loader: ({ context }) => context.queryClient.ensureQueryData(datasetsQuery),
+  loader: ({ context }) =>
+    Promise.all([
+      context.queryClient.ensureQueryData(datasetsQuery),
+      context.queryClient.ensureQueryData(correctionsQuery),
+    ]),
   head: ({ match }) => ({
     meta: [
       { title: pageTitle(messagesFor(match.context.locale).sources.title) },
@@ -28,9 +34,10 @@ export const Route = createFileRoute('/surse')({
 
 function Sources() {
   const { t, f } = useI18n()
-  const { fila } = Route.useSearch()
+  const { fila, despre } = Route.useSearch()
   const navigate = Route.useNavigate()
   const { data: datasets } = useSuspenseQuery(datasetsQuery)
+  const { data: corrections } = useSuspenseQuery(correctionsQuery)
   const tab = fila ?? 'surse'
 
   return (
@@ -57,10 +64,20 @@ function Sources() {
                 label: t.sources.tabSources(f.count(datasets.length)),
               },
               { value: 'metodologie', label: t.sources.tabMethod },
+              {
+                value: 'corecturi',
+                label:
+                  corrections.length > 0
+                    ? t.corrections.tabCounted(f.count(corrections.length))
+                    : t.corrections.tab,
+              },
             ]}
             onChange={(value) =>
               void navigate({
-                search: { fila: value === 'surse' ? undefined : value },
+                search: (old) => ({
+                  ...old,
+                  fila: value === 'surse' ? undefined : value,
+                }),
                 resetScroll: false,
               })
             }
@@ -82,9 +99,12 @@ function Sources() {
                     </a>
                   </Button>
                 </Flex>
+                <ReportForm about={despre} />
               </>
-            ) : (
+            ) : tab === 'metodologie' ? (
               <Methodology datasets={datasets} />
+            ) : (
+              <Corrections items={corrections} />
             )}
           </UrlTabs>
         )}

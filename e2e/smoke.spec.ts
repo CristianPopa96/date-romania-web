@@ -557,3 +557,68 @@ test('the sources page says what is held, what is to come and how it is counted'
       .getByRole('link', { name: 'Surse' }),
   ).toHaveAttribute('aria-current', 'page')
 })
+
+test('a reader reports an error from the page it is on', async ({ page }) => {
+  await page.goto('/contracte/9001')
+  await page
+    .getByRole('contentinfo')
+    .getByRole('link', { name: 'Raportează o eroare' })
+    .click()
+  await expect(page).toHaveURL(
+    /\/surse\?despre=%2Fcontracte%2F9001#raporteaza$/,
+  )
+  const main = page.getByRole('main')
+  await expect(main.getByLabel('Pagina')).toHaveValue('/contracte/9001')
+
+  // A word is not a report: nothing is sent.
+  await main.getByLabel('Ce e greșit').fill('greșit')
+  await main.getByRole('button', { name: 'Trimite' }).click()
+  await expect(main.getByRole('alert')).toHaveText(
+    'Scrie ce e greșit, în cel puțin 10 caractere.',
+  )
+
+  // The queue is full: the reader is told to come back, and keeps what they wrote.
+  await main.getByLabel('Ce e greșit').fill('Valoarea e greșită (coada plină).')
+  await main.getByRole('button', { name: 'Trimite' }).click()
+  await expect(main.getByRole('alert')).toContainText(
+    'prea multe raportări în ultima oră',
+  )
+  await expect(main.getByLabel('Ce e greșit')).toHaveValue(
+    'Valoarea e greșită (coada plină).',
+  )
+
+  await main
+    .getByLabel('Ce e greșit')
+    .fill('Valoarea include TVA, nu e fără TVA.')
+  await main.getByRole('button', { name: 'Trimite' }).click()
+  await expect(main.getByRole('status')).toContainText('Am primit raportarea')
+  await expect(main.getByLabel('Ce e greșit')).toHaveValue('')
+  await expect(main.getByRole('alert')).toHaveCount(0)
+})
+
+test('the corrections tab lists what was corrected, in our words', async ({
+  page,
+}) => {
+  await page.goto('/surse')
+  const main = page.getByRole('main')
+  // On the sources page itself the link names no page.
+  await expect(
+    page
+      .getByRole('contentinfo')
+      .getByRole('link', { name: 'Raportează o eroare' }),
+  ).toHaveAttribute('href', '/surse#raporteaza')
+  await expect(main.getByLabel('Pagina')).toHaveValue('')
+
+  await main.getByRole('tab', { name: 'Corecturi (1)' }).click()
+  await expect(page).toHaveURL(/\/surse\?fila=corecturi$/)
+  const row = main.getByRole('row').filter({ hasText: '08.10.2026' })
+  await expect(row).toContainText(
+    'Valoarea contractului 2 era cu TVA; acum e fără TVA, ca în SEAP.',
+  )
+  await expect(
+    row.getByRole('link', { name: '/contracte/9001' }),
+  ).toHaveAttribute('href', '/contracte/9001')
+  // What the reader wrote is not published, and neither is a report still waiting.
+  await expect(main.getByText('include TVA')).toHaveCount(0)
+  await expect(main.getByText('/institutii/4981310')).toHaveCount(0)
+})
