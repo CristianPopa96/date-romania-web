@@ -19,6 +19,15 @@ describe('coverage', () => {
     })
   })
 
+  it('never says more days were read than the period has', () => {
+    expect(coverage(dataset(41, 2))).toEqual({
+      expected: 40,
+      full: 40,
+      partial: 0,
+      missing: 0,
+    })
+  })
+
   it('tells days read in part from days never read', () => {
     expect(coverage(dataset(36, 3))).toEqual({
       expected: 40,

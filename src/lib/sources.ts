@@ -18,8 +18,10 @@ export function coverage(
   if (!dataset.first_day || !dataset.last_day) return null
   const span = Date.parse(dataset.last_day) - Date.parse(dataset.first_day)
   const expected = Math.round(span / DAY) + 1
-  const full = dataset.days_collected
-  const partial = dataset.days_partial
+  // The API counts only days inside the period. Should it ever say more, the page still
+  // must not read "41 of 40 days".
+  const full = Math.min(dataset.days_collected, expected)
+  const partial = Math.min(dataset.days_partial, expected - full)
   return {
     expected,
     full,

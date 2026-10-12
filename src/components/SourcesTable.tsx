@@ -116,6 +116,11 @@ function Held({ dataset }: { dataset: Dataset }) {
         <Text as="div" size="1" color="gray">
           {t.sources.accepted(f.count(n('accepted')))}
         </Text>
+        {n('above_limit') > 0 ? (
+          <Text as="div" size="1" color="gray">
+            {t.sources.aboveLimit(f.count(n('above_limit')))}
+          </Text>
+        ) : null}
       </>
     )
   }
