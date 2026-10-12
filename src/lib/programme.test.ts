@@ -68,6 +68,8 @@ describe('matchParam', () => {
 })
 
 describe('tiedShare', () => {
+  const zero = { count: 0, amount: 0 }
+  const none = { one: zero, several: zero, none: zero, unnamed: zero }
   const counts = {
     one: { count: 647, amount: 892.9 },
     several: { count: 324, amount: 469.3 },
@@ -76,7 +78,7 @@ describe('tiedShare', () => {
   }
 
   it('counts one contract as tied, out of the payments that name the builder by tax ID', () => {
-    const share = tiedShare(counts)
+    const share = tiedShare(counts, none)
     expect(share?.named).toBe(1064)
     // Several possible contracts is not "tied": we do not know which one is paid.
     expect(share?.several).toBe(324)
@@ -87,8 +89,16 @@ describe('tiedShare', () => {
   it('says nothing when no payment names its builder by tax ID', () => {
     const empty = { count: 0, amount: 0 }
     expect(
-      tiedShare({ ...counts, one: empty, several: empty, none: empty }),
+      tiedShare({ ...counts, one: empty, several: empty, none: empty }, none),
     ).toBeNull()
+  })
+
+  it('leaves out of "probably tied" the payments tied by a link that is only possible', () => {
+    const possible = { ...none, one: { count: 88, amount: 97.5 } }
+    const share = tiedShare(counts, possible)
+    expect(share?.possible).toBe(88)
+    expect(share?.ofCount).toBeCloseTo((647 - 88) / 1064, 5)
+    expect(share?.ofAmount).toBeCloseTo((892.9 - 97.5) / 1541, 5)
   })
 })
 

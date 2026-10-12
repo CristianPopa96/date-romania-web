@@ -31,6 +31,10 @@ export function ProgrammeMatch({ programme }: { programme: Programme }) {
   // The first file that names builders by tax ID; the ones before it cannot be tied.
   const firstNamed = programme.files.find((file) => file.with_tax_id > 0)
   const counts = programme.payments_match
+  // Payments tied by links that are all only possible, to one contract or to several.
+  const possible =
+    programme.payments_possible.one.count +
+    programme.payments_possible.several.count
 
   return (
     <Flex direction="column" gap="3">
@@ -41,12 +45,7 @@ export function ProgrammeMatch({ programme }: { programme: Programme }) {
       <Text size="2" color="gray" style={{ maxWidth: '75ch' }}>
         {p.how}
         {searched ? ` ${p.howSearched(searched.from, searched.to)}` : null}
-        {programme.payments_possible.count > 0
-          ? ` ${p.howPossible(
-              programme.payments_possible.count,
-              f.count(programme.payments_possible.count),
-            )}`
-          : null}
+        {possible > 0 ? ` ${p.howPossible(possible, f.count(possible))}` : null}
       </Text>
       <Grid columns={{ initial: '1', sm: '2', md: '4' }} gap="3">
         {MATCHES.map((match) => (

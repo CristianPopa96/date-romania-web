@@ -37,11 +37,13 @@ export function matchParam(match: Match) {
   return names.find((name) => MATCH_PARAMS[name] === match)
 }
 
-// How much was tied to the contracts of one award notice, out of what could be tied
-// at all. Only payments that name the builder by tax ID can be tied, so the share is of
-// those, never of every payment: the older files give names only. A payment with several
-// possible notices is not counted as tied: we do not know which contract it settles.
-export function tiedShare(match: MatchCounts) {
+// How much was tied, probably, to the contracts of one award notice, out of what could
+// be tied at all. Only payments that name the builder by tax ID can be tied, so the share
+// is of those, never of every payment: the older files give names only. Left out of what
+// counts as tied, and counted apart:
+//   several   payments with several possible notices: we do not know which one is paid
+//   possible  payments tied to one notice by a link that is only possible
+export function tiedShare(match: MatchCounts, possible: MatchCounts) {
   const named = {
     count: match.one.count + match.several.count + match.none.count,
     amount: match.one.amount + match.several.amount + match.none.amount,
@@ -50,8 +52,9 @@ export function tiedShare(match: MatchCounts) {
   return {
     named: named.count,
     several: match.several.count,
-    ofCount: match.one.count / named.count,
-    ofAmount: match.one.amount / named.amount,
+    possible: possible.one.count,
+    ofCount: (match.one.count - possible.one.count) / named.count,
+    ofAmount: (match.one.amount - possible.one.amount) / named.amount,
   }
 }
 

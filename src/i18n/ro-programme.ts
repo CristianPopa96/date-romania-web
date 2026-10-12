@@ -24,6 +24,9 @@ export const programme = {
   tiedSeveral: (n: number, text: string) =>
     `${counted(n, text, 'o plată are', 'plăți au')} mai multe contracte posibile și nu ${n === 1 ? 'e numărată' : 'sunt numărate'} aici`,
 
+  tiedPossible: (n: number, text: string) =>
+    `${counted(n, text, 'o plată are', 'plăți au')} un contract legat doar posibil și nu ${n === 1 ? 'e numărată' : 'sunt numărate'} aici`,
+
   // Finding a project.
   findTitle: 'Urmărește un proiect',
   county: 'Județ',

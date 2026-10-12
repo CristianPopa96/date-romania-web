@@ -12,7 +12,7 @@ export function ProgrammeFigures({ programme }: { programme: Programme }) {
   const { t, f } = useI18n()
   const p = t.programme
   const days = f.span(programme.first_day, programme.last_day)
-  const share = tiedShare(programme.payments_match)
+  const share = tiedShare(programme.payments_match, programme.payments_possible)
 
   return (
     <Card size="3">
@@ -46,6 +46,9 @@ export function ProgrammeFigures({ programme }: { programme: Programme }) {
                 p.tiedOf(share.named, f.count(share.named)),
                 ...(share.several > 0
                   ? [p.tiedSeveral(share.several, f.count(share.several))]
+                  : []),
+                ...(share.possible > 0
+                  ? [p.tiedPossible(share.possible, f.count(share.possible))]
                   : []),
               ]}
               share={share.ofAmount}

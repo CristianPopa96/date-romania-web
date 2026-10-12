@@ -47,8 +47,8 @@ export type Programme = {
   files: Array<ProgrammeFile>
   payments_match: MatchCounts
   projects_match: MatchCounts
-  // Of the payments tied, those whose links are all only possible.
-  payments_possible: MatchCount
+  // Of the payments tied, those whose links are all only possible, by match state.
+  payments_possible: MatchCounts
   // The contracts searched were published in SEAP between these two days.
   contracts_first_day: string | null
   contracts_last_day: string | null
