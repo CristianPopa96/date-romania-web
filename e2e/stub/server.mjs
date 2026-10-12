@@ -24,6 +24,33 @@ for (const [call, answer] of Object.entries(saved)) {
 const port = Number(process.env.PORT ?? 8099)
 
 createServer((request, response) => {
+  // The one call that sends something: a reader's report. The stub takes it and keeps
+  // nothing, unless the text asks for the answer of a full queue.
+  if (request.method === 'POST' && request.url === '/v1/reports') {
+    let body = ''
+    request.on('data', (chunk) => (body += chunk))
+    request.on('end', () => {
+      let message
+      try {
+        message = JSON.parse(body).message
+      } catch {
+        // Not JSON: refused below, like a body without a message.
+      }
+      const status =
+        typeof message !== 'string'
+          ? 422
+          : message.includes('coada plină')
+            ? 429
+            : message.includes('text refuzat')
+              ? 422
+              : 201
+      response.writeHead(status, { 'content-type': 'application/json' })
+      response.end(
+        JSON.stringify(status === 201 ? { id: 1 } : { detail: 'Refused' }),
+      )
+    })
+    return
+  }
   const answer = answers.get(key(request.url ?? '/'))
   if (!answer) console.error(`stub API: no saved answer for ${request.url}`)
   response.writeHead(answer?.status ?? 501, {

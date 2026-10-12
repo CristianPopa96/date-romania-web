@@ -20,6 +20,7 @@ import {
   getPurchase,
 } from '#/lib/api-contracts'
 import type { Won } from '#/lib/api-contracts'
+import { getCorrections } from '#/lib/api-reports'
 import { contractCount } from '#/lib/contracts'
 import { entityList } from '#/lib/urls'
 import type { EntitySearch } from '#/lib/urls'
@@ -27,6 +28,11 @@ import type { EntitySearch } from '#/lib/urls'
 export const datasetsQuery = queryOptions({
   queryKey: ['datasets'],
   queryFn: () => getDatasets(),
+})
+
+export const correctionsQuery = queryOptions({
+  queryKey: ['corrections'],
+  queryFn: () => getCorrections(),
 })
 
 export const statsQuery = queryOptions({

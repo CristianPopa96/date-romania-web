@@ -53,6 +53,7 @@ export const ro = {
       'Datele provin din surse publice și pot fi refolosite sub licența CC BY 4.0. Fiecare cifră își arată sursa.',
     footerCode: 'Codul este public: {site} și {api}.',
     footerSite: 'site',
+    footerReport: 'Ai găsit o greșeală? {link}.',
     footerApi: 'API',
   },
 
@@ -192,6 +193,45 @@ export const ro = {
     reuse:
       'Datele pot fi refolosite sub licența CC BY 4.0, cu menționarea sursei. Fiecare rând exportat își păstrează sursa și data la care a fost preluat.',
     exportContracts: 'Exportă contractele din perioadă (CSV)',
+  },
+
+  // The form a reader uses to say something is wrong.
+  report: {
+    link: 'Raportează o eroare',
+    title: 'Raportează o eroare',
+    lead: 'Dacă o cifră sau un nume de pe site nu se potrivește cu sursa, spune-ne. O persoană citește fiecare raportare înainte să schimbăm ceva.',
+    page: 'Pagina',
+    pageHint: 'adresa paginii, de exemplu /contracte/123',
+    message: 'Ce e greșit',
+    messageHint: 'De exemplu: valoarea include TVA, nu e fără TVA.',
+    noPersonal: 'Nu scrie date personale în raportare.',
+    evidence: 'Sursa care arată valoarea corectă (opțional)',
+    evidenceHint: 'link sau document',
+    public: 'Corecturile acceptate apar public în fila Corecturi.',
+    send: 'Trimite',
+    sending: 'Se trimite…',
+    sent: 'Am primit raportarea. O citim și, dacă se confirmă, corectura apare în fila Corecturi.',
+    tooShort: (min: string) =>
+      `Scrie ce e greșit, în cel puțin ${min} caractere.`,
+    tooLong: (max: string) =>
+      `Textul e prea lung: cel mult ${max} de caractere.`,
+    invalid:
+      'Nu am putut primi textul așa cum e scris. Verifică-l și trimite din nou.',
+    busy: 'Am primit prea multe raportări în ultima oră. Încearcă din nou mai târziu.',
+    failed:
+      'Nu am putut trimite raportarea. Încearcă din nou peste câteva minute.',
+  },
+
+  // What was corrected after a report.
+  corrections: {
+    tab: 'Corecturi',
+    tabCounted: (count: string) => `Corecturi (${count})`,
+    title: 'Corecturi',
+    lead: 'Erorile raportate de cititori și confirmate, cu ce am schimbat. Textul raportării nu este publicat.',
+    none: 'Nicio corectură până acum.',
+    day: 'Data',
+    page: 'Pagina',
+    what: 'Ce am corectat',
   },
 
   // How the figures are counted, in words. The rules live in the API.

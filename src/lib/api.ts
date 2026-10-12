@@ -34,6 +34,20 @@ export async function getFile(path: string, params: Params = {}) {
   return response.arrayBuffer()
 }
 
+// The one thing the site sends to the API: a reader's error report. Returns the status.
+export async function postJson(
+  path: string,
+  body: unknown,
+  headers: Record<string, string> = {},
+) {
+  const response = await fetch(apiUrl(path), {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', ...headers },
+    body: JSON.stringify(body),
+  })
+  return response.status
+}
+
 export type Source = {
   publisher: string
   record: string | null

@@ -16,14 +16,23 @@ import {
 } from '#/lib/urls'
 
 describe('validateSourcesSearch', () => {
-  it('keeps the methodology tab and drops anything else', () => {
-    expect(validateSourcesSearch({ fila: 'metodologie' })).toEqual({
-      fila: 'metodologie',
-    })
-    expect(validateSourcesSearch({ fila: 'surse' })).toEqual({
+  it('keeps a tab it knows and drops anything else', () => {
+    expect(validateSourcesSearch({ fila: 'metodologie' }).fila).toBe(
+      'metodologie',
+    )
+    expect(validateSourcesSearch({ fila: 'corecturi' }).fila).toBe('corecturi')
+    expect(validateSourcesSearch({ fila: 'surse' }).fila).toBeUndefined()
+    expect(validateSourcesSearch({ fila: 7 }).fila).toBeUndefined()
+  })
+
+  it('keeps the page a report is about only when it is a page of the site', () => {
+    expect(validateSourcesSearch({ despre: '/contracte/9001' })).toEqual({
       fila: undefined,
+      despre: '/contracte/9001',
     })
-    expect(validateSourcesSearch({ fila: 7 })).toEqual({ fila: undefined })
+    expect(
+      validateSourcesSearch({ despre: 'https://example.test' }).despre,
+    ).toBeUndefined()
   })
 })
 

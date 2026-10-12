@@ -1,4 +1,5 @@
 // What a shared address means: the parts of a URL that decide which page is shown.
+import { sitePath } from '#/lib/reports'
 
 // Search params shared by the institution and the supplier page.
 // `lista` picks one of the two lists; left out, the page opens on its contracts when it
@@ -87,12 +88,22 @@ export function validateRankingSearch(
 }
 
 // /surse?fila=metodologie; the sources themselves are the page's plain address.
-export type SourcesSearch = { fila?: 'metodologie' }
+// `despre` is the page a reader came from to report an error: /surse?despre=/contracte/9001.
+export type SourcesSearch = {
+  fila?: 'metodologie' | 'corecturi'
+  despre?: string
+}
 
 export function validateSourcesSearch(
   search: Record<string, unknown>,
 ): SourcesSearch {
-  return { fila: search.fila === 'metodologie' ? 'metodologie' : undefined }
+  return {
+    fila:
+      search.fila === 'metodologie' || search.fila === 'corecturi'
+        ? search.fila
+        : undefined,
+    despre: sitePath(search.despre),
+  }
 }
 
 // Whose contracts a CSV file holds: /contracte.csv?institutie=4981310, ?furnizor=...,
