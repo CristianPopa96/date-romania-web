@@ -157,6 +157,7 @@ export const ro = {
     purchases: (n: number, text: string) =>
       counted(n, text, 'o achiziție', 'achiziții'),
     accepted: (count: string) => `${count} acceptate`,
+    aboveLimit: (count: string) => `${count} peste plafon, nu intră în total`,
     notices: (n: number, text: string) =>
       counted(n, text, 'un anunț', 'anunțuri'),
     contractsHeld: (contracts: string, signed: string) =>

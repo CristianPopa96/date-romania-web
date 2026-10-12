@@ -534,6 +534,7 @@ test('the sources page says what is held, what is to come and how it is counted'
     .filter({ hasText: 'SEAP · achiziții directe' })
   await expect(direct).toContainText('6 achiziții')
   await expect(direct).toContainText('5 acceptate')
+  await expect(direct).toContainText('1 peste plafon, nu intră în total')
 
   // Sources still to come carry the dotted state and no figure.
   const budget = main.getByRole('row').filter({ hasText: 'Forexebug' })
