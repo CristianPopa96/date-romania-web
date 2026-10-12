@@ -1,5 +1,5 @@
 import { Link as RouterLink, useRouterState } from '@tanstack/react-router'
-import { BarChartIcon, FileTextIcon } from '@radix-ui/react-icons'
+import { BarChartIcon, FileTextIcon, Share2Icon } from '@radix-ui/react-icons'
 import { Box, Container, Flex, Link, Text } from '@radix-ui/themes'
 
 import { SearchBox } from '#/components/SearchBox'
@@ -37,6 +37,11 @@ function LogoMark() {
   )
 }
 
+// A section is open on its own page and on the pages under it.
+function isOpen(path: string, section: string) {
+  return path === section || path.startsWith(`${section}/`)
+}
+
 // On every page: the logo, the sections that exist, and a compact search. A section
 // joins the bar when its page ships, never as a placeholder. The search field is the way
 // in to search, so there is no "Caută" item next to it.
@@ -47,6 +52,7 @@ export function TopBar() {
   // to it would be the same field twice.
   const ownSearch = path === '/' || path === '/cautare'
   const sections = [
+    { to: '/programe', label: t.nav.programmes, icon: <Share2Icon /> },
     { to: '/clasamente', label: t.nav.rankings, icon: <BarChartIcon /> },
     { to: '/surse', label: t.nav.sources, icon: <FileTextIcon /> },
   ] as const
@@ -72,11 +78,19 @@ export function TopBar() {
                   <Link
                     key={section.to}
                     asChild
-                    color={path === section.to ? undefined : 'gray'}
+                    color={isOpen(path, section.to) ? undefined : 'gray'}
                   >
                     <RouterLink
                       to={section.to}
-                      aria-current={path === section.to ? 'page' : undefined}
+                      // On a page under the section, the section is where the
+                      // reader is, not the page itself.
+                      aria-current={
+                        path === section.to
+                          ? 'page'
+                          : isOpen(path, section.to)
+                            ? 'location'
+                            : undefined
+                      }
                     >
                       <Flex align="center" gap="1">
                         {section.icon}
