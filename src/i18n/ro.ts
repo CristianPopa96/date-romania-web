@@ -126,7 +126,11 @@ export const ro = {
     period: 'Perioada',
     fetched: 'Preluat ultima dată',
     rows: 'Ce avem',
+    errors: 'Erori',
     limits: 'Limite cunoscute',
+    // Rows the parser could not read: logged, kept in the stored file, in no figure.
+    errorsNote:
+      'Erori: rânduri din răspunsurile preluate pe care nu le-am putut citi. Nu intră în nicio cifră de pe site; răspunsul întreg rămâne păstrat așa cum l-am primit.',
     brings: {
       'seap-direct': 'cumpărări sub pragul de licitație, cu furnizor și CUI',
       'seap-awards': 'contracte atribuite prin proceduri de achiziție',

@@ -146,6 +146,9 @@ export type Dataset = {
   days_partial: number
   // Raw answers kept from the source.
   documents: number
+  // Rows of those answers the parser could not read; null until every answer was seen
+  // (read, or set aside unread) by a parser that counts them.
+  rejected_rows: number | null
   // What is held, by kind of row; `records` is the one the totals use.
   counts: Record<string, number | undefined>
 }
