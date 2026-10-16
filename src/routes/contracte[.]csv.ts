@@ -13,9 +13,12 @@ export const Route = createFileRoute('/contracte.csv')({
         if (!filter) return new Response('Not found', { status: 404 })
         const cui = filter.buyer ?? filter.supplier
         const file = await getFile('/v1/award-contracts', {
-          ...filter,
+          buyer: filter.buyer,
+          supplier: filter.supplier,
           // One entity's contracts read best by date; the whole period, largest first.
           sort: cui === undefined ? 'value' : 'newest',
+          cpv: filter.cpv,
+          eu_funded: filter.eu === undefined ? undefined : String(filter.eu),
           format: 'csv',
         })
         const name = cui === undefined ? 'contracte' : `contracte-${cui}`

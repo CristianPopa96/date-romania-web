@@ -20,12 +20,13 @@ import {
   getPurchase,
 } from '#/lib/api-contracts'
 import type { Won } from '#/lib/api-contracts'
+import { getCpvDivisions, getNearLimit } from '#/lib/api-patterns'
 import { getProgramme, getProject, getProjects } from '#/lib/api-programme'
 import type { ProjectFilter } from '#/lib/api-programme'
 import { getCorrections } from '#/lib/api-reports'
 import { contractCount } from '#/lib/contracts'
 import { entityList } from '#/lib/urls'
-import type { EntitySearch } from '#/lib/urls'
+import type { EntitySearch, RankingFilter } from '#/lib/urls'
 
 export const datasetsQuery = queryOptions({
   queryKey: ['datasets'],
@@ -65,10 +66,10 @@ export const purchasesQuery = (
     queryFn: () => getPurchases({ data: { role, cui, page, byValue } }),
   })
 
-export const rankingQuery = (role: Role) =>
+export const rankingQuery = (role: Role, cpv?: string) =>
   queryOptions({
-    queryKey: ['ranking', role],
-    queryFn: () => getRanking({ data: { role } }),
+    queryKey: ['ranking', role, cpv ?? null],
+    queryFn: () => getRanking({ data: { role, cpv } }),
   })
 
 export const noticeQuery = (id: number) =>
@@ -107,15 +108,31 @@ export const contractsQuery = (role: Role, cui: number, page: number) =>
     queryFn: () => getContracts({ data: { role, cui, page } }),
   })
 
-export const largestContractsQuery = queryOptions({
-  queryKey: ['contracts', 'largest'],
-  queryFn: () => getContracts({ data: { page: 1 } }),
+export const largestContractsQuery = (filter: RankingFilter) =>
+  queryOptions({
+    queryKey: ['contracts', 'largest', filter],
+    queryFn: () => getContracts({ data: { page: 1, ...filter } }),
+  })
+
+export const contractRankingQuery = (
+  role: Role,
+  filter: RankingFilter,
+  won?: Won,
+) =>
+  queryOptions({
+    queryKey: ['contract-ranking', role, won ?? null, filter],
+    queryFn: () => getContractRanking({ data: { role, won, filter } }),
+  })
+
+export const cpvDivisionsQuery = queryOptions({
+  queryKey: ['cpv-divisions'],
+  queryFn: () => getCpvDivisions(),
 })
 
-export const contractRankingQuery = (role: Role, won?: Won) =>
+export const nearLimitQuery = (cpv?: string) =>
   queryOptions({
-    queryKey: ['contract-ranking', role, won ?? null],
-    queryFn: () => getContractRanking({ data: { role, won } }),
+    queryKey: ['patterns', 'near-limit', cpv ?? null],
+    queryFn: () => getNearLimit({ data: { cpv } }),
   })
 
 // Everything the page of an institution or a supplier reads, for the list its address

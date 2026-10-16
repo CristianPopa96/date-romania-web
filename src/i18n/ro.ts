@@ -7,6 +7,7 @@
 
 import { counted, plural } from '#/i18n/ro-plural'
 import { programme } from '#/i18n/ro-programme'
+import { rankings } from '#/i18n/ro-rankings'
 
 export const ro = {
   common: {
@@ -386,29 +387,7 @@ export const ro = {
     aboveLimit: 'peste plafon, nu intră în total',
   },
 
-  rankings: {
-    title: 'Clasamente',
-    intro:
-      'Fapte măsurabile, fiecare cu sursa ei. Un loc în clasament arată doar cât s-a contractat, s-a cumpărat sau s-a vândut, nu spune nimic despre corectitudinea achizițiilor.',
-    suppliers: 'Furnizori',
-    institutions: 'Instituții',
-    tabs: {
-      contracte: 'Cele mai mari contracte',
-      furnizori: 'Furnizori',
-      achizitii: 'Achiziții directe',
-      institutii: 'Instituții',
-    },
-    wonAlone: 'Singur',
-    wonTogether: 'În asociere',
-    wonLabel: 'Cum au fost câștigate contractele',
-    // A member's place says what the contracts were worth, not what the member received.
-    associationNote:
-      'Un contract câștigat în asociere apare la fiecare membru, cu valoarea întreagă.',
-    bySuppliers: 'Furnizori, după valoarea contractelor câștigate',
-    byInstitutions: 'Instituții, după valoarea contractelor atribuite',
-    directIntro: 'După valoarea achizițiilor directe acceptate.',
-    none: 'Niciun contract semnat în această perioadă nu apare în anunțurile preluate.',
-  },
+  rankings,
 
   notes: {
     period: (days: string) =>

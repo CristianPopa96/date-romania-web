@@ -7,6 +7,7 @@ import {
   entityList,
   entityListSearch,
   idFromPath,
+  rankingFilter,
   searchParam,
   validateEntitySearch,
   validatePageSearch,
@@ -146,7 +147,29 @@ describe('validateRankingSearch', () => {
   it('keeps the plain address for the largest contracts', () => {
     expect(validateRankingSearch({})).toEqual({})
     expect(validateRankingSearch({ clasament: 'contracte' })).toEqual({})
-    expect(validateRankingSearch({ clasament: 'tipare' })).toEqual({})
+    expect(validateRankingSearch({ clasament: 'nimic' })).toEqual({})
+  })
+
+  it('keeps a CPV code everywhere and EU funds only on contract rankings', () => {
+    // A number in the address, or it would be written back in quotes; "03" keeps its zero.
+    expect(validateRankingSearch({ cpv: '45', ue: 'da' })).toEqual({
+      cpv: 45,
+      ue: 'da',
+    })
+    expect(validateRankingSearch({ cpv: '03' }).cpv).toBe('03')
+    expect(
+      validateRankingSearch({ clasament: 'tipare', cpv: 4523, ue: 'nu' }),
+    ).toEqual({ clasament: 'tipare', cpv: 4523 })
+    expect(validateRankingSearch({ cpv: '4', ue: 'poate' })).toEqual({})
+    expect(validateRankingSearch({ cpv: '45-1' })).toEqual({})
+  })
+
+  it('turns the address into what the API filters by', () => {
+    expect(rankingFilter({ cpv: 45, ue: 'nu' })).toEqual({
+      cpv: '45',
+      eu: false,
+    })
+    expect(rankingFilter({})).toEqual({ cpv: undefined, eu: undefined })
   })
 
   it('keeps a ranking that exists', () => {
@@ -194,6 +217,16 @@ describe('the address of a CSV file', () => {
     expect(read('institutie=abc')).toBeNull()
     expect(read('furnizor=1;drop')).toBeNull()
     expect(read('institutie=4981310&furnizor=17886786')).toBeNull()
+  })
+
+  it('carries the filters of the rankings for the whole period', () => {
+    expect(contractsCsvPath({ cpv: '45', eu: true })).toBe(
+      '/contracte.csv?cpv=45&ue=da',
+    )
+    expect(read('cpv=45&ue=da')).toEqual({ cpv: '45', eu: true })
+    expect(read('ue=nu')).toEqual({ eu: false })
+    expect(read('cpv=4x')).toBeNull()
+    expect(read('ue=poate')).toBeNull()
   })
 })
 
