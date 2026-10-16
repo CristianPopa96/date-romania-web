@@ -7,7 +7,7 @@ export const programme = {
   name: 'Anghel Saligny',
   eyebrow: 'Program național de investiții · MDLPA',
   title: 'Programul Anghel Saligny',
-  lead: 'Ministerul Dezvoltării plătește primăriilor lucrări de drumuri, apă, canalizare și gaze. Este singurul program în care plățile numesc constructorul cu CUI, așa că le putem lega de contractele lui din SEAP.',
+  lead: 'Ministerul Dezvoltării plătește primăriilor lucrări de drumuri, apă, canalizare și gaze. Este singurul program în care plățile numesc constructorul, iar fișierele recente îi dau și CUI-ul, așa că le putem lega de contractele lui din SEAP.',
 
   // The four headline figures.
   paid: (days: string) => `Plătit, în fișierele din ${days}`,

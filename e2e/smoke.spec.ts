@@ -56,6 +56,12 @@ test('the top bar lists only what exists, and searches from every page but home'
   await page.goto('/')
   const bar = page.getByRole('navigation', { name: 'Secțiuni' })
   await expect(bar.getByRole('link')).toHaveCount(3)
+  // In the order of the design, which does not change as sections join.
+  await expect(bar.getByRole('link')).toHaveText([
+    'Clasamente',
+    'Programe',
+    'Surse',
+  ])
   await expect(bar.getByRole('link', { name: 'Programe' })).toBeVisible()
   await expect(bar.getByRole('link', { name: 'Surse' })).toBeVisible()
   await expect(bar.getByRole('link', { name: 'Clasamente' })).toBeVisible()
