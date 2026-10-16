@@ -1,7 +1,8 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { Link as RouterLink } from '@tanstack/react-router'
-import { InfoCircledIcon } from '@radix-ui/react-icons'
+import { DownloadIcon, InfoCircledIcon } from '@radix-ui/react-icons'
 import {
+  Button,
   Callout,
   Code,
   Flex,
@@ -20,6 +21,7 @@ import { rich } from '#/i18n/rich'
 import type { NearLimitPair, NearLimitPurchase } from '#/lib/api-patterns'
 import { ruleLimits, shareOfLimit } from '#/lib/patterns'
 import { nearLimitQuery } from '#/lib/queries'
+import { patternCsvPath } from '#/lib/urls'
 
 // The patterns tab: measured facts worth asking documents for, each with its rule, what
 // it does and does not mean, and its source. Never an accusation.
@@ -88,12 +90,21 @@ function NearLimit({ cpv }: { cpv?: string }) {
         </Text>
       ) : (
         <>
-          <Text size="2" weight="bold">
-            {words.pairs(data.pairs, f.count(data.pairs))}
-            {data.items.length < data.pairs
-              ? ` · ${words.shown(f.count(data.items.length), f.count(data.pairs))}`
-              : null}
-          </Text>
+          <Flex justify="between" align="center" gap="3" wrap="wrap">
+            <Text size="2" weight="bold">
+              {words.pairs(data.pairs, f.count(data.pairs))}
+              {data.items.length < data.pairs
+                ? ` · ${words.shown(f.count(data.items.length), f.count(data.pairs))}`
+                : null}
+            </Text>
+            {/* Every pair, one line per purchase, with the filter of the tab. */}
+            <Button asChild variant="soft" color="gray" size="1">
+              <a href={patternCsvPath(cpv)} download>
+                <DownloadIcon />
+                {t.contracts.export}
+              </a>
+            </Button>
+          </Flex>
           <Table.Root variant="surface" size="1">
             <Table.Header>
               <Table.Row>

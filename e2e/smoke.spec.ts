@@ -56,6 +56,12 @@ test('the top bar lists only what exists, and searches from every page but home'
   await page.goto('/')
   const bar = page.getByRole('navigation', { name: 'Secțiuni' })
   await expect(bar.getByRole('link')).toHaveCount(3)
+  // In the order of the design, which does not change as sections join.
+  await expect(bar.getByRole('link')).toHaveText([
+    'Clasamente',
+    'Programe',
+    'Surse',
+  ])
   await expect(bar.getByRole('link', { name: 'Programe' })).toBeVisible()
   await expect(bar.getByRole('link', { name: 'Surse' })).toBeVisible()
   await expect(bar.getByRole('link', { name: 'Clasamente' })).toBeVisible()
@@ -404,6 +410,11 @@ test('the patterns tab lists purchases just under their limit, as facts', async 
     main.getByText('Achizițiile verificate sunt finalizate în perioada'),
   ).toContainText('05.10.2026 – 07.10.2026')
   await expect(main.getByText('Tipar observat, nu o acuzație.')).toBeVisible()
+  // The file holds every pair, one line per purchase, and carries the filter.
+  await expect(main.getByRole('link', { name: 'Exportă CSV' })).toHaveAttribute(
+    'href',
+    '/tipare.csv',
+  )
 
   // The patterns the data cannot give yet, with the reason; ANAF is still to collect.
   const anaf = main.getByText(
@@ -426,6 +437,10 @@ test('the patterns tab lists purchases just under their limit, as facts', async 
   await expect(
     main.getByRole('row').filter({ hasText: 'ALFA CONSTRUCT' }),
   ).toHaveCount(0)
+  await expect(main.getByRole('link', { name: 'Exportă CSV' })).toHaveAttribute(
+    'href',
+    '/tipare.csv?cpv=30',
+  )
 })
 
 test('winners are ranked by what they won alone or in associations', async ({
@@ -507,6 +522,46 @@ test('a purchase opens its own page, with what is not collected marked as such',
   await expect(
     main.getByText('Sursa: SEAP · DA00000004 · preluat 07.10.2026'),
   ).toBeVisible()
+})
+
+test('the source of one record opens a panel; a total says what it is added up from', async ({
+  page,
+}) => {
+  await page.goto('/achizitii-directe/4')
+  const main = page.getByRole('main')
+  await main
+    .getByRole('button', {
+      name: 'Sursa: SEAP · DA00000004 · preluat 07.10.2026',
+    })
+    .click()
+  const panel = page.getByRole('dialog')
+  await expect(
+    panel.getByRole('heading', { name: 'De unde e cifra asta?' }),
+  ).toBeVisible()
+  await expect(panel).toContainText('d'.repeat(64))
+  await expect(panel).toContainText('Versiunea parserului')
+  await expect(panel).toContainText('Copia noastră a răspunsului nu e publică')
+  await expect(
+    panel.getByRole('link', { name: 'Deschide la sursă' }),
+  ).toHaveAttribute(
+    'href',
+    'https://e-licitatie.ro/pub/direct-acquisition/view/4',
+  )
+  await expect(
+    panel.getByRole('link', { name: 'Raportează o eroare' }),
+  ).toHaveAttribute('href', '/surse?despre=%2Fachizitii-directe%2F4#raporteaza')
+
+  // A total has no panel: its line counts the answers and leads to the sources page.
+  await page.goto('/')
+  const home = page.getByRole('main')
+  await expect(
+    home.getByText(
+      'Sursa: SEAP · preluat 07.10.2026 · adunat dintr-un răspuns',
+    ),
+  ).toBeVisible()
+  await expect(
+    home.getByRole('link', { name: 'Vezi sursele' }).first(),
+  ).toHaveAttribute('href', '/surse')
 })
 
 test('a purchase above the limit is stated as a fact', async ({ page }) => {

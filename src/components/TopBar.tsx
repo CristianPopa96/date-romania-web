@@ -43,7 +43,9 @@ function isOpen(path: string, section: string) {
 }
 
 // On every page: the logo, the sections that exist, and a compact search. A section
-// joins the bar when its page ships, never as a placeholder. The search field is the way
+// joins the bar when its page ships, never as a placeholder, in its place in the full
+// order of the design (Fonduri, Caută, Clasamente, Programe, Localități, Surse), so the
+// items never reshuffle. The search field is the way
 // in to search, so there is no "Caută" item next to it.
 export function TopBar() {
   const { t } = useI18n()
@@ -52,8 +54,8 @@ export function TopBar() {
   // to it would be the same field twice.
   const ownSearch = path === '/' || path === '/cautare'
   const sections = [
-    { to: '/programe', label: t.nav.programmes, icon: <Share2Icon /> },
     { to: '/clasamente', label: t.nav.rankings, icon: <BarChartIcon /> },
+    { to: '/programe', label: t.nav.programmes, icon: <Share2Icon /> },
     { to: '/surse', label: t.nav.sources, icon: <FileTextIcon /> },
   ] as const
 

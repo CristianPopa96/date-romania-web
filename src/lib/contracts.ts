@@ -91,5 +91,7 @@ export function listSource(contracts: Array<Contract>): Source | null {
     url: null,
     fetched_at: fetched.at(-1) ?? null,
     document_id: null,
+    documents: new Set(contracts.map((contract) => contract.source.document_id))
+      .size,
   }
 }

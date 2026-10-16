@@ -54,6 +54,11 @@ export type Source = {
   url: string | null
   fetched_at: string | null
   document_id: number | null
+  // One record: the hash of the stored answer it was read from, and the parser's version.
+  sha256?: string | null
+  parser_version?: number | null
+  // A total: how many stored answers its rows were read from.
+  documents?: number | null
 }
 
 export type EntityRef = { cui: number; name: string; kind: string }

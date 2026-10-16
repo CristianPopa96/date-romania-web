@@ -159,14 +159,14 @@ describe('contractCount', () => {
 })
 
 describe('listSource', () => {
-  const from = (fetched_at: string | null) =>
+  const from = (fetched_at: string | null, document_id = 1) =>
     ({
       source: {
         publisher: 'SEAP',
         record: 'CAN1',
         url: 'https://example.test',
         fetched_at,
-        document_id: 1,
+        document_id,
       },
     }) as Contract
 
@@ -174,10 +174,10 @@ describe('listSource', () => {
     expect(listSource([])).toBeNull()
   })
 
-  it('names the publisher and the last time any row was fetched', () => {
+  it('names the publisher, the last time any row was fetched and the answers read', () => {
     const source = listSource([
       from('2026-10-05T04:30:00Z'),
-      from('2026-10-07T04:30:00Z'),
+      from('2026-10-07T04:30:00Z', 2),
       from(null),
     ])
     expect(source).toEqual({
@@ -186,6 +186,8 @@ describe('listSource', () => {
       url: null,
       fetched_at: '2026-10-07T04:30:00Z',
       document_id: null,
+      // Three rows, read from two stored answers.
+      documents: 2,
     })
   })
 })

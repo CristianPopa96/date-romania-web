@@ -67,6 +67,24 @@ export const ro = {
     },
     fetched: (day: string) => `preluat ${day}`,
     open: 'Vezi la sursă',
+    // A total: the stored answers its rows were read from, and the page that lists them.
+    addedUp: (n: number, text: string) =>
+      n === 1
+        ? 'adunat dintr-un răspuns'
+        : `adunat din ${counted(n, text, 'un răspuns', 'răspunsuri')}`,
+    sources: 'Vezi sursele',
+    // The source panel of one record.
+    panel: {
+      title: 'De unde e cifra asta?',
+      source: 'Sursa',
+      address: 'Adresa',
+      fetched: 'Preluat',
+      hash: 'Amprenta (SHA-256)',
+      parser: 'Versiunea parserului',
+      open: 'Deschide la sursă',
+      private:
+        'Copia noastră a răspunsului nu e publică: poate conține coduri numerice personale nemascate.',
+    },
   },
 
   home: {
@@ -273,10 +291,10 @@ export const ro = {
     vat: 'Toate sumele sunt în lei, fără TVA, așa cum le publică SEAP.',
     personalTitle: 'Date personale',
     personal:
-      'O persoană fizică autorizată poate apărea în SEAP cu codul numeric personal. Îl ascundem înainte de a salva rândul: pe site apare ca [CNP].',
+      'O persoană fizică autorizată poate apărea în SEAP cu codul numeric personal. Îl ascundem în toate datele de pe site: apare ca [CNP].',
     rawTitle: 'Păstrăm originalul',
     raw: (n: number, text: string) =>
-      `Fiecare răspuns primit de la o sursă e păstrat neschimbat, cu amprenta lui, înainte de a fi citit. Până acum sunt ${counted(n, text, 'un răspuns', 'răspunsuri')}.`,
+      `Fiecare răspuns primit de la o sursă e păstrat neschimbat, cu amprenta lui, înainte de a fi citit. Copia nu este publică, pentru că poate conține coduri numerice personale. Până acum sunt ${counted(n, text, 'un răspuns', 'răspunsuri')}.`,
     gapTitle: 'De ce nu se vede tot drumul banilor',
     gap: 'Bugetul, contractele și plățile sunt publicate de sisteme diferite, care nu au un identificator comun. Contractele nu spun din ce linie de buget sunt plătite, iar plățile către firme nu sunt publicate, cu puține excepții. De aceea arătăm capetele pe care le putem citi și spunem ce lipsește între ele.',
   },
