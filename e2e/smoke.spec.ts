@@ -410,6 +410,11 @@ test('the patterns tab lists purchases just under their limit, as facts', async 
     main.getByText('Achizițiile verificate sunt finalizate în perioada'),
   ).toContainText('05.10.2026 – 07.10.2026')
   await expect(main.getByText('Tipar observat, nu o acuzație.')).toBeVisible()
+  // The file holds every pair, one line per purchase, and carries the filter.
+  await expect(main.getByRole('link', { name: 'Exportă CSV' })).toHaveAttribute(
+    'href',
+    '/tipare.csv',
+  )
 
   // The patterns the data cannot give yet, with the reason; ANAF is still to collect.
   const anaf = main.getByText(
@@ -432,6 +437,10 @@ test('the patterns tab lists purchases just under their limit, as facts', async 
   await expect(
     main.getByRole('row').filter({ hasText: 'ALFA CONSTRUCT' }),
   ).toHaveCount(0)
+  await expect(main.getByRole('link', { name: 'Exportă CSV' })).toHaveAttribute(
+    'href',
+    '/tipare.csv?cpv=30',
+  )
 })
 
 test('winners are ranked by what they won alone or in associations', async ({
