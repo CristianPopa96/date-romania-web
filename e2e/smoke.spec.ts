@@ -661,6 +661,15 @@ test('the sources page says what is held, what is to come and how it is counted'
   await expect(exports).toContainText('nu intră în totaluri și clasamente')
   await expect(main.getByRole('tab', { name: 'Surse (4)' })).toBeVisible()
 
+  // Rows the parser could not read, per source; not counted yet is the dotted state.
+  const errors = (row: typeof direct) => row.getByRole('cell').nth(3)
+  await expect(errors(direct)).toHaveText('0')
+  await expect(errors(awards)).toHaveText('2')
+  await expect(errors(payments)).toHaveText('Încă necolectat')
+  await expect(
+    main.getByText('Erori: rânduri din răspunsurile preluate'),
+  ).toBeVisible()
+
   // Sources still to come carry the dotted state and no figure. The payments of the
   // programme are held now, so they are no longer among them.
   await expect(main.getByText('MDLPA · plăți Anghel Saligny')).toHaveCount(0)

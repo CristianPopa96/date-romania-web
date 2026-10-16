@@ -22,6 +22,9 @@ export function SourcesTable({ datasets }: { datasets: Array<Dataset> }) {
             <Table.ColumnHeaderCell justify="end">
               {t.sources.rows}
             </Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell justify="end">
+              {t.sources.errors}
+            </Table.ColumnHeaderCell>
             <Table.ColumnHeaderCell>{t.sources.limits}</Table.ColumnHeaderCell>
           </Table.Row>
         </Table.Header>
@@ -88,6 +91,13 @@ export function SourcesTable({ datasets }: { datasets: Array<Dataset> }) {
                 <Table.Cell justify="end">
                   <Held dataset={dataset} />
                 </Table.Cell>
+                <Table.Cell justify="end">
+                  {dataset.rejected_rows === null ? (
+                    <DataState kind="notCollected" />
+                  ) : (
+                    f.count(dataset.rejected_rows)
+                  )}
+                </Table.Cell>
                 <Table.Cell>
                   {limits.map((limit) => (
                     <Text key={limit} as="div" size="1" color="gray">
@@ -100,6 +110,9 @@ export function SourcesTable({ datasets }: { datasets: Array<Dataset> }) {
           })}
         </Table.Body>
       </Table.Root>
+      <Text size="1" color="gray">
+        {t.sources.errorsNote}
+      </Text>
       <Text size="1" color="gray">
         {t.sources.frozen}
       </Text>
