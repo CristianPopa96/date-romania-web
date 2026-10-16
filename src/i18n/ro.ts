@@ -67,6 +67,24 @@ export const ro = {
     },
     fetched: (day: string) => `preluat ${day}`,
     open: 'Vezi la sursă',
+    // A total: the stored answers its rows were read from, and the page that lists them.
+    addedUp: (n: number, text: string) =>
+      n === 1
+        ? 'adunat dintr-un răspuns'
+        : `adunat din ${counted(n, text, 'un răspuns', 'răspunsuri')}`,
+    sources: 'Vezi sursele',
+    // The source panel of one record.
+    panel: {
+      title: 'De unde e cifra asta?',
+      source: 'Sursa',
+      address: 'Adresa',
+      fetched: 'Preluat',
+      hash: 'Amprenta (SHA-256)',
+      parser: 'Versiunea parserului',
+      open: 'Deschide la sursă',
+      private:
+        'Copia noastră a răspunsului nu e publică: poate conține coduri numerice personale nemascate.',
+    },
   },
 
   home: {

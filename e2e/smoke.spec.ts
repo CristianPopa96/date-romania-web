@@ -524,6 +524,46 @@ test('a purchase opens its own page, with what is not collected marked as such',
   ).toBeVisible()
 })
 
+test('the source of one record opens a panel; a total says what it is added up from', async ({
+  page,
+}) => {
+  await page.goto('/achizitii-directe/4')
+  const main = page.getByRole('main')
+  await main
+    .getByRole('button', {
+      name: 'Sursa: SEAP · DA00000004 · preluat 07.10.2026',
+    })
+    .click()
+  const panel = page.getByRole('dialog')
+  await expect(
+    panel.getByRole('heading', { name: 'De unde e cifra asta?' }),
+  ).toBeVisible()
+  await expect(panel).toContainText('d'.repeat(64))
+  await expect(panel).toContainText('Versiunea parserului')
+  await expect(panel).toContainText('Copia noastră a răspunsului nu e publică')
+  await expect(
+    panel.getByRole('link', { name: 'Deschide la sursă' }),
+  ).toHaveAttribute(
+    'href',
+    'https://e-licitatie.ro/pub/direct-acquisition/view/4',
+  )
+  await expect(
+    panel.getByRole('link', { name: 'Raportează o eroare' }),
+  ).toHaveAttribute('href', '/surse?despre=%2Fachizitii-directe%2F4#raporteaza')
+
+  // A total has no panel: its line counts the answers and leads to the sources page.
+  await page.goto('/')
+  const home = page.getByRole('main')
+  await expect(
+    home.getByText(
+      'Sursa: SEAP · preluat 07.10.2026 · adunat dintr-un răspuns',
+    ),
+  ).toBeVisible()
+  await expect(
+    home.getByRole('link', { name: 'Vezi sursele' }).first(),
+  ).toHaveAttribute('href', '/surse')
+})
+
 test('a purchase above the limit is stated as a fact', async ({ page }) => {
   await page.goto('/achizitii-directe/5')
   const main = page.getByRole('main')
