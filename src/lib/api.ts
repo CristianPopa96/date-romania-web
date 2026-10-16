@@ -209,7 +209,10 @@ export const getPurchases = createServerFn({ method: 'GET' })
   })
 
 export const getRanking = createServerFn({ method: 'GET' })
-  .inputValidator((data: { role: Role }) => data)
+  .inputValidator((data: { role: Role; cpv?: string }) => data)
   .handler(({ data }) =>
-    getJson<Ranking>(`/v1/rankings/${data.role}`, { limit: 20 }),
+    getJson<Ranking>(`/v1/rankings/${data.role}`, {
+      cpv: data.cpv,
+      limit: 20,
+    }),
   )

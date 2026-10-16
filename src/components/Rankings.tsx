@@ -29,20 +29,25 @@ import {
   statsQuery,
 } from '#/lib/queries'
 import { contractsCsvPath } from '#/lib/urls'
+import type { RankingFilter } from '#/lib/urls'
 
 // The rankings, one per tab of the page. Contracts and direct purchases are two kinds of
 // money and never share a list.
 
+function isFiltered(filter: RankingFilter) {
+  return filter.cpv !== undefined || filter.eu !== undefined
+}
+
 // The largest contracts signed in the period, whoever bought and whoever won.
-export function LargestContracts() {
+export function LargestContracts({ filter }: { filter: RankingFilter }) {
   const { t } = useI18n()
-  const { data } = useSuspenseQuery(largestContractsQuery)
+  const { data } = useSuspenseQuery(largestContractsQuery(filter))
   const source = listSource(data.items)
 
   if (!source) {
     return (
       <Text size="2" color="gray">
-        {t.rankings.none}
+        {isFiltered(filter) ? t.rankings.noneFiltered : t.rankings.none}
       </Text>
     )
   }
@@ -51,7 +56,7 @@ export function LargestContracts() {
       <IncompleteContracts period={data.period} />
       <Flex justify="end">
         <Button asChild variant="soft" color="gray" size="1">
-          <a href={contractsCsvPath({})} download>
+          <a href={contractsCsvPath(filter)} download>
             <DownloadIcon />
             {t.contracts.export}
           </a>
@@ -66,15 +71,17 @@ export function LargestContracts() {
 // Winners by the contracts they won, or institutions by the contracts they awarded.
 export function ContractRanking({
   role,
+  filter,
   won,
   onWon,
 }: {
   role: Role
+  filter: RankingFilter
   won?: Won
   onWon?: (won: Won) => void
 }) {
   const { t, f } = useI18n()
-  const { data } = useSuspenseQuery(contractRankingQuery(role, won))
+  const { data } = useSuspenseQuery(contractRankingQuery(role, filter, won))
   if (!data) return <Unavailable />
 
   return (
@@ -120,7 +127,7 @@ export function ContractRanking({
         </Card>
       ) : (
         <Text size="2" color="gray">
-          {t.rankings.none}
+          {isFiltered(filter) ? t.rankings.noneFiltered : t.rankings.none}
         </Text>
       )}
       <SourceLine source={data.source} />
@@ -129,7 +136,7 @@ export function ContractRanking({
 }
 
 // Direct purchases: who sold most and who bought most, by accepted value.
-export function DirectRankings() {
+export function DirectRankings({ cpv }: { cpv?: string }) {
   const { t } = useI18n()
   const { data: stats } = useSuspenseQuery(statsQuery)
 
@@ -142,21 +149,39 @@ export function DirectRankings() {
         {stats ? <PeriodNote summary={stats.direct_purchases} /> : null}
       </Flex>
       <Grid columns={{ initial: '1', md: '2' }} gap="5">
-        <DirectRanking role="suppliers" title={t.rankings.suppliers} />
-        <DirectRanking role="institutions" title={t.rankings.institutions} />
+        <DirectRanking
+          role="suppliers"
+          title={t.rankings.suppliers}
+          cpv={cpv}
+        />
+        <DirectRanking
+          role="institutions"
+          title={t.rankings.institutions}
+          cpv={cpv}
+        />
       </Grid>
     </Flex>
   )
 }
 
-function DirectRanking({ role, title }: { role: Role; title: string }) {
+function DirectRanking({
+  role,
+  title,
+  cpv,
+}: {
+  role: Role
+  title: string
+  cpv?: string
+}) {
   const { t, f } = useI18n()
-  const { data } = useSuspenseQuery(rankingQuery(role))
+  const { data } = useSuspenseQuery(rankingQuery(role, cpv))
 
   return (
     <Flex direction="column" gap="3">
       <Heading size="4">{title}</Heading>
-      {data && data.items.length > 0 ? (
+      {!data || (data.items.length === 0 && !cpv) ? (
+        <Unavailable />
+      ) : data.items.length > 0 ? (
         <>
           <Card>
             <BarList
@@ -171,7 +196,9 @@ function DirectRanking({ role, title }: { role: Role; title: string }) {
           <SourceLine source={data.source} />
         </>
       ) : (
-        <Unavailable />
+        <Text size="2" color="gray">
+          {t.rankings.noneFiltered}
+        </Text>
       )}
     </Flex>
   )

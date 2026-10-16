@@ -2,6 +2,7 @@ import { createServerFn } from '@tanstack/react-start'
 
 import { PAGE_SIZE, getJson } from '#/lib/api'
 import type { EntityRef, Purchase, Role, Source, Summary } from '#/lib/api'
+import type { RankingFilter } from '#/lib/urls'
 
 // Award notices, their contracts, and one direct purchase: the calls behind the pages of
 // single records. See api.ts for how the site reaches the API.
@@ -157,14 +158,26 @@ export const getEntityContracts = createServerFn({ method: 'GET' })
     )
   })
 
+// The filters of the rankings, as the API names them.
+function filterParams(filter: RankingFilter) {
+  return {
+    cpv: filter.cpv,
+    eu_funded: filter.eu === undefined ? undefined : String(filter.eu),
+  }
+}
+
 // Contracts signed in the period, without framework agreements: those of one buyer or
-// one winner, newest first, or with no entity the largest of all.
+// one winner, newest first, or with no entity the largest of all, which the filters of
+// the rankings can narrow.
 export const getContracts = createServerFn({ method: 'GET' })
-  .inputValidator((data: { role?: Role; cui?: number; page: number }) => data)
+  .inputValidator(
+    (data: { role?: Role; cui?: number; page: number } & RankingFilter) => data,
+  )
   .handler(async ({ data }): Promise<ContractPage> => {
     const found = await getJson<ContractPage>('/v1/award-contracts', {
       [data.role === 'suppliers' ? 'supplier' : 'buyer']: data.cui,
       sort: data.cui === undefined ? 'value' : 'newest',
+      ...filterParams(data),
       limit: PAGE_SIZE,
       offset: (data.page - 1) * PAGE_SIZE,
     })
@@ -186,14 +199,18 @@ export type ContractRanking = {
 
 // Winners by what they won alone or in associations; institutions by what they awarded.
 export const getContractRanking = createServerFn({ method: 'GET' })
-  .inputValidator((data: { role: Role; won?: Won }) => data)
+  .inputValidator(
+    (data: { role: Role; won?: Won; filter: RankingFilter }) => data,
+  )
   .handler(({ data }) =>
     data.role === 'suppliers'
       ? getJson<ContractRanking>('/v1/rankings/contract-suppliers', {
           won: data.won ?? 'alone',
+          ...filterParams(data.filter),
           limit: 20,
         })
       : getJson<ContractRanking>('/v1/rankings/contract-institutions', {
+          ...filterParams(data.filter),
           limit: 20,
         }),
   )

@@ -21,6 +21,10 @@ function build(locale: Locale) {
   const { tag } = LOCALES[locale]
   const { money } = messagesFor(locale)
   const whole = new Intl.NumberFormat(tag, { maximumFractionDigits: 0 })
+  const exact = new Intl.NumberFormat(tag, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })
   const oneDecimal = new Intl.NumberFormat(tag, {
     minimumFractionDigits: 1,
     maximumFractionDigits: 1,
@@ -52,6 +56,12 @@ function build(locale: Locale) {
 
   function lei(value: number) {
     return money.lei(whole.format(value))
+  }
+
+  // With the bani when it has any, where rounding would change what a value says: 270.119,60 lei is under
+  // a limit of 270.120 lei, which a whole figure would hide.
+  function leiExact(value: number) {
+    return money.lei((Number.isInteger(value) ? whole : exact).format(value))
   }
 
   // For headline figures: "1,5 mld. lei", "48,2 mil. lei". Small amounts stay whole.
@@ -99,5 +109,5 @@ function build(locale: Locale) {
     return first === last ? day(first) : `${day(first)} – ${day(last)}`
   }
 
-  return { count, percent, lei, leiShort, day, period, span, list }
+  return { count, percent, lei, leiExact, leiShort, day, period, span, list }
 }

@@ -316,8 +316,116 @@ test('the rankings open on the largest contracts', async ({ page }) => {
   await expect(first).toContainText('ALFA CONSTRUCT S.R.L., Beta Birotică SRL')
   await expect(main.getByRole('row')).toHaveCount(4)
   await expect(main.getByText('Contract 102')).toHaveCount(0)
-  await expect(main.getByRole('tab', { name: 'Tipare' })).toHaveCount(0)
   await expect(page.getByRole('button', { name: /Cere/ })).toHaveCount(0)
+  // The filters say which ones exist and why the others cannot be chosen yet.
+  await expect(main.getByRole('combobox', { name: 'CPV' })).toHaveText(
+    'CPV: toate',
+  )
+  await expect(main.getByRole('combobox', { name: 'Fonduri UE' })).toHaveText(
+    'Fonduri UE: toate',
+  )
+  await expect(
+    main.getByText('Anul, județul și tipul instituției nu pot fi alese încă'),
+  ).toBeVisible()
+})
+
+test('the filters narrow a ranking and stay in the address', async ({
+  page,
+}) => {
+  await page.goto('/clasamente')
+  const main = page.getByRole('main')
+  await main.getByRole('combobox', { name: 'CPV' }).click()
+  await page
+    .getByRole('option', { name: '45 · Lucrari de constructii' })
+    .click()
+  await expect(page).toHaveURL(/\/clasamente\?cpv=45$/)
+  await main.getByRole('combobox', { name: 'Fonduri UE' }).click()
+  await page.getByRole('option', { name: 'da' }).click()
+  await expect(page).toHaveURL(/\/clasamente\?cpv=45&ue=da$/)
+
+  await expect(
+    main.getByText('Un anunț care nu spune cum e plătit'),
+  ).toBeVisible()
+  await expect(main.getByRole('row')).toHaveCount(3)
+  await expect(main.getByRole('link', { name: 'Exportă CSV' })).toHaveAttribute(
+    'href',
+    '/contracte.csv?cpv=45&ue=da',
+  )
+
+  // Nothing matches: the page says so, with no figure.
+  await page.goto('/clasamente?cpv=30')
+  await expect(
+    main.getByText('Nimic nu se potrivește cu filtrele alese.'),
+  ).toBeVisible()
+
+  // The CPV filter goes with the reader to the direct purchases, the EU one does not.
+  await page.goto('/clasamente?clasament=furnizori&cpv=45')
+  await expect(main.getByText('1. ALFA CONSTRUCT S.R.L.')).toBeVisible()
+  await main.getByRole('tab', { name: 'Achiziții directe' }).click()
+  await expect(page).toHaveURL(/\/clasamente\?clasament=achizitii&cpv=45$/)
+  await expect(main.getByRole('combobox', { name: 'Fonduri UE' })).toHaveCount(
+    0,
+  )
+})
+
+test('the patterns tab lists purchases just under their limit, as facts', async ({
+  page,
+}) => {
+  await page.goto('/clasamente?clasament=tipare')
+  const main = page.getByRole('main')
+  await expect(main.getByText('Un tipar nu înseamnă o neregulă')).toBeVisible()
+  await expect(
+    main.getByRole('heading', {
+      name: 'Achiziții directe repetate chiar sub plafon',
+    }),
+  ).toBeVisible()
+  await expect(
+    main.getByText('cel puțin 2 achiziții directe acceptate'),
+  ).toContainText(
+    '270.120 lei pentru produse și servicii, 900.400 lei pentru lucrări',
+  )
+  await expect(main.getByText('2 perechi cumpărător–furnizor')).toBeVisible()
+
+  const works = main.getByRole('row').filter({ hasText: 'ALFA CONSTRUCT' })
+  await expect(works).toContainText(TOWN_HALL)
+  await expect(works).toContainText(
+    '2 achiziții de lucrări sub plafonul de 900.400 lei',
+  )
+  await expect(works).toContainText('1.730.000 lei')
+  await expect(works.getByRole('link', { name: 'DA00000024' })).toHaveAttribute(
+    'href',
+    '/achizitii-directe/24',
+  )
+  // What was checked, and over the days of the purchases checked.
+  await expect(
+    main.getByText('Verificat: 7 din 13 achiziții directe acceptate.'),
+  ).toContainText('6 nu au tipul contractului')
+  await expect(
+    main.getByText('Achizițiile verificate sunt finalizate în perioada'),
+  ).toContainText('05.10.2026 – 07.10.2026')
+  await expect(main.getByText('Tipar observat, nu o acuzație.')).toBeVisible()
+
+  // The patterns the data cannot give yet, with the reason; ANAF is still to collect.
+  const anaf = main.getByText(
+    'Furnizor inactiv la ANAF sau înființat de curând',
+  )
+  await expect(anaf).toBeVisible()
+  await expect(main.getByText('Încă necolectat')).toHaveCount(2)
+  // The contract against the project's value is on the programme, not in the list.
+  await expect(
+    main.getByRole('link', { name: 'programul Anghel Saligny' }),
+  ).toHaveAttribute('href', '/programe/anghel-saligny')
+  await expect(page.getByRole('button', { name: /Cere/ })).toHaveCount(0)
+
+  // Narrowed to one CPV division, the works pair is left out.
+  await page.goto('/clasamente?clasament=tipare&cpv=30')
+  await expect(main.getByText('O pereche cumpărător–furnizor')).toBeVisible()
+  await expect(main.getByRole('combobox', { name: 'CPV' })).toHaveText(
+    'CPV: 30',
+  )
+  await expect(
+    main.getByRole('row').filter({ hasText: 'ALFA CONSTRUCT' }),
+  ).toHaveCount(0)
 })
 
 test('winners are ranked by what they won alone or in associations', async ({
