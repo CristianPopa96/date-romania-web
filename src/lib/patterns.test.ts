@@ -18,6 +18,8 @@ describe('shareOfLimit', () => {
     expect(shareOfLimit(265000, 270120)).toBe(0.981)
     // 99.96 % stays under 100 %.
     expect(shareOfLimit(270000, 270120)).toBe(0.999)
+    // Exactly 90.2 %, which dividing first floors to 90.1 %.
+    expect(shareOfLimit(243648.24, 270120)).toBe(0.902)
     expect(shareOfLimit(1, 0)).toBe(0)
   })
 })

@@ -33,6 +33,11 @@ export function RankingFilters({
           divisions?.find((division) => division.code === code),
         )
   const eu = search.ue ?? ALL
+  // The code in the address stays a choice even when the list could not be read.
+  const options =
+    code === undefined || divisions?.some((division) => division.code === code)
+      ? (divisions ?? [])
+      : [...(divisions ?? []), { code, name: null }]
 
   return (
     <Flex direction="column" gap="2">
@@ -55,7 +60,7 @@ export function RankingFilters({
           </Select.Trigger>
           <Select.Content position="popper">
             <Select.Item value={ALL}>{labels.all}</Select.Item>
-            {(divisions ?? []).map((division) => (
+            {options.map((division) => (
               <Select.Item key={division.code} value={division.code}>
                 {cpvDivisionLabel(division.code, division)}
               </Select.Item>

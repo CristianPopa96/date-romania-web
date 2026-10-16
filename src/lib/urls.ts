@@ -163,11 +163,14 @@ export function contractsCsvPath(filter: CsvFilter) {
 }
 
 // Null for an address that names something other than one CUI, or the whole period
-// with valid filters.
+// with valid filters. The contracts of one CUI take no filter, so one with a filter is
+// refused rather than answered without it.
 export function csvFilterFromSearch(params: URLSearchParams): CsvFilter | null {
   const buyer = params.get('institutie')
   const supplier = params.get('furnizor')
   if (buyer !== null && supplier !== null) return null
+  const filtered = params.has('cpv') || params.has('ue')
+  if ((buyer !== null || supplier !== null) && filtered) return null
   if (buyer !== null) {
     const cui = cuiFromPath(buyer)
     return cui === null ? null : { buyer: cui }

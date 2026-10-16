@@ -51,13 +51,19 @@ export const rankings = {
     nearLimit: {
       title: 'Achiziții directe repetate chiar sub plafon',
       rule: (repeats: string, from: string, goods: string, works: string) =>
-        `Același cumpărător și același furnizor, cel puțin ${repeats} achiziții directe acceptate, fiecare de la ${from} din plafonul legal al tipului ei până la plafon: ${goods} pentru produse și servicii, ${works} pentru lucrări.`,
+        `Același cumpărător și același furnizor, cel puțin ${repeats} achiziții directe acceptate, fiecare de la ${from} din plafonul legal al tipului ei până chiar sub plafon (${goods} pentru produse și servicii, ${works} pentru lucrări), oricând în perioada verificată.`,
       meaning:
         'Ce arată: valori apropiate de plafon, fără să-l depășească. Ce nu arată: că o achiziție a fost împărțită ca să rămână sub plafon. Asta se poate afla doar din documente.',
       annex2:
         'Serviciile din anexa 2 a legii, de exemplu hotelurile și serviciile sociale, au un plafon mai mare. Nu le deosebim încă, așa că o pereche de servicii poate fi departe de plafonul ei.',
+      // "verificat: X din Y". The type is missing mostly on quiet days, when SEAP's list
+      // did not have to be asked by type.
+      checked: (checked: string, n: number, total: string) =>
+        `Verificat: ${checked} din ${counted(n, total, 'o achiziție directă acceptată', 'achiziții directe acceptate')}.`,
       unknownType: (n: number, text: string) =>
-        `${counted(n, text, 'O achiziție acceptată nu are', 'achiziții acceptate nu au')} tipul contractului în datele SEAP preluate și nu ${n === 1 ? 'e verificată' : 'sunt verificate'}.`,
+        `${n === 1 ? 'Una nu are' : `${text} nu au`} tipul contractului în datele SEAP preluate, mai ales în zilele cu puține achiziții, și nu ${n === 1 ? 'poate fi verificată' : 'pot fi verificate'}.`,
+      checkedPeriod: (days: string) =>
+        `Achizițiile verificate sunt finalizate în perioada ${days}. Sumele sunt fără TVA.`,
       pairs: (n: number, text: string) =>
         `${counted(n, text, 'O pereche', 'perechi')} cumpărător–furnizor`,
       shown: (shown: string, all: string) =>
@@ -90,11 +96,13 @@ export const rankings = {
         title: 'Proceduri cu o singură ofertă',
         reason: 'Nu am găsit încă numărul de oferte în datele SEAP.',
       },
-      {
-        title: 'Valoarea contractului departe de valoarea proiectului',
-        reason:
-          'În programul Anghel Saligny, legătura dintre plată și contract e doar probabilă. Raportul e pe pagina fiecărui proiect.',
-      },
     ],
+    // Kept out of the rankings (the tie between a payment and a contract is only probable),
+    // but shown on each project's page.
+    elsewhere: {
+      title: 'Valoarea contractului față de valoarea proiectului',
+      text: 'Nu e un clasament, pentru că legătura dintre plată și contract e doar probabilă. O vezi pe pagina fiecărui proiect din {programme}.',
+      programme: 'programul Anghel Saligny',
+    },
   },
 }

@@ -13,6 +13,7 @@ import {
   Text,
 } from '@radix-ui/themes'
 
+import { DataState } from '#/components/DataState'
 import { EntityLink } from '#/components/EntityLink'
 import { Pager } from '#/components/Pager'
 import { useI18n } from '#/i18n/context'
@@ -118,9 +119,11 @@ function PurchaseRow({ purchase, other }: { purchase: Purchase; other: Role }) {
   return (
     <Table.Row>
       <Table.Cell style={{ whiteSpace: 'nowrap' }}>
-        {purchase.finalized_at
-          ? f.day(purchase.finalized_at)
-          : t.common.notPublished}
+        {purchase.finalized_at ? (
+          f.day(purchase.finalized_at)
+        ) : (
+          <DataState kind="notPublished" />
+        )}
       </Table.Cell>
       <Table.Cell>
         <Box style={{ maxWidth: 360 }}>

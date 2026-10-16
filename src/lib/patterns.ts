@@ -9,8 +9,9 @@ export function cpvDivisionLabel(code: string, division?: CpvDivision) {
 
 // The share of its limit a purchase reaches, rounded down to a tenth of a percent: 0.981
 // for 265,000 lei under 270,120. Down, so a value under the limit never reads "100 %".
+// Multiplied before dividing, so a share that is exactly a tenth is not floored below it.
 export function shareOfLimit(value: number, limit: number) {
-  return limit > 0 ? Math.floor((value / limit) * 1000) / 1000 : 0
+  return limit > 0 ? Math.floor((value * 1000) / limit) / 1000 : 0
 }
 
 // The limit for goods and services and the one for works, as the rule states them.

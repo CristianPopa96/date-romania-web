@@ -16,6 +16,7 @@ import { EntityLink } from '#/components/EntityLink'
 import { Unavailable } from '#/components/Notes'
 import { SourceLine } from '#/components/SourceLine'
 import { useI18n } from '#/i18n/context'
+import { rich } from '#/i18n/rich'
 import type { NearLimitPair, NearLimitPurchase } from '#/lib/api-patterns'
 import { ruleLimits, shareOfLimit } from '#/lib/patterns'
 import { nearLimitQuery } from '#/lib/queries'
@@ -64,14 +65,19 @@ function NearLimit({ cpv }: { cpv?: string }) {
         <Text size="2" color="gray">
           {words.annex2}
         </Text>
-        {data.unknown_type > 0 ? (
-          <Text size="2" color="gray">
-            {words.unknownType(data.unknown_type, f.count(data.unknown_type))}
-          </Text>
-        ) : null}
+        <Text size="2" color="gray">
+          {words.checked(
+            f.count(data.checked),
+            data.accepted_total,
+            f.count(data.accepted_total),
+          )}
+          {data.unknown_type > 0
+            ? ` ${words.unknownType(data.unknown_type, f.count(data.unknown_type))}`
+            : null}
+        </Text>
         {days ? (
           <Text size="2" color="gray">
-            {t.notes.period(days)}
+            {words.checkedPeriod(days)}
           </Text>
         ) : null}
       </Flex>
@@ -185,20 +191,24 @@ function PurchaseLine({
         </RouterLink>
       </Link>
       {' · '}
-      {purchase.finalized_at
-        ? f.day(purchase.finalized_at)
-        : t.common.notPublished}
+      {purchase.finalized_at ? (
+        f.day(purchase.finalized_at)
+      ) : (
+        <DataState kind="notPublished" />
+      )}
       {' · '}
-      {f.lei(purchase.value)}
+      {f.leiExact(purchase.value)}
       {' · '}
       {words.ofLimit(f.percent(shareOfLimit(purchase.value, limit), 1))}
     </Text>
   )
 }
 
-// The other patterns of the flow, and why the data held cannot give them yet.
+// The other patterns of the flow: why the data held cannot give them yet, or where the
+// site shows one outside the rankings.
 function Later() {
   const { t } = useI18n()
+  const { elsewhere } = t.rankings.patterns
   return (
     <Flex direction="column" gap="2">
       <Heading size="4">{t.rankings.patterns.laterTitle}</Heading>
@@ -217,6 +227,22 @@ function Later() {
           </Text>
         </Flex>
       ))}
+      <Flex direction="column" gap="1">
+        <Text size="2" weight="medium">
+          {elsewhere.title}
+        </Text>
+        <Text size="2" color="gray">
+          {rich(elsewhere.text, {
+            programme: (
+              <Link key="programme" asChild>
+                <RouterLink to="/programe/anghel-saligny">
+                  {elsewhere.programme}
+                </RouterLink>
+              </Link>
+            ),
+          })}
+        </Text>
+      </Flex>
     </Flex>
   )
 }

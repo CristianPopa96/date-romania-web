@@ -396,9 +396,13 @@ test('the patterns tab lists purchases just under their limit, as facts', async 
     'href',
     '/achizitii-directe/24',
   )
+  // What was checked, and over the days of the purchases checked.
   await expect(
-    main.getByText('6 achiziții acceptate nu au tipul contractului'),
-  ).toBeVisible()
+    main.getByText('Verificat: 7 din 13 achiziții directe acceptate.'),
+  ).toContainText('6 nu au tipul contractului')
+  await expect(
+    main.getByText('Achizițiile verificate sunt finalizate în perioada'),
+  ).toContainText('05.10.2026 – 07.10.2026')
   await expect(main.getByText('Tipar observat, nu o acuzație.')).toBeVisible()
 
   // The patterns the data cannot give yet, with the reason; ANAF is still to collect.
@@ -407,6 +411,10 @@ test('the patterns tab lists purchases just under their limit, as facts', async 
   )
   await expect(anaf).toBeVisible()
   await expect(main.getByText('Încă necolectat')).toHaveCount(2)
+  // The contract against the project's value is on the programme, not in the list.
+  await expect(
+    main.getByRole('link', { name: 'programul Anghel Saligny' }),
+  ).toHaveAttribute('href', '/programe/anghel-saligny')
   await expect(page.getByRole('button', { name: /Cere/ })).toHaveCount(0)
 
   // Narrowed to one CPV division, the works pair is left out.

@@ -219,6 +219,11 @@ describe('the address of a CSV file', () => {
     expect(read('institutie=4981310&furnizor=17886786')).toBeNull()
   })
 
+  it('refuses a filter on the contracts of one CUI, which cannot apply it', () => {
+    expect(read('institutie=4981310&cpv=45')).toBeNull()
+    expect(read('furnizor=17886786&ue=da')).toBeNull()
+  })
+
   it('carries the filters of the rankings for the whole period', () => {
     expect(contractsCsvPath({ cpv: '45', eu: true })).toBe(
       '/contracte.csv?cpv=45&ue=da',
