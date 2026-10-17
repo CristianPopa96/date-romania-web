@@ -2,19 +2,20 @@
 
 ## Commands
 
-| Command                | What it does                                                |
-| ---------------------- | ----------------------------------------------------------- |
-| `pnpm install`         | Install dependencies                                        |
-| `pnpm dev`             | Development server with hot reload on http://localhost:3000 |
-| `pnpm build`           | Production build into `.output/`                            |
-| `pnpm start`           | Run the production build                                    |
-| `pnpm typecheck`       | TypeScript check                                            |
-| `pnpm lint`            | ESLint                                                      |
-| `pnpm check`           | Prettier check                                              |
-| `pnpm test`            | Unit tests (vitest)                                         |
-| `pnpm e2e`             | Browser tests (Playwright), on the built site               |
-| `pnpm format`          | Prettier and ESLint fixes                                   |
-| `pnpm generate-routes` | Regenerate `src/routeTree.gen.ts`                           |
+| Command                   | What it does                                                |
+| ------------------------- | ----------------------------------------------------------- |
+| `pnpm install`            | Install dependencies                                        |
+| `pnpm dev`                | Development server with hot reload on http://localhost:3000 |
+| `pnpm build`              | Production build into `.output/`                            |
+| `pnpm start`              | Run the production build                                    |
+| `pnpm typecheck`          | TypeScript check                                            |
+| `pnpm lint`               | ESLint                                                      |
+| `pnpm check`              | Prettier check                                              |
+| `pnpm test`               | Unit tests (vitest)                                         |
+| `pnpm e2e`                | Browser tests (Playwright), on the built site               |
+| `pnpm format`             | Prettier and ESLint fixes                                   |
+| `pnpm generate-routes`    | Regenerate `src/routeTree.gen.ts`                           |
+| `pnpm generate-api-types` | Regenerate `src/lib/api-schema.gen.ts` from `openapi.json`  |
 
 CI runs `typecheck`, `lint`, `check`, `test` and `build`, then the browser tests. Run
 the same before calling work done.

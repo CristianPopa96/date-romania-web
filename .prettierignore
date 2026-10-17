@@ -3,3 +3,6 @@ pnpm-lock.yaml
 yarn.lock
 # A byte-for-byte copy of a file in date-romania-api; see the README.
 e2e/stub/answers.json
+# Also a copy from date-romania-api, and the types generated from it.
+openapi.json
+src/lib/api-schema.gen.ts

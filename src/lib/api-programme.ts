@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 
 import { PAGE_SIZE, getJson } from '#/lib/api'
-import type { EntityRef, Source } from '#/lib/api'
+import type { Schemas } from '#/lib/api'
 
 // The Anghel Saligny programme: the ministry's payments, the projects they pay for, and
 // the SEAP contracts a payment could be tied to. See api.ts for how the site reaches
@@ -15,134 +15,35 @@ import type { EntityRef, Source } from '#/lib/api'
 export const MATCHES = ['one', 'several', 'none', 'unnamed'] as const
 export type Match = (typeof MATCHES)[number]
 
-export type MatchCount = { count: number; amount: number }
-export type MatchCounts = Record<Match, MatchCount>
+export type MatchCount = Schemas['MatchCount']
+export type MatchCounts = Schemas['ProgrammeMatch']
 
-export type ProgrammeGroup = {
-  key: string
-  name: string
-  payments: number
-  amount: number
-  projects: number
-}
+export type ProgrammeGroup = Schemas['ProgrammeGroup']
 
-export type ProgrammeFile = {
-  published_on: string | null
-  payments: number
-  amount: number
-  // Payments that name the builder by tax ID.
-  with_tax_id: number
-}
+export type ProgrammeFile = Schemas['ProgrammeFile']
 
-export type Programme = {
-  payments: number
-  amount: number
-  projects: number
-  town_halls: number
-  builders: number
-  first_day: string | null
-  last_day: string | null
-  networks: Array<ProgrammeGroup>
-  counties: Array<ProgrammeGroup>
-  files: Array<ProgrammeFile>
-  payments_match: MatchCounts
-  projects_match: MatchCounts
-  // Of the payments tied, those whose links are all only possible, by match state.
-  payments_possible: MatchCounts
-  // The contracts searched were published in SEAP between these two days.
-  contracts_first_day: string | null
-  contracts_last_day: string | null
-  source: Source
-  contracts_source: Source
-}
+export type Programme = Schemas['Programme']
 
-export type ProjectRow = {
-  id: number
-  investment: string | null
-  county: string
-  county_name: string
-  town_hall: string
-  network: string
-  category: string | null
-  total_value: number | null
-  state_budget_value: number | null
-  paid: number
-  payments: number
-  match: Match
-}
+export type ProjectRow = Schemas['ProjectRow']
 
-export type ProjectPage = { total: number; items: Array<ProjectRow> }
+export type ProjectPage = Schemas['ProjectPage']
 
-export type ProjectPayment = {
-  id: number
-  published_on: string | null
-  registered_on: string | null
-  requested_on: string | null
-  amount: number
-  progress: string | null
-  builder_text: string | null
-}
+export type ProjectPayment = Schemas['ProjectPayment']
 
-export type TraceParty = {
-  cui: number | null
-  name: string | null
-  // Set when the company has a page on the site.
-  entity: EntityRef | null
-}
+export type TraceParty = Schemas['TraceParty']
 
 // How sure a link between a payment and a contract is. None is sure: the payment
 // files do not name the contract.
 //   probable  an export puts the buyer in the project's county, or no other buyer in
 //             SEAP's exports carries the town hall's name
 //   possible  other buyers carry the same name
-export type Confidence = 'probable' | 'possible'
+export type Confidence = Schemas['TraceContract']['confidence']
 
-export type TraceContract = {
-  notice_no: string | null
-  // Our id of the award notice, when we also collected it from SEAP: it has a page.
-  notice_id: number | null
-  notice_date: string | null
-  contract_no: string | null
-  contract_date: string | null
-  title: string | null
-  lot: string | null
-  value_ron: number | null
-  procedure_type: string | null
-  contract_type: string | null
-  is_framework: boolean | null
-  buyer: EntityRef | null
-  buyer_text: string | null
-  confidence: Confidence
-  // What the link rests on, in the API's words.
-  method: string
-  // The other winners of an association. The value is the whole contract's.
-  partners: Array<TraceParty>
-  // Contract value over the project's total value.
-  ratio: number | null
-}
+export type TraceContract = Schemas['TraceContract']
 
-export type TraceBuilder = TraceParty & {
-  payments: number
-  amount: number
-  match: Match
-  contracts: Array<TraceContract>
-}
+export type TraceBuilder = Schemas['TraceBuilder']
 
-export type Project = ProjectRow & {
-  town_hall_entity: EntityRef | null
-  ministry_contract_no: string | null
-  ministry_contract_date: string | null
-  poim: boolean | null
-  progress: string | null
-  estimated_end: string | null
-  items: Array<ProjectPayment>
-  builders: Array<TraceBuilder>
-  designers: Array<TraceParty>
-  // The weakest link among the contracts shown; null when there are none.
-  confidence: Confidence | null
-  source: Source
-  contracts_source: Source
-}
+export type Project = Schemas['Project']
 
 const ROOT = '/v1/programmes/anghel-saligny'
 

@@ -133,6 +133,9 @@ describe('contractCount', () => {
       url: null,
       fetched_at: null,
       document_id: null,
+      sha256: null,
+      parser_version: null,
+      documents: null,
     },
   }
 
@@ -186,6 +189,8 @@ describe('listSource', () => {
       url: null,
       fetched_at: '2026-10-07T04:30:00Z',
       document_id: null,
+      sha256: null,
+      parser_version: null,
       // Three rows, read from two stored answers.
       documents: 2,
     })

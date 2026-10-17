@@ -1,15 +1,12 @@
 import { createServerFn } from '@tanstack/react-start'
 import { getRequestHeader, getRequestIP } from '@tanstack/react-start/server'
 
+import type { Schemas } from '#/lib/api'
 import { getJson, postJson } from '#/lib/api'
 import { checkReport } from '#/lib/reports'
 
 // What was corrected after a reader's report: the page, and what changed in our words.
-export type Correction = {
-  page: string | null
-  correction: string
-  corrected_on: string
-}
+export type Correction = Schemas['Correction']
 
 // The sources page must still open when this list cannot be read. Null says so: an
 // empty list would state that nothing was ever corrected.

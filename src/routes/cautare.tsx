@@ -30,8 +30,8 @@ export const Route = createFileRoute('/cautare')({
     const found = await context.queryClient.ensureQueryData(
       searchQuery(searchTerm(deps.q)),
     )
-    // A valid CUI we hold skips the results: the institution page when it buys, else
-    // the supplier page.
+    // A CUI we hold skips the results: the institution page when it buys, else the
+    // supplier page. The API holds only valid CUIs, so the match is the check.
     const cui = cuiFromQuery(deps.q)
     const exact = cui === null ? null : found.find((e) => e.cui === cui)
     if (exact) {
