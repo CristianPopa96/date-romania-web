@@ -3,7 +3,10 @@ import { Badge, Code, Container, Flex, Heading, Text } from '@radix-ui/themes'
 
 import { EntityContractList } from '#/components/EntityContractList'
 import { EntityFigures } from '#/components/EntityFigures'
-import { GapPanel } from '#/components/GapPanel'
+import {
+  InstitutionHeader,
+  InstitutionMoney,
+} from '#/components/InstitutionMoney'
 import { PartnerList } from '#/components/PartnerList'
 import { PurchaseTable } from '#/components/PurchaseTable'
 import { UrlTabs } from '#/components/UrlTabs'
@@ -60,10 +63,17 @@ export function EntityView({
             </Text>
           </Flex>
           <Heading size="7">{data.entity.name}</Heading>
+          {role === 'institutions' ? (
+            <InstitutionHeader entity={data.entity} />
+          ) : null}
         </Flex>
 
         {contracts.role === 'institutions' ? (
-          <GapPanel awarded={contracts.awarded} period={contracts.period} />
+          <InstitutionMoney
+            cui={cui}
+            awarded={contracts.awarded}
+            period={contracts.period}
+          />
         ) : null}
 
         <Flex direction="column" gap="3">

@@ -20,6 +20,7 @@ import {
   getPurchase,
 } from '#/lib/api-contracts'
 import type { Won } from '#/lib/api-contracts'
+import { getInstitutionBudget } from '#/lib/api-budget'
 import { getCpvDivisions, getNearLimit } from '#/lib/api-patterns'
 import { getProgramme, getProject, getProjects } from '#/lib/api-programme'
 import type { ProjectFilter } from '#/lib/api-programme'
@@ -102,6 +103,12 @@ export const entityContractsQuery = (role: Role, cui: number) =>
     queryFn: () => getEntityContracts({ data: { role, cui } }),
   })
 
+export const budgetQuery = (cui: number) =>
+  queryOptions({
+    queryKey: ['institution-budget', cui],
+    queryFn: () => getInstitutionBudget({ data: cui }),
+  })
+
 export const contractsQuery = (role: Role, cui: number, page: number) =>
   queryOptions({
     queryKey: ['contracts', role, cui, page],
@@ -147,6 +154,7 @@ export async function loadEntityPage(
     client.ensureQueryData(entityQuery(role, cui)),
     client.ensureQueryData(entityContractsQuery(role, cui)),
     client.ensureQueryData(statsQuery),
+    role === 'institutions' ? client.ensureQueryData(budgetQuery(cui)) : null,
   ])
   if (!page || !totals) return null
   const list = entityList(search, contractCount(totals) > 0)

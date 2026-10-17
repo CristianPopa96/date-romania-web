@@ -4,21 +4,34 @@ import { Box, Callout, Flex, Grid, Heading, Text } from '@radix-ui/themes'
 import { DataState, NOT_COLLECTED_OUTLINE } from '#/components/DataState'
 import { useI18n } from '#/i18n/context'
 import type { ContractTotals, Period } from '#/lib/api-contracts'
+import type { GapEnds } from '#/lib/budget'
 
 // The two ends of an institution's money side by side: what it spent, what it awarded,
-// and the payments that can be named. Only the contracts are held today; the other two
-// are published at the source and not collected yet, so their cells are dotted and carry
-// no figure.
+// and the payments that can be named (GapPanel in the design system). A cell we do not
+// hold is dotted and carries no figure. The cells cover different periods (the budget's
+// year, the contracts' days, the payment files), so each names its period, no bars are
+// drawn and no difference between them is computed.
 export function GapPanel({
   awarded,
   period,
+  ends,
 }: {
   awarded: ContractTotals
   period: Period
+  ends: GapEnds
 }) {
   const { t, f } = useI18n()
   const days = f.span(period.first_day, period.last_day)
   const count = t.contracts.count(awarded.contracts, f.count(awarded.contracts))
+  const paidDays =
+    ends.paid && f.span(ends.paid.first_published, ends.paid.last_published)
+  const signed = days ? t.period.range(days.from, days.to) : null
+  const paid = paidDays ? t.period.range(paidDays.from, paidDays.to) : null
+  const periods = [
+    ends.spent ? t.gap.spentPeriod(String(ends.spent.year)) : null,
+    signed ? t.gap.awardedPeriod(signed) : null,
+    paid ? t.gap.paidPeriod(paid) : null,
+  ].filter((part): part is string => part !== null)
 
   return (
     <Flex direction="column" gap="3">
@@ -28,27 +41,52 @@ export function GapPanel({
         gap="3"
         align="stretch"
       >
-        <Cell label={t.gap.spent} />
+        {ends.spent ? (
+          <Cell
+            label={t.gap.spent}
+            value={f.leiShort(ends.spent.value)}
+            notes={[t.gap.spentNote(String(ends.spent.year))]}
+          />
+        ) : (
+          <Cell label={t.gap.spent} />
+        )}
         <Arrow />
         <Cell
           label={t.gap.awarded}
           value={f.leiShort(awarded.value)}
           notes={[
             t.gap.awardedNote,
-            days
-              ? t.period.signed(count, t.period.range(days.from, days.to))
-              : count,
+            signed ? t.period.signed(count, signed) : count,
           ]}
         />
         <Arrow />
-        <Cell label={t.gap.paid} />
+        {ends.paid ? (
+          <Cell
+            label={t.gap.paid}
+            value={f.leiShort(ends.paid.amount)}
+            notes={paid ? [t.gap.paidNote(paid)] : []}
+          />
+        ) : (
+          <Cell label={t.gap.paid} />
+        )}
       </Grid>
       <Callout.Root color="gray" variant="surface" size="1">
         <Callout.Icon>
           <InfoCircledIcon />
         </Callout.Icon>
         <Callout.Text>
-          <Text weight="bold">{t.gap.whyTitle}</Text> {t.gap.why}
+          {ends.periodsDiffer ? (
+            <>
+              <Text weight="bold">
+                {t.gap.periodsTitle(periods.join(', '))}
+              </Text>{' '}
+              {ends.paid ? t.gap.periods : t.gap.periodsNoPayments}
+            </>
+          ) : (
+            <>
+              <Text weight="bold">{t.gap.whyTitle}</Text> {t.gap.why}
+            </>
+          )}
         </Callout.Text>
       </Callout.Root>
     </Flex>

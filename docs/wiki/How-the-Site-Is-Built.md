@@ -35,8 +35,8 @@
 2. The loader calls `context.queryClient.ensureQueryData(...)` with query options from
    `src/lib/queries.ts`.
 3. Each query calls a server function (`createServerFn`) in `src/lib/api.ts` (and its
-   companions `api-contracts.ts`, `api-patterns.ts`, `api-programme.ts`,
-   `api-reports.ts`). These run **on the server**, call the API at `API_URL`, and return
+   companions `api-budget.ts`, `api-contracts.ts`, `api-patterns.ts`,
+   `api-programme.ts`, `api-reports.ts`). These run **on the server**, call the API at `API_URL`, and return
    the answer. Its shape is a type generated from the API's own schema
    (`src/lib/api-schema.gen.ts`, from `openapi.json`), never one written by hand.
 4. The component reads it with `useSuspenseQuery`.
@@ -96,7 +96,7 @@ dictionaries are exempt.
 
 ## Text and languages
 
-- All interface text lives in `src/i18n/ro.ts` (with `ro-programme.ts`,
+- All interface text lives in `src/i18n/ro.ts` (with `ro-budget.ts`, `ro-programme.ts`,
   `ro-rankings.ts`). Components read it with `useI18n()` and never hold text themselves.
 - A second language is a file with the same shape (`Messages`) and an entry in
   `src/i18n/index.ts`; a missing or extra message fails the type check.
