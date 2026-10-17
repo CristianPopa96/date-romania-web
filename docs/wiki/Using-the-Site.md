@@ -1,0 +1,189 @@
+# Using the site
+
+A tour of every page, in the order a visitor usually meets them. The interface is in
+Romanian; the Romanian labels are quoted so you can find them on screen, and the
+[Glossary](Glossary) translates the rest.
+
+## How the pages connect
+
+```
+            Home (/)  ──search──►  Search results (/cautare)
+              │                         │
+              ▼                         ▼
+     Rankings (/clasamente)  ──►  Institution (/institutii/CUI)  ◄──►  Company (/furnizori/CUI)
+              │                         │                                   │
+              │                         ▼                                   ▼
+              └──────────────►  Award notice (/contracte/ID)      Direct purchase (/achizitii-directe/ID)
+
+     Programme (/programe/anghel-saligny) ──► Project ──► builder's company page, SEAP notice
+
+     Sources (/surse): every source, how figures are counted, corrections, error report
+```
+
+Every name of an institution or company is a link to its page, so you can keep
+following the money from any page. The top bar on every page holds the sections that
+exist today, "Clasamente", "Programe" and "Surse", and a compact search field.
+
+## Home: `/`
+
+What you see: a headline ("Urmărește banii publici, de la buget la contract"), a large
+search box with example searches (primăria, consiliul județean, spitalul județean,
+universitatea), the headline figures for direct purchases (accepted value, number of
+accepted purchases, institutions, suppliers), and "Ce date avem", a table of each source
+held with its period, number of records and the day it was last read.
+
+What you can do: search, or jump to the rankings or the sources.
+
+## Search: `/cautare?q=…`
+
+Type part of a name or a tax ID (CUI). Diacritics and small typos are forgiven
+("Barzava" finds "Bârzava"). Results are split in tabs: "Toate", "Instituții",
+"Firme".
+
+- A **valid CUI** takes you straight to its page: the institution page if that CUI buys
+  through SEAP, otherwise the company page.
+- Search only knows institutions and companies that appear in the data held (direct
+  purchases and award notices).
+
+## Institution page: `/institutii/{CUI}`
+
+The page of a public body as a **buyer** (a town hall, a hospital, a ministry…).
+
+1. **Header**: name and CUI.
+2. **"Cele două capete ale banilor"** (the two ends of the money): three boxes side by
+   side, capital spending executed, contracts awarded, and payments we can name. Today
+   only the middle one (contracts) is held; the other two are marked "Încă necolectat"
+   with a note saying why. This panel is where the budget will meet the contracts once
+   budget data is collected.
+3. **Figures**: "Contracte atribuite" (contracts awarded, signed in the period held) and
+   "Achiziții directe acceptate" (accepted direct purchases). The two are never added
+   together.
+4. **Two tabs**:
+   - "Contracte": the contracts it awarded, with winner, value and signing date, and a
+     CSV export.
+   - "Achiziții directe": its top suppliers by value, then every direct purchase, sortable
+     by newest or largest.
+
+The page opens on the tab that has something to show. Tab, page and sort live in the
+address (`?lista=achizitii&pagina=2&ordine=valoare`), so you can share the exact view.
+
+## Company page: `/furnizori/{CUI}`
+
+The same layout, flipped: a company as a **seller**.
+
+- Figures: "Câștigate singur" (contracts won alone), "Câștigate în asociere" (won as part
+  of an association, at the full value of the contract) and "Achiziții directe
+  acceptate". They sit side by side and are never added, because a contract won in an
+  association would otherwise be counted once per member.
+- Tabs: its contracts, and the institutions it sold to directly, with every sale.
+
+## Award notice page: `/contracte/{ID}`
+
+One SEAP award notice, which can hold **several contracts**.
+
+- Title, procedure type, CPV code, buyer ("Autoritate contractantă"), financing, the day
+  it was first published and last republished, and the "Anunț de participare" (the
+  notice that opened the procedure).
+- "Contractele din anunț": one row per contract, with its winner(s), value without VAT
+  and date. Above the table, the notice's total counts ordinary and subsequent contracts.
+- A framework agreement shows muted as "Acord-cadru · plafon · nu intră în total": it is
+  a ceiling, not money spent.
+- An association shows the badge "Asociere · N membri" with its members in SEAP's
+  order.
+- "Ce nu este public": a fixed list of what SEAP does not publish (signed contracts and
+  addenda, the number of offers, payment orders, subcontractors, reception documents).
+- A link to the notice on SEAP ("Vezi la sursă").
+
+## Direct purchase page: `/achizitii-directe/{ID}`
+
+A small purchase made without an auction, from SEAP's catalogue.
+
+- Buyer, supplier, value without VAT, state and date.
+- A purchase that was not accepted shows its value muted, "Neacceptată · nu intră în
+  total"; one published above the legal ceiling shows "Peste plafon · nu intră în total".
+- "Ce s-a cumpărat" (the items bought) is marked "Încă necolectat": SEAP publishes it,
+  but it is not collected yet.
+- "Același furnizor, același cumpărător": how many accepted purchases the same pair made
+  in the period, and for how much.
+
+## Rankings: `/clasamente`
+
+Five tabs, each a measurable fact with its source:
+
+| Tab                       | What it ranks                                                                                               |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| "Cele mai mari contracte" | The largest contracts signed in the period                                                                  |
+| "Furnizori"               | Companies by value of contracts won; switch between won alone ("Singur") and in association ("În asociere") |
+| "Achiziții directe"       | Suppliers and institutions by accepted direct purchases, kept apart from contracts                          |
+| "Instituții"              | Institutions by value of contracts awarded                                                                  |
+| "Tipare"                  | Patterns worth asking documents about (see below)                                                           |
+
+Filters: **CPV** (the category of what was bought, by its first two digits, for example
+45 for construction works) on every tab, and **Fonduri UE** (EU funds: yes or no) on the
+contract tabs. A note says which filters cannot be offered yet (year, county,
+institution type) and why.
+
+**"Tipare" (patterns).** One pattern is shown today: **repeated direct purchases just
+under the legal ceiling**, the same buyer and the same supplier with at least two
+accepted direct purchases, each between 90% of the ceiling for its type and the
+ceiling. Each row says what was measured and links to both parties; the list exports as
+CSV (`/tipare.csv`). The page explains what the pattern shows and what it does not: a
+value close to the ceiling does not prove a purchase was split. Patterns that the data
+cannot give yet are listed with the reason.
+
+## Programme: `/programe/anghel-saligny`
+
+The Anghel Saligny national investment programme: the ministry (MDLPA) pays town halls
+for roads, water, sewage and gas works.
+
+- Headline figures: amount paid in the payment files held, number of projects, town
+  halls and county councils paid, and the share of the money that could be tied,
+  probably, to one SEAP contract.
+- "Cum s-au legat plățile": how a payment is tied to a contract, in plain words.
+- "Urmărește un proiect": a finder with a county select, a match-state filter and a
+  search on the town hall or the works.
+- The list of payment files held, with how many name the builder's CUI.
+
+**Project page** (`/programe/anghel-saligny/proiecte/{ID}`): the ministry's financing
+contract, total value, the state budget share, progress, designer and builder, and
+"Drumul banilor", the chain **ministry → town hall → project → builder → SEAP
+contract**. Each hop says where it comes from and how sure it is. The project's payments
+are listed below. A project has one of four states:
+
+| State                              | Meaning                                                              |
+| ---------------------------------- | -------------------------------------------------------------------- |
+| "Probabil un singur contract"      | One contract fits; the chain is complete                             |
+| "Mai multe contracte posibile"     | Several contracts fit; all are shown, none is picked                 |
+| "Niciun contract găsit"            | The chain stops at the builder; likely reasons are listed            |
+| "Constructor numit doar cu numele" | The file gives only the builder's name, no CUI, so no search is made |
+
+From a project you can open the builder's page, the town hall's page, the SEAP notice,
+or every project of the same builder.
+
+## Sources: `/surse`
+
+Three tabs:
+
+- **"Surse"**: one row per source held, with the period, the day it was last read, what
+  is held in the source's own units, "Erori" (rows that could not be read: logged, kept,
+  never counted) and its known limits. A second table lists public sources not collected
+  yet. A link exports every contract of the period as CSV.
+- **"Metodologie"**: "Cum numărăm", the counting rules in plain words. See
+  [Reading the figures](Reading-the-Figures).
+- **"Corecturi"**: corrections made after readers' reports.
+
+**Reporting an error.** Every page's footer has "Raportează o eroare". The form takes
+the page address, what is wrong and, optionally, a link to evidence. A person reads each
+report before anything changes; only the reviewer's description of an accepted
+correction is published, never the reader's text. A reader can send at most 5 reports
+an hour.
+
+## Exports
+
+| Address                                            | What you get                                                                     |
+| -------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `/contracte.csv`                                   | Every contract signed in the period, largest first                               |
+| `/contracte.csv?institutie=CUI` or `?furnizor=CUI` | One institution's or one company's contracts (the export button on its page)     |
+| `/tipare.csv`                                      | The purchases behind the "just under the ceiling" pattern, one line per purchase |
+
+Each row keeps its source and the day it was read. Data is under CC BY 4.0.
