@@ -1,8 +1,14 @@
 import { createServerFn } from '@tanstack/react-start'
 
+import type { components } from '#/lib/api-schema.gen'
+
 // The site talks to the FastAPI back end only from the server, so the API
 // address stays internal and the browser never needs CORS. The default is 127.0.0.1, not
 // localhost: Docker publishes the API on IPv4 only, and localhost can try IPv6 first.
+// The answers' shapes, generated from the API's schema (openapi.json, `pnpm
+// generate-api-types`). Each file names the ones it uses.
+export type Schemas = components['schemas']
+
 type Params = Record<string, string | number | undefined>
 
 // A parameter left undefined is not sent.
@@ -44,81 +50,25 @@ export async function postJson(
   return response.status
 }
 
-export type Source = {
-  publisher: string
-  record: string | null
-  url: string | null
-  fetched_at: string | null
-  document_id: number | null
-  // One record: the hash of the stored answer it was read from, and the parser's version.
-  sha256?: string | null
-  parser_version?: number | null
-  // A total: how many stored answers its rows were read from.
-  documents?: number | null
-}
+export type Source = Schemas['Source']
 
-export type EntityRef = { cui: number; name: string; kind: string }
-export type Entity = EntityRef & {
-  county: string | null
-  locality: string | null
-}
+export type EntityRef = Schemas['EntityRef']
+export type Entity = Schemas['EntityOut']
 
-export type Summary = {
-  purchases: number
-  accepted: number
-  value: number
-  above_limit: number
-  above_limit_value: number
-  first_day: string | null
-  last_day: string | null
-}
+export type Summary = Schemas['Summary']
 
-export type Stats = {
-  direct_purchases: Summary
-  institutions: number
-  suppliers: number
-  limit: number
-  source: Source
-}
+export type Stats = Schemas['Stats']
 
-export type Partner = EntityRef & { accepted: number; value: number }
+export type Partner = Schemas['Partner']
 
-export type EntityPage = {
-  entity: Entity
-  direct_purchases: Summary
-  partners: Array<Partner>
-  source: Source
-}
+export type EntityPage = Schemas['EntityPage']
 
-export type Purchase = {
-  id: number
-  code: string | null
-  name: string | null
-  state_id: number | null
-  state: string | null
-  cpv_code: string | null
-  cpv_name: string | null
-  buyer: EntityRef | null
-  buyer_text: string | null
-  supplier: EntityRef | null
-  supplier_text: string | null
-  published_at: string | null
-  finalized_at: string | null
-  estimated_value: number | null
-  value: number | null
-  above_limit: boolean
-  source: Source
-}
+export type Purchase = Schemas['Purchase']
 
-export type PurchasePage = { total: number; items: Array<Purchase> }
+export type PurchasePage = Schemas['PurchasePage']
 
-export type RankingRow = Partner & { rank: number }
-export type Ranking = {
-  date_from: string | null
-  date_to: string | null
-  items: Array<RankingRow>
-  source: Source
-}
+export type RankingRow = Schemas['RankingRow']
+export type Ranking = Schemas['Ranking']
 
 // 'institutions' looks at an entity as a buyer, 'suppliers' as a seller.
 export type Role = 'institutions' | 'suppliers'
@@ -133,26 +83,7 @@ export const ACCEPTED = 7
 export const DIRECT_PURCHASE_LIMIT = 900_400
 
 // One source as we hold it: its days, how many records, when it was last read.
-export type Dataset = {
-  key: string
-  publisher: string
-  first_day: string | null
-  last_day: string | null
-  records: number
-  // False when the source publishes late, so the list of the period is never whole.
-  complete: boolean
-  fetched_at: string | null
-  // Days read in full, and days the source would not give in full.
-  days_collected: number
-  days_partial: number
-  // Raw answers kept from the source.
-  documents: number
-  // Rows of those answers the parser could not read; null until every answer was seen
-  // (read, or set aside unread) by a parser that counts them.
-  rejected_rows: number | null
-  // What is held, by kind of row; `records` is the one the totals use.
-  counts: Record<string, number | undefined>
-}
+export type Dataset = Schemas['Dataset']
 
 // Like the totals, the table of what we hold must not take the home page down.
 export const getDatasets = createServerFn({ method: 'GET' }).handler(

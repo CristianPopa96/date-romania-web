@@ -73,6 +73,13 @@ what the API answers. When that file changes, copy it here and run the browser t
 call with no saved answer gets a 501, so a page that starts asking for something new fails
 instead of showing an empty state.
 
+The types of the API's answers are not written by hand either. `openapi.json` is a copy
+of `tests/fixtures/openapi.json` in date-romania-api, also kept equal to the API by a
+test there; `pnpm generate-api-types` turns it into `src/lib/api-schema.gen.ts`, and
+`src/lib/api*.ts` name the shapes they use from it. When the API's schema changes, copy
+the file here and regenerate: a field renamed or removed is then a type error, not a
+blank on a page. CI fails if the generated file does not match the copy.
+
 ## Configuration
 
 | Variable  | Default                 | Meaning                          |

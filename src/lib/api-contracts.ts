@@ -1,89 +1,23 @@
 import { createServerFn } from '@tanstack/react-start'
 
 import { PAGE_SIZE, getJson } from '#/lib/api'
-import type { EntityRef, Purchase, Role, Source, Summary } from '#/lib/api'
+import type { Purchase, Role, Source, Summary, Schemas } from '#/lib/api'
 import type { RankingFilter } from '#/lib/urls'
 
 // Award notices, their contracts, and one direct purchase: the calls behind the pages of
 // single records. See api.ts for how the site reaches the API.
 
-export type NoticeDetail = {
-  call_notice_no: string | null
-  call_published_at: string | null
-  ted_notice_no: string | null
-  lots: number
-  eu_funded: boolean | null
-  financing_types: Array<string>
-  eu_funds: Array<string>
-  eu_project: string | null
-}
+export type NoticeDetail = Schemas['NoticeDetail']
 
-export type Notice = {
-  id: number
-  notice_no: string | null
-  notice_type_id: number | null
-  title: string | null
-  buyer: EntityRef | null
-  buyer_text: string | null
-  cpv_code: string | null
-  cpv_name: string | null
-  contract_type: string | null
-  procedure_type: string | null
-  published_at: string | null
-  // Null until the versions of the notice are collected.
-  first_published_at: string | null
-  versions: number | null
-  // Null until the detail of the notice is collected.
-  detail: NoticeDetail | null
-  contracts: number
-  ordinary: number
-  frameworks: number
-  subsequent: number
-  // Ordinary and subsequent contracts of this notice, whatever their date.
-  total: number
-  source: Source
-}
+export type Notice = Schemas['AwardNoticeOut']
 
-export type Winner = {
-  supplier: EntityRef | null
-  text: string | null
-  country: string | null
-}
+export type Winner = Schemas['Winner']
 
-export type Contract = {
-  id: number
-  notice_id: number
-  notice_no: string | null
-  notice_title: string | null
-  contract_no: string | null
-  title: string | null
-  signed_at: string | null
-  // 1 ordinary, 2 framework agreement, 3 subsequent contract.
-  kind: number | null
-  // False for a framework agreement: a ceiling, never added to a total.
-  counted: boolean
-  lots: string | null
-  // In lei. Null when SEAP gives no value in lei, even if it gives one below.
-  value: number | null
-  // The value as the contract states it, in `currency` ("RON", "EUR").
-  original_value: number | null
-  currency: string | null
-  buyer: EntityRef | null
-  buyer_text: string | null
-  procedure_type: string | null
-  cpv_code: string | null
-  // In SEAP's order. More than one is an association: one value, never split.
-  winners: Array<Winner>
-  source: Source
-}
+export type Contract = Schemas['Contract']
 
-export type Period = { first_day: string | null; last_day: string | null }
+export type Period = Schemas['Period']
 
-export type ContractPage = {
-  total: number
-  period: Period | null
-  items: Array<Contract>
-}
+export type ContractPage = Schemas['ContractPage']
 
 // The contracts of one notice, a page at a time.
 export const NOTICE_PAGE_SIZE = 50
@@ -121,7 +55,7 @@ export const getPairSummary = createServerFn({ method: 'GET' })
     }),
   )
 
-export type ContractTotals = { contracts: number; value: number }
+export type ContractTotals = Schemas['ContractTotals']
 
 // What an institution awarded, or what a company won, among the contracts signed in the
 // period we hold. For a company the two figures are never added: `association` is the
@@ -131,13 +65,8 @@ export type EntityContracts = { period: Period; source: Source } & (
   | { role: 'suppliers'; alone: ContractTotals; association: ContractTotals }
 )
 
-type InstitutionAnswer = ContractTotals & { period: Period; source: Source }
-type SupplierAnswer = {
-  period: Period
-  alone: ContractTotals
-  association: ContractTotals
-  source: Source
-}
+type InstitutionAnswer = Schemas['InstitutionContracts']
+type SupplierAnswer = Schemas['SupplierContracts']
 
 export const getEntityContracts = createServerFn({ method: 'GET' })
   .inputValidator((data: { role: Role; cui: number }) => data)
@@ -184,18 +113,9 @@ export const getContracts = createServerFn({ method: 'GET' })
     return found ?? { total: 0, period: null, items: [] }
   })
 
-export type Won = 'alone' | 'association'
-export type ContractRankingRow = EntityRef & {
-  rank: number
-  contracts: number
-  value: number
-}
-export type ContractRanking = {
-  period: Period
-  won: Won | null
-  items: Array<ContractRankingRow>
-  source: Source
-}
+export type Won = NonNullable<Schemas['ContractRanking']['won']>
+export type ContractRankingRow = Schemas['ContractRankingRow']
+export type ContractRanking = Schemas['ContractRanking']
 
 // Winners by what they won alone or in associations; institutions by what they awarded.
 export const getContractRanking = createServerFn({ method: 'GET' })

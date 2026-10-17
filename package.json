@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "vite dev --port 3000",
     "generate-routes": "tsr generate",
+    "generate-api-types": "openapi-typescript openapi.json -o src/lib/api-schema.gen.ts",
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint",
@@ -38,6 +39,7 @@
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^6.0.1",
     "eslint": "^9.20.0",
+    "openapi-typescript": "^7.13.0",
     "prettier": "^3.8.1",
     "typescript": "^6.0.2",
     "vite": "^8.0.0",

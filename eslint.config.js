@@ -16,6 +16,11 @@ export default [
   },
   {
     // Build output is not ours to lint.
-    ignores: ['eslint.config.js', 'prettier.config.js', '.output/**'],
+    ignores: [
+      'eslint.config.js',
+      'prettier.config.js',
+      '.output/**',
+      'src/lib/api-schema.gen.ts',
+    ],
   },
 ]

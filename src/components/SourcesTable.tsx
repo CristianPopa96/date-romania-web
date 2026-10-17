@@ -32,7 +32,7 @@ export function SourcesTable({ datasets }: { datasets: Array<Dataset> }) {
           {datasets.map((dataset) => {
             const days = f.span(dataset.first_day, dataset.last_day)
             // A source that comes as files has no days to read or to miss.
-            const files = dataset.counts.files ?? 0
+            const files = 'files' in dataset.counts ? dataset.counts.files : 0
             const read = files > 0 ? null : coverage(dataset)
             const limits = t.sources.limitsOf[dataset.key] ?? []
             return (

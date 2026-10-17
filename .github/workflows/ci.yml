@@ -20,6 +20,9 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # The API types are generated from openapi.json, a copy of the API's schema; a
+      # hand edit or a forgotten regeneration fails here.
+      - run: pnpm generate-api-types && git diff --exit-code src/lib/api-schema.gen.ts
       - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm check
