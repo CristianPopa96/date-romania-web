@@ -3,20 +3,20 @@ import { createServerFn } from '@tanstack/react-start'
 // The site talks to the FastAPI back end only from the server, so the API
 // address stays internal and the browser never needs CORS. The default is 127.0.0.1, not
 // localhost: Docker publishes the API on IPv4 only, and localhost can try IPv6 first.
-function apiUrl(path: string) {
-  const base = process.env.API_URL ?? 'http://127.0.0.1:8000'
-  return new URL(path, base)
-}
-
 type Params = Record<string, string | number | undefined>
 
-// Null means the API answered "not found"; any other failure is thrown.
-export async function getJson<T>(path: string, params: Params = {}) {
-  const url = apiUrl(path)
+// A parameter left undefined is not sent.
+function apiUrl(path: string, params: Params = {}) {
+  const url = new URL(path, process.env.API_URL ?? 'http://127.0.0.1:8000')
   for (const [key, value] of Object.entries(params)) {
     if (value !== undefined) url.searchParams.set(key, String(value))
   }
-  const response = await fetch(url)
+  return url
+}
+
+// Null means the API answered "not found"; any other failure is thrown.
+export async function getJson<T>(path: string, params: Params = {}) {
+  const response = await fetch(apiUrl(path, params))
   if (response.status === 404) return null
   if (!response.ok) throw new Error(`API ${response.status} for ${path}`)
   return (await response.json()) as T
@@ -25,11 +25,7 @@ export async function getJson<T>(path: string, params: Params = {}) {
 // A file the API writes (a CSV export), passed on byte for byte. Reading it as text
 // would drop the mark at its start that makes spreadsheet programs read the diacritics.
 export async function getFile(path: string, params: Params = {}) {
-  const url = apiUrl(path)
-  for (const [key, value] of Object.entries(params)) {
-    if (value !== undefined) url.searchParams.set(key, String(value))
-  }
-  const response = await fetch(url)
+  const response = await fetch(apiUrl(path, params))
   if (!response.ok) throw new Error(`API ${response.status} for ${path}`)
   return response.arrayBuffer()
 }
