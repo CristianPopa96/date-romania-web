@@ -273,6 +273,9 @@ describe('validateSearchSearch', () => {
 
   it('keeps a kind of result that has a tab', () => {
     expect(validateSearchSearch({ q: 'a', tip: 'firme' }).tip).toBe('firme')
+    expect(validateSearchSearch({ q: 'a', tip: 'localitati' }).tip).toBe(
+      'localitati',
+    )
     expect(validateSearchSearch({ q: 'a', tip: 'contracte' }).tip).toBe(
       undefined,
     )

@@ -54,7 +54,9 @@ export function SourcesTable({ datasets }: { datasets: Array<Dataset> }) {
                   </Text>
                   {files > 0 ? (
                     <Text as="div" size="1" color="gray">
-                      {t.sources.files(files, f.count(files))}
+                      {dataset.key === 'anaf'
+                        ? t.sources.answers(files, f.count(files))
+                        : t.sources.files(files, f.count(files))}
                     </Text>
                   ) : null}
                   {read ? (
@@ -179,6 +181,36 @@ function Held({ dataset }: { dataset: Dataset }) {
         </Text>
         <Text as="div" size="1" color="gray">
           {t.sources.exportRowsNote}
+        </Text>
+      </>
+    )
+  }
+  const s = t.sources
+  const lines: Partial<Record<string, [string, string]>> = {
+    siruta: [
+      s.placesHeld(dataset.records, f.count(dataset.records)),
+      s.uatsHeld(n('uats'), f.count(n('uats'))),
+    ],
+    'public-entities': [
+      s.entitiesHeld(dataset.records, f.count(dataset.records)),
+      s.entitiesPlaced(f.count(n('placed'))),
+    ],
+    'local-budgets': [
+      s.budgetsHeld(dataset.records, f.count(dataset.records)),
+      s.populationHeld(f.count(n('population'))),
+    ],
+    anaf: [
+      s.anafHeld(dataset.records, f.count(dataset.records)),
+      s.anafFound(f.count(n('found'))),
+    ],
+  }
+  const found = lines[dataset.key]
+  if (found) {
+    return (
+      <>
+        <Text as="div">{found[0]}</Text>
+        <Text as="div" size="1" color="gray">
+          {found[1]}
         </Text>
       </>
     )

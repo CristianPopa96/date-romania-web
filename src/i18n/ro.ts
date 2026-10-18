@@ -7,6 +7,7 @@
 
 import { budget } from '#/i18n/ro-budget'
 import { counted, plural } from '#/i18n/ro-plural'
+import { places } from '#/i18n/ro-places'
 import { programme } from '#/i18n/ro-programme'
 import { rankings } from '#/i18n/ro-rankings'
 
@@ -47,6 +48,7 @@ export const ro = {
   nav: {
     label: 'Secțiuni',
     programmes: 'Programe',
+    places: 'Localități',
     rankings: 'Clasamente',
     sources: 'Surse',
   },
@@ -54,6 +56,8 @@ export const ro = {
   programme,
 
   budget,
+
+  places,
 
   notFound: {
     title: 'Pagina nu există',
@@ -123,6 +127,10 @@ export const ro = {
       'seap-awards': 'anunțuri de atribuire',
       'pnias-payments': 'plăți Anghel Saligny',
       'seap-exports': 'exporturi de contracte SEAP',
+      siruta: 'SIRUTA, lista localităților',
+      'public-entities': 'lista entităților publice',
+      'local-budgets': 'bugetele primăriilor și consiliilor județene',
+      anaf: 'registrul contribuabililor',
     } as Record<string, string | undefined>,
     name: (publisher: string, what: string) => `${publisher} · ${what}`,
     // What the count of a source counts, where the word "records" is not enough.
@@ -159,6 +167,13 @@ export const ro = {
         'plăți către primării, cu proiectul, constructorul și CUI-ul lui',
       'seap-exports':
         'contracte din SEAP din 2021 încoace, doar ale constructorilor din programul Anghel Saligny',
+      siruta:
+        'fiecare județ, localitate și sat, cu codul lui, de la Institutul Național de Statistică',
+      'public-entities':
+        'unde lucrează fiecare instituție publică și cine o finanțează, de la Ministerul Finanțelor',
+      'local-budgets':
+        'bugetul executat al fiecărei primării și al fiecărui consiliu județean, și populația fiecărei localități, de la MDLPA',
+      anaf: 'județul și localitatea sediului fiecărei instituții și firme',
     } as Record<string, string | undefined>,
     limitsOf: {
       'seap-direct': [
@@ -179,6 +194,18 @@ export const ro = {
         'nu intră în totaluri și clasamente',
         'fără titlul contractului din 2023 încoace',
       ],
+      'public-entities': [
+        'câteva comune redenumite nu se regăsesc în SIRUTA; ANAF le dă localitatea',
+      ],
+      'local-budgets': [
+        'doar 2024, pe an întreg',
+        'doar primăriile și consiliile județene',
+        'fără plățile și beneficiarii din spatele cifrelor',
+      ],
+      anaf: [
+        'doar județul și localitatea, niciodată strada',
+        'întrebat o dată pentru fiecare CUI',
+      ],
     } as Record<string, Array<string> | undefined>,
     files: (n: number, text: string) =>
       counted(n, text, 'un fișier', 'fișiere'),
@@ -189,6 +216,22 @@ export const ro = {
     exportRows: (n: number, text: string) =>
       counted(n, text, 'un rând', 'rânduri'),
     exportRowsNote: 'un rând pentru fiecare câștigător și fiecare export',
+    answers: (n: number, text: string) =>
+      counted(n, text, 'un răspuns', 'răspunsuri'),
+    placesHeld: (n: number, text: string) =>
+      counted(n, text, 'un loc', 'locuri'),
+    uatsHeld: (n: number, text: string) =>
+      `din care ${counted(n, text, 'o localitate cu primărie', 'localități cu primărie')}`,
+    entitiesHeld: (n: number, text: string) =>
+      counted(n, text, 'o entitate publică', 'entități publice'),
+    entitiesPlaced: (count: string) => `${count} găsite în SIRUTA`,
+    budgetsHeld: (n: number, text: string) =>
+      counted(n, text, 'un buget', 'bugete'),
+    populationHeld: (count: string) =>
+      `și ${count} cifre de populație, 2021–2024`,
+    anafHeld: (n: number, text: string) =>
+      counted(n, text, 'un CUI întrebat', 'CUI-uri întrebate'),
+    anafFound: (count: string) => `${count} găsite la ANAF`,
     daysRead: (full: string, expected: number, expectedText: string) =>
       `${full} din ${counted(expected, expectedText, 'o zi', 'zile')} citite complet`,
     daysPartial: (n: number, text: string) =>
@@ -310,6 +353,7 @@ export const ro = {
     all: 'Toate',
     institutions: 'Instituții',
     companies: 'Firme',
+    places: 'Localități',
     noneOfKind: 'Niciun rezultat de acest tip.',
     found: (n: number, text: string, q: string) =>
       `${counted(n, text, 'Un rezultat', 'rezultate')} pentru „${q}”`,
