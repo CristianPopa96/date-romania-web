@@ -5,6 +5,7 @@
 // typed into a string here. A message that needs a link or a styled part inside it names
 // the place as `{part}` and is filled with `rich()`. Data is never translated.
 
+import { budget } from '#/i18n/ro-budget'
 import { counted, plural } from '#/i18n/ro-plural'
 import { programme } from '#/i18n/ro-programme'
 import { rankings } from '#/i18n/ro-rankings'
@@ -51,6 +52,8 @@ export const ro = {
   },
 
   programme,
+
+  budget,
 
   notFound: {
     title: 'Pagina nu există',
@@ -352,6 +355,17 @@ export const ro = {
     paid: 'Plăți pe care le putem numi',
     whyTitle: 'Ce se vede deocamdată.',
     why: 'Contractele arată cui s-au atribuit banii, dar nu din ce linie de buget. Execuția bugetară, care arată cât s-a cheltuit, și plățile publicate cu numele celui plătit există la sursă, dar nu le-am preluat încă.',
+    // When the cells cover different periods: no bars, no difference between them.
+    spentNote: (year: string) => `${year} · MDLPA · fără beneficiari`,
+    paidNote: (range: string) => `${range} · doar plățile Anghel Saligny`,
+    spentPeriod: (year: string) => `execuția e pe ${year}`,
+    awardedPeriod: (range: string) => `contractele pe ${range}`,
+    paidPeriod: (range: string) => `plățile pe ${range}`,
+    periodsTitle: (periods: string) => `Perioadele diferă: ${periods}.`,
+    periods:
+      'De aceea cifrele nu se scad una din alta. Execuția bugetară arată cât s-a cheltuit, dar nu către cine. Contractele arată cui, dar nu din ce linie de buget. Plățile cu numele celui plătit le avem doar din programul Anghel Saligny.',
+    periodsNoPayments:
+      'De aceea cifrele nu se scad una din alta. Execuția bugetară arată cât s-a cheltuit, dar nu către cine. Contractele arată cui, dar nu din ce linie de buget. Plățile cu numele celui plătit există la sursă doar pentru câteva instituții, iar pe acestea nu le-am preluat încă.',
   },
 
   contracts: {

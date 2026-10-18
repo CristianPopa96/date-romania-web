@@ -121,6 +121,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/institutions/{cui}/budget": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Institution Budget
+         * @description For a town hall or a county council: the latest executed budget held and the
+         *     Anghel Saligny payments to it. Every institution: the one that funds it.
+         */
+        get: operations["institution_budget_v1_institutions__cui__budget_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/direct-purchases": {
         parameters: {
             query?: never;
@@ -581,6 +602,16 @@ export interface components {
             total: number;
             source: components["schemas"]["Source"];
         };
+        /** ChapterAmount */
+        ChapterAmount: {
+            /**
+             * Chapter
+             * @enum {string}
+             */
+            chapter: "general_services" | "defence_order" | "education" | "health" | "culture" | "social" | "housing" | "environment" | "economic_affairs" | "energy" | "agriculture" | "transport" | "other_economic";
+            /** Amount */
+            amount: number;
+        };
         /**
          * Contract
          * @description One contract of an award notice. `value` is in lei without VAT.
@@ -825,6 +856,18 @@ export interface components {
             /** Version */
             version: string;
         };
+        /**
+         * InstitutionBudget
+         * @description `place` is the UAT or county the institution governs, when it is a town hall or
+         *     a county council; every other institution has none, and no budget held.
+         */
+        InstitutionBudget: {
+            place: components["schemas"]["PlaceRef"] | null;
+            /** @description The institution that funds it (its main credit holder), when held. */
+            funder: components["schemas"]["EntityRef"] | null;
+            budget: components["schemas"]["LocalBudgetOut"] | null;
+            programme_payments: components["schemas"]["ProgrammePayments"] | null;
+        };
         /** InstitutionContracts */
         InstitutionContracts: {
             /** Contracts */
@@ -832,6 +875,43 @@ export interface components {
             /** Value */
             value: number;
             period: components["schemas"]["Period"];
+            source: components["schemas"]["Source"];
+        };
+        /**
+         * LocalBudgetOut
+         * @description A year of a town hall's or county council's budget, executed to 31 December.
+         */
+        LocalBudgetOut: {
+            /** Year */
+            year: number;
+            /**
+             * Executed On
+             * Format: date
+             * @description The day the figures run to: 31 December.
+             */
+            executed_on: string;
+            /**
+             * Revenue
+             * @description Total revenue; the lines add up to it exactly.
+             */
+            revenue: number;
+            /**
+             * Revenue Lines
+             * @description In the order the site shows them.
+             */
+            revenue_lines: components["schemas"]["RevenueAmount"][];
+            /** Spending */
+            spending: number;
+            /**
+             * Capital
+             * @description Capital spending (investments), part of `spending`.
+             */
+            capital: number;
+            /**
+             * Chapters
+             * @description Spending by what it was for, largest first; they add up to `spending`.
+             */
+            chapters: components["schemas"]["ChapterAmount"][];
             source: components["schemas"]["Source"];
         };
         /** MatchCount */
@@ -999,6 +1079,21 @@ export interface components {
             /** Last Day */
             last_day: string | null;
         };
+        /** PlaceRef */
+        PlaceRef: {
+            /** Siruta */
+            siruta: number;
+            /**
+             * Name
+             * @description As the national list of places writes it.
+             */
+            name: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "county" | "municipality" | "town" | "commune" | "sector";
+        };
         /**
          * Programme
          * @description The Anghel Saligny programme, from the ministry's payment files.
@@ -1120,6 +1215,38 @@ export interface components {
              *     }
              */
             unnamed: components["schemas"]["MatchCount"];
+        };
+        /**
+         * ProgrammePayments
+         * @description The Anghel Saligny payments to this town hall or county council, from the
+         *     ministry's files. Never added to the budget's state subsidies: the periods differ,
+         *     and the budget file does not say which programme a subsidy came from.
+         */
+        ProgrammePayments: {
+            /**
+             * County
+             * @description As the files write it, the key of the programme's counties.
+             */
+            county: string;
+            /**
+             * Town Hall
+             * @description As the files write it, to find its projects.
+             */
+            town_hall: string;
+            /** Amount */
+            amount: number;
+            /** Payments */
+            payments: number;
+            /** Projects */
+            projects: number;
+            /**
+             * First Published
+             * @description Day of the first file that lists one.
+             */
+            first_published: string | null;
+            /** Last Published */
+            last_published: string | null;
+            source: components["schemas"]["Source"];
         };
         /** Project */
         Project: {
@@ -1366,6 +1493,16 @@ export interface components {
         ReportReceived: {
             /** Id */
             id: number;
+        };
+        /** RevenueAmount */
+        RevenueAmount: {
+            /**
+             * Line
+             * @enum {string}
+             */
+            line: "state_subsidies" | "income_tax" | "vat" | "own_revenue" | "eu_funds" | "other_administrations" | "other";
+            /** Amount */
+            amount: number;
         };
         /** SearchResults */
         SearchResults: {
@@ -1750,6 +1887,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["EntityPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    institution_budget_v1_institutions__cui__budget_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                cui: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InstitutionBudget"];
                 };
             };
             /** @description Validation Error */

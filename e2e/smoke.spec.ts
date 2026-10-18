@@ -175,9 +175,9 @@ test('an institution page keeps contracts and direct purchases apart', async ({
   await expect(
     main.getByText('Numărăm contractele semnate între 05.10 și 07.10.2026.'),
   ).toBeVisible()
-  // Budget execution and named payments are published, and not collected yet.
+  // Its budget and its Anghel Saligny payments are held: none is dotted.
   await expect(main.getByText('Încă necolectat', { exact: true })).toHaveCount(
-    2,
+    0,
   )
   await expect(
     main.getByText('Sursa contractelor: SEAP · preluat 07.10.2026'),
@@ -210,6 +210,93 @@ test('an institution page keeps contracts and direct purchases apart', async ({
   await expect(
     main.getByRole('heading', { name: 'Achiziții directe (4)' }),
   ).toBeVisible()
+})
+
+test('a town hall shows its budget and the payments to it, each with its period', async ({
+  page,
+}) => {
+  await page.goto('/institutii/4981310')
+  const main = page.getByRole('main')
+
+  // Where it is, and what we hold for it.
+  await expect(main.getByText('Buget 2024', { exact: true })).toBeVisible()
+  await expect(main.getByText('Anghel Saligny', { exact: true })).toBeVisible()
+
+  // The gap panel names three periods and draws no difference between the figures.
+  await expect(
+    main.getByText(
+      'Perioadele diferă: execuția e pe 2024, contractele pe 05.10–07.10.2026, plățile pe 18.05–27.08.2026.',
+    ),
+  ).toBeVisible()
+  await expect(main.getByText('2024 · MDLPA · fără beneficiari')).toBeVisible()
+  await expect(
+    main.getByText('18.05–27.08.2026 · doar plățile Anghel Saligny'),
+  ).toBeVisible()
+  await expect(main.getByText(/nu poate fi urmărit/)).toHaveCount(0)
+
+  // Revenue in the design's order; the lines add up to the total.
+  await expect(
+    main.getByRole('heading', { name: 'Venituri · 2024' }),
+  ).toBeVisible()
+  await expect(main.getByText('Venituri totale: 10,0 mil. lei')).toBeVisible()
+  const lines = main.getByRole('listitem').filter({ hasText: /lei$/ })
+  await expect(lines.first()).toContainText('Subvenții de la bugetul de stat')
+  await expect(lines.first()).toContainText('5.000.000 lei')
+  await expect(main.getByText('Cote din impozitul pe venit')).toBeVisible()
+
+  // Spending: capital first, then by chapter.
+  await expect(
+    main.getByRole('heading', { name: 'Cheltuieli · 2024' }),
+  ).toBeVisible()
+  await expect(
+    main.getByText('investiții, din totalul de 9,8 mil. lei'),
+  ).toBeVisible()
+  await expect(main.getByText('Transporturi')).toBeVisible()
+  await expect(main.getByText('executat la 31.12.2024')).toHaveCount(2)
+  await expect(
+    main
+      .getByText(
+        'Sursa: data.gov.ro · MDLPA · Situația veniturilor și cheltuielilor 2024 · preluat 07.10.2026',
+      )
+      .first(),
+  ).toBeVisible()
+
+  // The payments are a card of their own, never added to the subsidies.
+  const paid = main.getByRole('heading', {
+    name: 'Plăți Anghel Saligny către primărie',
+  })
+  await expect(paid).toBeVisible()
+  await expect(main.getByText('3 plăți · un proiect')).toBeVisible()
+  await expect(
+    main.getByText(/Nu le adunăm cu subvențiile din 2024/),
+  ).toBeVisible()
+  await expect(
+    main.getByRole('link', { name: 'vezi proiectele' }),
+  ).toHaveAttribute('href', /\/programe\/anghel-saligny\?judet=gorj&q=/)
+})
+
+test('an institution with no budget held says so, and names who funds it', async ({
+  page,
+}) => {
+  await page.goto('/institutii/4491342')
+  const main = page.getByRole('main')
+
+  await expect(
+    main
+      .getByRole('link', { name: 'Comuna Țânțăreni (Primăria Țânțăreni)' })
+      .first(),
+  ).toHaveAttribute('href', '/institutii/4981310')
+  await expect(main.getByText('Buget 2024', { exact: true })).toHaveCount(0)
+  // The budget and named payments: dotted in the gap panel, and in the budget section.
+  await expect(main.getByText('Încă necolectat', { exact: true })).toHaveCount(
+    3,
+  )
+  await expect(
+    main.getByText(
+      /Bugetul celorlalte instituții e publicat de Ministerul Finanțelor/,
+    ),
+  ).toBeVisible()
+  await expect(main.getByText('Ce se vede deocamdată.')).toBeVisible()
 })
 
 test('an institution page counts only accepted purchases', async ({ page }) => {
