@@ -11,8 +11,10 @@ Romanian words and acronyms you meet on the site, with what they mean here.
 | **data.gov.ro**             | The national open data portal                                                                                                   |
 | **MDLPA**                   | Ministerul Dezvoltării, Lucrărilor Publice și Administrației, the ministry that runs the Anghel Saligny programme               |
 | **Anghel Saligny (PNIAS)**  | A national investment programme paying town halls for roads, water, sewage and gas works                                        |
-| **ANAF**                    | The national tax agency; its data (county, locality, company status) is not collected yet                                       |
-| **Forexebug**               | The treasury's budget execution reporting system; not collected yet                                                             |
+| **ANAF**                    | The national tax agency; its register gives the county and locality of every institution and company held                       |
+| **Forexebug**               | The treasury's budget execution reporting system; its portal asks for a captcha, so it cannot be collected                      |
+| **SIRUTA**                  | The national list of places (INS), with a code for every county, town hall area and village                                     |
+| **UAT**                     | Unitate administrativ-teritorială: a commune, town, municipality or Bucharest sector, the area of one town hall                 |
 | **MIPE**                    | The ministry for EU funds; not collected yet                                                                                    |
 | **TED**                     | The EU's Official Journal tenders database; not collected yet                                                                   |
 | **Primăria**                | Town hall                                                                                                                       |

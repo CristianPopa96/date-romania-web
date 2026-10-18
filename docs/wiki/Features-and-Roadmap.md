@@ -1,20 +1,21 @@
 # Features and roadmap
 
 The site is planned as ten user flows, built in releases. This page is the state as of
-17.10.2026.
+18.10.2026.
 
 ## Built
 
-| Release | Flow                              | On the site                                                                                                             |
-| ------- | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| 1       | Search                            | `/cautare`: institutions and companies by name or CUI                                                                   |
-| 1       | Institution (money out only)      | `/institutii/{CUI}`: contracts awarded and direct purchases                                                             |
-| 1       | Company                           | `/furnizori/{CUI}`: contracts won alone and in association, direct sales                                                |
-| 1       | Award notice and direct purchase  | `/contracte/{ID}`, `/achizitii-directe/{ID}`                                                                            |
-| 2       | Programme trace (Anghel Saligny)  | `/programe/anghel-saligny` and one page per project                                                                     |
-| 2       | Rankings and patterns             | `/clasamente`: five tabs, CPV and EU funds filters, one pattern                                                         |
-| 2       | Sources, methodology, corrections | `/surse`: sources held, "Erori" per source, "Cum numărăm", corrections, error report form, source panel on every record |
-| 2       | Exports                           | CSV of contracts (all, or per institution or company) and of the pattern                                                |
+| Release | Flow                              | On the site                                                                                                                                                            |
+| ------- | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1       | Search                            | `/cautare`: institutions and companies by name or CUI                                                                                                                  |
+| 1       | Institution (money out only)      | `/institutii/{CUI}`: contracts awarded and direct purchases                                                                                                            |
+| 1       | Company                           | `/furnizori/{CUI}`: contracts won alone and in association, direct sales                                                                                               |
+| 1       | Award notice and direct purchase  | `/contracte/{ID}`, `/achizitii-directe/{ID}`                                                                                                                           |
+| 2       | Programme trace (Anghel Saligny)  | `/programe/anghel-saligny` and one page per project                                                                                                                    |
+| 2       | Rankings and patterns             | `/clasamente`: five tabs, CPV and EU funds filters, one pattern                                                                                                        |
+| 2       | Sources, methodology, corrections | `/surse`: sources held, "Erori" per source, "Cum numărăm", corrections, error report form, source panel on every record                                                |
+| 2       | Exports                           | CSV of contracts (all, or per institution or company) and of the pattern                                                                                               |
+| 3       | Institution "money in"            | On `/institutii/{CUI}` of a town hall or county council: its 2024 budget, the Anghel Saligny payments to it, the gap panel with periods; the funder of any institution |
 
 ## The data behind it
 
@@ -27,17 +28,22 @@ being built; no other days are collected until the maintainer decides to resume.
   counted, and that list is incomplete for good (contracts appear weeks after signing).
 - **Anghel Saligny**: six payment files (18 May to 27 August 2026) and SEAP's quarterly
   contract exports from 2021, used only to trace the programme.
+- **Places and local budgets**: SIRUTA (every county, town hall and village), the
+  Finance Ministry's list of 13,485 public entities, the 2024 executed budget of every
+  town hall and county council and the population of every town hall area (Ministry of
+  Development), and ANAF's record of all 49,525 institutions and companies held. All
+  but two have their county and town hall area.
 
 ## Not built yet
 
-| Release | Flow                                                                                     | What it needs                                                                     |
-| ------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| 3       | Institution "money in": budget and execution by year                                     | Budget execution data (Forexebug), not collected yet                              |
-| 3       | My locality / county: every public body in one place                                     | ANAF data (county and locality of each institution and company)                   |
-| 4       | EU funded projects                                                                       | MIPE project lists, SMIS codes found in contract titles                           |
-| 4       | From a gap to a Law 544 request: request missing documents, track the answer, publish it | The request tracker; the project team sends every request                         |
-| On hold | Available versus unused funds, and who answers for them                                  | Dated EU absorption snapshots, budget commitments, office holders and their dates |
-| Later   | Politicians and parties                                                                  | Not researched yet                                                                |
+| Release | Flow                                                                                     | What it needs                                                                                                                     |
+| ------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| 3       | My locality / county: every public body in one place                                     | Built next; the data is held (places, budgets, population, ANAF)                                                                  |
+| Later   | "Money in" for institutions other than town halls and county councils                    | Budget execution per institution (Forexebug): its portal asks for a captcha, so a bulk request to the Finance Ministry is planned |
+| 4       | EU funded projects                                                                       | MIPE project lists, SMIS codes found in contract titles                                                                           |
+| 4       | From a gap to a Law 544 request: request missing documents, track the answer, publish it | The request tracker; the project team sends every request                                                                         |
+| On hold | Available versus unused funds, and who answers for them                                  | Dated EU absorption snapshots, budget commitments, office holders and their dates                                                 |
+| Later   | Politicians and parties                                                                  | Not researched yet                                                                                                                |
 
 Also waiting:
 

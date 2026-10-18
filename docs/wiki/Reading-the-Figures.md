@@ -71,6 +71,11 @@ exactly one contract.
 The site holds only the days that were collected (today: 1 September to 10 October
 2026). Every total says which days it covers.
 
+Figures over **different periods are never added or subtracted**. A town hall's budget
+covers the whole of 2024, its contracts the days held, its Anghel Saligny payments the
+dates of the ministry's files (18.05–27.08.2026): each figure names its own period, and
+none is put on one scale with another.
+
 Contract totals also carry a note that **the list is incomplete**: SEAP publishes half of
 all contracts more than 17 days after signing and one in ten more than 50 days after, so
 some contracts signed in the period had not appeared yet when the data was frozen.

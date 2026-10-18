@@ -49,16 +49,28 @@ Type part of a name or a tax ID (CUI). Diacritics and small typos are forgiven
 
 The page of a public body as a **buyer** (a town hall, a hospital, a ministry…).
 
-1. **Header**: name and CUI.
+1. **Header**: name and CUI, its county, the institution that funds it ("subordonată
+   …", a link), and which sources are held for it ("SEAP", "Buget 2024", "Anghel
+   Saligny").
 2. **"Cele două capete ale banilor"** (the two ends of the money): three boxes side by
-   side, capital spending executed, contracts awarded, and payments we can name. Today
-   only the middle one (contracts) is held; the other two are marked "Încă necolectat"
-   with a note saying why. This panel is where the budget will meet the contracts once
-   budget data is collected.
-3. **Figures**: "Contracte atribuite" (contracts awarded, signed in the period held) and
+   side, capital spending executed, contracts awarded, and payments we can name. For a
+   town hall or a county council, the first holds its capital spending of 2024 and the
+   last the Anghel Saligny payments to it. The three cover different periods, so each
+   box names its own, no bars are drawn and no difference is computed: the note under
+   them opens "Perioadele diferă: …". A box not held is marked "Încă necolectat".
+3. **"Buget"**: for a town hall or a county council, "Venituri · 2024" (revenue in seven
+   lines that add up to the total: state subsidies, income tax shares, VAT shares, own
+   revenue, EU funds, subsidies from other administrations, other) and "Cheltuieli ·
+   2024" (capital spending, then spending by chapter: transport, education…), both
+   executed to 31.12.2024, from the Ministry of Development. The Anghel Saligny payments
+   to it are a card of their own, never added to the subsidies, with a link to its
+   projects. Any other institution (a school, a hospital, a ministry) shows "Încă
+   necolectat": the Finance Ministry publishes its budget, but it cannot be collected
+   yet.
+4. **Figures**: "Contracte atribuite" (contracts awarded, signed in the period held) and
    "Achiziții directe acceptate" (accepted direct purchases). The two are never added
    together.
-4. **Two tabs**:
+5. **Two tabs**:
    - "Contracte": the contracts it awarded, with winner, value and signing date, and a
      CSV export.
    - "Achiziții directe": its top suppliers by value, then every direct purchase, sortable
