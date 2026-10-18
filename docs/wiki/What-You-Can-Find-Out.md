@@ -5,6 +5,10 @@ site is in Romanian; the words in quotes are the ones you will see on screen.
 
 ## About your town or commune
 
+![A commune page](images/commune.png)
+
+_A commune page, shown with made-up test data._
+
 **"How much money does my town hall have, and where does it come from?"**
 Open "Localități", pick your county, then your commune or town (or just type its name in
 the search box). The page shows the town hall's 2024 budget: how much came from the

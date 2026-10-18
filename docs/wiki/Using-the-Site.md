@@ -4,6 +4,9 @@ A tour of every page, in the order a visitor usually meets them. The interface i
 Romanian; the Romanian labels are quoted so you can find them on screen, and the
 [Glossary](Glossary) translates the rest.
 
+The screenshots below show the site filled with made-up test data, so the names and
+amounts in them are not real.
+
 ## How the pages connect
 
 Every name of an institution or company is a link to its page, so you can keep
@@ -17,6 +20,8 @@ exist today and a search field:
 
 ## Home
 
+![The home page](images/home.png)
+
 What you see: a headline ("Urmărește banii publici, de la buget la contract"), a large
 search box with example searches (primăria, consiliul județean, spitalul județean,
 universitatea), the headline figures for direct purchases (accepted value, number of
@@ -26,6 +31,8 @@ held with its period, number of records and the day it was last read.
 What you can do: search, or jump to the rankings or the sources.
 
 ## Search
+
+![Search results](images/search.png)
 
 Type part of a name or a tax ID (CUI). Diacritics and small typos are forgiven
 ("Barzava" finds "Bârzava"). Results are split in tabs: "Toate", "Instituții",
@@ -38,6 +45,8 @@ Type part of a name or a tax ID (CUI). Diacritics and small typos are forgiven
   or by the name of one of its villages ("Localități" tab).
 
 ## Institution page
+
+![An institution page](images/institution.png)
 
 The page of a public body as a **buyer** (a town hall, a hospital, a ministry…).
 
@@ -73,6 +82,8 @@ the tab, page and order you chose, so you can share exactly what you see.
 
 ## Company page
 
+![A company page](images/company.png)
+
 The same layout, flipped: a company as a **seller**.
 
 - Figures: "Câștigate singur" (contracts won alone), "Câștigate în asociere" (won as part
@@ -82,6 +93,8 @@ The same layout, flipped: a company as a **seller**.
 - Tabs: its contracts, and the institutions it sold to directly, with every sale.
 
 ## Award notice page
+
+![An award notice page](images/notice.png)
 
 One SEAP award notice, which can hold **several contracts**.
 
@@ -100,6 +113,8 @@ One SEAP award notice, which can hold **several contracts**.
 
 ## Direct purchase page
 
+![A direct purchase page](images/direct-purchase.png)
+
 A small purchase made without an auction, from SEAP's catalogue.
 
 - Buyer, supplier, value without VAT, state and date.
@@ -112,13 +127,19 @@ A small purchase made without an auction, from SEAP's catalogue.
 
 ## Localities
 
+![The list of counties](images/localities.png)
+
 The 42 counties (Bucharest is one), each with its number of UATs (communes, towns,
 municipalities, Bucharest sectors) and people. A county opens its page.
+
+![A county page](images/county.png)
 
 **A county.** The same figures as a locality,
 added up over its UATs and its county council, then a table of every UAT with its
 population, capital spending in 2024 (the year of the UATs' budgets, the council's left
 out) and contracts signed in the period held.
+
+![A commune page](images/commune.png)
 
 **A town or commune.** One UAT:
 
@@ -144,6 +165,8 @@ of its own: searching it opens its UAT, with the line "Localitatea X face parte 
 
 ## Rankings
 
+![The rankings](images/rankings.png)
+
 Five tabs, each a measurable fact with its source:
 
 | Tab                       | What it ranks                                                                                               |
@@ -159,6 +182,8 @@ Filters: **CPV** (the category of what was bought, by its first two digits, for 
 contract tabs. A note says which filters cannot be offered yet (year, county,
 institution type) and why.
 
+![The patterns tab](images/patterns.png)
+
 **"Tipare" (patterns).** One pattern is shown today: **repeated direct purchases just
 under the legal ceiling**, the same buyer and the same supplier with at least two
 accepted direct purchases, each between 90% of the ceiling for its type and the
@@ -168,6 +193,8 @@ value close to the ceiling does not prove a purchase was split. Patterns that th
 cannot give yet are listed with the reason.
 
 ## Programme
+
+![The Anghel Saligny programme page](images/programme.png)
 
 The Anghel Saligny national investment programme: the ministry (MDLPA) pays town halls
 for roads, water, sewage and gas works.
@@ -179,6 +206,8 @@ for roads, water, sewage and gas works.
 - "Urmărește un proiect": a finder with a county select, a match-state filter and a
   search on the town hall or the works.
 - The list of payment files held, with how many name the builder's CUI.
+
+![An Anghel Saligny project page](images/project.png)
 
 **Project page**: the ministry's financing
 contract, total value, the state budget share, progress, designer and builder, and
@@ -197,6 +226,8 @@ From a project you can open the builder's page, the town hall's page, the SEAP n
 or every project of the same builder.
 
 ## Sources
+
+![The sources page](images/sources.png)
 
 Three tabs:
 

@@ -19,6 +19,11 @@ contractelor", "Sursa plăților").
   of the copy changes, so nobody can quietly alter it), a button to open the record at
   the source ("Deschide la sursă"), and "Raportează o eroare". The kept copy itself is
   not public, because it can hold personal ID numbers.
+
+  ![The source panel of one direct purchase](images/source-panel.png)
+
+  _Made-up test data._
+
 - **For a total**, there is no single file. Its line says how many stored answers it is
   added up from ("adunat din 40 de răspunsuri") and links to the sources page.
 
