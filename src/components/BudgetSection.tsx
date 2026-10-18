@@ -158,7 +158,7 @@ function Payments({
               to="/programe/anghel-saligny"
               search={{
                 judet: countySlug(payments.county),
-                q: payments.town_hall,
+                q: payments.town_hall ?? undefined,
               }}
             >
               {t.budget.payments.projects}

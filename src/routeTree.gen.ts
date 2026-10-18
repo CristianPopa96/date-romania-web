@@ -19,7 +19,10 @@ import { Route as AchizitiiDirecteIdRouteImport } from './routes/achizitii-direc
 import { Route as ContracteIdRouteImport } from './routes/contracte.$id'
 import { Route as FurnizoriCuiRouteImport } from './routes/furnizori.$cui'
 import { Route as InstitutiiCuiRouteImport } from './routes/institutii.$cui'
+import { Route as LocalitatiIndexRouteImport } from './routes/localitati.index'
 import { Route as ProgrameIndexRouteImport } from './routes/programe.index'
+import { Route as LocalitatiJudetIndexRouteImport } from './routes/localitati.$judet.index'
+import { Route as LocalitatiJudetUatRouteImport } from './routes/localitati.$judet.$uat'
 import { Route as ProgrameAnghelSalignyIndexRouteImport } from './routes/programe.anghel-saligny.index'
 import { Route as ProgrameAnghelSalignyProiecteIdRouteImport } from './routes/programe.anghel-saligny.proiecte.$id'
 
@@ -73,9 +76,24 @@ const InstitutiiCuiRoute = InstitutiiCuiRouteImport.update({
   path: '/institutii/$cui',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LocalitatiIndexRoute = LocalitatiIndexRouteImport.update({
+  id: '/localitati/',
+  path: '/localitati/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProgrameIndexRoute = ProgrameIndexRouteImport.update({
   id: '/programe/',
   path: '/programe/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LocalitatiJudetIndexRoute = LocalitatiJudetIndexRouteImport.update({
+  id: '/localitati/$judet/',
+  path: '/localitati/$judet/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LocalitatiJudetUatRoute = LocalitatiJudetUatRouteImport.update({
+  id: '/localitati/$judet/$uat',
+  path: '/localitati/$judet/$uat',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProgrameAnghelSalignyIndexRoute =
@@ -102,7 +120,10 @@ export interface FileRoutesByFullPath {
   '/contracte/$id': typeof ContracteIdRoute
   '/furnizori/$cui': typeof FurnizoriCuiRoute
   '/institutii/$cui': typeof InstitutiiCuiRoute
+  '/localitati/': typeof LocalitatiIndexRoute
   '/programe/': typeof ProgrameIndexRoute
+  '/localitati/$judet/$uat': typeof LocalitatiJudetUatRoute
+  '/localitati/$judet/': typeof LocalitatiJudetIndexRoute
   '/programe/anghel-saligny/': typeof ProgrameAnghelSalignyIndexRoute
   '/programe/anghel-saligny/proiecte/$id': typeof ProgrameAnghelSalignyProiecteIdRoute
 }
@@ -117,7 +138,10 @@ export interface FileRoutesByTo {
   '/contracte/$id': typeof ContracteIdRoute
   '/furnizori/$cui': typeof FurnizoriCuiRoute
   '/institutii/$cui': typeof InstitutiiCuiRoute
+  '/localitati': typeof LocalitatiIndexRoute
   '/programe': typeof ProgrameIndexRoute
+  '/localitati/$judet/$uat': typeof LocalitatiJudetUatRoute
+  '/localitati/$judet': typeof LocalitatiJudetIndexRoute
   '/programe/anghel-saligny': typeof ProgrameAnghelSalignyIndexRoute
   '/programe/anghel-saligny/proiecte/$id': typeof ProgrameAnghelSalignyProiecteIdRoute
 }
@@ -133,7 +157,10 @@ export interface FileRoutesById {
   '/contracte/$id': typeof ContracteIdRoute
   '/furnizori/$cui': typeof FurnizoriCuiRoute
   '/institutii/$cui': typeof InstitutiiCuiRoute
+  '/localitati/': typeof LocalitatiIndexRoute
   '/programe/': typeof ProgrameIndexRoute
+  '/localitati/$judet/$uat': typeof LocalitatiJudetUatRoute
+  '/localitati/$judet/': typeof LocalitatiJudetIndexRoute
   '/programe/anghel-saligny/': typeof ProgrameAnghelSalignyIndexRoute
   '/programe/anghel-saligny/proiecte/$id': typeof ProgrameAnghelSalignyProiecteIdRoute
 }
@@ -150,7 +177,10 @@ export interface FileRouteTypes {
     | '/contracte/$id'
     | '/furnizori/$cui'
     | '/institutii/$cui'
+    | '/localitati/'
     | '/programe/'
+    | '/localitati/$judet/$uat'
+    | '/localitati/$judet/'
     | '/programe/anghel-saligny/'
     | '/programe/anghel-saligny/proiecte/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -165,7 +195,10 @@ export interface FileRouteTypes {
     | '/contracte/$id'
     | '/furnizori/$cui'
     | '/institutii/$cui'
+    | '/localitati'
     | '/programe'
+    | '/localitati/$judet/$uat'
+    | '/localitati/$judet'
     | '/programe/anghel-saligny'
     | '/programe/anghel-saligny/proiecte/$id'
   id:
@@ -180,7 +213,10 @@ export interface FileRouteTypes {
     | '/contracte/$id'
     | '/furnizori/$cui'
     | '/institutii/$cui'
+    | '/localitati/'
     | '/programe/'
+    | '/localitati/$judet/$uat'
+    | '/localitati/$judet/'
     | '/programe/anghel-saligny/'
     | '/programe/anghel-saligny/proiecte/$id'
   fileRoutesById: FileRoutesById
@@ -196,7 +232,10 @@ export interface RootRouteChildren {
   ContracteIdRoute: typeof ContracteIdRoute
   FurnizoriCuiRoute: typeof FurnizoriCuiRoute
   InstitutiiCuiRoute: typeof InstitutiiCuiRoute
+  LocalitatiIndexRoute: typeof LocalitatiIndexRoute
   ProgrameIndexRoute: typeof ProgrameIndexRoute
+  LocalitatiJudetUatRoute: typeof LocalitatiJudetUatRoute
+  LocalitatiJudetIndexRoute: typeof LocalitatiJudetIndexRoute
   ProgrameAnghelSalignyIndexRoute: typeof ProgrameAnghelSalignyIndexRoute
   ProgrameAnghelSalignyProiecteIdRoute: typeof ProgrameAnghelSalignyProiecteIdRoute
 }
@@ -273,11 +312,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InstitutiiCuiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/localitati/': {
+      id: '/localitati/'
+      path: '/localitati'
+      fullPath: '/localitati/'
+      preLoaderRoute: typeof LocalitatiIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/programe/': {
       id: '/programe/'
       path: '/programe'
       fullPath: '/programe/'
       preLoaderRoute: typeof ProgrameIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/localitati/$judet/': {
+      id: '/localitati/$judet/'
+      path: '/localitati/$judet'
+      fullPath: '/localitati/$judet/'
+      preLoaderRoute: typeof LocalitatiJudetIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/localitati/$judet/$uat': {
+      id: '/localitati/$judet/$uat'
+      path: '/localitati/$judet/$uat'
+      fullPath: '/localitati/$judet/$uat'
+      preLoaderRoute: typeof LocalitatiJudetUatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/programe/anghel-saligny/': {
@@ -308,7 +368,10 @@ const rootRouteChildren: RootRouteChildren = {
   ContracteIdRoute: ContracteIdRoute,
   FurnizoriCuiRoute: FurnizoriCuiRoute,
   InstitutiiCuiRoute: InstitutiiCuiRoute,
+  LocalitatiIndexRoute: LocalitatiIndexRoute,
   ProgrameIndexRoute: ProgrameIndexRoute,
+  LocalitatiJudetUatRoute: LocalitatiJudetUatRoute,
+  LocalitatiJudetIndexRoute: LocalitatiJudetIndexRoute,
   ProgrameAnghelSalignyIndexRoute: ProgrameAnghelSalignyIndexRoute,
   ProgrameAnghelSalignyProiecteIdRoute: ProgrameAnghelSalignyProiecteIdRoute,
 }

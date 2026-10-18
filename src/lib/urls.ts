@@ -205,7 +205,7 @@ export function patternCsvFilterFromSearch(
 }
 
 // The search page: the words searched, and one kind of result when a tab narrows them.
-export type SearchKind = 'institutii' | 'firme'
+export type SearchKind = 'institutii' | 'firme' | 'localitati'
 // `q` is a number when the address carries one (a CUI): written back as text it would
 // come out in quotes, `?q="4981310"`.
 export type SearchSearch = { q: string | number; tip?: SearchKind }
@@ -224,7 +224,9 @@ export function validateSearchSearch(
         ? search.q
         : '',
     tip:
-      search.tip === 'institutii' || search.tip === 'firme'
+      search.tip === 'institutii' ||
+      search.tip === 'firme' ||
+      search.tip === 'localitati'
         ? search.tip
         : undefined,
   }

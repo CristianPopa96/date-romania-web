@@ -502,6 +502,88 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/places": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Counties
+         * @description The 42 counties (Bucharest is one), with how many UATs and people each has.
+         */
+        get: operations["counties_v1_places_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/places/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Search Places
+         * @description UATs by name, and villages, each found as the UAT it belongs to.
+         */
+        get: operations["search_places_v1_places_search_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/places/{county}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * County
+         * @description A county: its figures added up over its UATs and its council, and every UAT.
+         */
+        get: operations["county_v1_places__county__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/places/{county}/{uat}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Locality
+         * @description One UAT: its town hall's budget, the payments to it, the contracts of every buyer
+         *     located there, its Anghel Saligny projects and its institutions. Bucharest adds up
+         *     its sectors' people, buyers and payments, and lists them.
+         */
+        get: operations["locality_v1_places__county___uat__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/reports": {
         parameters: {
             query?: never;
@@ -600,6 +682,22 @@ export interface components {
              * @description Ordinary and subsequent contracts of this notice, whatever their date.
              */
             total: number;
+            source: components["schemas"]["Source"];
+        };
+        /**
+         * Capital
+         * @description Capital spending executed in a year, by town halls (and a county's council).
+         */
+        Capital: {
+            /** Amount */
+            amount: number;
+            /** Year */
+            year: number;
+            /**
+             * Places
+             * @description How many budgets it is added up from.
+             */
+            places: number;
             source: components["schemas"]["Source"];
         };
         /** ChapterAmount */
@@ -735,6 +833,45 @@ export interface components {
             /** Items */
             items: components["schemas"]["Correction"][];
         };
+        /** Counties */
+        Counties: {
+            /** Items */
+            items: components["schemas"]["CountyRow"][];
+        };
+        /**
+         * County
+         * @description A county, its figures added up over its UATs and its council.
+         */
+        County: {
+            place: components["schemas"]["PlaceRef"];
+            council: components["schemas"]["EntityRef"] | null;
+            figures: components["schemas"]["PlaceFigures"];
+            /** Uats */
+            uats: components["schemas"]["CountyUat"][];
+        };
+        /** CountyRow */
+        CountyRow: {
+            place: components["schemas"]["PlaceRef"];
+            /** Uats */
+            uats: number;
+            /** Population */
+            population: number | null;
+        };
+        /** CountyUat */
+        CountyUat: {
+            place: components["schemas"]["PlaceRef"];
+            /** Population */
+            population: number | null;
+            /**
+             * Capital
+             * @description Capital spending in the county's budget year.
+             */
+            capital: number | null;
+            /** Contract Value */
+            contract_value: number;
+            /** Contracts */
+            contracts: number;
+        };
         /** CpvDivision */
         CpvDivision: {
             /**
@@ -863,6 +1000,8 @@ export interface components {
          */
         InstitutionBudget: {
             place: components["schemas"]["PlaceRef"] | null;
+            /** @description The UAT any institution is located in (Finance Ministry's list, else ANAF). */
+            located: components["schemas"]["PlaceRef"] | null;
             /** @description The institution that funds it (its main credit holder), when held. */
             funder: components["schemas"]["EntityRef"] | null;
             budget: components["schemas"]["LocalBudgetOut"] | null;
@@ -913,6 +1052,64 @@ export interface components {
              */
             chapters: components["schemas"]["ChapterAmount"][];
             source: components["schemas"]["Source"];
+        };
+        /** LocalInstitution */
+        LocalInstitution: {
+            entity: components["schemas"]["EntityRef"];
+            /** Town Hall */
+            town_hall: boolean;
+            /** Contract Value */
+            contract_value: number;
+            /** Contracts */
+            contracts: number;
+        };
+        /**
+         * LocalProject
+         * @description An Anghel Saligny project of the town hall.
+         */
+        LocalProject: {
+            /** Id */
+            id: number;
+            /** Investment */
+            investment: string | null;
+            builder: components["schemas"]["EntityRef"] | null;
+            /** Builder Text */
+            builder_text: string | null;
+            /**
+             * Progress
+             * @description As the town hall typed it in the latest file.
+             */
+            progress: string | null;
+            /** Paid */
+            paid: number;
+            /** Payments */
+            payments: number;
+            /**
+             * Match
+             * @enum {string}
+             */
+            match: "one" | "several" | "none" | "unnamed";
+        };
+        /**
+         * Locality
+         * @description One UAT. Bucharest lists its sectors in `parts`.
+         */
+        Locality: {
+            place: components["schemas"]["PlaceRef"];
+            /** @description Its town hall, when held. */
+            town_hall: components["schemas"]["EntityRef"] | null;
+            /** Parts */
+            parts: components["schemas"]["PlaceRef"][];
+            figures: components["schemas"]["PlaceFigures"];
+            /** @description The town hall's latest budget held. */
+            budget: components["schemas"]["LocalBudgetOut"] | null;
+            /** Projects */
+            projects: components["schemas"]["LocalProject"][];
+            /**
+             * Institutions
+             * @description Every institution held there.
+             */
+            institutions: components["schemas"]["LocalInstitution"][];
         };
         /** MatchCount */
         MatchCount: {
@@ -1079,13 +1276,52 @@ export interface components {
             /** Last Day */
             last_day: string | null;
         };
-        /** PlaceRef */
+        /**
+         * PlaceContracts
+         * @description Contracts signed in the period held by every buyer located in the place.
+         */
+        PlaceContracts: {
+            /** Value */
+            value: number;
+            /** Contracts */
+            contracts: number;
+            /** Buyers */
+            buyers: number;
+            period: components["schemas"]["Period"];
+            source: components["schemas"]["Source"];
+        };
+        /** PlaceFigures */
+        PlaceFigures: {
+            population: components["schemas"]["Population"] | null;
+            programme_payments: components["schemas"]["ProgrammePayments"] | null;
+            capital: components["schemas"]["Capital"] | null;
+            contracts: components["schemas"]["PlaceContracts"];
+            supplier_counties: components["schemas"]["SupplierCounties"];
+            /** Top Winners */
+            top_winners: components["schemas"]["TopWinner"][];
+        };
+        /**
+         * PlaceHit
+         * @description A UAT found by its name or by the name of one of its villages.
+         */
+        PlaceHit: {
+            place: components["schemas"]["PlaceRef"];
+            /**
+             * Village
+             * @description The village searched for, when it is one.
+             */
+            village: string | null;
+        };
+        /**
+         * PlaceRef
+         * @description A county or a UAT, named as the site shows it and addressed by its slugs.
+         */
         PlaceRef: {
             /** Siruta */
             siruta: number;
             /**
              * Name
-             * @description As the national list of places writes it.
+             * @description As the site shows it: 'Comuna Albac', 'Sectorul 3', 'Alba'.
              */
             name: string;
             /**
@@ -1093,6 +1329,37 @@ export interface components {
              * @enum {string}
              */
             kind: "county" | "municipality" | "town" | "commune" | "sector";
+            /**
+             * Slug
+             * @description 'comuna-albac'; for a county, its own slug.
+             */
+            slug: string;
+            /**
+             * County Slug
+             * @description 'alba', 'bistrita-nasaud', 'bucuresti'.
+             */
+            county_slug: string;
+            /**
+             * County
+             * @description The county's name: 'Alba', 'București'.
+             */
+            county: string;
+        };
+        /** PlaceResults */
+        PlaceResults: {
+            /** Items */
+            items: components["schemas"]["PlaceHit"][];
+        };
+        /** Population */
+        Population: {
+            /** People */
+            people: number;
+            /**
+             * On
+             * Format: date
+             * @description 1 January of the year counted.
+             */
+            on: string;
         };
         /**
          * Programme
@@ -1230,9 +1497,9 @@ export interface components {
             county: string;
             /**
              * Town Hall
-             * @description As the files write it, to find its projects.
+             * @description As the files write it, to find its projects; null for a county's town halls.
              */
-            town_hall: string;
+            town_hall: string | null;
             /** Amount */
             amount: number;
             /** Payments */
@@ -1608,6 +1875,49 @@ export interface components {
             /** @description The whole value of the contracts won with others; never add it to `alone`. */
             association: components["schemas"]["ContractTotals"];
             source: components["schemas"]["Source"];
+        };
+        /**
+         * SupplierCounties
+         * @description The contract value of `PlaceContracts` by where its winners are, after ANAF. An
+         *     association counts as from the county only when all its members are; one with
+         *     members in and out of it is counted apart, and no member stands for it.
+         */
+        SupplierCounties: {
+            /** County */
+            county: string;
+            /**
+             * Local
+             * @description Won by suppliers, or associations, all in the county.
+             */
+            local: number;
+            /**
+             * Mixed
+             * @description Won by associations with members in and out of it.
+             */
+            mixed: number;
+            /**
+             * Elsewhere
+             * @description Won by suppliers outside it, or of no known county.
+             */
+            elsewhere: number;
+        };
+        /**
+         * TopWinner
+         * @description One supplier, or one association of suppliers, and what it won from the place's
+         *     buyers. An association is one row with its whole value, never split.
+         */
+        TopWinner: {
+            /** Members */
+            members: components["schemas"]["EntityRef"][];
+            /**
+             * Counties
+             * @description Each member's county, in `members`' order.
+             */
+            counties: (string | null)[];
+            /** Value */
+            value: number;
+            /** Contracts */
+            contracts: number;
         };
         /** TraceBuilder */
         TraceBuilder: {
@@ -2491,6 +2801,122 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Project"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    counties_v1_places_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Counties"];
+                };
+            };
+        };
+    };
+    search_places_v1_places_search_get: {
+        parameters: {
+            query: {
+                /** @description A place's name. */
+                q: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlaceResults"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    county_v1_places__county__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                county: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["County"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    locality_v1_places__county___uat__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                county: string;
+                uat: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Locality"];
                 };
             };
             /** @description Validation Error */

@@ -22,6 +22,12 @@ import {
 import type { Won } from '#/lib/api-contracts'
 import { getInstitutionBudget } from '#/lib/api-budget'
 import { getCpvDivisions, getNearLimit } from '#/lib/api-patterns'
+import {
+  getCounties,
+  getCounty,
+  getLocality,
+  searchPlaces,
+} from '#/lib/api-places'
 import { getProgramme, getProject, getProjects } from '#/lib/api-programme'
 import type { ProjectFilter } from '#/lib/api-programme'
 import { getCorrections } from '#/lib/api-reports'
@@ -184,4 +190,27 @@ export const projectQuery = (id: number) =>
   queryOptions({
     queryKey: ['programme', 'project', id],
     queryFn: () => getProject({ data: id }),
+  })
+
+export const countiesQuery = queryOptions({
+  queryKey: ['counties'],
+  queryFn: () => getCounties(),
+})
+
+export const countyQuery = (slug: string) =>
+  queryOptions({
+    queryKey: ['county', slug],
+    queryFn: () => getCounty({ data: slug }),
+  })
+
+export const localityQuery = (county: string, uat: string) =>
+  queryOptions({
+    queryKey: ['locality', county, uat],
+    queryFn: () => getLocality({ data: { county, uat } }),
+  })
+
+export const placeSearchQuery = (q: string) =>
+  queryOptions({
+    queryKey: ['place-search', q],
+    queryFn: () => searchPlaces({ data: q }),
   })
