@@ -34,13 +34,13 @@ pnpm dev          # http://localhost:3000, API_URL defaults to http://127.0.0.1:
 
 ## Pages
 
-| Address             | What it shows                                                           |
-| ------------------- | ----------------------------------------------------------------------- |
-| `/`                 | Search box and the headline figures for direct purchases                |
-| `/cautare?q=`       | Institutions and companies found by name or CUI                         |
-| `/institutii/{cui}` | An institution as a buyer: totals, its suppliers, its purchases         |
-| `/furnizori/{cui}`  | A company as a supplier: totals, the institutions it sold to, its sales |
-| `/clasamente`       | The largest suppliers and institutions by accepted value                |
+| Address             | What it shows                                                                                                  |
+| ------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `/`                 | Search box and the headline figures for direct purchases                                                       |
+| `/cautare?q=`       | Institutions and companies found by name or CUI                                                                |
+| `/institutii/{cui}` | An institution as a buyer: totals, its suppliers, its purchases; for a town hall or county council, its budget |
+| `/furnizori/{cui}`  | A company as a supplier: totals, the institutions it sold to, its sales                                        |
+| `/clasamente`       | The largest suppliers and institutions by accepted value                                                       |
 
 Paging and sorting live in the address (`?pagina=2&ordine=valoare`), so any view can be
 shared as a link.

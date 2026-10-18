@@ -40,7 +40,7 @@ export const rankings = {
     euNote:
       'Fonduri UE după anunțul de atribuire: „da” dacă un lot e plătit din fonduri europene. Un anunț care nu spune cum e plătit apare doar la „toate”.',
     missing:
-      'Anul, județul și tipul instituției nu pot fi alese încă: avem o singură perioadă, iar județul și tipul instituției vin din datele ANAF, pe care nu le-am preluat.',
+      'Anul, județul și tipul instituției nu pot fi alese încă: avem o singură perioadă, filtrul după județ nu e construit încă, iar tipul instituției nu îl avem.',
   },
 
   // The patterns tab. A pattern is a fact worth asking documents for, never an accusation.
@@ -83,8 +83,8 @@ export const rankings = {
     later: [
       {
         title: 'Furnizor inactiv la ANAF sau înființat de curând',
-        reason: 'Starea firmei și data înființării vin de la ANAF.',
-        notCollected: true,
+        reason:
+          'Starea firmei o avem de la ANAF; data înființării o dă tot ANAF și urmează să o citim. Tiparul nu e construit încă.',
       },
       {
         title:
