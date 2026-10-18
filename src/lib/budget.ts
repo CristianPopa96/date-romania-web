@@ -22,6 +22,14 @@ export function paidAs(answer: InstitutionBudget): 'county' | 'townHall' {
   return answer.place?.kind === 'county' ? 'county' : 'townHall'
 }
 
+// Why an institution's budget is missing: it is not a town hall or a county council, or
+// it is one whose budget is not held yet (a year not collected, a name not matched).
+export function missingBudget(
+  answer: InstitutionBudget | null,
+): 'other' | 'townHall' | 'county' {
+  return answer?.place ? paidAs(answer) : 'other'
+}
+
 // What the gap panel holds beside the contracts. While any of it is held, the cells
 // cover different periods (the budget's year, the contracts' days, the payment files),
 // so the panel names each period and draws no bars.

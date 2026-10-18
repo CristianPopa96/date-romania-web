@@ -10,7 +10,7 @@ import type {
   LocalBudget,
   ProgrammePayments,
 } from '#/lib/api-budget'
-import { chapterRows, paidAs, revenueRows } from '#/lib/budget'
+import { chapterRows, missingBudget, paidAs, revenueRows } from '#/lib/budget'
 import { countySlug } from '#/lib/programme'
 
 // An institution's budget (flow 1, design round 8). A town hall or a county council
@@ -44,7 +44,7 @@ export function BudgetSection({
         <Flex direction="column" gap="2" align="start">
           <DataState kind="notCollected" />
           <Text size="2" color="gray">
-            {t.budget.notHeld}
+            {t.budget.notHeld[missingBudget(answer)]}
           </Text>
         </Flex>
       )}

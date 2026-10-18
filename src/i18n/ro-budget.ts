@@ -36,8 +36,14 @@ export const budget = {
     transport: 'Transporturi',
     other_economic: 'Alte acțiuni economice',
   },
-  notHeld:
-    'Avem bugetele primăriilor și ale consiliilor județene. Bugetul celorlalte instituții e publicat de Ministerul Finanțelor, dar nu îl putem prelua încă.',
+  // Why there is no budget: an institution that is not a town hall or a county council,
+  // or one that is, whose budget we do not hold yet.
+  notHeld: {
+    other:
+      'Avem bugetele primăriilor și ale consiliilor județene. Bugetul celorlalte instituții e publicat de Ministerul Finanțelor, dar nu îl putem prelua încă.',
+    townHall: 'Bugetul acestei primării nu e preluat încă.',
+    county: 'Bugetul acestui consiliu județean nu e preluat încă.',
+  },
   payments: {
     townHall: 'Plăți Anghel Saligny către primărie',
     county: 'Plăți Anghel Saligny către consiliul județean',

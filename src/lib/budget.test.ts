@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
 import type { InstitutionBudget } from '#/lib/api-budget'
-import { chapterRows, gapEnds, paidAs, revenueRows } from '#/lib/budget'
+import {
+  chapterRows,
+  gapEnds,
+  missingBudget,
+  paidAs,
+  revenueRows,
+} from '#/lib/budget'
 
 const source = {
   publisher: 'data.gov.ro',
@@ -97,5 +103,27 @@ describe('gapEnds', () => {
     expect(ends.spent).toEqual({ value: 40, year: 2024 })
     expect(ends.paid?.amount).toBe(5)
     expect(ends.periodsDiffer).toBe(true)
+  })
+})
+
+describe('missingBudget', () => {
+  it('tells a town hall whose budget is not held from any other institution', () => {
+    expect(missingBudget(null)).toBe('other')
+    expect(
+      missingBudget({
+        place: null,
+        funder: null,
+        budget: null,
+        programme_payments: null,
+      }),
+    ).toBe('other')
+    expect(missingBudget({ ...townHall, budget: null })).toBe('townHall')
+    expect(
+      missingBudget({
+        ...townHall,
+        place: { siruta: 79, name: 'JUDEŢUL GORJ', kind: 'county' },
+        budget: null,
+      }),
+    ).toBe('county')
   })
 })
