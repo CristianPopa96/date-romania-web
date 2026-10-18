@@ -1,4 +1,4 @@
-# Using the site
+# A tour of the site
 
 A tour of every page, in the order a visitor usually meets them. The interface is in
 Romanian; the Romanian labels are quoted so you can find them on screen, and the
@@ -6,26 +6,16 @@ Romanian; the Romanian labels are quoted so you can find them on screen, and the
 
 ## How the pages connect
 
-```
-            Home (/)  ──search──►  Search results (/cautare)
-              │                         │
-              ▼                         ▼
-     Rankings (/clasamente)  ──►  Institution (/institutii/CUI)  ◄──►  Company (/furnizori/CUI)
-              │                         │                                   │
-              │                         ▼                                   ▼
-              └──────────────►  Award notice (/contracte/ID)      Direct purchase (/achizitii-directe/ID)
-
-     Programme (/programe/anghel-saligny) ──► Project ──► builder's company page, SEAP notice
-
-     Sources (/surse): every source, how figures are counted, corrections, error report
-```
-
 Every name of an institution or company is a link to its page, so you can keep
 following the money from any page. The top bar on every page holds the sections that
-exist today, "Clasamente", "Programe", "Localități" and "Surse", and a compact search
-field.
+exist today and a search field:
 
-## Home: `/`
+- **"Localități"**: every county, town and commune.
+- **"Clasamente"**: rankings of the largest contracts, companies and institutions.
+- **"Programe"**: the Anghel Saligny investment programme.
+- **"Surse"**: where the data comes from, how it is counted, and corrections.
+
+## Home
 
 What you see: a headline ("Urmărește banii publici, de la buget la contract"), a large
 search box with example searches (primăria, consiliul județean, spitalul județean,
@@ -35,7 +25,7 @@ held with its period, number of records and the day it was last read.
 
 What you can do: search, or jump to the rankings or the sources.
 
-## Search: `/cautare?q=…`
+## Search
 
 Type part of a name or a tax ID (CUI). Diacritics and small typos are forgiven
 ("Barzava" finds "Bârzava"). Results are split in tabs: "Toate", "Instituții",
@@ -47,7 +37,7 @@ Type part of a name or a tax ID (CUI). Diacritics and small typos are forgiven
   purchases and award notices), and places: a commune, town or municipality by its name,
   or by the name of one of its villages ("Localități" tab).
 
-## Institution page: `/institutii/{CUI}`
+## Institution page
 
 The page of a public body as a **buyer** (a town hall, a hospital, a ministry…).
 
@@ -78,10 +68,10 @@ The page of a public body as a **buyer** (a town hall, a hospital, a ministry…
    - "Achiziții directe": its top suppliers by value, then every direct purchase, sortable
      by newest or largest.
 
-The page opens on the tab that has something to show. Tab, page and sort live in the
-address (`?lista=achizitii&pagina=2&ordine=valoare`), so you can share the exact view.
+The page opens on the tab that has something to show. The link in your browser keeps
+the tab, page and order you chose, so you can share exactly what you see.
 
-## Company page: `/furnizori/{CUI}`
+## Company page
 
 The same layout, flipped: a company as a **seller**.
 
@@ -91,7 +81,7 @@ The same layout, flipped: a company as a **seller**.
   association would otherwise be counted once per member.
 - Tabs: its contracts, and the institutions it sold to directly, with every sale.
 
-## Award notice page: `/contracte/{ID}`
+## Award notice page
 
 One SEAP award notice, which can hold **several contracts**.
 
@@ -108,7 +98,7 @@ One SEAP award notice, which can hold **several contracts**.
   addenda, the number of offers, payment orders, subcontractors, reception documents).
 - A link to the notice on SEAP ("Vezi la sursă").
 
-## Direct purchase page: `/achizitii-directe/{ID}`
+## Direct purchase page
 
 A small purchase made without an auction, from SEAP's catalogue.
 
@@ -120,17 +110,17 @@ A small purchase made without an auction, from SEAP's catalogue.
 - "Același furnizor, același cumpărător": how many accepted purchases the same pair made
   in the period, and for how much.
 
-## Localities: `/localitati`
+## Localities
 
 The 42 counties (Bucharest is one), each with its number of UATs (communes, towns,
 municipalities, Bucharest sectors) and people. A county opens its page.
 
-**County: `/localitati/{judet}`** (`/localitati/alba`). The same figures as a locality,
+**A county.** The same figures as a locality,
 added up over its UATs and its county council, then a table of every UAT with its
 population, capital spending in 2024 (the year of the UATs' budgets, the council's left
 out) and contracts signed in the period held.
 
-**Locality: `/localitati/{judet}/{uat}`** (`/localitati/alba/comuna-albac`). One UAT:
+**A town or commune.** One UAT:
 
 1. Its kind, county and population at 1 January 2024, and a lead saying every figure has
    its own period and none is added to another.
@@ -151,10 +141,8 @@ out) and contracts signed in the period held.
 Bucharest's page adds up its six sectors and links to each; its payments figure names
 the town hall and its sectors. A village, or a component locality of a town, has no page
 of its own: searching it opens its UAT, with the line "Localitatea X face parte din Y."
-The line is shown only when X is one of that UAT's localities, so an address with any
-other `?sat=` names nothing.
 
-## Rankings: `/clasamente`
+## Rankings
 
 Five tabs, each a measurable fact with its source:
 
@@ -174,12 +162,12 @@ institution type) and why.
 **"Tipare" (patterns).** One pattern is shown today: **repeated direct purchases just
 under the legal ceiling**, the same buyer and the same supplier with at least two
 accepted direct purchases, each between 90% of the ceiling for its type and the
-ceiling. Each row says what was measured and links to both parties; the list exports as
-CSV (`/tipare.csv`). The page explains what the pattern shows and what it does not: a
+ceiling. Each row says what was measured and links to both parties; the list downloads
+as a spreadsheet. The page explains what the pattern shows and what it does not: a
 value close to the ceiling does not prove a purchase was split. Patterns that the data
 cannot give yet are listed with the reason.
 
-## Programme: `/programe/anghel-saligny`
+## Programme
 
 The Anghel Saligny national investment programme: the ministry (MDLPA) pays town halls
 for roads, water, sewage and gas works.
@@ -192,7 +180,7 @@ for roads, water, sewage and gas works.
   search on the town hall or the works.
 - The list of payment files held, with how many name the builder's CUI.
 
-**Project page** (`/programe/anghel-saligny/proiecte/{ID}`): the ministry's financing
+**Project page**: the ministry's financing
 contract, total value, the state budget share, progress, designer and builder, and
 "Drumul banilor", the chain **ministry → town hall → project → builder → SEAP
 contract**. Each hop says where it comes from and how sure it is. The project's payments
@@ -208,7 +196,7 @@ are listed below. A project has one of four states:
 From a project you can open the builder's page, the town hall's page, the SEAP notice,
 or every project of the same builder.
 
-## Sources: `/surse`
+## Sources
 
 Three tabs:
 
@@ -226,12 +214,12 @@ report before anything changes; only the reviewer's description of an accepted
 correction is published, never the reader's text. A reader can send at most 5 reports
 an hour.
 
-## Exports
+## Downloads
 
-| Address                                            | What you get                                                                     |
-| -------------------------------------------------- | -------------------------------------------------------------------------------- |
-| `/contracte.csv`                                   | Every contract signed in the period, largest first                               |
-| `/contracte.csv?institutie=CUI` or `?furnizor=CUI` | One institution's or one company's contracts (the export button on its page)     |
-| `/tipare.csv`                                      | The purchases behind the "just under the ceiling" pattern, one line per purchase |
+Every list of contracts has a download button that gives a CSV file (it opens in Excel
+or any spreadsheet program): all contracts of the period from "Surse", or one
+institution's or one company's contracts from its page. The purchases behind the "just
+under the ceiling" pattern download from the "Tipare" tab.
 
-Each row keeps its source and the day it was read. Data is under CC BY 4.0.
+Each row keeps its source and the day it was read. The data is free to reuse under CC BY
+4.0, naming Date România and the original source.

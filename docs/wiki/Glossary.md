@@ -4,22 +4,23 @@ Romanian words and acronyms you meet on the site, with what they mean here.
 
 ## Institutions and data sources
 
-| Term                        | Meaning                                                                                                                         |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| **SEAP** / **SICAP**        | Romania's electronic public procurement system (e-licitatie.ro), run by ADR. The main source of contracts and direct purchases. |
-| **ADR**                     | Autoritatea pentru Digitalizarea României, which runs SEAP and publishes its quarterly contract exports on data.gov.ro          |
-| **data.gov.ro**             | The national open data portal                                                                                                   |
-| **MDLPA**                   | Ministerul Dezvoltării, Lucrărilor Publice și Administrației, the ministry that runs the Anghel Saligny programme               |
-| **Anghel Saligny (PNIAS)**  | A national investment programme paying town halls for roads, water, sewage and gas works                                        |
-| **ANAF**                    | The national tax agency; its register gives the county and locality of every institution and company held                       |
-| **Forexebug**               | The treasury's budget execution reporting system; its portal asks for a captcha, so it cannot be collected                      |
-| **SIRUTA**                  | The national list of places (INS), with a code for every county, town hall area and village                                     |
-| **UAT**                     | Unitate administrativ-teritorială: a commune, town, municipality or Bucharest sector, the area of one town hall                 |
-| **MIPE**                    | The ministry for EU funds; not collected yet                                                                                    |
-| **TED**                     | The EU's Official Journal tenders database; not collected yet                                                                   |
-| **Primăria**                | Town hall                                                                                                                       |
-| **Consiliul Județean**      | County council                                                                                                                  |
-| **Autoritate contractantă** | Contracting authority: the public body that buys                                                                                |
+| Term                        | Meaning                                                                                                                                      |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| **SEAP** / **SICAP**        | Romania's electronic public procurement system (e-licitatie.ro), run by ADR. The main source of contracts and direct purchases.              |
+| **ADR**                     | Autoritatea pentru Digitalizarea României, which runs SEAP and publishes its quarterly contract exports on data.gov.ro                       |
+| **data.gov.ro**             | The national open data portal                                                                                                                |
+| **MDLPA**                   | Ministerul Dezvoltării, Lucrărilor Publice și Administrației, the ministry that runs the Anghel Saligny programme                            |
+| **Anghel Saligny (PNIAS)**  | A national investment programme paying town halls for roads, water, sewage and gas works                                                     |
+| **ANAF**                    | The national tax agency; its register gives the county and locality of every institution and company held                                    |
+| **Forexebug**               | The Finance Ministry's system for institutions' budget reports; its website asks for a verification code, so it cannot be read automatically |
+| **SIRUTA**                  | The national list of places (INS), with a code for every county, town hall area and village                                                  |
+| **UAT**                     | Unitate administrativ-teritorială: a commune, town, municipality or Bucharest sector, the area of one town hall                              |
+| **MIPE**                    | The ministry for EU funds; not collected yet                                                                                                 |
+| **TED**                     | The EU's Official Journal tenders database; not collected yet                                                                                |
+| **Primăria**                | Town hall                                                                                                                                    |
+| **Consiliul Județean**      | County council                                                                                                                               |
+| **Subordonată …**           | "Under …": the institution that funds this one (a school is under its town hall)                                                             |
+| **Autoritate contractantă** | Contracting authority: the public body that buys                                                                                             |
 
 ## Identifiers
 
@@ -52,24 +53,30 @@ Romanian words and acronyms you meet on the site, with what they mean here.
 
 ## Labels on the site
 
-| Label                                      | Meaning                                                               |
-| ------------------------------------------ | --------------------------------------------------------------------- |
-| **Nepublicat**                             | The source does not publish this value                                |
-| **Încă necolectat**                        | The source publishes it; not collected yet                            |
-| **Legătură sigură / probabilă / posibilă** | Sure / probable / possible link between two records                   |
-| **Listă incompletă**                       | The list is incomplete (contracts appear in SEAP weeks after signing) |
-| **Peste plafon · nu intră în total**       | Published above the legal ceiling; left out of totals                 |
-| **Neacceptată · nu intră în total**        | Not accepted; left out of totals                                      |
-| **Tipar observat, nu o acuzație**          | An observed pattern, not an accusation                                |
-| **Sursa: … · preluat …**                   | Source: … · read on …                                                 |
-| **De unde e cifra asta?**                  | "Where is this figure from?", the source panel of one record          |
-| **Clasamente**                             | Rankings                                                              |
-| **Tipare**                                 | Patterns                                                              |
-| **Surse**                                  | Sources                                                               |
-| **Metodologie**                            | Methodology                                                           |
-| **Corecturi**                              | Corrections                                                           |
-| **Raportează o eroare**                    | Report an error                                                       |
-| **Drumul banilor**                         | "The road of the money", the chain on a programme project page        |
+| Label                                      | Meaning                                                                  |
+| ------------------------------------------ | ------------------------------------------------------------------------ |
+| **Nepublicat**                             | The source does not publish this value                                   |
+| **Încă necolectat**                        | The source publishes it; not collected yet                               |
+| **Legătură sigură / probabilă / posibilă** | Sure / probable / possible link between two records                      |
+| **Listă incompletă**                       | The list is incomplete (contracts appear in SEAP weeks after signing)    |
+| **Peste plafon · nu intră în total**       | Published above the legal ceiling; left out of totals                    |
+| **Neacceptată · nu intră în total**        | Not accepted; left out of totals                                         |
+| **Tipar observat, nu o acuzație**          | An observed pattern, not an accusation                                   |
+| **Sursa: … · preluat …**                   | Source: … · read on …                                                    |
+| **De unde e cifra asta?**                  | "Where is this figure from?", the source panel of one record             |
+| **Localități**                             | Places: counties, towns and communes                                     |
+| **Buget · Venituri · Cheltuieli**          | Budget · revenue · spending                                              |
+| **Cheltuieli de capital**                  | Capital spending: money spent on investments (roads, buildings)          |
+| **Cele două capete ale banilor**           | "The two ends of the money": budget, contracts and payments side by side |
+| **Perioadele diferă**                      | "The periods differ": figures over different times, never added          |
+| **Proiecte în zonă**                       | Programme projects in the area                                           |
+| **Clasamente**                             | Rankings                                                                 |
+| **Tipare**                                 | Patterns                                                                 |
+| **Surse**                                  | Sources                                                                  |
+| **Metodologie**                            | Methodology                                                              |
+| **Corecturi**                              | Corrections                                                              |
+| **Raportează o eroare**                    | Report an error                                                          |
+| **Drumul banilor**                         | "The road of the money", the chain on a programme project page           |
 
 ## Laws mentioned
 
