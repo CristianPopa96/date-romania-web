@@ -5,18 +5,18 @@ The site is planned as ten user flows, built in releases. This page is the state
 
 ## Built
 
-| Release | Flow                              | On the site                                                                                                                                                            |
-| ------- | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1       | Search                            | `/cautare`: institutions and companies by name or CUI                                                                                                                  |
-| 1       | Institution (money out only)      | `/institutii/{CUI}`: contracts awarded and direct purchases                                                                                                            |
-| 1       | Company                           | `/furnizori/{CUI}`: contracts won alone and in association, direct sales                                                                                               |
-| 1       | Award notice and direct purchase  | `/contracte/{ID}`, `/achizitii-directe/{ID}`                                                                                                                           |
-| 2       | Programme trace (Anghel Saligny)  | `/programe/anghel-saligny` and one page per project                                                                                                                    |
-| 2       | Rankings and patterns             | `/clasamente`: five tabs, CPV and EU funds filters, one pattern                                                                                                        |
-| 2       | Sources, methodology, corrections | `/surse`: sources held, "Erori" per source, "Cum numărăm", corrections, error report form, source panel on every record                                                |
-| 2       | Exports                           | CSV of contracts (all, or per institution or company) and of the pattern                                                                                               |
-| 3       | Institution "money in"            | On `/institutii/{CUI}` of a town hall or county council: its 2024 budget, the Anghel Saligny payments to it, the gap panel with periods; the funder of any institution |
-| 3       | Localities and counties           | `/localitati`, `/localitati/{judet}`, `/localitati/{judet}/{uat}`: budgets, payments, contracts and projects of every place; localities in search                      |
+| Release | What you can do                                                                                                                           |
+| ------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| 1       | Search institutions and companies by name or tax ID                                                                                       |
+| 1       | See what an institution contracted and bought                                                                                             |
+| 1       | See what a company won, alone and with others, and whom it sold to                                                                        |
+| 1       | Open any contract notice or direct purchase                                                                                               |
+| 2       | Follow the Anghel Saligny programme from the ministry to the builder                                                                      |
+| 2       | Browse rankings and the "just under the limit" pattern, filtered by kind of purchase and EU funds                                         |
+| 2       | See every source, how figures are counted, corrections, and report an error; check the source of any record                               |
+| 2       | Download contracts (all, or one institution's or company's) and the pattern as spreadsheets                                               |
+| 3       | See the money coming in for a town hall or county council: its 2024 budget and the Anghel Saligny payments; see who funds any institution |
+| 3       | Look up any county, town or commune: its budget, programme money, contracts, projects and institutions; find a village by name            |
 
 ## The data behind it
 
@@ -37,13 +37,13 @@ being built; no other days are collected until the maintainer decides to resume.
 
 ## Not built yet
 
-| Release | Flow                                                                                     | What it needs                                                                                                                     |
-| ------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| Later   | "Money in" for institutions other than town halls and county councils                    | Budget execution per institution (Forexebug): its portal asks for a captcha, so a bulk request to the Finance Ministry is planned |
-| 4       | EU funded projects                                                                       | MIPE project lists, SMIS codes found in contract titles                                                                           |
-| 4       | From a gap to a Law 544 request: request missing documents, track the answer, publish it | The request tracker; the project team sends every request                                                                         |
-| On hold | Available versus unused funds, and who answers for them                                  | Dated EU absorption snapshots, budget commitments, office holders and their dates                                                 |
-| Later   | Politicians and parties                                                                  | Not researched yet                                                                                                                |
+| Release | What it will do                                                                          | What it needs                                                                                                                |
+| ------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Later   | "Money in" for institutions other than town halls and county councils                    | The Finance Ministry's per-institution budgets, published behind a verification code; a request for the whole set is planned |
+| 4       | EU funded projects                                                                       | The EU funds ministry's project lists, and project codes found in contract titles                                            |
+| 4       | From a gap to a Law 544 request: request missing documents, track the answer, publish it | The request tracker; the project team sends every request                                                                    |
+| On hold | Available versus unused funds, and who answers for them                                  | Dated EU absorption snapshots, budget commitments, office holders and their dates                                            |
+| Later   | Politicians and parties                                                                  | Not researched yet                                                                                                           |
 
 Also waiting:
 

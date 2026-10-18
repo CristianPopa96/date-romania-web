@@ -14,10 +14,11 @@ When two sources stand side by side, each line says what it is the source of ("S
 contractelor", "Sursa plăților").
 
 - **For one record** (a purchase, a notice, a contract), the line opens
-  **"De unde e cifra asta?"**: the source, its address, the day it was read, the
-  fingerprint (SHA-256) of the stored answer, the version of the program that read it,
-  a button to open it at the source ("Deschide la sursă"), and "Raportează o eroare".
-  The stored copy itself is not public, because it can hold unmasked personal codes.
+  **"De unde e cifra asta?"**: the source, its address, the day it was read, a digital
+  fingerprint of the copy Date România keeps (a code that changes if a single character
+  of the copy changes, so nobody can quietly alter it), a button to open the record at
+  the source ("Deschide la sursă"), and "Raportează o eroare". The kept copy itself is
+  not public, because it can hold personal ID numbers.
 - **For a total**, there is no single file. Its line says how many stored answers it is
   added up from ("adunat din 40 de răspunsuri") and links to the sources page.
 
@@ -85,7 +86,7 @@ some contracts signed in the period had not appeared yet when the data was froze
 Romanian format: `.` for thousands and `,` for decimals. Large sums are shortened:
 "48,2 mil. lei" is 48.2 million lei, "1,5 mld. lei" is 1.5 billion lei. Exact amounts
 keep every digit ("6.120.000 lei"). Dates are day.month.year (`17.10.2026`). Tax IDs,
-notice numbers and CPV codes are set in a monospaced font.
+notice numbers and CPV codes are set in a typewriter-style font.
 
 ## Facts, not accusations
 
