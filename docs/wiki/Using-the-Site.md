@@ -127,7 +127,8 @@ municipalities, Bucharest sectors) and people. A county opens its page.
 
 **County: `/localitati/{judet}`** (`/localitati/alba`). The same figures as a locality,
 added up over its UATs and its county council, then a table of every UAT with its
-population, capital spending in 2024 and contracts signed in the period held.
+population, capital spending in 2024 (the year of the UATs' budgets, the council's left
+out) and contracts signed in the period held.
 
 **Locality: `/localitati/{judet}/{uat}`** (`/localitati/alba/comuna-albac`). One UAT:
 
@@ -142,12 +143,16 @@ population, capital spending in 2024 and contracts signed in the period held.
    its page), and who gets the contracts, each supplier with its county.
 4. "Proiecte în zonă": the town hall's Anghel Saligny projects, with the progress as the
    town hall types it and whether a SEAP contract was found.
-5. "Plăți ale primăriei": the town hall does not publish its payments.
+5. "Plăți ale primăriei": we do not hold whom the town hall paid; its payments can be
+   asked for under Law 544/2001.
 6. "Instituții din localitate": every institution located here, with its contracts and,
    for the town hall, its capital spending.
 
-Bucharest's page adds up its six sectors and links to each. A village has no page of
-its own: searching it opens its commune, with the line "Satul X face parte din comuna Y."
+Bucharest's page adds up its six sectors and links to each; its payments figure names
+the town hall and its sectors. A village, or a component locality of a town, has no page
+of its own: searching it opens its UAT, with the line "Localitatea X face parte din Y."
+The line is shown only when X is one of that UAT's localities, so an address with any
+other `?sat=` names nothing.
 
 ## Rankings: `/clasamente`
 
