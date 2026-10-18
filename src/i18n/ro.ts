@@ -211,15 +211,12 @@ export const ro = {
     toCome: [
       {
         name: 'Execuția bugetară (Forexebug)',
-        brings: 'cât a cheltuit fiecare instituție, pe capitole de buget',
+        brings:
+          'cât a cheltuit fiecare instituție, alta decât primăriile și consiliile județene, pe capitole de buget. Portalul Ministerului Finanțelor cere un cod de verificare la fiecare căutare, așa că datele vor fi cerute ministerului.',
       },
       {
         name: 'MIPE · fonduri europene',
         brings: 'cât s-a plătit din fiecare program',
-      },
-      {
-        name: 'ANAF',
-        brings: 'județul și localitatea instituțiilor și firmelor',
       },
       {
         name: 'TED',

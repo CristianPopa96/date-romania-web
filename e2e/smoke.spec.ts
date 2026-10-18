@@ -503,12 +503,13 @@ test('the patterns tab lists purchases just under their limit, as facts', async 
     '/tipare.csv',
   )
 
-  // The patterns the data cannot give yet, with the reason; ANAF is still to collect.
+  // The patterns the data cannot give yet, with the reason. ANAF's status is held now;
+  // only turnover (ANAF's financial statements) is still to collect.
   const anaf = main.getByText(
     'Furnizor inactiv la ANAF sau înființat de curând',
   )
   await expect(anaf).toBeVisible()
-  await expect(main.getByText('Încă necolectat')).toHaveCount(2)
+  await expect(main.getByText('Încă necolectat')).toHaveCount(1)
   // The contract against the project's value is on the programme, not in the list.
   await expect(
     main.getByRole('link', { name: 'programul Anghel Saligny' }),
@@ -817,6 +818,11 @@ test('the sources page says what is held, what is to come and how it is counted'
   await expect(main.getByText('MDLPA · plăți Anghel Saligny')).toHaveCount(0)
   const budget = main.getByRole('row').filter({ hasText: 'Forexebug' })
   await expect(budget).toContainText('Încă necolectat')
+  await expect(budget).toContainText('cere un cod de verificare')
+  // ANAF is held now, so it is no longer among them.
+  await expect(main.getByRole('row').filter({ hasText: /^ANAF/ })).toHaveCount(
+    0,
+  )
   await expect(
     main.getByRole('link', { name: 'Exportă contractele din perioadă (CSV)' }),
   ).toHaveAttribute('href', '/contracte.csv')
