@@ -55,11 +55,12 @@ test('the top bar lists only what exists, and searches from every page but home'
 }) => {
   await page.goto('/')
   const bar = page.getByRole('navigation', { name: 'Secțiuni' })
-  await expect(bar.getByRole('link')).toHaveCount(3)
+  await expect(bar.getByRole('link')).toHaveCount(4)
   // In the order of the design, which does not change as sections join.
   await expect(bar.getByRole('link')).toHaveText([
     'Clasamente',
     'Programe',
+    'Localități',
     'Surse',
   ])
   await expect(bar.getByRole('link', { name: 'Programe' })).toBeVisible()
@@ -80,7 +81,8 @@ test('the top bar lists only what exists, and searches from every page but home'
   await compact.fill('tantareni')
   await compact.press('Enter')
   await expect(page).toHaveURL(/\/cautare\?q=tantareni$/)
-  await expect(page.getByText('Un rezultat pentru „tantareni”')).toBeVisible()
+  // The town hall, and the commune it governs.
+  await expect(page.getByText('2 rezultate pentru „tantareni”')).toBeVisible()
 })
 
 test('an example on the home page is a search', async ({ page }) => {
@@ -124,8 +126,9 @@ test('search results can be narrowed to one kind', async ({ page }) => {
       'Un CUI valid te duce direct la pagina instituției sau a firmei.',
     ),
   ).toBeVisible()
-  await expect(main.getByRole('tab')).toHaveCount(3)
+  await expect(main.getByRole('tab')).toHaveCount(4)
   await expect(main.getByRole('tab', { name: /Instituții/ })).toContainText('1')
+  await expect(main.getByRole('tab', { name: /Localități/ })).toContainText('1')
 
   await main.getByRole('tab', { name: /Firme/ }).click()
   await expect(page).toHaveURL(/\/cautare\?q=tantareni&tip=firme$/)
@@ -142,7 +145,8 @@ test('a search without diacritics finds the town hall and leads to its page', as
 
   await expect(page).toHaveURL(/\/cautare\?q=tantareni$/)
   await expect(page).toHaveTitle('Căutare · Date România')
-  await expect(page.getByText('Un rezultat pentru „tantareni”')).toBeVisible()
+  // The town hall, and the commune it governs.
+  await expect(page.getByText('2 rezultate pentru „tantareni”')).toBeVisible()
 
   await page.getByRole('link', { name: TOWN_HALL }).click()
 
@@ -802,7 +806,7 @@ test('the sources page says what is held, what is to come and how it is counted'
     .filter({ hasText: 'data.gov.ro · exporturi de contracte SEAP' })
   await expect(exports).toContainText('5 rânduri')
   await expect(exports).toContainText('nu intră în totaluri și clasamente')
-  await expect(main.getByRole('tab', { name: 'Surse (4)' })).toBeVisible()
+  await expect(main.getByRole('tab', { name: 'Surse (5)' })).toBeVisible()
 
   // Rows the parser could not read, per source; not counted yet is the dotted state.
   const errors = (row: typeof direct) => row.getByRole('cell').nth(3)
@@ -833,7 +837,7 @@ test('the sources page says what is held, what is to come and how it is counted'
     main.getByText('Un anunț nu este un contract', { exact: true }),
   ).toBeVisible()
   await expect(main.getByText('publicată peste 900.400 lei')).toBeVisible()
-  await expect(main.getByText('Până acum sunt 5 răspunsuri.')).toBeVisible()
+  await expect(main.getByText('Până acum sunt 6 răspunsuri.')).toBeVisible()
   await expect(main.getByText(/vinovat|ascuns/)).toHaveCount(0)
 
   await expect(
@@ -1167,4 +1171,122 @@ test('a chain that stops at the builder says why', async ({ page }) => {
   const missing = await page.goto(`${PROGRAMME}/proiecte/999`)
   expect(missing?.status()).toBe(404)
   await expect(main.getByText('Pagina nu există')).toBeVisible()
+})
+
+test('the localities start from the counties and lead to one commune', async ({
+  page,
+}) => {
+  await page.goto('/')
+  await page
+    .getByRole('navigation', { name: 'Secțiuni' })
+    .getByRole('link', { name: 'Localități' })
+    .click()
+  await expect(page).toHaveURL(/\/localitati$/)
+  const main = page.getByRole('main')
+  const gorj = main.getByRole('row').filter({ hasText: 'Gorj' })
+  await expect(gorj).toContainText('5.533')
+  await gorj.getByRole('link', { name: 'Gorj' }).click()
+
+  await expect(page).toHaveURL(/\/localitati\/gorj$/)
+  await expect(
+    main.getByRole('heading', { name: 'Gorj', level: 1 }),
+  ).toBeVisible()
+  await expect(
+    main.getByText(/Fiecare cifră are perioada ei; nu le adunăm./),
+  ).toBeVisible()
+  await expect(
+    main.getByRole('heading', { name: 'Localitățile județului' }),
+  ).toBeVisible()
+  await main.getByRole('link', { name: 'Comuna Țânțăreni' }).click()
+  await expect(page).toHaveURL(/\/localitati\/gorj\/comuna-tantareni$/)
+})
+
+test('a commune names each figure with its period and never adds them', async ({
+  page,
+}) => {
+  await page.goto('/localitati/gorj/comuna-tantareni')
+  const main = page.getByRole('main')
+
+  await expect(
+    main.getByRole('heading', { name: 'Comuna Țânțăreni', level: 1 }),
+  ).toBeVisible()
+  await expect(
+    main.getByText('Comună · jud. Gorj · 5.533 locuitori la 1 ianuarie 2024'),
+  ).toBeVisible()
+  await expect(
+    main.getByText(/Fiecare cifră are perioada ei; nu le adunăm./),
+  ).toBeVisible()
+
+  // The four figures, each with its own period.
+  await expect(
+    main.getByText(
+      '18.05–27.08.2026 · PNDL, PNRR, fonduri UE: încă necolectat',
+    ),
+  ).toBeVisible()
+  await expect(main.getByText('2024, executat · MDLPA')).toBeVisible()
+  await expect(
+    main.getByText('2 contracte · semnate 05.10–07.10.2026 · listă incompletă'),
+  ).toBeVisible()
+  // The builder is in Gorj, the stationer in Dolj: their association is apart.
+  await expect(main.getByText('3 %')).toBeVisible()
+  await expect(
+    main.getByText(
+      'asocieri cu membri din mai multe județe: 97 %, numărate separat',
+    ),
+  ).toBeVisible()
+
+  // Who gets the contracts: the association is one row, each member with its county.
+  await expect(main.getByText('Asociere · 2 membri')).toBeVisible()
+  await expect(main.getByText('· Dolj')).toBeVisible()
+
+  // The town hall's budget, and the way to all of it.
+  await expect(
+    main.getByRole('heading', { name: 'Bugetul primăriei · 2024' }),
+  ).toBeVisible()
+  await expect(
+    main.getByRole('link', { name: 'Vezi bugetul complet al primăriei' }),
+  ).toHaveAttribute('href', '/institutii/4981310')
+
+  // Its projects, with the progress as the town hall typed it.
+  const project = main
+    .getByRole('row')
+    .filter({ hasText: 'Modernizare drumuri' })
+  await expect(project).toContainText('64%')
+  await expect(project).toContainText('Probabil un singur contract')
+
+  // No payments of its own are published; no request button until flow 8.
+  await expect(main.getByText('Primăria nu își publică plățile.')).toBeVisible()
+  await expect(page.getByRole('button', { name: /Cere/ })).toHaveCount(0)
+
+  const townHall = main.getByRole('row').filter({ hasText: 'primărie' })
+  await expect(townHall).toContainText('6.000.000 lei')
+})
+
+test('a village is found as the commune it belongs to', async ({ page }) => {
+  await page.goto('/cautare?q=floresti')
+  const main = page.getByRole('main')
+  await expect(
+    main.getByText('Satul Florești face parte din Comuna Țânțăreni.'),
+  ).toBeVisible()
+  await main.getByRole('link', { name: 'Comuna Țânțăreni' }).click()
+  await expect(page).toHaveURL(
+    /\/localitati\/gorj\/comuna-tantareni\?sat=Flore/,
+  )
+  await expect(
+    main.getByText('Satul Florești face parte din Comuna Țânțăreni.'),
+  ).toBeVisible()
+})
+
+test('an institution leads to its county and its locality', async ({
+  page,
+}) => {
+  await page.goto('/institutii/4981310')
+  const main = page.getByRole('main')
+  await expect(main.getByRole('link', { name: 'jud. Gorj' })).toHaveAttribute(
+    'href',
+    '/localitati/gorj',
+  )
+  await expect(
+    main.getByRole('link', { name: 'Comuna Țânțăreni' }).first(),
+  ).toHaveAttribute('href', '/localitati/gorj/comuna-tantareni')
 })

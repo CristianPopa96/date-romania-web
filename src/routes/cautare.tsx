@@ -1,5 +1,9 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import {
+  Link as RouterLink,
+  createFileRoute,
+  redirect,
+} from '@tanstack/react-router'
 import {
   Badge,
   Card,
@@ -7,6 +11,7 @@ import {
   Container,
   Flex,
   Heading,
+  Link,
   Text,
 } from '@radix-ui/themes'
 
@@ -17,9 +22,11 @@ import { messagesFor } from '#/i18n'
 import { useI18n } from '#/i18n/context'
 import { rich } from '#/i18n/rich'
 import type { Entity } from '#/lib/api'
+import type { PlaceHit } from '#/lib/api-places'
 import { pageTitle } from '#/lib/copy'
 import { cuiFromQuery, searchTerm } from '#/lib/cui'
-import { searchQuery } from '#/lib/queries'
+import { placeLink } from '#/lib/places'
+import { placeSearchQuery, searchQuery } from '#/lib/queries'
 import { validateSearchSearch } from '#/lib/urls'
 import type { SearchKind } from '#/lib/urls'
 
@@ -27,9 +34,10 @@ export const Route = createFileRoute('/cautare')({
   validateSearch: validateSearchSearch,
   loaderDeps: ({ search }) => ({ q: String(search.q) }),
   loader: async ({ context, deps }) => {
-    const found = await context.queryClient.ensureQueryData(
-      searchQuery(searchTerm(deps.q)),
-    )
+    const [found] = await Promise.all([
+      context.queryClient.ensureQueryData(searchQuery(searchTerm(deps.q))),
+      context.queryClient.ensureQueryData(placeSearchQuery(deps.q)),
+    ])
     // A CUI we hold skips the results: the institution page when it buys, else the
     // supplier page. The API holds only valid CUIs, so the match is the check.
     const cui = cuiFromQuery(deps.q)
@@ -55,6 +63,7 @@ export const Route = createFileRoute('/cautare')({
 // Which results a tab keeps. Only the kinds we hold have a tab.
 function ofKind(found: Array<Entity>, kind: SearchKind | undefined) {
   if (!kind) return found
+  if (kind === 'localitati') return []
   return found.filter(
     (entity) => (entity.kind === 'authority') === (kind === 'institutii'),
   )
@@ -67,12 +76,20 @@ function Search() {
   const navigate = Route.useNavigate()
   const { t, f } = useI18n()
   const { data: found } = useSuspenseQuery(searchQuery(searchTerm(q)))
+  const { data: places } = useSuspenseQuery(placeSearchQuery(q))
   const shown = ofKind(found, tip)
+  const shownPlaces = !tip || tip === 'localitati' ? places : []
+  const total = found.length + places.length
   const tabs = [
     { value: 'toate', label: t.search.all, kind: undefined },
     { value: 'institutii', label: t.search.institutions, kind: 'institutii' },
     { value: 'firme', label: t.search.companies, kind: 'firme' },
+    { value: 'localitati', label: t.search.places, kind: 'localitati' },
   ] as const
+  const counts = (kind: SearchKind | undefined) =>
+    kind === 'localitati'
+      ? places.length
+      : ofKind(found, kind).length + (kind ? 0 : places.length)
 
   return (
     <Container size="3" px="5" py="7">
@@ -85,15 +102,14 @@ function Search() {
           <Text size="2" color="gray">
             {t.search.tooShort}
           </Text>
-        ) : found.length === 0 ? (
+        ) : total === 0 ? (
           <Text size="2" color="gray">
             {t.search.none(q)}
           </Text>
         ) : (
           <Flex direction="column" gap="3">
             <Text size="2" color="gray">
-              {t.search.found(found.length, f.count(found.length), q)}{' '}
-              {t.search.cuiHint}
+              {t.search.found(total, f.count(total), q)} {t.search.cuiHint}
             </Text>
             <UrlTabs
               value={tip ?? 'toate'}
@@ -103,9 +119,7 @@ function Search() {
                 label: (
                   <Flex gap="2" align="center">
                     {tab.label}
-                    <Badge color="gray">
-                      {f.count(ofKind(found, tab.kind).length)}
-                    </Badge>
+                    <Badge color="gray">{f.count(counts(tab.kind))}</Badge>
                   </Flex>
                 ),
               }))}
@@ -119,11 +133,17 @@ function Search() {
                 })
               }
             >
-              {shown.length === 0 ? (
+              {shown.length === 0 && shownPlaces.length === 0 ? (
                 <Text size="2" color="gray">
                   {t.search.noneOfKind}
                 </Text>
               ) : null}
+              {shownPlaces.map((hit) => (
+                <PlaceResult
+                  key={`${hit.place.siruta}-${hit.village}`}
+                  hit={hit}
+                />
+              ))}
               {shown.map((entity) => (
                 <Card key={entity.cui}>
                   <Flex justify="between" align="center" gap="3">
@@ -159,5 +179,35 @@ function Search() {
         )}
       </Flex>
     </Container>
+  )
+}
+
+// A UAT found by its name, or by a village's: the page opens with the village named.
+function PlaceResult({ hit }: { hit: PlaceHit }) {
+  const { t } = useI18n()
+  const link = placeLink(hit.place)
+  return (
+    <Card>
+      <Flex justify="between" align="center" gap="3">
+        <Flex direction="column" gap="1">
+          <Text size="3" weight="medium">
+            <Link asChild>
+              <RouterLink
+                {...link}
+                search={hit.village ? { sat: hit.village } : undefined}
+              >
+                {hit.place.name}
+              </RouterLink>
+            </Link>
+          </Text>
+          <Text size="1" color="gray">
+            {hit.village
+              ? t.places.village(hit.village, hit.place.name)
+              : t.places.eyebrowCounty(hit.place.county)}
+          </Text>
+        </Flex>
+        <Badge color="gray">{t.places.kinds[hit.place.kind]}</Badge>
+      </Flex>
+    </Card>
   )
 }

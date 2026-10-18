@@ -1,5 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { Badge, Flex, Text } from '@radix-ui/themes'
+import { Link as RouterLink } from '@tanstack/react-router'
+import { Badge, Flex, Link, Text } from '@radix-ui/themes'
 
 import { BudgetSection } from '#/components/BudgetSection'
 import { EntityLink } from '#/components/EntityLink'
@@ -9,6 +10,7 @@ import { rich } from '#/i18n/rich'
 import type { Entity } from '#/lib/api'
 import type { ContractTotals, Period } from '#/lib/api-contracts'
 import { gapEnds } from '#/lib/budget'
+import { placeLink } from '#/lib/places'
 import { budgetQuery } from '#/lib/queries'
 
 // What only an institution's page has: where it is and who funds it, which sources we
@@ -26,7 +28,27 @@ export function InstitutionHeader({ entity }: { entity: Entity }) {
   return (
     <Flex direction="column" gap="2">
       <Flex gap="2" wrap="wrap" align="center">
-        {entity.county ? (
+        {data?.located ? (
+          <>
+            <Badge color="gray">
+              <Link asChild>
+                <RouterLink
+                  to="/localitati/$judet"
+                  params={{ judet: data.located.county_slug }}
+                >
+                  {t.budget.county(data.located.county)}
+                </RouterLink>
+              </Link>
+            </Badge>
+            <Badge color="gray">
+              <Link asChild>
+                <RouterLink {...placeLink(data.located)}>
+                  {data.located.name}
+                </RouterLink>
+              </Link>
+            </Badge>
+          </>
+        ) : entity.county ? (
           <Badge color="gray">{t.budget.county(entity.county)}</Badge>
         ) : null}
         {data?.funder ? (

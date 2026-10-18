@@ -22,7 +22,8 @@ Romanian; the Romanian labels are quoted so you can find them on screen, and the
 
 Every name of an institution or company is a link to its page, so you can keep
 following the money from any page. The top bar on every page holds the sections that
-exist today, "Clasamente", "Programe" and "Surse", and a compact search field.
+exist today, "Clasamente", "Programe", "Localități" and "Surse", and a compact search
+field.
 
 ## Home: `/`
 
@@ -43,7 +44,8 @@ Type part of a name or a tax ID (CUI). Diacritics and small typos are forgiven
 - A **valid CUI** takes you straight to its page: the institution page if that CUI buys
   through SEAP, otherwise the company page.
 - Search only knows institutions and companies that appear in the data held (direct
-  purchases and award notices).
+  purchases and award notices), and places: a commune, town or municipality by its name,
+  or by the name of one of its villages ("Localități" tab).
 
 ## Institution page: `/institutii/{CUI}`
 
@@ -117,6 +119,35 @@ A small purchase made without an auction, from SEAP's catalogue.
   but it is not collected yet.
 - "Același furnizor, același cumpărător": how many accepted purchases the same pair made
   in the period, and for how much.
+
+## Localities: `/localitati`
+
+The 42 counties (Bucharest is one), each with its number of UATs (communes, towns,
+municipalities, Bucharest sectors) and people. A county opens its page.
+
+**County: `/localitati/{judet}`** (`/localitati/alba`). The same figures as a locality,
+added up over its UATs and its county council, then a table of every UAT with its
+population, capital spending in 2024 and contracts signed in the period held.
+
+**Locality: `/localitati/{judet}/{uat}`** (`/localitati/alba/comuna-albac`). One UAT:
+
+1. Its kind, county and population at 1 January 2024, and a lead saying every figure has
+   its own period and none is added to another.
+2. Four figures, each with its period: the Anghel Saligny payments to its town hall
+   (other programmes are not collected yet), the town hall's capital spending in 2024,
+   the contracts of every institution located here, and the share of them won by
+   suppliers of the county (an association counts only when all its members are; one
+   with members in several counties is counted apart).
+3. The town hall's budget (its largest revenue lines, and a link to the whole budget on
+   its page), and who gets the contracts, each supplier with its county.
+4. "Proiecte în zonă": the town hall's Anghel Saligny projects, with the progress as the
+   town hall types it and whether a SEAP contract was found.
+5. "Plăți ale primăriei": the town hall does not publish its payments.
+6. "Instituții din localitate": every institution located here, with its contracts and,
+   for the town hall, its capital spending.
+
+Bucharest's page adds up its six sectors and links to each. A village has no page of
+its own: searching it opens its commune, with the line "Satul X face parte din comuna Y."
 
 ## Rankings: `/clasamente`
 

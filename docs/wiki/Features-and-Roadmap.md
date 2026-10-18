@@ -16,6 +16,7 @@ The site is planned as ten user flows, built in releases. This page is the state
 | 2       | Sources, methodology, corrections | `/surse`: sources held, "Erori" per source, "Cum numărăm", corrections, error report form, source panel on every record                                                |
 | 2       | Exports                           | CSV of contracts (all, or per institution or company) and of the pattern                                                                                               |
 | 3       | Institution "money in"            | On `/institutii/{CUI}` of a town hall or county council: its 2024 budget, the Anghel Saligny payments to it, the gap panel with periods; the funder of any institution |
+| 3       | Localities and counties           | `/localitati`, `/localitati/{judet}`, `/localitati/{judet}/{uat}`: budgets, payments, contracts and projects of every place; localities in search                      |
 
 ## The data behind it
 
@@ -38,7 +39,6 @@ being built; no other days are collected until the maintainer decides to resume.
 
 | Release | Flow                                                                                     | What it needs                                                                                                                     |
 | ------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| 3       | My locality / county: every public body in one place                                     | Built next; the data is held (places, budgets, population, ANAF)                                                                  |
 | Later   | "Money in" for institutions other than town halls and county councils                    | Budget execution per institution (Forexebug): its portal asks for a captcha, so a bulk request to the Finance Ministry is planned |
 | 4       | EU funded projects                                                                       | MIPE project lists, SMIS codes found in contract titles                                                                           |
 | 4       | From a gap to a Law 544 request: request missing documents, track the answer, publish it | The request tracker; the project team sends every request                                                                         |

@@ -74,8 +74,7 @@ published data alone. Date România does the next best thing.
 ## What it does not do (yet)
 
 - It shows the budget of town halls and county councils only, for 2024: the budget of
-  other institutions cannot be collected yet. It does not show EU-funded projects, and
-  the locality and county pages are being built.
+  other institutions cannot be collected yet. It does not show EU-funded projects.
 - It does not cover every day: the data is fixed to 1 September to 10 October 2026
   while the site is being built.
 - It does not know who was paid outside the Anghel Saligny programme, because those

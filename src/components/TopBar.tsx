@@ -1,5 +1,10 @@
 import { Link as RouterLink, useRouterState } from '@tanstack/react-router'
-import { BarChartIcon, FileTextIcon, Share2Icon } from '@radix-ui/react-icons'
+import {
+  BarChartIcon,
+  FileTextIcon,
+  SewingPinIcon,
+  Share2Icon,
+} from '@radix-ui/react-icons'
 import { Box, Container, Flex, Link, Text } from '@radix-ui/themes'
 
 import { SearchBox } from '#/components/SearchBox'
@@ -56,6 +61,7 @@ export function TopBar() {
   const sections = [
     { to: '/clasamente', label: t.nav.rankings, icon: <BarChartIcon /> },
     { to: '/programe', label: t.nav.programmes, icon: <Share2Icon /> },
+    { to: '/localitati', label: t.nav.places, icon: <SewingPinIcon /> },
     { to: '/surse', label: t.nav.sources, icon: <FileTextIcon /> },
   ] as const
 

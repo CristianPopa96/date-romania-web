@@ -39,8 +39,27 @@ const budget: InstitutionBudget['budget'] = {
   source,
 }
 
+const TANTARENI = {
+  siruta: 84914,
+  name: 'Comuna Țânțăreni',
+  kind: 'commune' as const,
+  slug: 'comuna-tantareni',
+  county_slug: 'gorj',
+  county: 'Gorj',
+}
+
+const GORJ = {
+  siruta: 79,
+  name: 'Gorj',
+  kind: 'county' as const,
+  slug: 'gorj',
+  county_slug: 'gorj',
+  county: 'Gorj',
+}
+
 const townHall: InstitutionBudget = {
-  place: { siruta: 84914, name: 'ŢÂNŢĂRENI', kind: 'commune' },
+  place: TANTARENI,
+  located: TANTARENI,
   funder: null,
   budget,
   programme_payments: {
@@ -75,7 +94,7 @@ describe('paidAs', () => {
     expect(
       paidAs({
         ...townHall,
-        place: { siruta: 79, name: 'JUDEŢUL GORJ', kind: 'county' },
+        place: GORJ,
       }),
     ).toBe('county')
   })
@@ -91,6 +110,7 @@ describe('gapEnds', () => {
     expect(
       gapEnds({
         place: null,
+        located: null,
         funder: null,
         budget: null,
         programme_payments: null,
@@ -112,6 +132,7 @@ describe('missingBudget', () => {
     expect(
       missingBudget({
         place: null,
+        located: null,
         funder: null,
         budget: null,
         programme_payments: null,
@@ -121,7 +142,7 @@ describe('missingBudget', () => {
     expect(
       missingBudget({
         ...townHall,
-        place: { siruta: 79, name: 'JUDEŢUL GORJ', kind: 'county' },
+        place: GORJ,
         budget: null,
       }),
     ).toBe('county')
