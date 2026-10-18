@@ -95,7 +95,7 @@ function CountyPage() {
         <UatsTable
           uats={county.uats}
           range={days ? t.period.range(days.from, days.to) : null}
-          year={figures.capital?.year ?? null}
+          year={county.capital_year}
         />
       </Flex>
     </Container>

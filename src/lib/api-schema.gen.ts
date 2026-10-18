@@ -846,6 +846,11 @@ export interface components {
             place: components["schemas"]["PlaceRef"];
             council: components["schemas"]["EntityRef"] | null;
             figures: components["schemas"]["PlaceFigures"];
+            /**
+             * Capital Year
+             * @description The budget year of the UATs' capital spending.
+             */
+            capital_year: number | null;
             /** Uats */
             uats: components["schemas"]["CountyUat"][];
         };
@@ -1100,6 +1105,11 @@ export interface components {
             town_hall: components["schemas"]["EntityRef"] | null;
             /** Parts */
             parts: components["schemas"]["PlaceRef"][];
+            /**
+             * Localities
+             * @description The names of its villages and component localities, in SIRUTA's order.
+             */
+            localities: string[];
             figures: components["schemas"]["PlaceFigures"];
             /** @description The town hall's latest budget held. */
             budget: components["schemas"]["LocalBudgetOut"] | null;

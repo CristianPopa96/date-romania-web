@@ -6,6 +6,7 @@ import {
   placeLink,
   topRevenue,
   validateLocalitySearch,
+  villageOf,
 } from '#/lib/places'
 
 const albac = {
@@ -72,5 +73,19 @@ describe('validateLocalitySearch', () => {
     })
     expect(validateLocalitySearch({ sat: 'x' })).toEqual({ sat: undefined })
     expect(validateLocalitySearch({ sat: 3 })).toEqual({ sat: undefined })
+  })
+})
+
+describe('villageOf', () => {
+  const localities = ['Țânțăreni', 'Florești']
+
+  it("gives the UAT's own spelling of a village searched for", () => {
+    expect(villageOf('floresti', localities)).toBe('Florești')
+    expect(villageOf('  FLOREȘTI ', localities)).toBe('Florești')
+  })
+
+  it('names nothing the UAT does not have', () => {
+    expect(villageOf('Paris', localities)).toBeNull()
+    expect(villageOf(undefined, localities)).toBeNull()
   })
 })

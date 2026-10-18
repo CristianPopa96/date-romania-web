@@ -26,7 +26,7 @@ export const places = {
   leadCounty:
     'Ce știm despre banii publici din județ: bugetele primăriilor și al consiliului județean, contractele instituțiilor de aici și plățile din programul Anghel Saligny. Fiecare cifră are perioada ei; nu le adunăm.',
   village: (village: string, uat: string) =>
-    `Satul ${village} face parte din ${uat}.`,
+    `Localitatea ${village} face parte din ${uat}.`,
   sectors: 'Sectoarele',
   council: 'Consiliul județean',
 
@@ -34,6 +34,7 @@ export const places = {
   figures: {
     payments: 'Plăți Anghel Saligny către primărie',
     paymentsCounty: 'Plăți Anghel Saligny în județ',
+    paymentsSectors: 'Plăți Anghel Saligny, primăria și sectoarele',
     paymentsMissing: 'PNDL, PNRR, fonduri UE: încă necolectat',
     noPayments: 'nicio plată în fișierele programului',
     capital: 'Cheltuieli de capital ale primăriei',
@@ -69,9 +70,9 @@ export const places = {
   contract: 'Contract SEAP',
 
   payments: 'Plăți ale primăriei',
-  paymentsTitle: 'Primăria nu își publică plățile.',
+  paymentsTitle: 'Nu avem plățile primăriei.',
   paymentsBody:
-    'Vedem cât s-a cheltuit și ce contracte s-au semnat, dar nu cui s-a plătit efectiv. Cluj-Napoca publică zilnic toate plățile; aici ele pot fi cerute prin Legea 544/2001.',
+    'Vedem cât s-a cheltuit și ce contracte s-au semnat, dar nu cui s-a plătit efectiv. Plățile unei primării pot fi cerute prin Legea 544/2001.',
 
   institutions: 'Instituții din localitate',
   institutionsNone: 'Nicio instituție de aici nu apare în datele preluate.',

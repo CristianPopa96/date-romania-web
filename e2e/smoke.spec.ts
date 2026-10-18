@@ -1254,8 +1254,8 @@ test('a commune names each figure with its period and never adds them', async ({
   await expect(project).toContainText('64%')
   await expect(project).toContainText('Probabil un singur contract')
 
-  // No payments of its own are published; no request button until flow 8.
-  await expect(main.getByText('Primăria nu își publică plățile.')).toBeVisible()
+  // Its payments are not held; no request button until flow 8.
+  await expect(main.getByText('Nu avem plățile primăriei.')).toBeVisible()
   await expect(page.getByRole('button', { name: /Cere/ })).toHaveCount(0)
 
   const townHall = main.getByRole('row').filter({ hasText: 'primărie' })
@@ -1266,15 +1266,22 @@ test('a village is found as the commune it belongs to', async ({ page }) => {
   await page.goto('/cautare?q=floresti')
   const main = page.getByRole('main')
   await expect(
-    main.getByText('Satul Florești face parte din Comuna Țânțăreni.'),
+    main.getByText('Localitatea Florești face parte din Comuna Țânțăreni.'),
   ).toBeVisible()
   await main.getByRole('link', { name: 'Comuna Țânțăreni' }).click()
   await expect(page).toHaveURL(
     /\/localitati\/gorj\/comuna-tantareni\?sat=Flore/,
   )
   await expect(
-    main.getByText('Satul Florești face parte din Comuna Țânțăreni.'),
+    main.getByText('Localitatea Florești face parte din Comuna Țânțăreni.'),
   ).toBeVisible()
+
+  // A village it does not have is not named, whatever the address says.
+  await page.goto('/localitati/gorj/comuna-tantareni?sat=Paris')
+  await expect(main.getByRole('heading', { level: 1 })).toHaveText(
+    'Comuna Țânțăreni',
+  )
+  await expect(main.getByText(/face parte din/)).toHaveCount(0)
 })
 
 test('an institution leads to its county and its locality', async ({

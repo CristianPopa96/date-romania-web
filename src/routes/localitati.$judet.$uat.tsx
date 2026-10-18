@@ -26,7 +26,12 @@ import { messagesFor } from '#/i18n'
 import { useI18n } from '#/i18n/context'
 import type { Locality } from '#/lib/api-places'
 import { pageTitle } from '#/lib/copy'
-import { placeLink, topRevenue, validateLocalitySearch } from '#/lib/places'
+import {
+  placeLink,
+  topRevenue,
+  validateLocalitySearch,
+  villageOf,
+} from '#/lib/places'
 import { localityQuery } from '#/lib/queries'
 
 // One UAT (flow 6, ScreenLocality): a commune, town, municipality or Bucharest sector.
@@ -65,6 +70,7 @@ function LocalityPage() {
     figures.contracts.period.last_day,
   )
   const range = days ? t.period.range(days.from, days.to) : null
+  const village = villageOf(sat, locality.localities)
 
   return (
     <Container size="4" px="5" py="7">
@@ -97,7 +103,9 @@ function LocalityPage() {
               .join(' · ')}
           </Text>
           <Heading size="7">{place.name}</Heading>
-          {sat ? <Text size="3">{p.village(sat, place.name)}</Text> : null}
+          {village ? (
+            <Text size="3">{p.village(village, place.name)}</Text>
+          ) : null}
           <Text size="3" color="gray" style={{ maxWidth: '70ch' }}>
             {p.lead}
           </Text>
@@ -115,7 +123,7 @@ function LocalityPage() {
           ) : null}
         </Flex>
 
-        <PlaceOverview figures={figures} />
+        <PlaceOverview figures={figures} sectors={locality.parts.length > 0} />
 
         <Grid columns={{ initial: '1', md: '2' }} gap="4">
           {locality.budget ? <BudgetCard locality={locality} /> : null}
@@ -125,7 +133,9 @@ function LocalityPage() {
         <ProjectsTable projects={locality.projects} />
 
         <Flex direction="column" gap="2">
-          <Heading size="5">{p.payments}</Heading>
+          <Heading as="h2" size="5">
+            {p.payments}
+          </Heading>
           <Callout.Root color="amber" variant="surface">
             <Callout.Icon>
               <ExclamationTriangleIcon />

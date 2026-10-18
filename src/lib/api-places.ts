@@ -50,10 +50,11 @@ export const getLocality = createServerFn({ method: 'GET' })
 export const searchPlaces = createServerFn({ method: 'GET' })
   .inputValidator((q: string) => q)
   .handler(async ({ data }): Promise<Array<PlaceHit>> => {
+    const q = data.trim().slice(0, 100)
     // A CUI is never the name of a place.
-    if (data.trim().length < 2 || /^\s*(ro)?\s*\d+\s*$/i.test(data)) return []
+    if (q.length < 2 || /^(ro)?\s*\d+$/i.test(q)) return []
     const found = await getJson<Schemas['PlaceResults']>('/v1/places/search', {
-      q: data,
+      q,
       limit: 20,
     })
     return found?.items ?? []

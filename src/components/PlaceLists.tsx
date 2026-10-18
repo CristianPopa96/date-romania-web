@@ -21,7 +21,9 @@ export function ProjectsTable({ projects }: { projects: Array<LocalProject> }) {
   const p = t.places
   return (
     <Flex direction="column" gap="2">
-      <Heading size="5">{p.projects}</Heading>
+      <Heading as="h2" size="5">
+        {p.projects}
+      </Heading>
       <Text size="2" color="gray">
         {rich(p.projectsLead, {
           notCollected: <DataState key="state" kind="notCollected" />,
@@ -101,7 +103,9 @@ export function InstitutionsTable({
   const p = t.places
   return (
     <Flex direction="column" gap="2">
-      <Heading size="5">{p.institutions}</Heading>
+      <Heading as="h2" size="5">
+        {p.institutions}
+      </Heading>
       {institutions.length === 0 ? (
         <Text size="2" color="gray">
           {p.institutionsNone}
@@ -168,7 +172,9 @@ export function UatsTable({
   const p = t.places
   return (
     <Flex direction="column" gap="2">
-      <Heading size="5">{p.uatTable}</Heading>
+      <Heading as="h2" size="5">
+        {p.uatTable}
+      </Heading>
       <Table.Root variant="surface" size="1">
         <Table.Header>
           <Table.Row>

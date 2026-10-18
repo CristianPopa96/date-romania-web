@@ -34,7 +34,8 @@ export function topRevenue(budget: LocalBudget, shown = 4) {
 }
 
 // A locality page can be reached from a village: /localitati/alba/comuna-albac?sat=Bărăști
-// says which village the reader searched for.
+// says which village the reader searched for. The page names it only when it is one of
+// the UAT's own (`villageOf`), since the address can be typed or shared with any name.
 export type LocalitySearch = { sat?: string }
 
 export function validateLocalitySearch(
@@ -43,4 +44,20 @@ export function validateLocalitySearch(
   const sat =
     typeof search.sat === 'string' ? search.sat.trim().slice(0, 80) : ''
   return { sat: sat.length >= 2 ? sat : undefined }
+}
+
+// The UAT's own spelling of the village in `?sat=`, or null when it has none by that name.
+export function villageOf(sat: string | undefined, localities: Array<string>) {
+  if (!sat) return null
+  const wanted = plainName(sat)
+  return localities.find((name) => plainName(name) === wanted) ?? null
+}
+
+function plainName(name: string) {
+  return name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim()
 }

@@ -9,13 +9,16 @@ import { countyShares } from '#/lib/places'
 // The four figures of a locality or a county (ScreenLocality): payments from the Anghel
 // Saligny programme, capital spending, the contracts of every buyer here, and how much
 // of them went to suppliers of the county. Each names its own period under it; none is
-// added to another or drawn on one scale with it.
+// added to another or drawn on one scale with it. `sectors`: Bucharest, whose payments
+// are its town hall's and its sectors'.
 export function PlaceOverview({
   figures,
   county = false,
+  sectors = false,
 }: {
   figures: PlaceFigures
   county?: boolean
+  sectors?: boolean
 }) {
   const { t, f } = useI18n()
   const p = t.places.figures
@@ -28,7 +31,11 @@ export function PlaceOverview({
 
   return (
     <Grid columns={{ initial: '1', sm: '2', md: '4' }} gap="3">
-      <Cell label={county ? p.paymentsCounty : p.payments}>
+      <Cell
+        label={
+          county ? p.paymentsCounty : sectors ? p.paymentsSectors : p.payments
+        }
+      >
         <Text size="6" weight="bold">
           {f.leiShort(paid?.amount ?? 0)}
         </Text>
