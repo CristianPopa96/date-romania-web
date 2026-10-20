@@ -84,8 +84,7 @@ the next best thing.
   of schools, hospitals, ministries and other institutions are published by the Finance
   Ministry behind a verification code that blocks automatic reading; a request for the
   whole set is planned.
-- **Contracts** cover only 40 days (1 September to 10 October 2026) while the site is
-  being built.
+- **Contracts** cover only 2026, from 1 January; earlier years are not collected.
 - **Payments**: it does not know whom a town hall paid, outside the Anghel Saligny
   programme, because those payments are mostly not published.
 - **EU-funded projects, politicians and parties** come later.

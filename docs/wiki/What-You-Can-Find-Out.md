@@ -92,5 +92,6 @@ accepted corrections are listed under "Surse", in "Corecturi".
   published. The page says so and points to Law 544/2001, under which you can ask for
   them.
 - The budget of an institution other than a town hall or county council.
-- Contracts outside 1 September to 10 October 2026.
+- Contracts signed before 2026 (a few are held when a notice of 2026 repeats them, and
+  none is counted).
 - EU-funded projects, and anything about politicians.

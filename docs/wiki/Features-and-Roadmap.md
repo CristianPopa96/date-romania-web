@@ -20,19 +20,20 @@ The site is planned as ten user flows, built in releases. This page is the state
 
 ## The data behind it
 
-The data is fixed to **1 September to 10 October 2026** (40 days) while the site is
-being built; no other days are collected until the maintainer decides to resume.
+Purchases and contracts are held for **every day from 1 January 2026**, and a new day
+is collected each morning (as of 20.10.2026).
 
-- **Direct purchases**: 293,712, complete for the period (2.5 billion lei accepted).
-- **Award notices**: 6,058 notices published or republished in the period, with 77,401
-  contracts. Only the 4,796 contracts signed inside the period (6.3 billion lei) are
-  counted, and that list is incomplete for good (contracts appear weeks after signing).
+- **Direct purchases**: 1,808,179, every day complete (1,719,358 accepted, 15.1 billion
+  lei).
+- **Award notices**: 34,445 notices published or republished in the period, with
+  246,883 contracts. Only the 76,281 contracts signed inside the period are counted,
+  and the newest days are always incomplete (contracts appear weeks after signing).
 - **Anghel Saligny**: six payment files (18 May to 27 August 2026) and SEAP's quarterly
   contract exports from 2021, used only to trace the programme.
 - **Places and local budgets**: SIRUTA (every county, town hall and village), the
   Finance Ministry's list of 13,485 public entities, the 2024 executed budget of every
   town hall and county council and the population of every town hall area (Ministry of
-  Development), and ANAF's record of all 49,525 institutions and companies held. All
+  Development), and ANAF's record of all 87,472 institutions and companies held. All
   but two have their county and town hall area.
 
 ## Not built yet

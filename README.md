@@ -62,8 +62,7 @@ A fresh install has **no data**: pages are empty until the collectors fill the d
 (see the API README).
 
 > **About the scheduler.** `docker compose up -d` with no service names also starts
-> `scheduler`, which collects every day missed so far. While the dataset is frozen,
-> bring services up by name as above.
+> `scheduler`, which collects every day missed so far, then a new day each morning.
 
 `docker compose down` stops everything and keeps the data; `docker compose down -v` also
 **deletes the database and every stored file**.

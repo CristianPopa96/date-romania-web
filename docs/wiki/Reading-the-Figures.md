@@ -74,8 +74,8 @@ exactly one contract.
 
 ## Which days a figure covers
 
-The site holds only the days that were collected (today: 1 September to 10 October
-2026). Every total says which days it covers.
+The site holds only the days that were collected (today: every day from 1 January
+2026, up to the day before). Every total says which days it covers.
 
 Figures over **different periods are never added or subtracted**. A town hall's budget
 covers the whole of 2024, its contracts the days held, its Anghel Saligny payments the
@@ -84,7 +84,7 @@ none is put on one scale with another.
 
 Contract totals also carry a note that **the list is incomplete**: SEAP publishes half of
 all contracts more than 17 days after signing and one in ten more than 50 days after, so
-some contracts signed in the period had not appeared yet when the data was frozen.
+the contracts of the newest days keep growing for weeks after they are collected.
 
 ## How numbers and dates are written
 
