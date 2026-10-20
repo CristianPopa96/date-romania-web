@@ -37,10 +37,10 @@ in plain words in the second wiki,
 
 ## Where things stand
 
-As of 18.10.2026 the site runs on the maintainer's computer and is not public yet. It is
-being built on a fixed slice of data: purchases and contracts from **1 September to 10
-October 2026**, town hall budgets for **2024**, and the Anghel Saligny payment files
-published up to **27 August 2026**. Three of the planned releases are built. See
+As of 20.10.2026 the site runs on the maintainer's computer and is not public yet. It
+holds purchases and contracts from **1 January 2026**, with a new day collected each
+morning, town hall budgets for **2024**, and the Anghel Saligny payment files published
+up to **27 August 2026**. Three of the planned releases are built. See
 [Features and roadmap](Features-and-Roadmap).
 
 The data can be reused freely under the CC BY 4.0 licence, naming the source. The code is
