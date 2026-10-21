@@ -1,4 +1,5 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
+import { Link as RouterLink } from '@tanstack/react-router'
 import { InfoCircledIcon } from '@radix-ui/react-icons'
 import {
   Badge,
@@ -10,6 +11,7 @@ import {
   Flex,
   Grid,
   Heading,
+  Link,
   Text,
 } from '@radix-ui/themes'
 
@@ -76,6 +78,25 @@ export function NoticeView({
             </Badge>
           </Flex>
           <Heading size="7">{notice.title ?? t.notice.fallbackTitle}</Heading>
+          {notice.replaced_by ? (
+            <Callout.Root color="gray" variant="surface">
+              <Callout.Icon>
+                <InfoCircledIcon />
+              </Callout.Icon>
+              <Callout.Text>
+                <Text weight="bold">{t.notice.replacedTitle}</Text>{' '}
+                {t.notice.replacedBody}{' '}
+                <Link asChild>
+                  <RouterLink
+                    to="/contracte/$id"
+                    params={{ id: String(notice.replaced_by) }}
+                  >
+                    {t.notice.replacedLink}
+                  </RouterLink>
+                </Link>
+              </Callout.Text>
+            </Callout.Root>
+          ) : null}
         </Flex>
 
         <Grid columns={{ initial: '1', md: '2fr 1fr' }} gap="5" align="start">

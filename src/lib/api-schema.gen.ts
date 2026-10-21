@@ -667,6 +667,11 @@ export interface components {
              * @description Null until the versions are collected.
              */
             versions: number | null;
+            /**
+             * Replaced By
+             * @description The newest notice we hold that SEAP published in place of this one. Its contracts then count there, not here.
+             */
+            replaced_by: number | null;
             /** @description Null until the detail is collected. */
             detail: components["schemas"]["NoticeDetail"] | null;
             /** Contracts */

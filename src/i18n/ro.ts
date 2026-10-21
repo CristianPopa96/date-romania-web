@@ -500,6 +500,10 @@ export const ro = {
     lastPublished: 'Republicat ultima dată',
     heldVersion: 'versiunea pe care o avem',
     callNotice: 'Anunț de participare',
+    replacedTitle: 'SEAP a retras această versiune a anunțului.',
+    replacedBody:
+      'A republicat anunțul cu toate contractele lui, iar contractele se numără o singură dată, în versiunea nouă.',
+    replacedLink: 'Vezi versiunea nouă',
     latestVersion:
       'SEAP republică anunțul când se adaugă sau se modifică un contract; arătăm ultima versiune',
     contractsIn: 'Contracte în anunț',
