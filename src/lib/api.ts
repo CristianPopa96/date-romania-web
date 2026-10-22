@@ -64,6 +64,9 @@ export type Partner = Schemas['Partner']
 export type EntityPage = Schemas['EntityPage']
 
 export type Purchase = Schemas['Purchase']
+// One purchase on its own page, with its lines and conditions once collected.
+export type PurchaseWithDetail = Schemas['PurchaseWithDetail']
+export type PurchaseDetail = Schemas['PurchaseDetail']
 
 export type PurchasePage = Schemas['PurchasePage']
 
@@ -83,6 +86,11 @@ export const ACCEPTED = 7
 // `above_limit`; these keep every page's wording in agreement with it.
 export const DIRECT_PURCHASE_LIMIT = 900_400
 export const DIRECT_PURCHASE_LIMIT_GOODS_SERVICES = 270_120
+
+// The detail of a purchase (its lines and conditions) is one request to SEAP each, so the
+// API collects it for accepted purchases from this value up, newest first. Keep it equal
+// to `MIN_VALUE` in the API's `collectors/seap_direct/details.py`.
+export const DETAIL_MIN_VALUE = 100_000
 
 // One source as we hold it: its days, how many records, when it was last read.
 export type Dataset = Schemas['Dataset']

@@ -15,15 +15,16 @@ import {
 
 import { DataState } from '#/components/DataState'
 import { EntityLink } from '#/components/EntityLink'
+import { PurchaseItems } from '#/components/PurchaseItems'
 import { SourceLine } from '#/components/SourceLine'
 import { useI18n } from '#/i18n/context'
 import { rich } from '#/i18n/rich'
 import { ACCEPTED } from '#/lib/api'
-import type { EntityRef, Purchase, Role } from '#/lib/api'
+import type { EntityRef, PurchaseWithDetail, Role } from '#/lib/api'
 import { pairSummaryQuery, purchaseQuery } from '#/lib/queries'
 
 // The page of one direct purchase, from what SEAP's list gives. What it bought, and on
-// which terms, is published in SEAP's detail, which we have not collected yet.
+// which terms, comes from the purchase's own page in SEAP, collected for some purchases.
 export function PurchaseView({ id }: { id: number }) {
   const { t } = useI18n()
   const { data: purchase } = useSuspenseQuery(purchaseQuery(id))
@@ -70,15 +71,7 @@ export function PurchaseView({ id }: { id: number }) {
                 <SourceLine source={purchase.source} />
               </Flex>
             </Card>
-            <Flex direction="column" gap="3">
-              <Heading size="5">{t.purchase.bought}</Heading>
-              <Flex direction="column" gap="2" align="start">
-                <DataState kind="notCollected" />
-                <Text size="2" color="gray">
-                  {t.purchase.boughtNotCollected}
-                </Text>
-              </Flex>
-            </Flex>
+            <PurchaseItems detail={purchase.detail} />
           </Flex>
 
           <Flex direction="column" gap="4">
@@ -133,7 +126,7 @@ function Party({
   )
 }
 
-function Facts({ purchase }: { purchase: Purchase }) {
+function Facts({ purchase }: { purchase: PurchaseWithDetail }) {
   const { t, f } = useI18n()
   const accepted = purchase.state_id === ACCEPTED
   // Only an accepted purchase at or under the legal limit is money spent.
@@ -218,17 +211,35 @@ function Facts({ purchase }: { purchase: Purchase }) {
       <DataList.Item>
         <DataList.Label>{t.purchase.payment}</DataList.Label>
         <DataList.Value>
-          <DataState kind="notCollected" />
+          <Condition
+            detail={purchase.detail}
+            text={purchase.detail?.payment_condition}
+          />
         </DataList.Value>
       </DataList.Item>
       <DataList.Item>
         <DataList.Label>{t.purchase.delivery}</DataList.Label>
         <DataList.Value>
-          <DataState kind="notCollected" />
+          <Condition
+            detail={purchase.detail}
+            text={purchase.detail?.delivery_condition}
+          />
         </DataList.Value>
       </DataList.Item>
     </DataList.Root>
   )
+}
+
+// A condition in the buyer's own words; not collected until the purchase's detail is.
+function Condition({
+  detail,
+  text,
+}: {
+  detail: PurchaseWithDetail['detail']
+  text: string | null | undefined
+}) {
+  if (detail === null) return <DataState kind="notCollected" />
+  return text ? <Text>{text}</Text> : <DataState kind="notPublished" />
 }
 
 // What this buyer bought directly from this supplier over the days we hold.

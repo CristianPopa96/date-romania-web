@@ -126,8 +126,12 @@ A small purchase made without an auction, from SEAP's catalogue.
 - A purchase that was not accepted shows its value muted, "Neacceptată · nu intră în
   total"; one published above the ceiling of its type shows "Peste plafon · nu intră în
   total".
-- "Ce s-a cumpărat" (the items bought) is marked "Încă necolectat": SEAP publishes it,
-  but it is not collected yet.
+- "Ce s-a cumpărat": the items bought, each with its quantity and value without VAT, and
+  their total, with the payment and delivery conditions above, in the buyer's own words.
+  They come from the purchase's own page in SEAP, one request each, so they are
+  collected for accepted purchases of 100,000 lei or more, newest first. For the others
+  they are marked "Încă necolectat". A line the supplier turned down is muted and marked
+  "Refuzat de furnizor".
 - "Același furnizor, același cumpărător": how many accepted purchases the same pair made
   in the period, and for how much.
 

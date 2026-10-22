@@ -48,8 +48,9 @@ is collected each morning (as of 20.10.2026).
 
 Also waiting:
 
-- The items bought in each direct purchase, payment and delivery conditions (shown as
-  "Încă necolectat").
+- The items bought in each direct purchase, with payment and delivery conditions, below
+  100,000 lei (shown as "Încă necolectat"). Accepted purchases of 100,000 lei or more
+  are collected, newest first, since October 2026.
 - Filters by year, county and institution type in the rankings.
 - More patterns: supplier inactive at ANAF or newly founded, public money as most of a
   company's turnover, single-offer procedures (the number of offers is not published by

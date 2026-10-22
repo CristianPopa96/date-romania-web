@@ -41,6 +41,14 @@ function build(locale: Locale) {
     return whole.format(value)
   }
 
+  // As many decimals as the API keeps.
+  const measured = new Intl.NumberFormat(tag, { maximumFractionDigits: 4 })
+
+  // A quantity as the buyer gave it: "30", "2,5", "1,2345".
+  function quantity(value: number) {
+    return measured.format(value)
+  }
+
   const shares = [0, 1, 2].map(
     (digits) =>
       new Intl.NumberFormat(tag, {
@@ -109,5 +117,16 @@ function build(locale: Locale) {
     return first === last ? day(first) : `${day(first)} – ${day(last)}`
   }
 
-  return { count, percent, lei, leiExact, leiShort, day, period, span, list }
+  return {
+    count,
+    quantity,
+    percent,
+    lei,
+    leiExact,
+    leiShort,
+    day,
+    period,
+    span,
+    list,
+  }
 }

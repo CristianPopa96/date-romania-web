@@ -585,8 +585,16 @@ export const ro = {
     limitUnknownType: 'tipul nu e cunoscut, plafonul cel mai mare',
     noLimit: 'Fără plafon · serviciu din anexa 2 a Legii 98/2016',
     bought: 'Ce s-a cumpărat',
-    boughtNotCollected:
-      'Produsele și serviciile din această achiziție, cu cantități și prețuri, sunt publicate în SEAP. Nu le-am preluat încă.',
+    // Keep the value in step with the API's `details.MIN_VALUE`, through DETAIL_MIN_VALUE.
+    boughtNotCollected: (min: string) =>
+      `Produsele și serviciile din această achiziție, cu cantități și prețuri, sunt publicate în SEAP. Nu le-am preluat încă: deocamdată le preluăm pentru achizițiile acceptate de cel puțin ${min}, de la cele mai noi.`,
+    item: 'Produs sau serviciu',
+    quantity: 'Cantitate',
+    quantityOf: (quantity: string, unit: string | null) =>
+      unit ? `${quantity} ${unit}` : quantity,
+    itemValue: 'Valoare fără TVA',
+    itemsTotal: 'Total',
+    itemRejected: 'Refuzat de furnizor',
     whatTitle: 'Ce e o achiziție directă.',
     what: 'O cumpărare mică, fără licitație, făcută din catalogul SEAP, sub pragul legal pentru tipul ei de contract. Nu există oferte concurente de comparat.',
     samePair: 'Același furnizor, același cumpărător',
