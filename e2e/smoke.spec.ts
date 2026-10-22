@@ -610,6 +610,14 @@ test('a purchase opens its own page, with what is not collected marked as such',
   await expect(main.getByText('Refuzată de furnizor')).toBeVisible()
   // Payment, delivery and what was bought are published by SEAP; we do not hold them yet.
   await expect(main.getByText('Încă necolectat')).toHaveCount(3)
+  await expect(
+    main.getByText(
+      'le preluăm pentru achizițiile acceptate de cel puțin 100.000 lei',
+      {
+        exact: false,
+      },
+    ),
+  ).toBeVisible()
   await expect(main.getByText('Nepublicat')).toHaveCount(0)
   await expect(
     main.getByText('o achiziție directă acceptată · 500 lei · 06.10.2026'),
@@ -657,6 +665,31 @@ test('the source of one record opens a panel; a total says what it is added up f
   await expect(
     home.getByRole('link', { name: 'Vezi sursele' }).first(),
   ).toHaveAttribute('href', '/surse')
+})
+
+test('a purchase whose page was collected lists what it bought and on which terms', async ({
+  page,
+}) => {
+  await page.goto('/achizitii-directe/3')
+  const main = page.getByRole('main')
+  await expect(main.getByText('OP la 30 de zile de la recepție')).toBeVisible()
+  await expect(main.getByText('La sediul primăriei')).toBeVisible()
+  const lines = main.getByRole('table')
+  await expect(lines.getByRole('row')).toHaveCount(4)
+  await expect(
+    lines.getByRole('row', { name: /Hârtie copiator A4/ }),
+  ).toContainText('10 top')
+  await expect(
+    lines.getByRole('row', { name: /Toner imprimantă/ }),
+  ).toContainText('250 lei')
+  await expect(lines.getByRole('row', { name: /Total/ })).toContainText(
+    '500 lei',
+  )
+  await expect(main.getByText('Încă necolectat')).toHaveCount(0)
+  // The lines have their own source: the purchase's page, read on its own.
+  await expect(
+    main.getByText('Sursa: SEAP · DA00000003 · preluat', { exact: false }),
+  ).toHaveCount(2)
 })
 
 test('a purchase above the limit is stated as a fact', async ({ page }) => {
@@ -849,7 +882,7 @@ test('the sources page says what is held, what is to come and how it is counted'
     ),
   ).toBeVisible()
   await expect(main.getByText('anexa 2 a Legii 98/2016')).toBeVisible()
-  await expect(main.getByText('Până acum sunt 6 răspunsuri.')).toBeVisible()
+  await expect(main.getByText('Până acum sunt 7 răspunsuri.')).toBeVisible()
   await expect(main.getByText(/vinovat|ascuns/)).toHaveCount(0)
 
   await expect(

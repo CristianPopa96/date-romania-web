@@ -1,7 +1,13 @@
 import { createServerFn } from '@tanstack/react-start'
 
 import { PAGE_SIZE, getJson } from '#/lib/api'
-import type { Purchase, Role, Source, Summary, Schemas } from '#/lib/api'
+import type {
+  PurchaseWithDetail,
+  Role,
+  Source,
+  Summary,
+  Schemas,
+} from '#/lib/api'
 import type { RankingFilter } from '#/lib/urls'
 
 // Award notices, their contracts, and one direct purchase: the calls behind the pages of
@@ -43,7 +49,9 @@ export const getNoticeContracts = createServerFn({ method: 'GET' })
 
 export const getPurchase = createServerFn({ method: 'GET' })
   .inputValidator((data: { id: number }) => data)
-  .handler(({ data }) => getJson<Purchase>(`/v1/direct-purchases/${data.id}`))
+  .handler(({ data }) =>
+    getJson<PurchaseWithDetail>(`/v1/direct-purchases/${data.id}`),
+  )
 
 // What one buyer bought directly from one supplier over the days we hold.
 export const getPairSummary = createServerFn({ method: 'GET' })

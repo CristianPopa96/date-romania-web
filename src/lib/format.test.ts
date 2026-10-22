@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import { formatFor } from '#/lib/format'
 
-const { count, day, lei, leiExact, leiShort, period, span } = formatFor('ro')
+const { count, day, lei, leiExact, leiShort, period, quantity, span } =
+  formatFor('ro')
 
 describe('count and lei', () => {
   it('groups thousands with a dot', () => {
@@ -20,6 +21,15 @@ describe('count and lei', () => {
   it('keeps the bani where asked, and only when there are some', () => {
     expect(leiExact(270119.6)).toBe('270.119,60 lei')
     expect(leiExact(265000)).toBe('265.000 lei')
+  })
+})
+
+describe('quantity', () => {
+  it('keeps the decimals a buyer gave, up to three', () => {
+    expect(quantity(30)).toBe('30')
+    expect(quantity(2.5)).toBe('2,5')
+    expect(quantity(0.125)).toBe('0,125')
+    expect(quantity(1500)).toBe('1.500')
   })
 })
 

@@ -191,7 +191,7 @@ export interface paths {
         };
         /**
          * Direct Purchase
-         * @description One direct purchase, by SEAP's own id.
+         * @description One direct purchase, by SEAP's own id, with its lines and conditions once collected.
          */
         get: operations["direct_purchase_v1_direct_purchases__purchase_id__get"];
         put?: never;
@@ -1730,12 +1730,124 @@ export interface components {
             above_limit: boolean;
             source: components["schemas"]["Source"];
         };
+        /**
+         * PurchaseDetail
+         * @description What the purchase's own page adds to the list: its lines and conditions.
+         */
+        PurchaseDetail: {
+            /**
+             * Payment Condition
+             * @description The buyer's own words.
+             */
+            payment_condition: string | null;
+            /**
+             * Delivery Condition
+             * @description The buyer's own words.
+             */
+            delivery_condition: string | null;
+            /** Items */
+            items: components["schemas"]["PurchaseItem"][];
+            /**
+             * Items Value
+             * @description The lines added up; null when a line has no price or quantity.
+             */
+            items_value: number | null;
+            source: components["schemas"]["Source"];
+        };
+        /**
+         * PurchaseItem
+         * @description One line of a direct purchase, as the buyer listed it.
+         */
+        PurchaseItem: {
+            /** Name */
+            name: string | null;
+            /** Cpv Code */
+            cpv_code: string | null;
+            /** Quantity */
+            quantity: number | null;
+            /**
+             * Unit
+             * @description The buyer's own word, e.g. 'bucată', 'pachet'.
+             */
+            unit: string | null;
+            /**
+             * Unit Price
+             * @description Lei without VAT, for one unit.
+             */
+            unit_price: number | null;
+            /**
+             * Value
+             * @description `unit_price` times `quantity`.
+             */
+            value: number | null;
+            /**
+             * Rejected
+             * @description The supplier turned this line down.
+             */
+            rejected: boolean | null;
+        };
         /** PurchasePage */
         PurchasePage: {
             /** Total */
             total: number;
             /** Items */
             items: components["schemas"]["Purchase"][];
+        };
+        /** PurchaseWithDetail */
+        PurchaseWithDetail: {
+            /** Id */
+            id: number;
+            /** Code */
+            code: string | null;
+            /** Name */
+            name: string | null;
+            /** State Id */
+            state_id: number | null;
+            /** State */
+            state: string | null;
+            /** Cpv Code */
+            cpv_code: string | null;
+            /** Cpv Name */
+            cpv_name: string | null;
+            /** @description Null when SEAP gives no valid CUI. */
+            buyer: components["schemas"]["EntityRef"] | null;
+            /**
+             * Buyer Text
+             * @description The buyer as SEAP writes it.
+             */
+            buyer_text: string | null;
+            supplier: components["schemas"]["EntityRef"] | null;
+            /** Supplier Text */
+            supplier_text: string | null;
+            /** Published At */
+            published_at: string | null;
+            /** Finalized At */
+            finalized_at: string | null;
+            /** Estimated Value */
+            estimated_value: number | null;
+            /**
+             * Value
+             * @description The closing value.
+             */
+            value: number | null;
+            /**
+             * Contract Type Id
+             * @description SEAP's type, as the buyer filed it: 1 goods, 2 services, 3 works.
+             */
+            contract_type_id: number | null;
+            /**
+             * Limit
+             * @description The legal limit this purchase is held to, in lei without VAT; null for services of Annex 2 of Law 98/2016, which have none.
+             */
+            limit: number | null;
+            /**
+             * Above Limit
+             * @description The purchase was accepted with a value above `limit`. Always false for a purchase that was not accepted.
+             */
+            above_limit: boolean;
+            source: components["schemas"]["Source"];
+            /** @description Null until collected: the detail is asked for one purchase at a time, so far for the accepted ones of 100,000 lei or more. */
+            detail: components["schemas"]["PurchaseDetail"] | null;
         };
         /** Ranking */
         Ranking: {
@@ -2372,7 +2484,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Purchase"];
+                    "application/json": components["schemas"]["PurchaseWithDetail"];
                 };
             };
             /** @description Validation Error */
