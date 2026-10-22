@@ -183,6 +183,19 @@ function Facts({ purchase }: { purchase: Purchase }) {
         </DataList.Value>
       </DataList.Item>
       <DataList.Item>
+        <DataList.Label>{t.purchase.limit}</DataList.Label>
+        <DataList.Value>
+          {purchase.limit === null
+            ? t.purchase.noLimit
+            : t.purchase.limitOf(
+                f.lei(purchase.limit),
+                (purchase.contract_type_id &&
+                  t.purchase.limitTypes[purchase.contract_type_id]) ||
+                  t.purchase.limitUnknownType,
+              )}
+        </DataList.Value>
+      </DataList.Item>
+      <DataList.Item>
         <DataList.Label>{t.purchase.state}</DataList.Label>
         <DataList.Value>
           <Badge color={accepted ? 'green' : 'gray'}>

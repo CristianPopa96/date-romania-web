@@ -1189,7 +1189,7 @@ export interface components {
             items: components["schemas"]["NearLimitPair"][];
             /**
              * Checked
-             * @description Accepted purchases of known contract type: the ones that were checked.
+             * @description Accepted purchases of known contract type, outside Annex 2: the ones that were checked.
              */
             checked: number;
             /**
@@ -1199,9 +1199,14 @@ export interface components {
             accepted_total: number;
             /**
              * Unknown Type
-             * @description Accepted purchases of unknown contract type, which cannot be checked.
+             * @description Accepted purchases of unknown contract type outside Annex 2, which cannot be checked. `checked`, `unknown_type` and `annex_2` add up to `accepted_total`.
              */
             unknown_type: number;
+            /**
+             * Annex 2
+             * @description Accepted purchases of services in Annex 2 of Law 98/2016 (by CPV code), which have no direct purchase limit to be near.
+             */
+            annex_2: number;
             source: components["schemas"]["Source"];
         };
         /** NearLimitPurchase */
@@ -1709,8 +1714,18 @@ export interface components {
              */
             value: number | null;
             /**
+             * Contract Type Id
+             * @description SEAP's type, as the buyer filed it: 1 goods, 2 services, 3 works.
+             */
+            contract_type_id: number | null;
+            /**
+             * Limit
+             * @description The legal limit this purchase is held to, in lei without VAT; null for services of Annex 2 of Law 98/2016, which have none.
+             */
+            limit: number | null;
+            /**
              * Above Limit
-             * @description The purchase was accepted with a value above 900,400 lei, the highest legal limit for a direct purchase. Always false for a purchase that was not accepted.
+             * @description The purchase was accepted with a value above `limit`. Always false for a purchase that was not accepted.
              */
             above_limit: boolean;
             source: components["schemas"]["Source"];
@@ -1843,9 +1858,14 @@ export interface components {
             suppliers: number;
             /**
              * Limit
-             * @description The limit used for `above_limit`: the legal one for works, the highest a direct purchase may have, in lei without VAT.
+             * @description The highest legal limit for a direct purchase (the one for works), in lei without VAT. Each purchase is held to the limit of its type: see `Summary`.
              */
             limit: number;
+            /**
+             * Limit Goods Services
+             * @description The legal limit for goods and services, in lei without VAT.
+             */
+            limit_goods_services: number;
             source: components["schemas"]["Source"];
         };
         /**
@@ -1870,7 +1890,7 @@ export interface components {
             value: number;
             /**
              * Above Limit
-             * @description Accepted purchases published with a value above 900,400 lei, the highest legal limit for a direct purchase (the one for works). They are not counted in `value` and are listed separately. A goods or services purchase between its own limit of 270,120 lei and this one is not marked.
+             * @description Accepted purchases published with a value above the legal limit of their type: 270,120 lei for goods and services, 900,400 lei for works (and for a purchase whose type is not known). Services of Annex 2 of Law 98/2016, told by CPV code, have no limit. They are not counted in `value` and are listed separately.
              */
             above_limit: number;
             /** Above Limit Value */

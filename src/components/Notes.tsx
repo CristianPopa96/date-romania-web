@@ -2,7 +2,10 @@ import { InfoCircledIcon } from '@radix-ui/react-icons'
 import { Callout, Text } from '@radix-ui/themes'
 
 import { useI18n } from '#/i18n/context'
-import { DIRECT_PURCHASE_LIMIT } from '#/lib/api'
+import {
+  DIRECT_PURCHASE_LIMIT,
+  DIRECT_PURCHASE_LIMIT_GOODS_SERVICES,
+} from '#/lib/api'
 import type { Summary } from '#/lib/api'
 import type { Period } from '#/lib/api-contracts'
 
@@ -31,6 +34,7 @@ export function AboveLimitNote({ summary }: { summary: Summary }) {
         {t.notes.aboveLimit(
           summary.above_limit,
           f.count(summary.above_limit),
+          f.lei(DIRECT_PURCHASE_LIMIT_GOODS_SERVICES),
           f.lei(DIRECT_PURCHASE_LIMIT),
           f.lei(summary.above_limit_value),
         )}
