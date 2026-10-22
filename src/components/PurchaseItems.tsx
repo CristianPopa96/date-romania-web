@@ -1,4 +1,11 @@
-import { Badge, Flex, Heading, Table, Text } from '@radix-ui/themes'
+import {
+  Badge,
+  Flex,
+  Heading,
+  Table,
+  Text,
+  VisuallyHidden,
+} from '@radix-ui/themes'
 
 import { DataState } from '#/components/DataState'
 import { SourceLine } from '#/components/SourceLine'
@@ -23,65 +30,86 @@ export function PurchaseItems({ detail }: { detail: PurchaseDetail | null }) {
         </Flex>
       ) : (
         <>
-          <Table.Root variant="surface" size="1">
-            <Table.Header>
-              <Table.Row>
-                <Table.ColumnHeaderCell>
-                  {t.purchase.item}
-                </Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell justify="end">
-                  {t.purchase.quantity}
-                </Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell justify="end">
-                  {t.purchase.itemValue}
-                </Table.ColumnHeaderCell>
-              </Table.Row>
-            </Table.Header>
-            <Table.Body>
-              {detail.items.map((item, index) => (
-                <Table.Row key={index}>
-                  <Table.Cell>
-                    <Flex gap="2" align="center" wrap="wrap">
-                      <Text color={item.rejected ? 'gray' : undefined}>
-                        {item.name ?? <DataState kind="notPublished" />}
-                      </Text>
-                      {item.rejected ? (
-                        <Badge color="gray">{t.purchase.itemRejected}</Badge>
-                      ) : null}
-                    </Flex>
-                  </Table.Cell>
-                  <Table.Cell justify="end">
-                    {item.quantity === null ? (
-                      <DataState kind="notPublished" />
-                    ) : (
-                      t.purchase.quantityOf(
-                        f.quantity(item.quantity),
-                        item.unit,
-                      )
-                    )}
-                  </Table.Cell>
-                  <Table.Cell justify="end">
-                    {item.value === null ? (
-                      <DataState kind="notPublished" />
-                    ) : (
-                      f.leiExact(item.value)
-                    )}
-                  </Table.Cell>
-                </Table.Row>
-              ))}
-              {detail.items_value === null ? null : (
+          {detail.items.length === 0 ? (
+            // The page was read, and SEAP lists no line on it.
+            <Flex align="start">
+              <DataState kind="notPublished" />
+            </Flex>
+          ) : (
+            <Table.Root variant="surface" size="1">
+              {/* Radix puts props on its wrapper, not the table: a caption names it. */}
+              <VisuallyHidden asChild>
+                <caption>{t.purchase.bought}</caption>
+              </VisuallyHidden>
+              <Table.Header>
                 <Table.Row>
-                  <Table.RowHeaderCell>
-                    <Text weight="bold">{t.purchase.itemsTotal}</Text>
-                  </Table.RowHeaderCell>
-                  <Table.Cell />
-                  <Table.Cell justify="end">
-                    <Text weight="bold">{f.leiExact(detail.items_value)}</Text>
-                  </Table.Cell>
+                  <Table.ColumnHeaderCell>
+                    {t.purchase.item}
+                  </Table.ColumnHeaderCell>
+                  <Table.ColumnHeaderCell justify="end">
+                    {t.purchase.quantity}
+                  </Table.ColumnHeaderCell>
+                  <Table.ColumnHeaderCell justify="end">
+                    {t.purchase.itemValue}
+                  </Table.ColumnHeaderCell>
                 </Table.Row>
-              )}
-            </Table.Body>
-          </Table.Root>
+              </Table.Header>
+              <Table.Body>
+                {detail.items.map((item, index) => {
+                  // A line the supplier turned down is shown muted, and left out of the total.
+                  const color = item.rejected ? 'gray' : undefined
+                  return (
+                    <Table.Row key={index}>
+                      <Table.RowHeaderCell>
+                        <Flex gap="2" align="center" wrap="wrap">
+                          <Text color={color}>
+                            {item.name ?? <DataState kind="notPublished" />}
+                          </Text>
+                          {item.rejected ? (
+                            <Badge color="gray">
+                              {t.purchase.itemRejected}
+                            </Badge>
+                          ) : null}
+                        </Flex>
+                      </Table.RowHeaderCell>
+                      <Table.Cell justify="end">
+                        {item.quantity === null ? (
+                          <DataState kind="notPublished" />
+                        ) : (
+                          <Text color={color}>
+                            {t.purchase.quantityOf(
+                              f.quantity(item.quantity),
+                              item.unit,
+                            )}
+                          </Text>
+                        )}
+                      </Table.Cell>
+                      <Table.Cell justify="end">
+                        {item.value === null ? (
+                          <DataState kind="notPublished" />
+                        ) : (
+                          <Text color={color}>{f.leiExact(item.value)}</Text>
+                        )}
+                      </Table.Cell>
+                    </Table.Row>
+                  )
+                })}
+                {detail.items_value === null ? null : (
+                  <Table.Row>
+                    <Table.RowHeaderCell>
+                      <Text weight="bold">{t.purchase.itemsTotal}</Text>
+                    </Table.RowHeaderCell>
+                    <Table.Cell />
+                    <Table.Cell justify="end">
+                      <Text weight="bold">
+                        {f.leiExact(detail.items_value)}
+                      </Text>
+                    </Table.Cell>
+                  </Table.Row>
+                )}
+              </Table.Body>
+            </Table.Root>
+          )}
           <SourceLine source={detail.source} />
         </>
       )}

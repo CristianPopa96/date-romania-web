@@ -1749,7 +1749,7 @@ export interface components {
             items: components["schemas"]["PurchaseItem"][];
             /**
              * Items Value
-             * @description The lines added up; null when a line has no price or quantity.
+             * @description The lines the supplier did not turn down, added up; null when there are none, or when one has no price or quantity.
              */
             items_value: number | null;
             source: components["schemas"]["Source"];

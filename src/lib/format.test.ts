@@ -25,10 +25,11 @@ describe('count and lei', () => {
 })
 
 describe('quantity', () => {
-  it('keeps the decimals a buyer gave, up to three', () => {
+  it('keeps the decimals a buyer gave, up to the four the API keeps', () => {
     expect(quantity(30)).toBe('30')
     expect(quantity(2.5)).toBe('2,5')
     expect(quantity(0.125)).toBe('0,125')
+    expect(quantity(1.2345)).toBe('1,2345')
     expect(quantity(1500)).toBe('1.500')
   })
 })

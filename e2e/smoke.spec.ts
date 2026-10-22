@@ -674,14 +674,18 @@ test('a purchase whose page was collected lists what it bought and on which term
   const main = page.getByRole('main')
   await expect(main.getByText('OP la 30 de zile de la recepție')).toBeVisible()
   await expect(main.getByText('La sediul primăriei')).toBeVisible()
-  const lines = main.getByRole('table')
-  await expect(lines.getByRole('row')).toHaveCount(4)
+  const lines = main.getByRole('table', { name: 'Ce s-a cumpărat' })
+  await expect(lines.getByRole('row')).toHaveCount(5)
   await expect(
     lines.getByRole('row', { name: /Hârtie copiator A4/ }),
   ).toContainText('10 top')
   await expect(
     lines.getByRole('row', { name: /Toner imprimantă/ }),
   ).toContainText('250 lei')
+  // A line the supplier turned down is marked, and the total leaves it out.
+  await expect(lines.getByRole('row', { name: /Plicuri C4/ })).toContainText(
+    'Refuzat de furnizor',
+  )
   await expect(lines.getByRole('row', { name: /Total/ })).toContainText(
     '500 lei',
   )
@@ -882,7 +886,7 @@ test('the sources page says what is held, what is to come and how it is counted'
     ),
   ).toBeVisible()
   await expect(main.getByText('anexa 2 a Legii 98/2016')).toBeVisible()
-  await expect(main.getByText('Până acum sunt 7 răspunsuri.')).toBeVisible()
+  await expect(main.getByText('Până acum sunt 6 răspunsuri.')).toBeVisible()
   await expect(main.getByText(/vinovat|ascuns/)).toHaveCount(0)
 
   await expect(

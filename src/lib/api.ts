@@ -88,7 +88,8 @@ export const DIRECT_PURCHASE_LIMIT = 900_400
 export const DIRECT_PURCHASE_LIMIT_GOODS_SERVICES = 270_120
 
 // The detail of a purchase (its lines and conditions) is one request to SEAP each, so the
-// API collects it for accepted purchases from this value up, newest first.
+// API collects it for accepted purchases from this value up, newest first. Keep it equal
+// to `MIN_VALUE` in the API's `collectors/seap_direct/details.py`.
 export const DETAIL_MIN_VALUE = 100_000
 
 // One source as we hold it: its days, how many records, when it was last read.

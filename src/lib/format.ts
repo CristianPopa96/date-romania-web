@@ -41,9 +41,10 @@ function build(locale: Locale) {
     return whole.format(value)
   }
 
-  const measured = new Intl.NumberFormat(tag, { maximumFractionDigits: 3 })
+  // As many decimals as the API keeps.
+  const measured = new Intl.NumberFormat(tag, { maximumFractionDigits: 4 })
 
-  // A quantity as the buyer gave it: "30", "2,5", "0,125".
+  // A quantity as the buyer gave it: "30", "2,5", "1,2345".
   function quantity(value: number) {
     return measured.format(value)
   }
