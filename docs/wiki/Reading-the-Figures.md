@@ -55,10 +55,12 @@ exactly one contract.
 - **Only accepted direct purchases are money spent.** A direct purchase that the
   supplier or the institution refused, or that got no answer, is listed but never added
   up.
-- **Above the ceiling.** An accepted direct purchase published with a value above
-  900,400 lei (the highest legal ceiling for a direct purchase, the one for works) is
-  left out of totals and reported next to them. This is what SEAP publishes; the site
-  does not call it an error.
+- **Above the ceiling.** An accepted direct purchase published with a value above the
+  legal ceiling of its type (270,120 lei for goods and services, 900,400 lei for works)
+  is left out of totals and reported next to them. This is what SEAP publishes; the site
+  does not call it an error. The services of Annex 2 of Law 98/2016 (health, social,
+  education, culture, hotels and restaurants and a few more) have no ceiling for a
+  direct purchase and are always counted.
 - **A notice is not a contract.** One award notice can hold several contracts, and SEAP
   republishes the notice each time a contract is added or changed. Contracts are counted
   by the day they were signed, not by the day the notice was published.

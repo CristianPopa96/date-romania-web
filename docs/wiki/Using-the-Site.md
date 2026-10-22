@@ -101,6 +101,8 @@ One SEAP award notice, which can hold **several contracts**.
 - Title, procedure type, CPV code, buyer ("Autoritate contractantă"), financing, the day
   it was first published and last republished, and the "Anunț de participare" (the
   notice that opened the procedure).
+- A version SEAP has withdrawn says so ("SEAP a retras această versiune a anunțului")
+  and links to the new version, where its contracts are counted.
 - "Contractele din anunț": one row per contract, with its winner(s), value without VAT
   and date. Above the table, the notice's total counts ordinary and subsequent contracts.
 - A framework agreement shows muted as "Acord-cadru · plafon · nu intră în total": it is
@@ -118,8 +120,12 @@ One SEAP award notice, which can hold **several contracts**.
 A small purchase made without an auction, from SEAP's catalogue.
 
 - Buyer, supplier, value without VAT, state and date.
+- "Plafon legal": the ceiling the purchase is held to, by its type (270,120 lei for
+  goods and services, 900,400 lei for works, the higher one when the type is not known),
+  or "Fără plafon" for the services of Annex 2 of Law 98/2016, which have none.
 - A purchase that was not accepted shows its value muted, "Neacceptată · nu intră în
-  total"; one published above the legal ceiling shows "Peste plafon · nu intră în total".
+  total"; one published above the ceiling of its type shows "Peste plafon · nu intră în
+  total".
 - "Ce s-a cumpărat" (the items bought) is marked "Încă necolectat": SEAP publishes it,
   but it is not collected yet.
 - "Același furnizor, același cumpărător": how many accepted purchases the same pair made
@@ -189,8 +195,10 @@ under the legal ceiling**, the same buyer and the same supplier with at least tw
 accepted direct purchases, each between 90% of the ceiling for its type and the
 ceiling. Each row says what was measured and links to both parties; the list downloads
 as a spreadsheet. The page explains what the pattern shows and what it does not: a
-value close to the ceiling does not prove a purchase was split. Patterns that the data
-cannot give yet are listed with the reason.
+value close to the ceiling does not prove a purchase was split. Services of Annex 2
+(health, social, education, hotels and others) have no ceiling and are not checked; the
+page says how many there are. Patterns that the data cannot give yet are listed with the
+reason.
 
 ## Programme
 
