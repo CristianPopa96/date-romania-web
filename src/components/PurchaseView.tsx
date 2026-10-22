@@ -68,7 +68,7 @@ export function PurchaseView({ id }: { id: number }) {
             <Card size="3">
               <Flex direction="column" gap="4">
                 <Facts purchase={purchase} />
-                <SourceLine source={purchase.source} />
+                <SourceLine source={purchase.source} of="purchase" />
               </Flex>
             </Card>
             <PurchaseItems detail={purchase.detail} />

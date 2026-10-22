@@ -116,7 +116,7 @@ export function SourcesTable({ datasets }: { datasets: Array<Dataset> }) {
         {t.sources.errorsNote}
       </Text>
       <Text size="1" color="gray">
-        {t.sources.frozen}
+        {t.sources.collecting}
       </Text>
     </Flex>
   )

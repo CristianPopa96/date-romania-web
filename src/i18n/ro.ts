@@ -71,6 +71,9 @@ export const ro = {
       contracts: (parts: string) => `Sursa contractelor: ${parts}`,
       purchases: (parts: string) => `Sursa achizițiilor directe: ${parts}`,
       payments: (parts: string) => `Sursa plăților: ${parts}`,
+      // One direct purchase: its list row, and its own page in SEAP, read apart.
+      purchase: (parts: string) => `Sursa achiziției: ${parts}`,
+      items: (parts: string) => `Sursa produselor: ${parts}`,
     },
     fetched: (day: string) => `preluat ${day}`,
     open: 'Vezi la sursă',
@@ -246,8 +249,8 @@ export const ro = {
       counted(n, text, 'un anunț', 'anunțuri'),
     contractsHeld: (contracts: string, signed: string) =>
       `${contracts}, din care ${signed} semnate în perioadă`,
-    frozen:
-      'Am preluat doar zilele din perioada arătată. Deocamdată nu preluăm alte zile.',
+    collecting:
+      'Preluăm în fiecare dimineață ziua de ieri; zilele cele mai noi se completează în săptămânile următoare.',
     toComeTitle: 'Surse pe care nu le-am preluat încă',
     toComeLead:
       'Aceste surse sunt publice și intră în plan. Până le preluăm, cifrele care depind de ele apar pe site ca „Încă necolectat”.',
@@ -595,6 +598,9 @@ export const ro = {
     itemValue: 'Valoare fără TVA',
     itemsTotal: 'Total',
     itemRejected: 'Refuzat de furnizor',
+    itemsRejectedNote: 'Totalul nu include liniile refuzate de furnizor.',
+    // The record of the lines' source: the purchase's own page, not its list row.
+    itemsRecord: (code: string) => `pagina achiziției ${code}`,
     whatTitle: 'Ce e o achiziție directă.',
     what: 'O cumpărare mică, fără licitație, făcută din catalogul SEAP, sub pragul legal pentru tipul ei de contract. Nu există oferte concurente de comparat.',
     samePair: 'Același furnizor, același cumpărător',

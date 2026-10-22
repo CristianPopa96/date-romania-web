@@ -110,7 +110,21 @@ export function PurchaseItems({ detail }: { detail: PurchaseDetail | null }) {
               </Table.Body>
             </Table.Root>
           )}
-          <SourceLine source={detail.source} />
+          {detail.items.some((item) => item.rejected) &&
+          detail.items_value !== null ? (
+            <Text size="2" color="gray">
+              {t.purchase.itemsRejectedNote}
+            </Text>
+          ) : null}
+          <SourceLine
+            source={{
+              ...detail.source,
+              record:
+                detail.source.record &&
+                t.purchase.itemsRecord(detail.source.record),
+            }}
+            of="items"
+          />
         </>
       )}
     </Flex>

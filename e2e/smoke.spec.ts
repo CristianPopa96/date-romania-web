@@ -623,7 +623,7 @@ test('a purchase opens its own page, with what is not collected marked as such',
     main.getByText('o achiziție directă acceptată · 500 lei · 06.10.2026'),
   ).toBeVisible()
   await expect(
-    main.getByText('Sursa: SEAP · DA00000004 · preluat 07.10.2026'),
+    main.getByText('Sursa achiziției: SEAP · DA00000004 · preluat 07.10.2026'),
   ).toBeVisible()
 })
 
@@ -634,7 +634,7 @@ test('the source of one record opens a panel; a total says what it is added up f
   const main = page.getByRole('main')
   await main
     .getByRole('button', {
-      name: 'Sursa: SEAP · DA00000004 · preluat 07.10.2026',
+      name: 'Sursa achiziției: SEAP · DA00000004 · preluat 07.10.2026',
     })
     .click()
   const panel = page.getByRole('dialog')
@@ -690,10 +690,21 @@ test('a purchase whose page was collected lists what it bought and on which term
     '500 lei',
   )
   await expect(main.getByText('Încă necolectat')).toHaveCount(0)
-  // The lines have their own source: the purchase's page, read on its own.
   await expect(
-    main.getByText('Sursa: SEAP · DA00000003 · preluat', { exact: false }),
-  ).toHaveCount(2)
+    main.getByText('Totalul nu include liniile refuzate de furnizor.'),
+  ).toBeVisible()
+  // Two answers read apart, each with its own label: the list row, and the purchase's page.
+  await expect(
+    main.getByText('Sursa achiziției: SEAP · DA00000003 · preluat', {
+      exact: false,
+    }),
+  ).toBeVisible()
+  await expect(
+    main.getByText(
+      'Sursa produselor: SEAP · pagina achiziției DA00000003 · preluat',
+      { exact: false },
+    ),
+  ).toBeVisible()
 })
 
 test('a purchase above the limit is stated as a fact', async ({ page }) => {
@@ -875,6 +886,12 @@ test('the sources page says what is held, what is to come and how it is counted'
     main.getByRole('link', { name: 'Exportă contractele din perioadă (CSV)' }),
   ).toHaveAttribute('href', '/contracte.csv')
 
+  // Collection goes on each morning; the newest days fill in over the next weeks.
+  await expect(
+    main.getByText('Preluăm în fiecare dimineață ziua de ieri', {
+      exact: false,
+    }),
+  ).toBeVisible()
   await main.getByRole('tab', { name: 'Metodologie' }).click()
   await expect(page).toHaveURL(/\/surse\?fila=metodologie$/)
   await expect(
