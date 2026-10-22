@@ -131,7 +131,9 @@ A small purchase made without an auction, from SEAP's catalogue.
   They come from the purchase's own page in SEAP, one request each, so they are
   collected for accepted purchases of 100,000 lei or more, newest first. For the others
   they are marked "Încă necolectat". A line the supplier turned down is muted and marked
-  "Refuzat de furnizor".
+  "Refuzat de furnizor", and a note under the total says it leaves such lines out.
+- Two source lines, one per SEAP answer read: "Sursa achiziției" under the facts (the
+  list row), and "Sursa produselor" under the table (the purchase's own page).
 - "Același furnizor, același cumpărător": how many accepted purchases the same pair made
   in the period, and for how much.
 
