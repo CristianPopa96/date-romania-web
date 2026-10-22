@@ -78,9 +78,11 @@ export const PAGE_SIZE = 20
 // SEAP's state for a purchase whose offer was accepted: the only ones that are money spent.
 export const ACCEPTED = 7
 
-// The highest legal limit for a direct purchase (the one for works), in lei without VAT.
-// The API uses the same value for `above_limit`; one constant keeps every page in agreement.
+// The legal limits for a direct purchase, in lei without VAT: for works (the highest), and
+// for goods and services. The API holds each purchase to the one of its type for
+// `above_limit`; these keep every page's wording in agreement with it.
 export const DIRECT_PURCHASE_LIMIT = 900_400
+export const DIRECT_PURCHASE_LIMIT_GOODS_SERVICES = 270_120
 
 // One source as we hold it: its days, how many records, when it was last read.
 export type Dataset = Schemas['Dataset']

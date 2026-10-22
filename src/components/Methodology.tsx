@@ -1,7 +1,10 @@
 import { Card, Flex, Grid, Heading, Text } from '@radix-ui/themes'
 
 import { useI18n } from '#/i18n/context'
-import { DIRECT_PURCHASE_LIMIT } from '#/lib/api'
+import {
+  DIRECT_PURCHASE_LIMIT,
+  DIRECT_PURCHASE_LIMIT_GOODS_SERVICES,
+} from '#/lib/api'
 import type { Dataset } from '#/lib/api'
 
 // How the figures on the site are counted, rule by rule. The rules themselves live in
@@ -16,7 +19,10 @@ export function Methodology({ datasets }: { datasets: Array<Dataset> }) {
     { title: t.method.acceptedTitle, text: t.method.accepted },
     {
       title: t.method.limitTitle,
-      text: t.method.limit(f.lei(DIRECT_PURCHASE_LIMIT)),
+      text: t.method.limit(
+        f.lei(DIRECT_PURCHASE_LIMIT_GOODS_SERVICES),
+        f.lei(DIRECT_PURCHASE_LIMIT),
+      ),
     },
     { title: t.method.noticeTitle, text: t.method.notice },
     { title: t.method.frameworkTitle, text: t.notice.whyFramework },

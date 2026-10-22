@@ -318,8 +318,8 @@ export const ro = {
     accepted:
       'O achiziție directă intră în totaluri doar dacă oferta a fost acceptată. Cele refuzate sau anulate apar în liste, dar nu se adună.',
     limitTitle: 'Achiziții peste plafon',
-    limit: (limit: string) =>
-      `O achiziție acceptată publicată peste ${limit}, cel mai mare plafon legal pentru o achiziție directă, nu intră în totaluri și e arătată separat. Este ceea ce publică SEAP; nu spunem că e o greșeală.`,
+    limit: (goods: string, works: string) =>
+      `O achiziție acceptată publicată peste plafonul legal al tipului ei (${goods} pentru produse și servicii, ${works} pentru lucrări, sau pentru o achiziție al cărei tip nu îl știm) nu intră în totaluri și e arătată separat. Este ceea ce publică SEAP; nu spunem că e o greșeală. Serviciile din anexa 2 a Legii 98/2016 (sănătate, servicii sociale, învățământ, cultură, hoteluri și restaurante, juridice, pază, poștale), după codul CPV, nu au plafon pentru achiziția directă și intră mereu în total.`,
     noticeTitle: 'Un anunț nu este un contract',
     notice:
       'Un anunț de atribuire poate avea mai multe contracte, iar SEAP îl republică de fiecare dată când se adaugă unul. Numărăm contractele după data semnării, nu după ziua publicării anunțului.',
@@ -470,12 +470,18 @@ export const ro = {
     period: (days: string) =>
       `Achiziții directe finalizate în perioada ${days}. Sumele sunt fără TVA.`,
     // Stated as what SEAP publishes, never as an error or a breach.
-    aboveLimit: (n: number, text: string, limit: string, value: string) =>
+    aboveLimit: (
+      n: number,
+      text: string,
+      goods: string,
+      works: string,
+      value: string,
+    ) =>
       `${plural(n, {
         one: 'O achiziție acceptată este publicată',
         few: `${text} achiziții acceptate sunt publicate`,
         other: `${text} de achiziții acceptate sunt publicate`,
-      })} în SEAP cu o valoare peste ${limit}, plafonul legal cel mai mare pentru o achiziție directă. ${
+      })} în SEAP cu o valoare peste plafonul legal al tipului ${n === 1 ? 'ei' : 'lor'}: ${goods} pentru produse și servicii, ${works} pentru lucrări și pentru o achiziție al cărei tip nu îl cunoaștem. ${
         n === 1 ? 'Nu este inclusă' : 'Nu sunt incluse'
       } în total: ${value}. Tipar observat, nu o acuzație.`,
   },
@@ -569,6 +575,15 @@ export const ro = {
     delivery: 'Livrare',
     notAccepted: 'Neacceptată · nu intră în total',
     aboveLimit: 'Peste plafon · nu intră în total',
+    limit: 'Plafon legal',
+    limitOf: (limit: string, type: string) => `${limit} · ${type}`,
+    limitTypes: {
+      1: 'produse',
+      2: 'servicii',
+      3: 'lucrări',
+    } as Record<number, string | undefined>,
+    limitUnknownType: 'tipul nu e cunoscut, plafonul cel mai mare',
+    noLimit: 'Fără plafon · serviciu din anexa 2 a Legii 98/2016',
     bought: 'Ce s-a cumpărat',
     boughtNotCollected:
       'Produsele și serviciile din această achiziție, cu cantități și prețuri, sunt publicate în SEAP. Nu le-am preluat încă.',

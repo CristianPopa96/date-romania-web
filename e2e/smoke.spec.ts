@@ -482,6 +482,9 @@ test('the patterns tab lists purchases just under their limit, as facts', async 
     '270.120 lei pentru produse și servicii, 900.400 lei pentru lucrări',
   )
   await expect(main.getByText('2 perechi cumpărător–furnizor')).toBeVisible()
+  await expect(
+    main.getByText('nu au plafon pentru achiziția directă'),
+  ).toContainText('nu sunt verificate: 0 achiziții acceptate')
 
   const works = main.getByRole('row').filter({ hasText: 'ALFA CONSTRUCT' })
   await expect(works).toContainText(TOWN_HALL)
@@ -662,6 +665,10 @@ test('a purchase above the limit is stated as a fact', async ({ page }) => {
   await expect(main.getByText('5.000.000 lei fără TVA')).toBeVisible()
   await expect(main.getByText('Peste plafon · nu intră în total')).toBeVisible()
   await expect(main.getByText('Ofertă acceptată')).toBeVisible()
+  // Its type is not known, so it is held to the highest limit, and the page says so.
+  await expect(
+    main.getByText('900.400 lei · tipul nu e cunoscut, plafonul cel mai mare'),
+  ).toBeVisible()
   // Its only purchase with this supplier is not counted, so there is no sum to show.
   await expect(
     main.getByText('Același furnizor, același cumpărător'),
@@ -836,7 +843,12 @@ test('the sources page says what is held, what is to come and how it is counted'
   await expect(
     main.getByText('Un anunț nu este un contract', { exact: true }),
   ).toBeVisible()
-  await expect(main.getByText('publicată peste 900.400 lei')).toBeVisible()
+  await expect(
+    main.getByText(
+      '270.120 lei pentru produse și servicii, 900.400 lei pentru lucrări',
+    ),
+  ).toBeVisible()
+  await expect(main.getByText('anexa 2 a Legii 98/2016')).toBeVisible()
   await expect(main.getByText('Până acum sunt 6 răspunsuri.')).toBeVisible()
   await expect(main.getByText(/vinovat|ascuns/)).toHaveCount(0)
 

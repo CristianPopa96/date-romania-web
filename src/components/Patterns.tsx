@@ -65,7 +65,7 @@ function NearLimit({ cpv }: { cpv?: string }) {
           {words.meaning}
         </Text>
         <Text size="2" color="gray">
-          {words.annex2}
+          {words.annex2(data.annex_2, f.count(data.annex_2))}
         </Text>
         <Text size="2" color="gray">
           {words.checked(

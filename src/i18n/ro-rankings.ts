@@ -54,8 +54,9 @@ export const rankings = {
         `Același cumpărător și același furnizor, cel puțin ${repeats} achiziții directe acceptate, fiecare de la ${from} din plafonul legal al tipului ei până chiar sub plafon (${goods} pentru produse și servicii, ${works} pentru lucrări), oricând în perioada verificată.`,
       meaning:
         'Ce arată: valori apropiate de plafon, fără să-l depășească. Ce nu arată: că o achiziție a fost împărțită ca să rămână sub plafon. Asta se poate afla doar din documente.',
-      annex2:
-        'Serviciile din anexa 2 a legii, de exemplu hotelurile și serviciile sociale, au un plafon mai mare. Nu le deosebim încă, așa că o pereche de servicii poate fi departe de plafonul ei.',
+      // Annex 2 of Law 98/2016, told by CPV code: no direct purchase limit to be near.
+      annex2: (n: number, text: string) =>
+        `Serviciile din anexa 2 a Legii 98/2016 (sănătate, servicii sociale, învățământ, cultură, hoteluri și restaurante și altele) nu au plafon pentru achiziția directă, așa că nu sunt verificate: ${counted(n, text, 'o achiziție acceptată', 'achiziții acceptate')}.`,
       // "verificat: X din Y". The type is missing mostly on quiet days, when SEAP's list
       // did not have to be asked by type.
       checked: (checked: string, n: number, total: string) =>
