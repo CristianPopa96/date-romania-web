@@ -481,7 +481,7 @@ export const ro = {
         one: 'O achiziție acceptată este publicată',
         few: `${text} achiziții acceptate sunt publicate`,
         other: `${text} de achiziții acceptate sunt publicate`,
-      })} în SEAP cu o valoare peste plafonul legal al tipului ${n === 1 ? 'ei' : 'lor'}: ${goods} pentru produse și servicii, ${works} pentru lucrări. ${
+      })} în SEAP cu o valoare peste plafonul legal al tipului ${n === 1 ? 'ei' : 'lor'}: ${goods} pentru produse și servicii, ${works} pentru lucrări și pentru o achiziție al cărei tip nu îl cunoaștem. ${
         n === 1 ? 'Nu este inclusă' : 'Nu sunt incluse'
       } în total: ${value}. Tipar observat, nu o acuzație.`,
   },

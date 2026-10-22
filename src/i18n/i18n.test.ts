@@ -54,7 +54,7 @@ describe('Romanian counts', () => {
     expect(
       t.notes.aboveLimit(1, '1', '270.120 lei', '900.400 lei', '5.000.000 lei'),
     ).toBe(
-      'O achiziție acceptată este publicată în SEAP cu o valoare peste plafonul legal al tipului ei: 270.120 lei pentru produse și servicii, 900.400 lei pentru lucrări. Nu este inclusă în total: 5.000.000 lei. Tipar observat, nu o acuzație.',
+      'O achiziție acceptată este publicată în SEAP cu o valoare peste plafonul legal al tipului ei: 270.120 lei pentru produse și servicii, 900.400 lei pentru lucrări și pentru o achiziție al cărei tip nu îl cunoaștem. Nu este inclusă în total: 5.000.000 lei. Tipar observat, nu o acuzație.',
     )
     expect(
       t.notes.aboveLimit(
