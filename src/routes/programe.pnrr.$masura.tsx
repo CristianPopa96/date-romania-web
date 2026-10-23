@@ -3,6 +3,7 @@ import {
   Link as RouterLink,
   createFileRoute,
   notFound,
+  redirect,
 } from '@tanstack/react-router'
 import {
   Card,
@@ -59,6 +60,16 @@ export const Route = createFileRoute('/programe/pnrr/$masura')({
       pnrrMeasureQuery(found.code),
     )
     if (!measure) throw notFound()
+    // A county the measure has no contract in: drop it rather than list everything under a
+    // link that looks filtered.
+    if (deps.judet && !countyBySlug(measure.counties, deps.judet)) {
+      throw redirect({
+        to: '/programe/pnrr/$masura',
+        params,
+        search: { ...deps, judet: undefined },
+        replace: true,
+      })
+    }
     await context.queryClient.ensureQueryData(
       pnrrContractsQuery(filterOf(measure, deps)),
     )
@@ -108,7 +119,7 @@ function MeasureView({ measure }: { measure: PnrrMeasure }) {
             / {measureLabel(measure.code, measure.name)}
           </Text>
           <Text size="1" color="gray" weight="medium">
-            {p.measureEyebrow(measure.ministry_name ?? measure.ministry ?? '')}{' '}
+            {p.measureEyebrow(measure.ministry_name ?? measure.ministry)}{' '}
             <Code variant="ghost">{measure.code}</Code>
           </Text>
           <Heading size="7">{measure.name ?? measure.code}</Heading>

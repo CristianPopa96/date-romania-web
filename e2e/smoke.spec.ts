@@ -1429,6 +1429,13 @@ test('a measure lists its contracts and filters them by status', async ({
   ).toBeVisible()
 })
 
+test('a county the measure has no contract in is dropped from the address', async ({
+  page,
+}) => {
+  await page.goto(`${PNRR}/c10.i3?judet=vaslui&stare=finalizat`)
+  await expect(page).toHaveURL(/\/programe\/pnrr\/c10\.i3\?stare=finalizat$/)
+})
+
 test('a measure never names a natural person, and says how many it leaves out', async ({
   page,
 }) => {
@@ -1445,7 +1452,7 @@ test('a measure never names a natural person, and says how many it leaves out', 
   ).toBeVisible()
   await expect(
     main.getByText(
-      'Din care 50.000 lei într-o plată către beneficiari fără contract',
+      'În fișierul de plăți: 50.000 lei într-o plată către beneficiari fără contract',
       {
         exact: false,
       },

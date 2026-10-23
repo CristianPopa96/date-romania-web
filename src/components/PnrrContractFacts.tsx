@@ -21,11 +21,11 @@ import { measureLabel, measureSlug } from '#/lib/pnrr'
 export function ProgressBars({ contract }: { contract: PnrrContract }) {
   const { t, f } = useI18n()
   const p = t.pnrr
-  const ministry = contract.ministry ?? ''
+  const ministry = contract.ministry
   const percent = (value: number | null) =>
     value === null ? t.common.notPublished : f.percent(value)
 
-  if (contract.physical_progress !== null || contract.lines.length <= 1) {
+  if (!contract.measures_differ) {
     return (
       <Flex direction="column" gap="3">
         <Bar
@@ -166,7 +166,7 @@ export function Facts({
                     </RouterLink>
                   </Link>
                   {/* Each measure's own status, when they differ. */}
-                  {contract.status === null && line.status ? (
+                  {contract.measures_differ && line.status ? (
                     <PnrrStatusBadge status={line.status} />
                   ) : null}
                 </Flex>

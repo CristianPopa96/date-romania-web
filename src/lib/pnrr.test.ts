@@ -73,6 +73,7 @@ describe('a measure', () => {
   it('has a paid share only when both sums are known', () => {
     expect(paidShare(180, 500)).toBeCloseTo(0.36)
     expect(paidShare(null, 500)).toBeNull()
+    expect(paidShare(0, 500)).toBe(0)
     expect(paidShare(10, 0)).toBeNull()
   })
 })

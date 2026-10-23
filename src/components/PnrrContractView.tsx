@@ -36,7 +36,7 @@ function ContractView({ contract }: { contract: PnrrContract }) {
   const measures = contract.lines.map((line) =>
     measureLabel(line.measure, line.measure_name),
   )
-  const ministry = contract.ministry ?? ''
+  const ministry = contract.ministry
   const paid = paidSoFar(contract)
   const euShare =
     contract.total && contract.eu !== null ? contract.eu / contract.total : null

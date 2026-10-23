@@ -167,22 +167,26 @@ export function PnrrContractFinder({
                   )}
                 </Table.Cell>
                 <Table.Cell>
-                  {row.status ? (
-                    <PnrrStatusBadge status={row.status} />
-                  ) : (
-                    // Its measures disagree: the contract's page shows each.
+                  {row.measures_differ ? (
+                    // The contract's page shows each measure's.
                     <Text size="1" color="gray">
                       {p.byMeasure}
                     </Text>
+                  ) : row.status ? (
+                    <PnrrStatusBadge status={row.status} />
+                  ) : (
+                    <DataState kind="notPublished" />
                   )}
                 </Table.Cell>
                 <Table.Cell justify="end">
-                  {row.physical_progress === null ? (
+                  {row.physical_progress !== null ? (
+                    f.percent(row.physical_progress)
+                  ) : row.measures_differ ? (
                     <Text size="1" color="gray">
                       {p.byMeasure}
                     </Text>
                   ) : (
-                    f.percent(row.physical_progress)
+                    <DataState kind="notPublished" />
                   )}
                 </Table.Cell>
               </Table.Row>

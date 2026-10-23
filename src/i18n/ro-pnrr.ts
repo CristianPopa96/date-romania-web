@@ -38,10 +38,12 @@ export const pnrr = {
   lastReceived: 'Ultima plată',
 
   // A measure's page.
-  measureEyebrow: (ministry: string) =>
-    `Măsură PNRR · coordonată de ${ministry}`,
+  measureEyebrow: (ministry: string | null) =>
+    ministry ? `Măsură PNRR · coordonată de ${ministry}` : 'Măsură PNRR',
+  // Lei from the payments file, under a figure in euro from the measures file: not a
+  // part of it, so it is said apart.
   paidWithoutContract: (amount: string, n: number, text: string) =>
-    `Din care ${amount} ${n === 1 ? 'într-o plată' : `în ${counted(n, text, 'o plată', 'plăți')}`} către beneficiari fără contract pe această măsură în lista MIPE (companii de stat, transferuri)`,
+    `În fișierul de plăți: ${amount} ${n === 1 ? 'într-o plată' : `în ${counted(n, text, 'o plată', 'plăți')}`} către beneficiari fără contract pe această măsură în lista MIPE (companii de stat, transferuri)`,
   naturalPersons: (n: number, text: string) =>
     `Include ${counted(n, text, 'un contract al unei persoane fizice', 'contracte ale unor persoane fizice')}, pe care nu le afișăm nominal.`,
   findTitle: 'Contractele de finanțare',
@@ -64,8 +66,8 @@ export const pnrr = {
 
   // A contract's page.
   contractTitle: (number: string) => `Contract ${number}`,
-  contractEyebrow: (measures: string, ministry: string) =>
-    `Contract de finanțare PNRR · ${measures} · coordonat de ${ministry}`,
+  contractEyebrow: (measures: string, ministry: string | null) =>
+    `Contract de finanțare PNRR · ${measures}${ministry ? ` · coordonat de ${ministry}` : ''}`,
   fallbackTitle: 'Contract de finanțare PNRR',
   total: 'Valoare totală',
   signed: (day: string) => `contract semnat ${day}`,
@@ -79,9 +81,11 @@ export const pnrr = {
   noPayment: 'Nicio plată găsită',
   progressPhysical: 'Progres fizic',
   progressFinancial: 'Progres financiar',
-  reportedBy: (ministry: string) => `raportat de ${ministry}`,
-  reportedByDiffers: (ministry: string) =>
-    `raportat de ${ministry} · poate diferi de plățile numărate de noi`,
+  // A ministry the dashboard leaves out is named by what it is.
+  reportedBy: (ministry: string | null) =>
+    `raportat de ${ministry ?? 'minister'}`,
+  reportedByDiffers: (ministry: string | null) =>
+    `raportat de ${ministry ?? 'minister'} · poate diferi de plățile numărate de noi`,
   progressByMeasure: 'Progresul raportat, pe măsuri',
   progressRow: (physical: string, financial: string) =>
     `fizic ${physical} · financiar ${financial}`,

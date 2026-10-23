@@ -1480,18 +1480,23 @@ export interface components {
             eu: number | null;
             /**
              * Status
-             * @description Null when its measures differ: see `lines`.
+             * @description Null when its measures differ (see `lines`) or none gives a status.
              */
             status: ("in_progress" | "under_30" | "finished") | null;
             /** Ends On */
             ends_on: string | null;
             /**
              * Physical Progress
-             * @description Null when its measures differ.
+             * @description Null when its measures differ or none gives it.
              */
             physical_progress: number | null;
             /** Financial Progress */
             financial_progress: number | null;
+            /**
+             * Measures Differ
+             * @description Its measures report different statuses or progress; `lines` has each.
+             */
+            measures_differ: boolean;
             /** Lines */
             lines: components["schemas"]["PnrrLine"][];
             /**
@@ -1542,14 +1547,19 @@ export interface components {
             total: number | null;
             /**
              * Status
-             * @description Null when its measures differ.
+             * @description Null when its measures differ, or when none gives a status we know.
              */
             status: ("in_progress" | "under_30" | "finished") | null;
             /**
              * Physical Progress
-             * @description 0 to 1; null when its measures differ.
+             * @description 0 to 1; null when its measures differ, or when none gives it.
              */
             physical_progress: number | null;
+            /**
+             * Measures Differ
+             * @description Its measures report different statuses or progress: see the contract.
+             */
+            measures_differ: boolean;
         };
         /**
          * PnrrLine

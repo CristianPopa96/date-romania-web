@@ -57,12 +57,13 @@ export function byComponent(
     .map(([component, list]) => ({ component, measures: list }))
 }
 
-// What was paid of what was allocated, both in euro; null when either is missing.
+// What was paid of what was allocated, both in euro; null when either is missing. Nothing
+// paid yet is 0 %, not a missing figure.
 export function paidShare(
   paidEur: number | null | undefined,
   allocatedEur: number | null | undefined,
 ): number | null {
-  if (!paidEur || !allocatedEur) return null
+  if (paidEur == null || !allocatedEur) return null
   return paidEur / allocatedEur
 }
 
