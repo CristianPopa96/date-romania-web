@@ -15,9 +15,9 @@ import {
   validatePageSearch,
   validateRankingSearch,
   validateSourcesSearch,
-  validateProgrammeSearch,
   validateSearchSearch,
 } from '#/lib/urls'
+import { validateProgrammeSearch } from '#/lib/urls-programmes'
 
 describe('validateSourcesSearch', () => {
   it('keeps a tab it knows and drops anything else', () => {

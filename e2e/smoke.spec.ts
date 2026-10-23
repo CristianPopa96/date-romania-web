@@ -1010,6 +1010,9 @@ test('the programme page adds up the payment files and says how much was tied', 
     .getByRole('navigation', { name: 'Secțiuni' })
     .getByRole('link', { name: 'Programe' })
     .click()
+  // The section lists its programmes; this one opens from the list.
+  await expect(page).toHaveURL(/\/programe$/)
+  await page.getByRole('link', { name: 'Programul Anghel Saligny' }).click()
   await expect(page).toHaveURL(/\/programe\/anghel-saligny$/)
   await expect(page).toHaveTitle('Programul Anghel Saligny · Date România')
   const main = page.getByRole('main')
@@ -1362,4 +1365,164 @@ test('an institution leads to its county and its locality', async ({
   await expect(
     main.getByRole('link', { name: 'Comuna Țânțăreni' }).first(),
   ).toHaveAttribute('href', '/localitati/gorj/comuna-tantareni')
+})
+
+const PNRR = '/programe/pnrr'
+
+test('the PNRR page shows its money in the units MIPE publishes, by measure', async ({
+  page,
+}) => {
+  await page.goto('/programe')
+  await page
+    .getByRole('link', { name: 'Planul Național de Redresare și Reziliență' })
+    .click()
+  await expect(page).toHaveURL(/\/programe\/pnrr$/)
+  const main = page.getByRole('main')
+  // Allocated and paid in euro, contracted in lei: the only way each is published.
+  await expect(main.getByText('20,1 mld. euro')).toBeVisible()
+  await expect(main.getByText('3,3 mld. lei')).toBeVisible()
+  await expect(main.getByText('74 % din alocat')).toBeVisible()
+  await expect(
+    main.getByText('Tabloul de bord PNRR, ediția 15.10.2026', { exact: false }),
+  ).toBeVisible()
+  const measures = main.getByRole('table')
+  await expect(
+    measures.getByRole('rowheader', { name: 'C10', exact: true }),
+  ).toBeVisible()
+  await measures.getByRole('link', { name: 'Investiția 3' }).click()
+  await expect(page).toHaveURL(/\/programe\/pnrr\/c10\.i3$/)
+})
+
+test('the largest PNRR recipients open the page of their kind', async ({
+  page,
+}) => {
+  await page.goto(`${PNRR}?tab=beneficiari`)
+  const main = page.getByRole('main')
+  await expect(
+    main.getByText('Regulamentul UE 2021/241', { exact: false }),
+  ).toBeVisible()
+  await expect(
+    main.getByRole('link', { name: 'Comuna Țânțăreni (Primăria Țânțăreni)' }),
+  ).toHaveAttribute('href', '/institutii/4981310')
+})
+
+test('a measure lists its contracts and filters them by status', async ({
+  page,
+}) => {
+  await page.goto(`${PNRR}/c10.i3`)
+  const main = page.getByRole('main')
+  await expect(
+    main.getByRole('heading', {
+      name: 'Investiția 3. Renovarea energetică a clădirilor publice',
+    }),
+  ).toBeVisible()
+  const contracts = main.getByRole('table')
+  await expect(contracts.getByRole('row')).toHaveCount(4)
+  await page.goto(`${PNRR}/c10.i3?stare=finalizat`)
+  await expect(
+    page.getByRole('main').getByRole('table').getByRole('row'),
+  ).toHaveCount(2)
+  await expect(
+    page
+      .getByRole('main')
+      .getByRole('link', { name: 'Renovare energetică ambulatoriu' }),
+  ).toBeVisible()
+})
+
+test('a county the measure has no contract in is dropped from the address', async ({
+  page,
+}) => {
+  await page.goto(`${PNRR}/c10.i3?judet=vaslui&stare=finalizat`)
+  await expect(page).toHaveURL(/\/programe\/pnrr\/c10\.i3\?stare=finalizat$/)
+})
+
+test('a measure never names a natural person, and says how many it leaves out', async ({
+  page,
+}) => {
+  await page.goto(`${PNRR}/c2.i1`)
+  const main = page.getByRole('main')
+  await expect(
+    main.getByText(
+      'Include un contract al unei persoane fizice, pe care nu le afișăm nominal.',
+    ),
+  ).toBeVisible()
+  await expect(main.getByText('NUME FICTIV')).toHaveCount(0)
+  await expect(
+    main.getByRole('link', { name: 'Împădurire teren comunal' }),
+  ).toBeVisible()
+  await expect(
+    main.getByText(
+      'În fișierul de plăți: 50.000 lei într-o plată către beneficiari fără contract',
+      {
+        exact: false,
+      },
+    ),
+  ).toBeVisible()
+})
+
+test('a PNRR contract alone on its measure has its payments, by day', async ({
+  page,
+}) => {
+  await page.goto(`${PNRR}/contracte/701`)
+  const main = page.getByRole('main')
+  await expect(
+    main.getByText(
+      'Contract de finanțare PNRR · C10 · Investiția 3 · coordonat de MDLPA',
+    ),
+  ).toBeVisible()
+  await expect(main.getByText('2,3 mil. lei')).toBeVisible()
+  await expect(main.getByText('3 plăți · ultima 02.10.2026')).toBeVisible()
+  await expect(
+    main.getByText('e singurul ei contract pe această măsură', {
+      exact: false,
+    }),
+  ).toBeVisible()
+  await expect(
+    main.getByRole('table', { name: 'Plăți' }).getByRole('row'),
+  ).toHaveCount(4)
+  await expect(
+    main.getByRole('progressbar', { name: 'Progres fizic' }),
+  ).toBeVisible()
+  await expect(
+    main.getByRole('link', { name: 'Comuna Țânțăreni (Primăria Țânțăreni)' }),
+  ).toHaveAttribute('href', '/institutii/4981310')
+})
+
+test('payments to a beneficiary with several contracts on a measure belong to none', async ({
+  page,
+}) => {
+  await page.goto(`${PNRR}/contracte/702`)
+  const main = page.getByRole('main')
+  await expect(main.getByText('Nu putem spune').first()).toBeVisible()
+  await expect(
+    main.getByText('pentru toate cele 2 contracte de mai jos', {
+      exact: false,
+    }),
+  ).toBeVisible()
+  await expect(main.getByText('nr. 12345 · acest contract')).toBeVisible()
+  await expect(
+    main.getByRole('link', { name: 'Renovare energetică ambulatoriu' }),
+  ).toHaveAttribute('href', '/programe/pnrr/contracte/703')
+})
+
+test('a contract on measures that disagree shows each its own progress', async ({
+  page,
+}) => {
+  await page.goto(`${PNRR}/contracte/704`)
+  const main = page.getByRole('main')
+  await expect(
+    main.getByRole('heading', { name: 'Dotări școlare Beta [CNP]' }),
+  ).toBeVisible()
+  await expect(main.getByText('Progresul raportat, pe măsuri')).toBeVisible()
+  await expect(main.getByText('fizic 95 % · financiar 90 %')).toBeVisible()
+  await expect(
+    main.getByText('Nicio plată găsită', { exact: false }),
+  ).toBeVisible()
+})
+
+test("a natural person's contract has no page", async ({ page }) => {
+  await page.goto(`${PNRR}/contracte/705`)
+  await expect(
+    page.getByRole('heading', { name: 'Pagina nu există' }),
+  ).toBeVisible()
 })

@@ -502,6 +502,89 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/programmes/pnrr": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Programme
+         * @description The plan from the newest dashboard edition held: its totals, its 143 measures and
+         *     the largest final recipients.
+         */
+        get: operations["programme_v1_programmes_pnrr_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/pnrr/measures/{code}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Measure
+         * @description One measure: its money, how much went to beneficiaries without a contract in the
+         *     list, and how many of its contracts are natural persons'.
+         */
+        get: operations["measure_v1_programmes_pnrr_measures__code__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/pnrr/contracts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Contracts
+         * @description Financing contracts, the largest first. Natural persons' are counted, never listed.
+         */
+        get: operations["contracts_v1_programmes_pnrr_contracts_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/pnrr/contracts/{contract_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Contract
+         * @description One financing contract: its measures, and for each the payments to the beneficiary,
+         *     which are the contract's own only when it is the beneficiary's one contract there.
+         */
+        get: operations["contract_v1_programmes_pnrr_contracts__contract_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/places": {
         parameters: {
             query?: never;
@@ -1369,6 +1452,357 @@ export interface components {
         PlaceResults: {
             /** Items */
             items: components["schemas"]["PlaceHit"][];
+        };
+        /** PnrrContract */
+        PnrrContract: {
+            /** Id */
+            id: number;
+            /** Number */
+            number: string | null;
+            /** Title */
+            title: string | null;
+            beneficiary: components["schemas"]["EntityRef"] | null;
+            /** Ministry */
+            ministry: string | null;
+            /** Ministry Name */
+            ministry_name: string | null;
+            /** Signed On */
+            signed_on: string | null;
+            /** Starts On */
+            starts_on: string | null;
+            /** County */
+            county: string | null;
+            /** Locality */
+            locality: string | null;
+            /** Total */
+            total: number | null;
+            /** Eu */
+            eu: number | null;
+            /**
+             * Status
+             * @description Null when its measures differ (see `lines`) or none gives a status.
+             */
+            status: ("in_progress" | "under_30" | "finished") | null;
+            /** Ends On */
+            ends_on: string | null;
+            /**
+             * Physical Progress
+             * @description Null when its measures differ or none gives it.
+             */
+            physical_progress: number | null;
+            /** Financial Progress */
+            financial_progress: number | null;
+            /**
+             * Measures Differ
+             * @description Its measures report different statuses or progress; `lines` has each.
+             */
+            measures_differ: boolean;
+            /** Lines */
+            lines: components["schemas"]["PnrrLine"][];
+            /**
+             * Payments
+             * @description One per measure of the contract.
+             */
+            payments: components["schemas"]["PnrrPayments"][];
+            /**
+             * Edition
+             * Format: date
+             */
+            edition: string;
+            source: components["schemas"]["Source"];
+        };
+        /** PnrrContractPage */
+        PnrrContractPage: {
+            /** Total */
+            total: number;
+            /** Items */
+            items: components["schemas"]["PnrrContractRow"][];
+            /**
+             * Natural Persons
+             * @description Contracts of natural persons that match and are left out: never named.
+             */
+            natural_persons: number;
+        };
+        /** PnrrContractRow */
+        PnrrContractRow: {
+            /**
+             * Id
+             * @description MIPE's commitment id: the page's address.
+             */
+            id: number;
+            /**
+             * Number
+             * @description The contract's own number; not unique.
+             */
+            number: string | null;
+            /** Title */
+            title: string | null;
+            beneficiary: components["schemas"]["EntityRef"] | null;
+            /** County */
+            county: string | null;
+            /**
+             * Total
+             * @description Lei, every measure of the contract added up.
+             */
+            total: number | null;
+            /**
+             * Status
+             * @description Null when its measures differ, or when none gives a status we know.
+             */
+            status: ("in_progress" | "under_30" | "finished") | null;
+            /**
+             * Physical Progress
+             * @description 0 to 1; null when its measures differ, or when none gives it.
+             */
+            physical_progress: number | null;
+            /**
+             * Measures Differ
+             * @description Its measures report different statuses or progress: see the contract.
+             */
+            measures_differ: boolean;
+        };
+        /**
+         * PnrrLine
+         * @description The part of a contract under one measure and funding, as the dashboard gives it.
+         */
+        PnrrLine: {
+            /** Measure */
+            measure: string;
+            /** Measure Name */
+            measure_name: string | null;
+            /** Funding */
+            funding: string | null;
+            /** Total */
+            total: number | null;
+            /** Eu */
+            eu: number | null;
+            /** Status */
+            status: ("in_progress" | "under_30" | "finished") | null;
+            /** Ends On */
+            ends_on: string | null;
+            /** Physical Progress */
+            physical_progress: number | null;
+            /** Financial Progress */
+            financial_progress: number | null;
+        };
+        /** PnrrMeasure */
+        PnrrMeasure: {
+            /**
+             * Code
+             * @description 'C10.I3', or 'C10.I3.a' for a sub-measure.
+             */
+            code: string;
+            /** Component */
+            component: string;
+            /** Name */
+            name: string | null;
+            /**
+             * Ministry
+             * @description The coordinating ministry, e.g. 'MDLPA'.
+             */
+            ministry: string | null;
+            /**
+             * Funding
+             * @description 'grant' or 'loan'.
+             */
+            funding: string | null;
+            /**
+             * Allocated Eur
+             * @description Published in euro only.
+             */
+            allocated_eur: number | null;
+            /**
+             * Contracted Ron
+             * @description EU money contracted, published in lei only.
+             */
+            contracted_ron: number | null;
+            /** Paid Ron */
+            paid_ron: number | null;
+            /** Paid Eur */
+            paid_eur: number | null;
+            /**
+             * Contracts
+             * @description Contracts held on the measure, natural persons' too.
+             */
+            contracts: number;
+            /** Ministry Name */
+            ministry_name: string | null;
+            /**
+             * Paid Without Contract
+             * @description Paid on the measure to beneficiaries with no contract on it in the list (state companies, transfers).
+             */
+            paid_without_contract: number;
+            /** Payments Without Contract */
+            payments_without_contract: number;
+            /**
+             * Natural Persons
+             * @description Contracts of natural persons on the measure.
+             */
+            natural_persons: number;
+            /**
+             * Counties
+             * @description The counties of its listed contracts, as the dashboard writes them: what `/contracts?county=` takes.
+             */
+            counties: string[];
+            /**
+             * Edition
+             * Format: date
+             */
+            edition: string;
+            source: components["schemas"]["Source"];
+        };
+        /** PnrrMeasureRow */
+        PnrrMeasureRow: {
+            /**
+             * Code
+             * @description 'C10.I3', or 'C10.I3.a' for a sub-measure.
+             */
+            code: string;
+            /** Component */
+            component: string;
+            /** Name */
+            name: string | null;
+            /**
+             * Ministry
+             * @description The coordinating ministry, e.g. 'MDLPA'.
+             */
+            ministry: string | null;
+            /**
+             * Funding
+             * @description 'grant' or 'loan'.
+             */
+            funding: string | null;
+            /**
+             * Allocated Eur
+             * @description Published in euro only.
+             */
+            allocated_eur: number | null;
+            /**
+             * Contracted Ron
+             * @description EU money contracted, published in lei only.
+             */
+            contracted_ron: number | null;
+            /** Paid Ron */
+            paid_ron: number | null;
+            /** Paid Eur */
+            paid_eur: number | null;
+            /**
+             * Contracts
+             * @description Contracts held on the measure, natural persons' too.
+             */
+            contracts: number;
+        };
+        /** PnrrPayment */
+        PnrrPayment: {
+            /** Paid On */
+            paid_on: string | null;
+            /** Amount */
+            amount: number;
+            /** Funding */
+            funding: string | null;
+        };
+        /**
+         * PnrrPayments
+         * @description The payments to the beneficiary on one measure. They name the beneficiary and the
+         *     measure, never the contract: they are this contract's only when it is the beneficiary's
+         *     one contract on the measure (`contracts` is 1).
+         */
+        PnrrPayments: {
+            /** Measure */
+            measure: string;
+            /**
+             * Contracts
+             * @description The beneficiary's contracts on the measure.
+             */
+            contracts: number;
+            /** Paid */
+            paid: number;
+            /** Count */
+            count: number;
+            /** First Day */
+            first_day: string | null;
+            /** Last Day */
+            last_day: string | null;
+            /** Items */
+            items: components["schemas"]["PnrrPayment"][];
+            /**
+             * Others
+             * @description The beneficiary's other contracts on the measure, when it has several.
+             */
+            others: components["schemas"]["PnrrSibling"][];
+        };
+        /**
+         * PnrrProgramme
+         * @description The plan as one edition of MIPE's dashboard gives it.
+         */
+        PnrrProgramme: {
+            /**
+             * Edition
+             * Format: date
+             * @description The day of the dashboard edition held.
+             */
+            edition: string;
+            /** Allocated Eur */
+            allocated_eur: number | null;
+            /** Paid Eur */
+            paid_eur: number | null;
+            /**
+             * Received Eur
+             * @description What the EU has paid Romania so far.
+             */
+            received_eur: number | null;
+            /**
+             * Contracts
+             * @description As the edition counts them.
+             */
+            contracts: number | null;
+            /** Beneficiaries Contracted */
+            beneficiaries_contracted: number | null;
+            /** Beneficiaries Paid */
+            beneficiaries_paid: number | null;
+            /**
+             * Contracted Ron
+             * @description EU money contracted, the measures added up.
+             */
+            contracted_ron: number;
+            /** Measures */
+            measures: components["schemas"]["PnrrMeasureRow"][];
+            /**
+             * Top
+             * @description The largest final recipients (EU Reg. 2021/241 art. 25a), largest first.
+             */
+            top: components["schemas"]["PnrrTopRecipient"][];
+            source: components["schemas"]["Source"];
+        };
+        /** PnrrSibling */
+        PnrrSibling: {
+            /** Id */
+            id: number;
+            /** Number */
+            number: string | null;
+            /** Title */
+            title: string | null;
+            /** Total */
+            total: number | null;
+        };
+        /** PnrrTopRecipient */
+        PnrrTopRecipient: {
+            /** Cui */
+            cui: number;
+            /**
+             * Name
+             * @description As the dashboard writes it.
+             */
+            name: string | null;
+            /** @description The entity we hold under the CUI, with its kind: which page it opens. */
+            entity: components["schemas"]["EntityRef"] | null;
+            /**
+             * Received
+             * @description Lei received, grants and loans together.
+             */
+            received: number | null;
+            /** Last Received On */
+            last_received_on: string | null;
         };
         /** Population */
         Population: {
@@ -2948,6 +3382,129 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Project"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    programme_v1_programmes_pnrr_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PnrrProgramme"];
+                };
+            };
+        };
+    };
+    measure_v1_programmes_pnrr_measures__code__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PnrrMeasure"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    contracts_v1_programmes_pnrr_contracts_get: {
+        parameters: {
+            query?: {
+                /** @description A measure code, e.g. 'C10.I3'. */
+                measure?: string | null;
+                /** @description As the dashboard writes it. */
+                county?: string | null;
+                status?: ("in_progress" | "under_30" | "finished") | null;
+                /** @description The beneficiary's CUI. */
+                beneficiary?: number | null;
+                /** @description Part of the title or beneficiary. */
+                q?: string | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PnrrContractPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    contract_v1_programmes_pnrr_contracts__contract_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contract_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PnrrContract"];
                 };
             };
             /** @description Validation Error */

@@ -24,7 +24,10 @@ import { Route as ProgrameIndexRouteImport } from './routes/programe.index'
 import { Route as LocalitatiJudetIndexRouteImport } from './routes/localitati.$judet.index'
 import { Route as LocalitatiJudetUatRouteImport } from './routes/localitati.$judet.$uat'
 import { Route as ProgrameAnghelSalignyIndexRouteImport } from './routes/programe.anghel-saligny.index'
+import { Route as ProgramePnrrIndexRouteImport } from './routes/programe.pnrr.index'
+import { Route as ProgramePnrrMasuraRouteImport } from './routes/programe.pnrr.$masura'
 import { Route as ProgrameAnghelSalignyProiecteIdRouteImport } from './routes/programe.anghel-saligny.proiecte.$id'
+import { Route as ProgramePnrrContracteIdRouteImport } from './routes/programe.pnrr.contracte.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -102,12 +105,27 @@ const ProgrameAnghelSalignyIndexRoute =
     path: '/programe/anghel-saligny/',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ProgramePnrrIndexRoute = ProgramePnrrIndexRouteImport.update({
+  id: '/programe/pnrr/',
+  path: '/programe/pnrr/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProgramePnrrMasuraRoute = ProgramePnrrMasuraRouteImport.update({
+  id: '/programe/pnrr/$masura',
+  path: '/programe/pnrr/$masura',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProgrameAnghelSalignyProiecteIdRoute =
   ProgrameAnghelSalignyProiecteIdRouteImport.update({
     id: '/programe/anghel-saligny/proiecte/$id',
     path: '/programe/anghel-saligny/proiecte/$id',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ProgramePnrrContracteIdRoute = ProgramePnrrContracteIdRouteImport.update({
+  id: '/programe/pnrr/contracte/$id',
+  path: '/programe/pnrr/contracte/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -123,9 +141,12 @@ export interface FileRoutesByFullPath {
   '/localitati/': typeof LocalitatiIndexRoute
   '/programe/': typeof ProgrameIndexRoute
   '/localitati/$judet/$uat': typeof LocalitatiJudetUatRoute
+  '/programe/pnrr/$masura': typeof ProgramePnrrMasuraRoute
   '/localitati/$judet/': typeof LocalitatiJudetIndexRoute
   '/programe/anghel-saligny/': typeof ProgrameAnghelSalignyIndexRoute
+  '/programe/pnrr/': typeof ProgramePnrrIndexRoute
   '/programe/anghel-saligny/proiecte/$id': typeof ProgrameAnghelSalignyProiecteIdRoute
+  '/programe/pnrr/contracte/$id': typeof ProgramePnrrContracteIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -141,9 +162,12 @@ export interface FileRoutesByTo {
   '/localitati': typeof LocalitatiIndexRoute
   '/programe': typeof ProgrameIndexRoute
   '/localitati/$judet/$uat': typeof LocalitatiJudetUatRoute
+  '/programe/pnrr/$masura': typeof ProgramePnrrMasuraRoute
   '/localitati/$judet': typeof LocalitatiJudetIndexRoute
   '/programe/anghel-saligny': typeof ProgrameAnghelSalignyIndexRoute
+  '/programe/pnrr': typeof ProgramePnrrIndexRoute
   '/programe/anghel-saligny/proiecte/$id': typeof ProgrameAnghelSalignyProiecteIdRoute
+  '/programe/pnrr/contracte/$id': typeof ProgramePnrrContracteIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -160,9 +184,12 @@ export interface FileRoutesById {
   '/localitati/': typeof LocalitatiIndexRoute
   '/programe/': typeof ProgrameIndexRoute
   '/localitati/$judet/$uat': typeof LocalitatiJudetUatRoute
+  '/programe/pnrr/$masura': typeof ProgramePnrrMasuraRoute
   '/localitati/$judet/': typeof LocalitatiJudetIndexRoute
   '/programe/anghel-saligny/': typeof ProgrameAnghelSalignyIndexRoute
+  '/programe/pnrr/': typeof ProgramePnrrIndexRoute
   '/programe/anghel-saligny/proiecte/$id': typeof ProgrameAnghelSalignyProiecteIdRoute
+  '/programe/pnrr/contracte/$id': typeof ProgramePnrrContracteIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -180,9 +207,12 @@ export interface FileRouteTypes {
     | '/localitati/'
     | '/programe/'
     | '/localitati/$judet/$uat'
+    | '/programe/pnrr/$masura'
     | '/localitati/$judet/'
     | '/programe/anghel-saligny/'
+    | '/programe/pnrr/'
     | '/programe/anghel-saligny/proiecte/$id'
+    | '/programe/pnrr/contracte/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -198,9 +228,12 @@ export interface FileRouteTypes {
     | '/localitati'
     | '/programe'
     | '/localitati/$judet/$uat'
+    | '/programe/pnrr/$masura'
     | '/localitati/$judet'
     | '/programe/anghel-saligny'
+    | '/programe/pnrr'
     | '/programe/anghel-saligny/proiecte/$id'
+    | '/programe/pnrr/contracte/$id'
   id:
     | '__root__'
     | '/'
@@ -216,9 +249,12 @@ export interface FileRouteTypes {
     | '/localitati/'
     | '/programe/'
     | '/localitati/$judet/$uat'
+    | '/programe/pnrr/$masura'
     | '/localitati/$judet/'
     | '/programe/anghel-saligny/'
+    | '/programe/pnrr/'
     | '/programe/anghel-saligny/proiecte/$id'
+    | '/programe/pnrr/contracte/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -235,9 +271,12 @@ export interface RootRouteChildren {
   LocalitatiIndexRoute: typeof LocalitatiIndexRoute
   ProgrameIndexRoute: typeof ProgrameIndexRoute
   LocalitatiJudetUatRoute: typeof LocalitatiJudetUatRoute
+  ProgramePnrrMasuraRoute: typeof ProgramePnrrMasuraRoute
   LocalitatiJudetIndexRoute: typeof LocalitatiJudetIndexRoute
   ProgrameAnghelSalignyIndexRoute: typeof ProgrameAnghelSalignyIndexRoute
+  ProgramePnrrIndexRoute: typeof ProgramePnrrIndexRoute
   ProgrameAnghelSalignyProiecteIdRoute: typeof ProgrameAnghelSalignyProiecteIdRoute
+  ProgramePnrrContracteIdRoute: typeof ProgramePnrrContracteIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -347,11 +386,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProgrameAnghelSalignyIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/programe/pnrr/': {
+      id: '/programe/pnrr/'
+      path: '/programe/pnrr'
+      fullPath: '/programe/pnrr/'
+      preLoaderRoute: typeof ProgramePnrrIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/programe/pnrr/$masura': {
+      id: '/programe/pnrr/$masura'
+      path: '/programe/pnrr/$masura'
+      fullPath: '/programe/pnrr/$masura'
+      preLoaderRoute: typeof ProgramePnrrMasuraRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/programe/anghel-saligny/proiecte/$id': {
       id: '/programe/anghel-saligny/proiecte/$id'
       path: '/programe/anghel-saligny/proiecte/$id'
       fullPath: '/programe/anghel-saligny/proiecte/$id'
       preLoaderRoute: typeof ProgrameAnghelSalignyProiecteIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/programe/pnrr/contracte/$id': {
+      id: '/programe/pnrr/contracte/$id'
+      path: '/programe/pnrr/contracte/$id'
+      fullPath: '/programe/pnrr/contracte/$id'
+      preLoaderRoute: typeof ProgramePnrrContracteIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -371,9 +431,12 @@ const rootRouteChildren: RootRouteChildren = {
   LocalitatiIndexRoute: LocalitatiIndexRoute,
   ProgrameIndexRoute: ProgrameIndexRoute,
   LocalitatiJudetUatRoute: LocalitatiJudetUatRoute,
+  ProgramePnrrMasuraRoute: ProgramePnrrMasuraRoute,
   LocalitatiJudetIndexRoute: LocalitatiJudetIndexRoute,
   ProgrameAnghelSalignyIndexRoute: ProgrameAnghelSalignyIndexRoute,
+  ProgramePnrrIndexRoute: ProgramePnrrIndexRoute,
   ProgrameAnghelSalignyProiecteIdRoute: ProgrameAnghelSalignyProiecteIdRoute,
+  ProgramePnrrContracteIdRoute: ProgramePnrrContracteIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

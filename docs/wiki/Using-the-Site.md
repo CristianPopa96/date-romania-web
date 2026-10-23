@@ -239,6 +239,27 @@ are listed below. A project has one of four states:
 From a project you can open the builder's page, the town hall's page, the SEAP notice,
 or every project of the same builder.
 
+## PNRR
+
+`/programe/pnrr`, from MIPE's PNRR dashboard: one edition, named in the source line.
+
+- Allocated and paid in euro, contracted in lei: each as MIPE publishes it, never
+  converted.
+- "Măsuri": the 143 measures by component, with the share paid of the allocation.
+  "Cei mai mari beneficiari": the largest final recipients, which an EU rule asks every
+  country to publish.
+- A measure (`/programe/pnrr/c10.i3`): its money, what went to beneficiaries with no
+  contract on it, and its contracts, by county, status or words. Contracts of natural
+  persons (afforestation grants) are never listed or named; the page says how many there
+  are.
+- A contract (`/programe/pnrr/contracte/{id}`): its value, the progress the ministry
+  reports (never worked out from payments), and the payments to its beneficiary on each
+  measure. The payments name the beneficiary and the measure, not the contract: they are
+  shown as the contract's own only when it is the beneficiary's one contract there;
+  otherwise "Plătit pe acest contract · Nu putem spune", with the beneficiary's payments
+  and contracts on the measure side by side. A contract on several measures that report
+  different progress shows each measure's.
+
 ## Sources
 
 ![The sources page](images/sources.png)
