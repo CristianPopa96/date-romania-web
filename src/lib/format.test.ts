@@ -34,6 +34,15 @@ describe('quantity', () => {
   })
 })
 
+describe('euro', () => {
+  it('is said in words, short or whole', () => {
+    const { euro, euroShort } = formatFor('ro')
+    expect(euro(1250)).toBe('1.250 euro')
+    expect(euroShort(20106860700)).toBe('20,1 mld. euro')
+    expect(euroShort(244838539)).toBe('244,8 mil. euro')
+  })
+})
+
 describe('leiShort', () => {
   it('writes billions as "mld." with one decimal and a comma', () => {
     expect(leiShort(1_500_000_000)).toBe('1,5 mld. lei')

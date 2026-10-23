@@ -1,3 +1,10 @@
+import {
+  getPnrr,
+  getPnrrContract,
+  getPnrrContracts,
+  getPnrrMeasure,
+} from '#/lib/api-pnrr'
+import type { PnrrContractFilter } from '#/lib/api-pnrr'
 import { queryOptions } from '@tanstack/react-query'
 import type { QueryClient } from '@tanstack/react-query'
 
@@ -174,6 +181,29 @@ export async function loadEntityPage(
   }
   return page
 }
+
+export const pnrrQuery = queryOptions({
+  queryKey: ['pnrr'],
+  queryFn: () => getPnrr(),
+})
+
+export const pnrrMeasureQuery = (code: string) =>
+  queryOptions({
+    queryKey: ['pnrr', 'measure', code],
+    queryFn: () => getPnrrMeasure({ data: code }),
+  })
+
+export const pnrrContractsQuery = (filter: PnrrContractFilter) =>
+  queryOptions({
+    queryKey: ['pnrr', 'contracts', filter],
+    queryFn: () => getPnrrContracts({ data: filter }),
+  })
+
+export const pnrrContractQuery = (id: number) =>
+  queryOptions({
+    queryKey: ['pnrr', 'contract', id],
+    queryFn: () => getPnrrContract({ data: id }),
+  })
 
 export const programmeQuery = queryOptions({
   queryKey: ['programme'],

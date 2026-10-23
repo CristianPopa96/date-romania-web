@@ -22,7 +22,7 @@ import { MATCHES } from '#/lib/api-programme'
 import type { Programme, ProjectPage } from '#/lib/api-programme'
 import { pageCount } from '#/lib/contracts'
 import { countySlug, isMatchParam, matchParam } from '#/lib/programme'
-import type { ProgrammeSearch } from '#/lib/urls'
+import type { ProgrammeSearch } from '#/lib/urls-programmes'
 
 const ALL = 'toate'
 

@@ -73,6 +73,16 @@ function build(locale: Locale) {
   }
 
   // For headline figures: "1,5 mld. lei", "48,2 mil. lei". Small amounts stay whole.
+  function euro(value: number) {
+    return money.euro(whole.format(value))
+  }
+
+  function euroShort(value: number) {
+    if (value >= 1e9) return money.euroBillion(oneDecimal.format(value / 1e9))
+    if (value >= 1e6) return money.euroMillion(oneDecimal.format(value / 1e6))
+    return euro(value)
+  }
+
   function leiShort(value: number) {
     if (value >= 1e9) return money.billion(oneDecimal.format(value / 1e9))
     if (value >= 1e6) return money.million(oneDecimal.format(value / 1e6))
@@ -124,6 +134,8 @@ function build(locale: Locale) {
     lei,
     leiExact,
     leiShort,
+    euro,
+    euroShort,
     day,
     period,
     span,

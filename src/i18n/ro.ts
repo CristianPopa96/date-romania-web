@@ -8,6 +8,7 @@
 import { budget } from '#/i18n/ro-budget'
 import { counted, plural } from '#/i18n/ro-plural'
 import { places } from '#/i18n/ro-places'
+import { pnrr } from '#/i18n/ro-pnrr'
 import { programme } from '#/i18n/ro-programme'
 import { rankings } from '#/i18n/ro-rankings'
 
@@ -32,6 +33,10 @@ export const ro = {
     lei: (amount: string) => `${amount} lei`,
     million: (amount: string) => `${amount} mil. lei`,
     billion: (amount: string) => `${amount} mld. lei`,
+    // Euro only where the source publishes nothing else (the PNRR allocation).
+    euro: (amount: string) => `${amount} euro`,
+    euroMillion: (amount: string) => `${amount} mil. euro`,
+    euroBillion: (amount: string) => `${amount} mld. euro`,
   },
 
   site: {
@@ -54,6 +59,8 @@ export const ro = {
   },
 
   programme,
+
+  pnrr,
 
   budget,
 

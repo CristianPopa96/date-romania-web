@@ -66,7 +66,8 @@ export function ProgrammeFigures({ programme }: { programme: Programme }) {
   )
 }
 
-function Stat({
+// One figure with its label and the lines under it; the PNRR pages use it too.
+export function Stat({
   label,
   value,
   detail,

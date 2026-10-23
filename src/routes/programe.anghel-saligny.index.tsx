@@ -12,8 +12,8 @@ import type { ProjectFilter } from '#/lib/api-programme'
 import { pageTitle } from '#/lib/copy'
 import { MATCH_PARAMS, countyKey } from '#/lib/programme'
 import { programmeQuery, projectsQuery } from '#/lib/queries'
-import { validateProgrammeSearch } from '#/lib/urls'
-import type { ProgrammeSearch } from '#/lib/urls'
+import { validateProgrammeSearch } from '#/lib/urls-programmes'
+import type { ProgrammeSearch } from '#/lib/urls-programmes'
 
 // What the address asks of the list of projects, in the API's words.
 function filterOf(search: ProgrammeSearch): ProjectFilter {
