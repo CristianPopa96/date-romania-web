@@ -1526,3 +1526,97 @@ test("a natural person's contract has no page", async ({ page }) => {
     page.getByRole('heading', { name: 'Pagina nu există' }),
   ).toBeVisible()
 })
+
+const EU = '/programe/fonduri-europene'
+
+test('the EU funds page lists each programme from its own list, never added up', async ({
+  page,
+}) => {
+  await page.goto('/programe')
+  await page.getByRole('link', { name: 'Proiecte cu fonduri europene' }).click()
+  await expect(page).toHaveURL(/\/programe\/fonduri-europene$/)
+  const main = page.getByRole('main')
+  const programmes = main.getByRole('table').first()
+  const pocu = programmes.getByRole('row', {
+    name: /Programul Operațional Capital Uman/,
+  })
+  // POCU publishes no total value: it is said, never made up.
+  await expect(pocu.getByText('Nepublicat')).toBeVisible()
+  await expect(pocu.getByText('31.08.2025')).toBeVisible()
+  await expect(
+    main.getByText('sumele nu se adună între programe', { exact: false }),
+  ).toBeVisible()
+  await expect(main.getByText('5 proiecte')).toBeVisible()
+})
+
+test('the EU projects are filtered by programme in the address', async ({
+  page,
+}) => {
+  await page.goto(`${EU}?program=por`)
+  const main = page.getByRole('main')
+  await expect(main.getByText('Un proiect')).toBeVisible()
+  const row = main.getByRole('row', { name: /Modernizarea drumului comunal/ })
+  await expect(row.getByText('Nume și localitate')).toBeVisible()
+  await row
+    .getByRole('link', { name: 'Modernizarea drumului comunal DC 12' })
+    .click()
+  await expect(page).toHaveURL(
+    /\/programe\/fonduri-europene\/proiecte\/118001$/,
+  )
+})
+
+test('a cohesion project says what was paid up to its list, with no payment day', async ({
+  page,
+}) => {
+  await page.goto(`${EU}/proiecte/312456`)
+  const main = page.getByRole('main')
+  await expect(
+    main.getByText(
+      'Proiect european · Programul Educație și Ocupare 2021–2027',
+    ),
+  ).toBeVisible()
+  await expect(main.getByText('Plătit până la 30.09.2026')).toBeVisible()
+  await expect(
+    main.getByText('data listei MIPE · plățile nu au dată'),
+  ).toBeVisible()
+  await expect(main.getByText('85 %').first()).toBeVisible()
+  await expect(main.getByText('CUI în listă')).toBeVisible()
+  await expect(
+    main.getByRole('link', { name: 'SPITALUL JUDETEAN DE URGENTA CLUJ' }),
+  ).toHaveAttribute('href', '/institutii/4491342')
+  await expect(main.getByText('Asociația Sănătate pentru Toți')).toBeVisible()
+  await expect(main.getByRole('table', { name: 'Plăți' })).toHaveCount(0)
+})
+
+test('a status the list names its own way is shown as written', async ({
+  page,
+}) => {
+  await page.goto(`${EU}/proiecte/118002`)
+  const main = page.getByRole('main')
+  await expect(main.getByText('etapizat')).toBeVisible()
+  await expect(main.getByText('Fără legătură')).toBeVisible()
+  await expect(main.getByText('Nepublicat').first()).toBeVisible()
+})
+
+test('a Health project has its payments one by one, apart from the list figure', async ({
+  page,
+}) => {
+  await page.goto(`${EU}/proiecte/324809`)
+  const main = page.getByRole('main')
+  await expect(main.getByText('Plătit până la 31.08.2026')).toBeVisible()
+  await expect(
+    main.getByText('2 plăți, 900.000 lei · 19.12.2025–02.09.2026', {
+      exact: false,
+    }),
+  ).toBeVisible()
+  await expect(
+    main.getByRole('table', { name: 'Plăți' }).getByRole('row'),
+  ).toHaveCount(3)
+})
+
+test('an EU project not held has no page', async ({ page }) => {
+  await page.goto(`${EU}/proiecte/999999`)
+  await expect(
+    page.getByRole('heading', { name: 'Pagina nu există' }),
+  ).toBeVisible()
+})
