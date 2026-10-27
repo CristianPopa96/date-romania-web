@@ -1,5 +1,7 @@
-// What a programme page's address means: the Anghel Saligny finder and the PNRR measure
-// pages. Kept apart from urls.ts, which holds every other page's.
+// What a programme page's address means: the Anghel Saligny finder, the PNRR measure
+// pages and the EU projects' finder. Kept apart from urls.ts, which holds every other
+// page's.
+import type { EuStatus } from '#/lib/api-eu'
 import type { PnrrStatus } from '#/lib/api-pnrr'
 import { isMatchParam } from '#/lib/programme'
 import type { MatchParam } from '#/lib/programme'
@@ -44,6 +46,54 @@ export function validatePnrrSearch(
       typeof search.stare === 'string' &&
       Object.values<string>(PNRR_STATUS_PARAMS).includes(search.stare)
         ? (search.stare as PnrrStatusParam)
+        : undefined,
+    q: q.length >= 2 ? q : undefined,
+    pagina: validateEntitySearch(search).pagina,
+  }
+}
+
+// The EU funds page: /programe/fonduri-europene?program=por-2014&stare=reziliat&q=drum.
+// `program` is a programme's code in lower case and its period's first year (lib/eu.ts).
+export type EuStatusParam = 'in-implementare' | 'finalizat' | 'reziliat'
+
+export const EU_STATUS_PARAMS: Record<EuStatus, EuStatusParam> = {
+  in_progress: 'in-implementare',
+  finished: 'finalizat',
+  terminated: 'reziliat',
+}
+
+export function euStatusOfParam(
+  param: EuStatusParam | undefined,
+): EuStatus | undefined {
+  const found = Object.entries(EU_STATUS_PARAMS).find(
+    ([, value]) => value === param,
+  )
+  return found ? (found[0] as EuStatus) : undefined
+}
+
+export type EuSearch = {
+  program?: string
+  stare?: EuStatusParam
+  q?: string
+  pagina?: number
+}
+
+export function validateEuSearch(search: Record<string, unknown>): EuSearch {
+  // A SMIS code typed in the field arrives as a number.
+  const q =
+    typeof search.q === 'string' || typeof search.q === 'number'
+      ? String(search.q).trim().slice(0, 100)
+      : ''
+  return {
+    program:
+      typeof search.program === 'string' &&
+      /^[a-z]{2,10}-\d{4}$/i.test(search.program)
+        ? search.program.toLowerCase()
+        : undefined,
+    stare:
+      typeof search.stare === 'string' &&
+      Object.values<string>(EU_STATUS_PARAMS).includes(search.stare)
+        ? (search.stare as EuStatusParam)
         : undefined,
     q: q.length >= 2 ? q : undefined,
     pagina: validateEntitySearch(search).pagina,

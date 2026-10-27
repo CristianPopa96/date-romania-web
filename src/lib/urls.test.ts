@@ -17,7 +17,11 @@ import {
   validateSourcesSearch,
   validateSearchSearch,
 } from '#/lib/urls'
-import { validateProgrammeSearch } from '#/lib/urls-programmes'
+import {
+  euStatusOfParam,
+  validateEuSearch,
+  validateProgrammeSearch,
+} from '#/lib/urls-programmes'
 
 describe('validateSourcesSearch', () => {
   it('keeps a tab it knows and drops anything else', () => {
@@ -324,5 +328,47 @@ describe('validateProgrammeSearch', () => {
 
   it('reads a number typed in the search field as words', () => {
     expect(validateProgrammeSearch({ q: 12519 }).q).toBe('12519')
+  })
+})
+
+describe('validateEuSearch', () => {
+  it('keeps a programme, a status and words', () => {
+    expect(
+      validateEuSearch({
+        program: 'PoIDS-2021',
+        stare: 'reziliat',
+        q: ' drum ',
+      }),
+    ).toEqual({
+      program: 'poids-2021',
+      stare: 'reziliat',
+      q: 'drum',
+      pagina: undefined,
+    })
+  })
+
+  it('drops what no page can mean', () => {
+    expect(
+      validateEuSearch({
+        program: '../x',
+        stare: 'etapizat',
+        q: 'a',
+        pagina: -1,
+      }),
+    ).toEqual({
+      program: undefined,
+      stare: undefined,
+      q: undefined,
+      pagina: undefined,
+    })
+  })
+
+  it('reads a SMIS code typed as a number', () => {
+    expect(validateEuSearch({ q: 312456 }).q).toBe('312456')
+  })
+
+  it('gives the API its word for a status', () => {
+    expect(euStatusOfParam('in-implementare')).toBe('in_progress')
+    expect(euStatusOfParam(undefined)).toBeUndefined()
   })
 })

@@ -8,6 +8,7 @@
 import { budget } from '#/i18n/ro-budget'
 import { counted, plural } from '#/i18n/ro-plural'
 import { places } from '#/i18n/ro-places'
+import { eu } from '#/i18n/ro-eu'
 import { pnrr } from '#/i18n/ro-pnrr'
 import { programme } from '#/i18n/ro-programme'
 import { rankings } from '#/i18n/ro-rankings'
@@ -61,6 +62,8 @@ export const ro = {
   programme,
 
   pnrr,
+
+  eu,
 
   budget,
 

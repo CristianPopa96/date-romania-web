@@ -1,3 +1,5 @@
+import { getEuFunds, getEuProject, getEuProjects } from '#/lib/api-eu'
+import type { EuProjectFilter } from '#/lib/api-eu'
 import {
   getPnrr,
   getPnrrContract,
@@ -243,4 +245,21 @@ export const placeSearchQuery = (q: string) =>
   queryOptions({
     queryKey: ['place-search', q],
     queryFn: () => searchPlaces({ data: q }),
+  })
+
+export const euFundsQuery = queryOptions({
+  queryKey: ['eu-funds'],
+  queryFn: () => getEuFunds(),
+})
+
+export const euProjectsQuery = (filter: EuProjectFilter) =>
+  queryOptions({
+    queryKey: ['eu-funds', 'projects', filter],
+    queryFn: () => getEuProjects({ data: filter }),
+  })
+
+export const euProjectQuery = (smis: number) =>
+  queryOptions({
+    queryKey: ['eu-funds', 'project', smis],
+    queryFn: () => getEuProject({ data: smis }),
   })

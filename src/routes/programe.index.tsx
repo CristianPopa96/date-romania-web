@@ -34,6 +34,12 @@ function ProgrammesPage() {
       lead: t.pnrr.lead,
     },
     {
+      to: '/programe/fonduri-europene',
+      eyebrow: t.eu.eyebrow,
+      title: t.eu.title,
+      lead: t.eu.lead,
+    },
+    {
       to: '/programe/anghel-saligny',
       eyebrow: t.programme.eyebrow,
       title: t.programme.title,

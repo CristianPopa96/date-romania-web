@@ -585,6 +585,67 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/programmes/eu-funds": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Eu Funds
+         * @description The programmes held, each from its newest list: projects, value and paid so far.
+         */
+        get: operations["eu_funds_v1_programmes_eu_funds_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/eu-funds/projects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Projects
+         * @description Projects, the largest first.
+         */
+        get: operations["projects_v1_programmes_eu_funds_projects_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/eu-funds/projects/{smis}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Project
+         * @description One project, from its programme's newest list, with its payments one by one where
+         *     the programme publishes them (Health).
+         */
+        get: operations["project_v1_programmes_eu_funds_projects__smis__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/places": {
         parameters: {
             query?: never;
@@ -1071,6 +1132,175 @@ export interface components {
              * @description authority, company or other
              */
             kind: string;
+        };
+        /** EuBeneficiary */
+        EuBeneficiary: {
+            /**
+             * Name
+             * @description As the list writes it.
+             */
+            name: string | null;
+            /** @description The entity it is tied to, when one is. */
+            entity: components["schemas"]["EntityRef"] | null;
+            /**
+             * Confidence
+             * @description sure: the list gives the tax ID; probable: tied by name and place.
+             */
+            confidence: ("sure" | "probable") | null;
+            /** Method */
+            method: ("cui-in-list" | "administration-name+place" | "name+place" | "company-name") | null;
+        };
+        /**
+         * EuFunds
+         * @description The programmes held. Their figures describe different days: never add them up.
+         */
+        EuFunds: {
+            /** Programmes */
+            programmes: components["schemas"]["EuProgramme"][];
+            source: components["schemas"]["Source"];
+        };
+        /** EuPayment */
+        EuPayment: {
+            /** Paid On */
+            paid_on: string | null;
+            /** Amount */
+            amount: number;
+            /**
+             * Kind
+             * @description 'Plată', 'Prefinanțare'..., as published.
+             */
+            kind: string | null;
+            /** Funding */
+            funding: string | null;
+        };
+        /** EuProgramme */
+        EuProgramme: {
+            /**
+             * Code
+             * @description 'POR', 'PEO', 'PoIDS'...
+             */
+            code: string;
+            /** Name */
+            name: string;
+            /**
+             * Period
+             * @description '2014-2020' or '2021-2027'.
+             */
+            period: string;
+            /** Projects */
+            projects: number;
+            /**
+             * Total
+             * @description Lei, the projects' total value added up.
+             */
+            total: number | null;
+            /**
+             * Paid
+             * @description Lei paid up to `cut_off`; null when not published.
+             */
+            paid: number | null;
+            /**
+             * Cut Off
+             * @description The day the programme's newest list describes.
+             */
+            cut_off: string | null;
+        };
+        /** EuProject */
+        EuProject: {
+            /** Smis */
+            smis: number;
+            /** Programme */
+            programme: string;
+            /** Title */
+            title: string | null;
+            beneficiary: components["schemas"]["EuBeneficiary"];
+            /**
+             * County
+             * @description As the list writes it.
+             */
+            county: string | null;
+            /** Total */
+            total: number | null;
+            /** Paid */
+            paid: number | null;
+            /** Status */
+            status: ("in_progress" | "finished" | "terminated") | null;
+            /**
+             * Status Written
+             * @description The status as the list writes it.
+             */
+            status_written: string | null;
+            /** Programme Name */
+            programme_name: string;
+            /** Period */
+            period: string;
+            /**
+             * Partners
+             * @description As the list writes them; never tied.
+             */
+            partners: string | null;
+            /** Summary */
+            summary: string | null;
+            /** Beneficiary Type */
+            beneficiary_type: string | null;
+            /** Locality */
+            locality: string | null;
+            /** Starts On */
+            starts_on: string | null;
+            /** Ends On */
+            ends_on: string | null;
+            /**
+             * Cofinancing Rate
+             * @description The EU's share, from 0 to 1.
+             */
+            cofinancing_rate: number | null;
+            /** Eu */
+            eu: number | null;
+            /**
+             * Cut Off
+             * @description The day `paid` is counted up to.
+             */
+            cut_off: string | null;
+            /**
+             * Payments
+             * @description One by one, newest first; null where the programme does not publish them.
+             */
+            payments: components["schemas"]["EuPayment"][] | null;
+            payments_source: components["schemas"]["Source"] | null;
+            source: components["schemas"]["Source"];
+        };
+        /** EuProjectPage */
+        EuProjectPage: {
+            /** Total */
+            total: number;
+            /** Items */
+            items: components["schemas"]["EuProjectRow"][];
+        };
+        /** EuProjectRow */
+        EuProjectRow: {
+            /** Smis */
+            smis: number;
+            /** Programme */
+            programme: string;
+            /** Title */
+            title: string | null;
+            beneficiary: components["schemas"]["EuBeneficiary"];
+            /**
+             * County
+             * @description As the list writes it.
+             */
+            county: string | null;
+            /** Total */
+            total: number | null;
+            /** Paid */
+            paid: number | null;
+            /** Status */
+            status: ("in_progress" | "finished" | "terminated") | null;
+            /**
+             * Status Written
+             * @description The status as the list writes it.
+             */
+            status_written: string | null;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -3505,6 +3735,96 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PnrrContract"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    eu_funds_v1_programmes_eu_funds_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EuFunds"];
+                };
+            };
+        };
+    };
+    projects_v1_programmes_eu_funds_projects_get: {
+        parameters: {
+            query?: {
+                /** @description A programme code, e.g. 'POR'. */
+                programme?: string | null;
+                /** @description The beneficiary's CUI. */
+                beneficiary?: number | null;
+                status?: ("in_progress" | "finished" | "terminated") | null;
+                /** @description Part of the title or the beneficiary's name, or a SMIS code. */
+                q?: string | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EuProjectPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    project_v1_programmes_eu_funds_projects__smis__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                smis: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EuProject"];
                 };
             };
             /** @description Validation Error */
