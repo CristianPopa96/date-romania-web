@@ -47,16 +47,20 @@ export const eu = {
   // How a project's beneficiary is tied to an institution or a company we hold.
   tie: {
     cui: 'CUI în listă',
+    // The design's medium label covers both ties by name and place.
+    administration: 'Nume și localitate',
     namePlace: 'Nume și localitate',
     companyName: 'Nume de firmă',
     none: 'Fără legătură',
   },
   tieHelp: {
     cui: 'Lista MIPE dă CUI-ul beneficiarului.',
+    administration:
+      'Legat de noi: lista dă doar numele unei administrații (de pildă „UAT Comuna Albac”), iar noi l-am legat de primăria sau consiliul județean al acelei localități, din județul proiectului.',
     namePlace:
-      'Legat de noi: lista dă doar numele, iar o singură instituție sau firmă cu acest nume e în același județ sau aceeași localitate.',
+      'Legat de noi: lista dă doar numele, iar o singură instituție sau firmă dintre cele pe care le avem poartă acest nume în județul sau localitatea proiectului.',
     companyName:
-      'Legat de noi: lista dă doar numele, iar o singură firmă din țară poartă acest nume; numele firmelor sunt unice în Registrul Comerțului.',
+      'Legat de noi: lista dă doar numele, iar o singură firmă dintre cele pe care le avem poartă acest nume. Numele firmelor sunt unice în Registrul Comerțului.',
     none: 'Lista dă doar numele, și nu l-am putut lega de o instituție sau firmă.',
   },
 

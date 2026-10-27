@@ -1552,7 +1552,7 @@ test('the EU funds page lists each programme from its own list, never added up',
 test('the EU projects are filtered by programme in the address', async ({
   page,
 }) => {
-  await page.goto(`${EU}?program=por`)
+  await page.goto(`${EU}?program=por-2014`)
   const main = page.getByRole('main')
   await expect(main.getByText('Un proiect')).toBeVisible()
   const row = main.getByRole('row', { name: /Modernizarea drumului comunal/ })

@@ -31,11 +31,20 @@ describe('beneficiaryTie', () => {
   })
 
   it('names the evidence of a tie made by us', () => {
-    for (const method of ['administration-name+place', 'name+place'] as const) {
-      expect(
-        beneficiaryTie(beneficiary({ entity, confidence: 'probable', method })),
-      ).toEqual({ level: 'probable', label: 'namePlace' })
-    }
+    expect(
+      beneficiaryTie(
+        beneficiary({
+          entity,
+          confidence: 'probable',
+          method: 'administration-name+place',
+        }),
+      ),
+    ).toEqual({ level: 'probable', label: 'administration' })
+    expect(
+      beneficiaryTie(
+        beneficiary({ entity, confidence: 'probable', method: 'name+place' }),
+      ),
+    ).toEqual({ level: 'probable', label: 'namePlace' })
     expect(
       beneficiaryTie(
         beneficiary({
@@ -56,14 +65,27 @@ describe('beneficiaryTie', () => {
 })
 
 describe('programmes in the address', () => {
-  const programmes = [{ code: 'POR' }, { code: 'PoIDS' }] as Array<EuProgramme>
+  const programmes = [
+    { code: 'POR', period: '2014-2020' },
+    { code: 'POAT', period: '2014-2020' },
+    { code: 'PoIDS', period: '2021-2027' },
+    { code: 'PoAT', period: '2021-2027' },
+  ] as Array<EuProgramme>
 
   it('are found back in any case', () => {
-    expect(programmeSlug('PoIDS')).toBe('poids')
-    expect(programmeBySlug(programmes, 'poids')?.code).toBe('PoIDS')
-    expect(programmeBySlug(programmes, 'POR')?.code).toBe('POR')
+    expect(programmeSlug(programmes[2])).toBe('poids-2021')
+    expect(programmeBySlug(programmes, 'poids-2021')?.code).toBe('PoIDS')
+    expect(programmeBySlug(programmes, 'POR-2014')?.code).toBe('POR')
+    expect(programmeBySlug(programmes, 'por')).toBeNull()
     expect(programmeBySlug(programmes, 'pnrr')).toBeNull()
     expect(programmeBySlug(programmes, undefined)).toBeNull()
+  })
+
+  it('tell apart two programmes whose codes differ only in case', () => {
+    const slugs = programmes.map(programmeSlug)
+    expect(new Set(slugs).size).toBe(programmes.length)
+    expect(programmeBySlug(programmes, 'poat-2014')?.period).toBe('2014-2020')
+    expect(programmeBySlug(programmes, 'poat-2021')?.code).toBe('PoAT')
   })
 })
 

@@ -52,8 +52,8 @@ export function validatePnrrSearch(
   }
 }
 
-// The EU funds page: /programe/fonduri-europene?program=por&stare=reziliat&q=drum.
-// `program` is a programme's code in lower case (see lib/eu.ts).
+// The EU funds page: /programe/fonduri-europene?program=por-2014&stare=reziliat&q=drum.
+// `program` is a programme's code in lower case and its period's first year (lib/eu.ts).
 export type EuStatusParam = 'in-implementare' | 'finalizat' | 'reziliat'
 
 export const EU_STATUS_PARAMS: Record<EuStatus, EuStatusParam> = {
@@ -87,7 +87,7 @@ export function validateEuSearch(search: Record<string, unknown>): EuSearch {
   return {
     program:
       typeof search.program === 'string' &&
-      /^[a-z]{2,10}$/i.test(search.program)
+      /^[a-z]{2,10}-\d{4}$/i.test(search.program)
         ? search.program.toLowerCase()
         : undefined,
     stare:

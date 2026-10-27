@@ -334,9 +334,13 @@ describe('validateProgrammeSearch', () => {
 describe('validateEuSearch', () => {
   it('keeps a programme, a status and words', () => {
     expect(
-      validateEuSearch({ program: 'PoIDS', stare: 'reziliat', q: ' drum ' }),
+      validateEuSearch({
+        program: 'PoIDS-2021',
+        stare: 'reziliat',
+        q: ' drum ',
+      }),
     ).toEqual({
-      program: 'poids',
+      program: 'poids-2021',
       stare: 'reziliat',
       q: 'drum',
       pagina: undefined,

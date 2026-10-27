@@ -21,7 +21,7 @@ import { PAGE_SIZE } from '#/lib/api'
 import { EU_STATUSES } from '#/lib/api-eu'
 import type { EuProgramme, EuProjectPage } from '#/lib/api-eu'
 import { pageCount } from '#/lib/contracts'
-import { programmeSlug } from '#/lib/eu'
+import { periodLabel, programmeSlug } from '#/lib/eu'
 import { EU_STATUS_PARAMS } from '#/lib/urls-programmes'
 import type { EuSearch, EuStatusParam } from '#/lib/urls-programmes'
 
@@ -68,9 +68,9 @@ export function EuProjectFinder({
               {programmes.map((programme) => (
                 <Select.Item
                   key={programme.code}
-                  value={programmeSlug(programme.code)}
+                  value={programmeSlug(programme)}
                 >
-                  {programme.code}
+                  {programme.code} {periodLabel(programme.period)}
                 </Select.Item>
               ))}
             </Select.Content>
