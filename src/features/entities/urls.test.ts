@@ -17,6 +17,15 @@ describe('validateEntitySearch', () => {
     })
   })
 
+  it('keeps a name two lists share for the list that reads it', () => {
+    // A number is a state of a direct purchase; a word, of an EU project or a PNRR
+    // contract. One list's undefined never erases another's value.
+    expect(validateEntitySearch({ stare: 7 }).stare).toBe(7)
+    expect(validateEntitySearch({ stare: 'finalizat' }).stare).toBe('finalizat')
+    expect(validateEntitySearch({ stare: 'sub-30' }).stare).toBe('sub-30')
+    expect(validateEntitySearch({ stare: 'nimic' }).stare).toBeUndefined()
+  })
+
   it('reads a page number written as text', () => {
     expect(validateEntitySearch({ pagina: '12' }).pagina).toBe(12)
   })

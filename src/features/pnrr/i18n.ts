@@ -64,6 +64,40 @@ export const pnrr = {
     finished: 'Finalizat',
   },
 
+  // A beneficiary's contracts in the list pattern (DataTable).
+  list: {
+    title: 'Contractele',
+    searchWhat: 'titlu',
+    filters: {
+      q: 'Căutare',
+      masura: 'Măsură',
+      stare: 'Stare',
+      valoare: 'Valoare',
+      progres: 'Progres fizic',
+    },
+    valuePresets: {
+      small: 'Sub 1.000.000 lei',
+      middle: '1.000.000–25.000.000 lei',
+      large: '25.000.000 lei sau mai mult',
+    },
+    progressBands: ['0–25 %', '25–50 %', '50–75 %', '75–99 %', '100 %'],
+    progressRange: (min: number, max: number) => `${min}–${max} %`,
+    contracts: (n: number, text: string) =>
+      counted(n, text, 'un contract', 'contracte'),
+    value: (value: string) => `valoare ${value}`,
+    of: (whole: string, edition: string) =>
+      `din ${whole} ale beneficiarului · ediția din ${edition} a datelor MIPE`,
+    differ: (n: number, text: string) =>
+      `${counted(n, text, 'unul', 'contracte')} cu măsuri în stări diferite`,
+    statusTitle: 'Stare',
+    statusUnit: 'contracte, aceleași filtre',
+    differPart: 'Diferă pe măsuri',
+    progressTitle: 'Progres fizic',
+    progressUnit: 'contracte, unde măsurile lor dau același progres',
+    total: (n: number, text: string) =>
+      `Total pentru filtrele alese · ${counted(n, text, 'un contract', 'contracte')}`,
+  },
+
   // A contract's page.
   contractTitle: (number: string) => `Contract ${number}`,
   contractEyebrow: (measures: string, ministry: string | null) =>

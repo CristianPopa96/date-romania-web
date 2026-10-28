@@ -24,7 +24,7 @@ import type { EntitySearch } from '#/features/entities/urls'
 import { pageCount } from '#/lib/list'
 import { statsQuery } from '#/lib/queries'
 import { budgetQuery } from '#/features/budget'
-import { entityPnrrContractsQuery } from '#/features/pnrr'
+import { pnrrListQuery, pnrrOverviewQuery } from '#/features/pnrr'
 
 export const entityQuery = (role: Role, cui: number) =>
   queryOptions({
@@ -50,7 +50,6 @@ export async function loadEntityPage(
   ])
   if (!page || !totals) return null
   const list = entityList(search, contractCount(totals) > 0, euLists(funds))
-  const pageNumber = search.pagina ?? 1
   if (list === 'contracte') {
     const won = contractsWon(totals, search)
     const [contracts] = await Promise.all([
@@ -80,7 +79,17 @@ export async function loadEntityPage(
   } else if (list === 'pnrr') {
     // Paid with no contract held: nothing to list.
     if (euCounts(funds).pnrr > 0) {
-      await client.ensureQueryData(entityPnrrContractsQuery(cui, pageNumber))
+      const [contracts] = await Promise.all([
+        client.ensureQueryData(pnrrListQuery(cui, search)),
+        client.ensureQueryData(pnrrOverviewQuery(cui, search)),
+      ])
+      return {
+        page,
+        last:
+          contracts === 'failed'
+            ? null
+            : pageCount(contracts.total, search.pe_pagina ?? 25),
+      }
     }
   } else {
     const [purchases] = await Promise.all([

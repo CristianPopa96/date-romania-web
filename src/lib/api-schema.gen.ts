@@ -674,6 +674,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/programmes/pnrr/contracts/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Pnrr Contracts Overview
+         * @description The contracts under the filters given, in figures: how many and their value, the
+         *     measures and statuses with their counts, and the contracts by value and progress.
+         */
+        get: operations["pnrr_contracts_overview_v1_programmes_pnrr_contracts_overview_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/programmes/pnrr/contracts": {
         parameters: {
             query?: never;
@@ -683,7 +704,8 @@ export interface paths {
         };
         /**
          * Contracts
-         * @description Financing contracts, the largest first. Natural persons' are counted, never listed.
+         * @description Financing contracts under the filters given, the largest first, or in any column's
+         *     order. Natural persons' are counted, never listed.
          */
         get: operations["contracts_v1_programmes_pnrr_contracts_get"];
         put?: never;
@@ -1992,6 +2014,16 @@ export interface components {
              */
             amount: number;
         };
+        /** MeasureOption */
+        MeasureOption: {
+            /**
+             * Value
+             * @description The measure's code, e.g. 'C10.I3'.
+             */
+            value: string;
+            /** Count */
+            count: number;
+        };
         /**
          * NearLimitPair
          * @description One buyer and one supplier with repeated accepted purchases just under a limit.
@@ -2321,6 +2353,45 @@ export interface components {
             edition: string;
             source: components["schemas"]["Source"];
         };
+        /**
+         * PnrrContractOverview
+         * @description The contracts under the filters chosen, in figures.
+         */
+        PnrrContractOverview: {
+            summary: components["schemas"]["PnrrContractSummary"];
+            /**
+             * Whole
+             * @description Contracts of the same beneficiary, with no other filter.
+             */
+            whole: number;
+            /**
+             * Measures
+             * @description Under every filter but the measure.
+             */
+            measures: components["schemas"]["MeasureOption"][];
+            /** Statuses */
+            statuses: components["schemas"]["PnrrStatusOption"][];
+            /**
+             * Measures Differ
+             * @description Contracts whose measures give different statuses: under no status.
+             */
+            measures_differ: number;
+            /**
+             * Bands
+             * @description Contracts by value in lei.
+             */
+            bands: components["schemas"]["Band"][];
+            /**
+             * Progress
+             * @description Contracts by physical progress, 0 to 1, where their measures agree on it; the last band is 1, finished.
+             */
+            progress: components["schemas"]["Band"][];
+            /**
+             * Without
+             * @description Only when no contract is found: what each filter given would leave out if it alone were removed, in the order of the parameters.
+             */
+            without: components["schemas"]["Without"][];
+        };
         /** PnrrContractPage */
         PnrrContractPage: {
             /** Total */
@@ -2370,6 +2441,24 @@ export interface components {
              * @description Its measures report different statuses or progress: see the contract.
              */
             measures_differ: boolean;
+        };
+        /** PnrrContractSummary */
+        PnrrContractSummary: {
+            /**
+             * Contracts
+             * @description Contracts listed: never a natural person's.
+             */
+            contracts: number;
+            /**
+             * Value
+             * @description Lei, every measure of each contract added up.
+             */
+            value: number | null;
+            /**
+             * Natural Persons
+             * @description Natural persons' contracts the filters also give: counted, never named.
+             */
+            natural_persons: number;
         };
         /**
          * PnrrLine
@@ -2594,6 +2683,19 @@ export interface components {
             title: string | null;
             /** Total */
             total: number | null;
+        };
+        /** PnrrStatusOption */
+        PnrrStatusOption: {
+            /**
+             * Value
+             * @enum {string}
+             */
+            value: "in_progress" | "under_30" | "finished";
+            /**
+             * Count
+             * @description Contracts whose measures all give this status.
+             */
+            count: number;
         };
         /** PnrrTopRecipient */
         PnrrTopRecipient: {
@@ -4735,20 +4837,82 @@ export interface operations {
             };
         };
     };
+    pnrr_contracts_overview_v1_programmes_pnrr_contracts_overview_get: {
+        parameters: {
+            query?: {
+                /** @description The beneficiary whose list this is: `whole` counts all of its. */
+                scope?: "beneficiary" | null;
+                /** @description Measure codes, e.g. 'C10.I3'; any of them. */
+                measure?: string[] | null;
+                /** @description As the dashboard writes it. */
+                county?: string | null;
+                /** @description Any of these statuses, as all of a contract's measures give it. */
+                status?: ("in_progress" | "under_30" | "finished")[] | null;
+                /** @description The beneficiary's CUI. */
+                beneficiary?: number | null;
+                /** @description Words of the title or beneficiary. */
+                q?: string | null;
+                /** @description Lei, included. */
+                value_min?: number | null;
+                /** @description Lei, excluded. */
+                value_max?: number | null;
+                /** @description Physical progress, 0 to 1, included. */
+                progress_min?: number | null;
+                /** @description Physical progress, 0 to 1, excluded. */
+                progress_max?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PnrrContractOverview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     contracts_v1_programmes_pnrr_contracts_get: {
         parameters: {
             query?: {
-                /** @description A measure code, e.g. 'C10.I3'. */
-                measure?: string | null;
-                /** @description As the dashboard writes it. */
-                county?: string | null;
-                status?: ("in_progress" | "under_30" | "finished") | null;
-                /** @description The beneficiary's CUI. */
-                beneficiary?: number | null;
-                /** @description Part of the title or beneficiary. */
-                q?: string | null;
+                /** @description The value, or the physical progress its measures agree on. */
+                sort?: "value" | "progress";
+                order?: "desc" | "asc";
                 limit?: number;
                 offset?: number;
+                /** @description Measure codes, e.g. 'C10.I3'; any of them. */
+                measure?: string[] | null;
+                /** @description As the dashboard writes it. */
+                county?: string | null;
+                /** @description Any of these statuses, as all of a contract's measures give it. */
+                status?: ("in_progress" | "under_30" | "finished")[] | null;
+                /** @description The beneficiary's CUI. */
+                beneficiary?: number | null;
+                /** @description Words of the title or beneficiary. */
+                q?: string | null;
+                /** @description Lei, included. */
+                value_min?: number | null;
+                /** @description Lei, excluded. */
+                value_max?: number | null;
+                /** @description Physical progress, 0 to 1, included. */
+                progress_min?: number | null;
+                /** @description Physical progress, 0 to 1, excluded. */
+                progress_max?: number | null;
             };
             header?: never;
             path?: never;

@@ -2,6 +2,8 @@ import { validateContractListSearch } from '#/features/contracts'
 import type { ContractListSearch } from '#/features/contracts'
 import { validateEuProjectListSearch } from '#/features/eu-projects'
 import type { EuProjectListSearch } from '#/features/eu-projects'
+import { validatePnrrListSearch } from '#/features/pnrr'
+import type { PnrrListSearch } from '#/features/pnrr'
 import { validatePurchaseListSearch } from '#/features/purchases'
 import type { PurchaseListSearch } from '#/features/purchases'
 import { pageFromParam } from '#/lib/urls'
@@ -24,7 +26,8 @@ export type EntityList = (typeof ENTITY_LISTS)[number]
 // change of tab clears them.
 export type EntitySearch = ContractListSearch &
   PurchaseListSearch &
-  EuProjectListSearch & {
+  EuProjectListSearch &
+  PnrrListSearch & {
     lista?: EntityList
     pagina?: number
   }
@@ -40,6 +43,7 @@ export function validateEntitySearch(
     ...defined(validateContractListSearch(search)),
     ...defined(validatePurchaseListSearch(search)),
     ...defined(validateEuProjectListSearch(search)),
+    ...defined(validatePnrrListSearch(search)),
   }
 }
 
