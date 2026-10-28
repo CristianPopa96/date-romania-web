@@ -38,6 +38,8 @@ export type RangeFilter = Base & {
 
 export type ChoiceFilter = Base & {
   kind: 'choice'
+  // One option at a time ("Câștigat: singur" or "în asociere"); choosing it again clears it.
+  single?: boolean
   value: Array<number>
   options: Array<ChoiceOption>
   patch: (values: Array<number>) => Patch

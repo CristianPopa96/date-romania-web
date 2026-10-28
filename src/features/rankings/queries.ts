@@ -2,7 +2,7 @@ import { queryOptions } from '@tanstack/react-query'
 
 import { getRanking, getContractRanking } from '#/features/rankings/api'
 import type { Role } from '#/lib/api'
-import { getContracts } from '#/features/contracts'
+import { getLargestContracts } from '#/features/contracts'
 import type { Won } from '#/features/rankings/api'
 import type { RankingFilter } from '#/features/rankings/urls'
 
@@ -15,7 +15,7 @@ export const rankingQuery = (role: Role, cpv?: string) =>
 export const largestContractsQuery = (filter: RankingFilter) =>
   queryOptions({
     queryKey: ['contracts', 'largest', filter],
-    queryFn: () => getContracts({ data: { page: 1, ...filter } }),
+    queryFn: () => getLargestContracts({ data: filter }),
   })
 
 export const contractRankingQuery = (

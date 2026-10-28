@@ -2,8 +2,9 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { Badge, Code, Container, Flex, Heading, Text } from '@radix-ui/themes'
 
 import {
-  EntityContractList,
+  ContractList,
   contractCount,
+  contractsWon,
   entityContractsQuery,
 } from '#/features/contracts'
 import {
@@ -121,11 +122,12 @@ export function EntityView({
           onChange={(value) => onSearch(entityListSearch(value, held > 0))}
         >
           {list === 'contracte' ? (
-            <EntityContractList
+            <ContractList
               role={role}
               cui={cui}
-              page={page}
-              onPage={onPage}
+              search={search}
+              won={contractsWon(contracts, search)}
+              onSearch={onSearch}
             />
           ) : list === 'coeziune' && funds && funds !== 'failed' ? (
             <EntityCohesion

@@ -192,9 +192,14 @@ function ChoicePanel({ filter, onDraft }: PanelProps<ChoiceFilter>) {
     .sort((a, b) => Number(b.count > 0) - Number(a.count > 0))
     .filter((option) => !find || plain(option.label).includes(plain(find)))
   const toggle = (value: number) => {
-    const next = draft.includes(value)
-      ? draft.filter((each) => each !== value)
-      : [...draft, value]
+    const chosen = draft.includes(value)
+    const next = filter.single
+      ? chosen
+        ? []
+        : [value]
+      : chosen
+        ? draft.filter((each) => each !== value)
+        : [...draft, value]
     setDraft(next)
     onDraft(filter.patch(next))
   }

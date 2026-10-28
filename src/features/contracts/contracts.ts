@@ -1,6 +1,8 @@
 // Reading a notice and its contracts: the small decisions the pages share, kept out of
 // the components so they can be tested.
 import type { Source } from '#/lib/api'
+import { wonOf } from '#/features/contracts/list'
+import type { ContractListSearch, Won } from '#/features/contracts/list'
 import type {
   Contract,
   EntityContracts,
@@ -61,6 +63,17 @@ export function financing(notice: Notice) {
   if (notice.detail === null) return 'notCollected' as const
   const parts = [...notice.detail.financing_types, ...notice.detail.eu_funds]
   return parts.length > 0 ? parts : ('notPublished' as const)
+}
+
+// How a company's list of contracts was won, from its address and its totals; a buyer's
+// list holds both (undefined).
+export function contractsWon(
+  totals: EntityContracts,
+  search: ContractListSearch,
+): Won | undefined {
+  return totals.role === 'suppliers'
+    ? wonOf(search, totals.alone.contracts)
+    : undefined
 }
 
 // How many contracts of the period name this entity. Counts may be added (a contract is

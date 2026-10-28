@@ -356,6 +356,70 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/award-contracts/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Award Contracts Overview
+         * @description The contracts of the list under the filters given, in figures: the summary, the value
+         *     per month (or per day), the largest parties, the options of each choice filter and the
+         *     contracts by value band.
+         */
+        get: operations["award_contracts_overview_v1_award_contracts_overview_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/award-contracts/parties": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Award Contract Parties
+         * @description The parties on one side of the contracts the other filters give, most contracts
+         *     first: the options of a typeahead filter. A member of an association is one of them.
+         */
+        get: operations["award_contract_parties_v1_award_contracts_parties_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/award-contracts/cpv-codes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Award Contract Cpv Codes
+         * @description The CPV codes of the notices of the contracts the other filters give, most contracts
+         *     first: the options of the CPV filter.
+         */
+        get: operations["award_contract_cpv_codes_v1_award_contracts_cpv_codes_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/award-notices/{notice_id}": {
         parameters: {
             query?: never;
@@ -405,7 +469,7 @@ export interface paths {
         };
         /**
          * Award Contracts
-         * @description Contracts signed in the period we hold, newest or largest first.
+         * @description Contracts signed in the period we hold, under the filters given, in any column's order.
          *
          *     Framework agreements are left out: their value is a ceiling, and what is committed
          *     under them are their subsequent contracts, which are listed. The list is not complete:
@@ -1053,6 +1117,73 @@ export interface components {
             winners: components["schemas"]["Winner"][];
             source: components["schemas"]["Source"];
         };
+        /**
+         * ContractOverview
+         * @description The contracts of an institution or a company under the filters chosen, in figures.
+         *
+         *     The list holds only what totals may count: contracts signed in the period held, of a
+         *     counted kind (never a framework agreement), in a notice still in force. It is never
+         *     complete: SEAP publishes many contracts weeks after they are signed.
+         */
+        ContractOverview: {
+            summary: components["schemas"]["ContractSummary"];
+            /**
+             * Whole
+             * @description Contracts of the same institution, or of the same company won the same way, with no other filter.
+             */
+            whole: number;
+            period: components["schemas"]["Period"];
+            /**
+             * Step
+             * @description Months, or days when the contracts found span under two months.
+             * @enum {string}
+             */
+            step: "month" | "day";
+            /**
+             * Points
+             * @description Contracts signed, and their value, per step.
+             */
+            points: components["schemas"]["Point"][];
+            /**
+             * Party
+             * @description The side `parties` lists: the other side of the buyer or supplier asked.
+             * @enum {string}
+             */
+            party: "supplier" | "buyer";
+            /**
+             * Parties
+             * @description The largest by value, at most five. Winners are ranked by the contracts they won alone: a contract won by an association is never given to one member.
+             */
+            parties: components["schemas"]["ContractParty"][];
+            others: components["schemas"]["Others"];
+            /** @description For the winners of a buyer's contracts: those won by associations, kept out of `parties` and `others`. Null for the buyers of a company's contracts. */
+            associations: components["schemas"]["ContractTotals"] | null;
+            /**
+             * Won
+             * @description Contracts won alone, and by associations.
+             */
+            won: components["schemas"]["WonOption"][];
+            /**
+             * Kinds
+             * @description 1 ordinary contracts, 3 subsequent contracts.
+             */
+            kinds: components["schemas"]["Option"][];
+            /**
+             * Eu Funded
+             * @description 1: notices with a lot paid from EU funds; 0: notices that say no lot is. Notices that do not say are in neither.
+             */
+            eu_funded: components["schemas"]["Option"][];
+            /**
+             * Bands
+             * @description Contracts by value in lei.
+             */
+            bands: components["schemas"]["Band"][];
+            /**
+             * Without
+             * @description Only when no contract is found: what each filter given would leave out if it alone were removed, in the order of the parameters.
+             */
+            without: components["schemas"]["Without"][];
+        };
         /** ContractPage */
         ContractPage: {
             /** Total */
@@ -1061,6 +1192,22 @@ export interface components {
             period: components["schemas"]["Period"] | null;
             /** Items */
             items: components["schemas"]["Contract"][];
+        };
+        /** ContractParty */
+        ContractParty: {
+            /** Cui */
+            cui: number;
+            /** Name */
+            name: string;
+            /**
+             * Kind
+             * @description authority, company or other
+             */
+            kind: string;
+            /** Contracts */
+            contracts: number;
+            /** Value */
+            value: number;
         };
         /** ContractRanking */
         ContractRanking: {
@@ -1091,6 +1238,28 @@ export interface components {
             contracts: number;
             /** Value */
             value: number;
+        };
+        /** ContractSummary */
+        ContractSummary: {
+            /** Contracts */
+            contracts: number;
+            /**
+             * Value
+             * @description Lei without VAT; a contract with no value adds nothing.
+             */
+            value: number;
+            /**
+             * Without Value
+             * @description Contracts SEAP gives no value in lei for.
+             */
+            without_value: number;
+            /**
+             * First Day
+             * @description The first day a contract found was signed.
+             */
+            first_day: string | null;
+            /** Last Day */
+            last_day: string | null;
         };
         /** ContractTotals */
         ContractTotals: {
@@ -1179,16 +1348,16 @@ export interface components {
              */
             name: string | null;
         };
-        /** CpvOption */
+        /**
+         * CpvOption
+         * @description A CPV code of a typeahead filter, with its rows under the other filters.
+         */
         CpvOption: {
             /** Code */
             code: string;
             /** Name */
             name: string | null;
-            /**
-             * Count
-             * @description Purchases under the other filters.
-             */
+            /** Count */
             count: number;
         };
         /**
@@ -1925,7 +2094,10 @@ export interface components {
             /** Value */
             value: number;
         };
-        /** PartyOption */
+        /**
+         * PartyOption
+         * @description An institution or company of a typeahead filter, with its rows under the other filters.
+         */
         PartyOption: {
             /** Cui */
             cui: number;
@@ -1936,10 +2108,7 @@ export interface components {
              * @description authority, company or other
              */
             kind: string;
-            /**
-             * Count
-             * @description Purchases under the other filters.
-             */
+            /** Count */
             count: number;
         };
         /**
@@ -3281,6 +3450,16 @@ export interface components {
             /** Count */
             count: number;
         };
+        /** WonOption */
+        WonOption: {
+            /**
+             * Value
+             * @enum {string}
+             */
+            value: "alone" | "association";
+            /** Count */
+            count: number;
+        };
     };
     responses: never;
     parameters: never;
@@ -3890,6 +4069,170 @@ export interface operations {
             };
         };
     };
+    award_contracts_overview_v1_award_contracts_overview_get: {
+        parameters: {
+            query?: {
+                /** @description The party whose list this is: the figures say what part of it the filters keep, and the chart of parties names the other side. */
+                scope?: ("buyer" | "supplier") | null;
+                /** @description CUI of the buying institution. */
+                buyer?: number | null;
+                /** @description CUI of a winner. */
+                supplier?: number | null;
+                /** @description Words of the contract's or notice's title, its numbers, or a party. */
+                q?: string | null;
+                /** @description By one company, or by an association of several. */
+                won?: ("alone" | "association") | null;
+                /** @description 1 ordinary, 3 subsequent; any of them. */
+                kind?: number[] | null;
+                /** @description true: notices with a lot paid from EU funds; false: notices that say no lot is. A notice whose form does not say is only in the list without it. */
+                eu_funded?: boolean | null;
+                /** @description Lei, included. */
+                value_min?: number | null;
+                /** @description Lei, excluded. */
+                value_max?: number | null;
+                /** @description Start of a CPV code: 45 for the division of works, 4523 for a narrower class. */
+                cpv?: string | null;
+                /** @description A day in Romanian time, YYYY-MM-DD. */
+                date_from?: string | null;
+                /** @description A day in Romanian time, YYYY-MM-DD. */
+                date_to?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContractOverview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    award_contract_parties_v1_award_contracts_parties_get: {
+        parameters: {
+            query: {
+                /** @description The side to list. */
+                side: "buyer" | "supplier";
+                /** @description Words of the name, or the CUI. */
+                find?: string | null;
+                /** @description CUI of the buying institution. */
+                buyer?: number | null;
+                /** @description CUI of a winner. */
+                supplier?: number | null;
+                /** @description Words of the contract's or notice's title, its numbers, or a party. */
+                q?: string | null;
+                /** @description By one company, or by an association of several. */
+                won?: ("alone" | "association") | null;
+                /** @description 1 ordinary, 3 subsequent; any of them. */
+                kind?: number[] | null;
+                /** @description true: notices with a lot paid from EU funds; false: notices that say no lot is. A notice whose form does not say is only in the list without it. */
+                eu_funded?: boolean | null;
+                /** @description Lei, included. */
+                value_min?: number | null;
+                /** @description Lei, excluded. */
+                value_max?: number | null;
+                /** @description Start of a CPV code: 45 for the division of works, 4523 for a narrower class. */
+                cpv?: string | null;
+                /** @description A day in Romanian time, YYYY-MM-DD. */
+                date_from?: string | null;
+                /** @description A day in Romanian time, YYYY-MM-DD. */
+                date_to?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartyOption"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    award_contract_cpv_codes_v1_award_contracts_cpv_codes_get: {
+        parameters: {
+            query?: {
+                /** @description The start of a code, or words of its name. */
+                find?: string | null;
+                /** @description CUI of the buying institution. */
+                buyer?: number | null;
+                /** @description CUI of a winner. */
+                supplier?: number | null;
+                /** @description Words of the contract's or notice's title, its numbers, or a party. */
+                q?: string | null;
+                /** @description By one company, or by an association of several. */
+                won?: ("alone" | "association") | null;
+                /** @description 1 ordinary, 3 subsequent; any of them. */
+                kind?: number[] | null;
+                /** @description true: notices with a lot paid from EU funds; false: notices that say no lot is. A notice whose form does not say is only in the list without it. */
+                eu_funded?: boolean | null;
+                /** @description Lei, included. */
+                value_min?: number | null;
+                /** @description Lei, excluded. */
+                value_max?: number | null;
+                /** @description Start of a CPV code: 45 for the division of works, 4523 for a narrower class. */
+                cpv?: string | null;
+                /** @description A day in Romanian time, YYYY-MM-DD. */
+                date_from?: string | null;
+                /** @description A day in Romanian time, YYYY-MM-DD. */
+                date_to?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CpvOption"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     award_notice_v1_award_notices__notice_id__get: {
         parameters: {
             query?: never;
@@ -3958,21 +4301,35 @@ export interface operations {
     award_contracts_v1_award_contracts_get: {
         parameters: {
             query?: {
-                /** @description CUI of the buying institution. */
-                buyer?: number | null;
-                /** @description CUI of a winner. */
-                supplier?: number | null;
-                /** @description By one company, or by an association of several. */
-                won?: ("alone" | "association") | null;
-                /** @description Start of a CPV code: 45 for the division of works, 4523 for a narrower class. */
-                cpv?: string | null;
-                /** @description true: notices with a lot paid from EU funds; false: notices that say no lot is. A notice whose form does not ask, or not read in detail, is only in the list without this filter. */
-                eu_funded?: boolean | null;
-                sort?: "newest" | "value";
+                /** @description The day signed, the value in lei, the first winner's or the buyer's name; `newest` is the day, as before. */
+                sort?: "date" | "value" | "supplier" | "buyer" | "newest";
+                order?: "desc" | "asc";
                 limit?: number;
                 offset?: number;
                 /** @description csv gives the whole list as a file. */
                 format?: "json" | "csv";
+                /** @description CUI of the buying institution. */
+                buyer?: number | null;
+                /** @description CUI of a winner. */
+                supplier?: number | null;
+                /** @description Words of the contract's or notice's title, its numbers, or a party. */
+                q?: string | null;
+                /** @description By one company, or by an association of several. */
+                won?: ("alone" | "association") | null;
+                /** @description 1 ordinary, 3 subsequent; any of them. */
+                kind?: number[] | null;
+                /** @description true: notices with a lot paid from EU funds; false: notices that say no lot is. A notice whose form does not say is only in the list without it. */
+                eu_funded?: boolean | null;
+                /** @description Lei, included. */
+                value_min?: number | null;
+                /** @description Lei, excluded. */
+                value_max?: number | null;
+                /** @description Start of a CPV code: 45 for the division of works, 4523 for a narrower class. */
+                cpv?: string | null;
+                /** @description A day in Romanian time, YYYY-MM-DD. */
+                date_from?: string | null;
+                /** @description A day in Romanian time, YYYY-MM-DD. */
+                date_to?: string | null;
             };
             header?: never;
             path?: never;
