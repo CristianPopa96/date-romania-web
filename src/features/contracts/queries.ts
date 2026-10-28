@@ -46,9 +46,10 @@ export const contractListQuery = (
     size: search.pe_pagina ?? 25,
     page: search.pagina ?? 1,
   }
+  // 'failed' when the API did not answer: the page stays, with a note in the tab.
   return queryOptions({
     queryKey: ['contracts', 'list', data],
-    queryFn: () => getContractList({ data }),
+    queryFn: () => getContractList({ data }).catch(() => 'failed' as const),
   })
 }
 
@@ -64,6 +65,6 @@ export const contractOverviewQuery = (
   }
   return queryOptions({
     queryKey: ['contracts', 'overview', data],
-    queryFn: () => getContractOverview({ data }),
+    queryFn: () => getContractOverview({ data }).catch(() => 'failed' as const),
   })
 }

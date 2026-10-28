@@ -5,7 +5,7 @@ import type { Patch } from '#/components/list/filter-types'
 import { RankBars } from '#/components/list/RankBars'
 import { TimeBars } from '#/components/list/TimeBars'
 import type { ContractOverview } from '#/features/contracts/api-list'
-import type { ContractListSearch } from '#/features/contracts/list'
+import type { ContractListSearch, Won } from '#/features/contracts/list'
 import { useI18n } from '#/i18n/context'
 import type { Role } from '#/lib/api'
 import { fillSteps, isOpen, monthOf } from '#/lib/list'
@@ -17,11 +17,13 @@ import { fillSteps, isOpen, monthOf } from '#/lib/list'
 // member.
 export function ContractCharts({
   role,
+  won,
   search,
   overview,
   onApply,
 }: {
   role: Role
+  won: Won | undefined
   search: ContractListSearch
   overview: ContractOverview
   onApply: (patch: Patch) => void
@@ -89,7 +91,11 @@ export function ContractCharts({
     <Flex gap="3" wrap="wrap" align="stretch">
       <ChartCard
         title={t.contractList.timeTitle[step]}
-        unit={t.contractList.timeUnit}
+        unit={
+          won === 'association'
+            ? t.contractList.wholeUnit
+            : t.contractList.timeUnit
+        }
         hint={t.list.chart.clickHint}
         note={
           open
@@ -119,7 +125,11 @@ export function ContractCharts({
       {rows.length ? (
         <ChartCard
           title={t.contractList.partiesTitle[overview.party]}
-          unit={t.contractList.partiesUnit[overview.party]}
+          unit={
+            won === 'association'
+              ? t.contractList.wholeUnit
+              : t.contractList.partiesUnit[overview.party]
+          }
           hint={t.list.chart.clickHint}
           rows={rows.map((row) => [row.label, f.lei(row.value)])}
         >

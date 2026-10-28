@@ -428,14 +428,9 @@ export const ro = {
   contracts: {
     count: (n: number, text: string) =>
       counted(n, text, 'un contract', 'contracte'),
-    object: 'Obiect',
     contract: 'Contract',
-    supplier: 'Furnizor',
     buyer: 'Cumpărător',
     winner: 'Câștigător',
-    procedure: 'Procedură',
-    won: 'Câștigat',
-    alone: 'singur',
     value: 'Valoare fără TVA',
     date: 'Data semnării',
     rank: 'Loc',
