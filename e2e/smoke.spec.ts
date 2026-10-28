@@ -371,7 +371,7 @@ test('a column header sorts the whole list, both ways, then back', async ({
   const value = main.getByRole('columnheader', { name: 'Valoare' })
 
   await value.getByRole('button').click()
-  await expect(page).toHaveURL(/lista=achizitii&ordine=valoare$/)
+  await expect(page).toHaveURL(/lista=achizitii&ordine=valoare-desc$/)
   await expect(value).toHaveAttribute('aria-sort', 'descending')
   await expect(purchaseRows(main).first()).toContainText('Purchase 4')
 
@@ -400,10 +400,29 @@ test('a filter in the address is a chip, and the list adds up what it keeps', as
     .getByRole('row')
     .filter({ hasText: 'Total pentru filtrele alese' })
   await expect(total).toContainText('3 achiziții')
-  await expect(total).toContainText('3.500 lei')
+  await expect(total).toContainText('3.500 lei fără TVA')
 
   await main.getByRole('button', { name: 'Scoate filtrul «Stare»' }).click()
   await expect(page).toHaveURL(/\/institutii\/4981310\?lista=achizitii$/)
+})
+
+test('an old link and a page past the end land on a list that exists', async ({
+  page,
+}) => {
+  // "Cele mai mari acceptate", before the columns sorted: largest first, accepted only.
+  await page.goto('/institutii/4981310?lista=achizitii&ordine=valoare')
+  const main = page.getByRole('main')
+  await expect(page).toHaveURL(/\?lista=achizitii&ordine=valoare-desc&stare=7$/)
+  await expect(main.getByText('Stare: acceptate')).toBeVisible()
+  // The list is in the page outline.
+  await expect(
+    main.getByRole('heading', { level: 2, name: 'Achiziții directe' }),
+  ).toBeVisible()
+
+  // Page 9 of a one-page list goes to its only page.
+  await page.goto('/institutii/4981310?lista=achizitii&pagina=9')
+  await expect(page).toHaveURL(/\/institutii\/4981310\?lista=achizitii$/)
+  await expect(purchaseRows(main).first()).toBeVisible()
 })
 
 test('a list emptied by its filters names the one to remove', async ({

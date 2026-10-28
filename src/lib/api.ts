@@ -34,12 +34,15 @@ export async function getJson<T>(path: string, params: Params = {}) {
   return (await response.json()) as T
 }
 
-// A file the API writes (a CSV export), passed on byte for byte. Reading it as text
-// would drop the mark at its start that makes spreadsheet programs read the diacritics.
+// A file the API writes (a CSV export), passed on byte for byte as it arrives, so a long
+// one is never held whole here either. Reading it as text would drop the mark at its
+// start that makes spreadsheet programs read the diacritics.
 export async function getFile(path: string, params: Params = {}) {
   const response = await fetch(apiUrl(path, params))
-  if (!response.ok) throw new Error(`API ${response.status} for ${path}`)
-  return response.arrayBuffer()
+  if (!response.ok || !response.body) {
+    throw new Error(`API ${response.status} for ${path}`)
+  }
+  return response.body
 }
 
 // The one thing the site sends to the API: a reader's error report. Returns the status.

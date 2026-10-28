@@ -83,12 +83,21 @@ function SearchField({
 }) {
   const { t } = useI18n()
   const [text, setText] = useState(q ?? '')
+  // The search last sent. Its own echo in the address is not a change: the reader may have
+  // typed on while the list reloaded, and that text stays.
+  const sent = useRef(q)
   // A search changed elsewhere (a filter cleared, Back) shows here too.
-  useEffect(() => setText(q ?? ''), [q])
+  useEffect(() => {
+    if (q === sent.current) return
+    sent.current = q
+    setText(q ?? '')
+  }, [q])
   const send = useRef(() => {})
   send.current = () => {
     const next = text.trim() || undefined
-    if (next !== q) onSearch(next)
+    if (next === q) return
+    sent.current = next
+    onSearch(next)
   }
   // The list follows the words typed once the reader pauses.
   useEffect(() => {

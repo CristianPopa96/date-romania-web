@@ -2,6 +2,7 @@
 // what its address holds, and what it asks the API for. The address is Romanian, the API's
 // parameters English: /institutii/4305857?lista=achizitii&stare=7&valoare_min=50000.
 
+import { ACCEPTED } from '#/lib/api'
 import type { Role } from '#/lib/api'
 import { searchParam } from '#/lib/urls'
 import {
@@ -62,11 +63,14 @@ export function validatePurchaseListSearch(
   const stare = choiceFromParam(search.stare)
   const tip = choiceFromParam(search.tip)
   const sort = sortFromParam(search.ordine, PURCHASE_COLUMNS)
+  // "Cele mai mari acceptate", the switch this list had before its columns sorted, wrote
+  // ?ordine=valoare: such a link keeps showing the largest accepted purchases.
+  const legacy = search.ordine === 'valoare' && stare === undefined
   return {
     q: q ? searchParam(q) : undefined,
     de_la: dayFromParam(search.de_la),
     pana_la: dayFromParam(search.pana_la),
-    stare: stare && choiceToParam(stare),
+    stare: legacy ? ACCEPTED : stare && choiceToParam(stare),
     tip: tip && choiceToParam(tip),
     valoare_min: numberFromParam(search.valoare_min),
     valoare_max: numberFromParam(search.valoare_max),

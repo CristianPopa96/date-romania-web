@@ -70,6 +70,7 @@ export function PurchaseList<TSearch extends Search>({
 
   return (
     <ListView
+      title={t.entity.tabPurchases}
       search={{
         q,
         what: t.purchaseList.searchWhat[role],
@@ -135,17 +136,7 @@ export function PurchaseList<TSearch extends Search>({
           q={q}
           sort={sort}
           onSort={onSort}
-          total={
-            acceptedOnly
-              ? {
-                  label: t.purchaseList.total(
-                    found.accepted,
-                    f.count(found.accepted),
-                  ),
-                  value: f.lei(found.value),
-                }
-              : null
-          }
+          total={acceptedOnly ? totalRow(overview, t, f) : null}
         />
       }
       empty={
@@ -184,6 +175,21 @@ export function PurchaseList<TSearch extends Search>({
       }}
     />
   )
+}
+
+// The row under the table: the purchases the sum counts (accepted, at or under their
+// limit) and the sum, so the rows above it add up to it.
+function totalRow(overview: PurchaseOverview, t: Messages, f: Format) {
+  const found = overview.summary
+  const counted = found.accepted - found.above_limit
+  return {
+    label: t.purchaseList.total(
+      counted,
+      f.count(counted),
+      found.above_limit > 0,
+    ),
+    value: t.purchaseList.value(f.lei(found.value)),
+  }
 }
 
 // "46 achiziții acceptate · 2,94 mil. lei fără TVA", and under it which part of the whole

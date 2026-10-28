@@ -23,7 +23,8 @@ export function nextSort(
   return null
 }
 
-// The sort in an address: "valoare" (the column's first direction) or "valoare-cresc".
+// The sort in an address: "valoare-desc" or "valoare-cresc". A column alone ("valoare")
+// reads as its first direction, for addresses written before the direction was named.
 export function sortFromParam(
   value: unknown,
   columns: SortColumns,
@@ -42,10 +43,7 @@ export function sortToParam(
   sort: Sort | null,
   columns: SortColumns,
 ): string | undefined {
-  if (!sort) return undefined
-  const text = sort.column in columns && columns[sort.column].text
-  const first: SortDir = text ? 'asc' : 'desc'
-  if (sort.dir === first) return sort.column
+  if (!sort || !(sort.column in columns)) return undefined
   return `${sort.column}-${sort.dir === 'asc' ? 'cresc' : 'desc'}`
 }
 
@@ -85,8 +83,13 @@ export function pageRange(page: number, size: number, total: number) {
 // A day as an address keeps it.
 export const DAY = /^\d{4}-\d{2}-\d{2}$/
 
+// A real day only: 2026-02-31 has the shape and is dropped, as the API would refuse it.
 export function dayFromParam(value: unknown): string | undefined {
-  return typeof value === 'string' && DAY.test(value) ? value : undefined
+  if (typeof value !== 'string' || !DAY.test(value)) return undefined
+  const day = new Date(`${value}T00:00:00Z`)
+  return !Number.isNaN(day.getTime()) && day.toISOString().startsWith(value)
+    ? value
+    : undefined
 }
 
 // A whole number of at most `digits` digits, from an address (which may give it as a
@@ -326,4 +329,14 @@ export function fileParams(
     if (value !== undefined) out[key] = String(value)
   }
   return out
+}
+
+// An amount typed in lei, whole lei only: "1.500" and "1 500" are 1500, and the decimals
+// after a comma ("1500,50") or after a point with one or two digits ("1500.50") are
+// dropped, never read as more digits. Anything else is no amount.
+export function amountFromText(text: string): number | undefined {
+  let whole = text.trim().split(',')[0]
+  whole = whole.replace(/\.\d{1,2}$/, '')
+  whole = whole.replace(/[.\s]/g, '')
+  return /^\d{1,12}$/.test(whole) ? Number(whole) : undefined
 }

@@ -10,7 +10,7 @@ import type {
 } from '#/components/list/filter-types'
 import { LookupPanel } from '#/components/list/LookupPanel'
 import { useI18n } from '#/i18n/context'
-import { periodPresets, plain } from '#/lib/list'
+import { amountFromText, periodPresets, plain } from '#/lib/list'
 import type { Period } from '#/lib/list'
 
 // The panel of one filter, by its kind (FilterBar in the design system). A change made in
@@ -116,10 +116,7 @@ function RangePanel({ filter, onDraft, onPick }: PanelProps<RangeFilter>) {
     setDraft(next)
     onDraft(filter.patch(next))
   }
-  const amount = (text: string) =>
-    /^\d+$/.test(text.replace(/\D/g, '')) && text.trim()
-      ? Number(text.replace(/\D/g, ''))
-      : undefined
+  const amount = (text: string) => amountFromText(text)
   return (
     <Flex direction="column" gap="3">
       <Flex align="end" gap="1" style={{ height: 48 }}>

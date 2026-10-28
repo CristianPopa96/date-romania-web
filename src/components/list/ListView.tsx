@@ -1,7 +1,14 @@
 import type { ReactNode } from 'react'
 import { useRouterState } from '@tanstack/react-router'
 import { DownloadIcon } from '@radix-ui/react-icons'
-import { Box, Button, Flex, SegmentedControl, Text } from '@radix-ui/themes'
+import {
+  Box,
+  Button,
+  Flex,
+  Heading,
+  SegmentedControl,
+  Text,
+} from '@radix-ui/themes'
 
 import { FilterBar } from '#/components/list/FilterBar'
 import type { FilterDecl, Patch } from '#/components/list/filter-types'
@@ -16,6 +23,7 @@ import type { PageSize, Sort } from '#/lib/list'
 // each part; the frame lays them out the same way everywhere. Everything chosen lives in
 // the address: the list turns each change into a new address.
 export function ListView({
+  title,
   search,
   summary,
   views,
@@ -26,6 +34,8 @@ export function ListView({
   empty,
   pager,
 }: {
+  // The list's heading (h2), for the page outline.
+  title: string
   search: {
     q: string | undefined
     // What the field searches in: "obiect, furnizor, cod DA".
@@ -64,6 +74,9 @@ export function ListView({
 
   return (
     <Flex direction="column" gap="4">
+      <Heading as="h2" size="4">
+        {title}
+      </Heading>
       <FilterBar
         q={search.q}
         searchWhat={search.what}

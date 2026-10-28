@@ -8,10 +8,12 @@ import {
 
 describe('validateEntitySearch', () => {
   it('keeps a page number and the value order', () => {
-    expect(validateEntitySearch({ pagina: 3, ordine: 'valoare' })).toEqual({
+    expect(
+      validateEntitySearch({ pagina: 3, ordine: 'valoare-cresc' }),
+    ).toEqual({
       lista: undefined,
       pagina: 3,
-      ordine: 'valoare',
+      ordine: 'valoare-cresc',
     })
   })
 

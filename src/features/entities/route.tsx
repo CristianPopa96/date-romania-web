@@ -1,5 +1,5 @@
 import type { QueryClient } from '@tanstack/react-query'
-import { getRouteApi, notFound } from '@tanstack/react-router'
+import { getRouteApi, notFound, redirect } from '@tanstack/react-router'
 
 import { EntityView } from '#/features/entities/EntityView'
 import { messagesFor } from '#/i18n'
@@ -55,9 +55,17 @@ export function entityRoute(role: Role) {
     }) => {
       const cui = cuiFromPath(params.cui)
       if (cui === null) throw notFound()
-      const page = await loadEntityPage(context.queryClient, role, cui, deps)
-      if (!page) throw notFound()
-      return { name: page.entity.name }
+      const found = await loadEntityPage(context.queryClient, role, cui, deps)
+      if (!found) throw notFound()
+      // A page past the end of the list goes to the last one that has rows.
+      if (found.last !== null && (deps.pagina ?? 1) > found.last) {
+        throw redirect({
+          to: PATHS[role],
+          params,
+          search: { ...deps, pagina: found.last > 1 ? found.last : undefined },
+        })
+      }
+      return { name: found.page.entity.name }
     },
     head: ({
       loaderData,

@@ -17,6 +17,7 @@ import {
 import { purchaseListQuery, purchaseOverviewQuery } from '#/features/purchases'
 import { entityList } from '#/features/entities/urls'
 import type { EntitySearch } from '#/features/entities/urls'
+import { pageCount } from '#/lib/list'
 import { statsQuery } from '#/lib/queries'
 import { budgetQuery } from '#/features/budget'
 import { entityPnrrContractsQuery } from '#/features/pnrr'
@@ -28,7 +29,8 @@ export const entityQuery = (role: Role, cui: number) =>
   })
 
 // Everything the page of an institution or a supplier reads, for the list its address
-// asks for. Null when the API knows no entity with this CUI.
+// asks for, and the last page of that list when it pages with the list pattern (the
+// route sends a page past it to it). Null when the API knows no entity with this CUI.
 export async function loadEntityPage(
   client: QueryClient,
   role: Role,
@@ -55,10 +57,14 @@ export async function loadEntityPage(
       await client.ensureQueryData(entityPnrrContractsQuery(cui, pageNumber))
     }
   } else {
-    await Promise.all([
+    const [purchases] = await Promise.all([
       client.ensureQueryData(purchaseListQuery(role, cui, search)),
       client.ensureQueryData(purchaseOverviewQuery(role, cui, search)),
     ])
+    return {
+      page,
+      last: pageCount(purchases.total, search.pe_pagina ?? 25),
+    }
   }
-  return page
+  return { page, last: null }
 }

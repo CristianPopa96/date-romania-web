@@ -50,13 +50,17 @@ export const purchaseList = {
   of: (whole: string, days: string | null) =>
     `din ${whole} achiziții directe${days ? ` · ${days}` : ''}`,
   noDays: 'achiziții finalizate în zilele preluate',
-  total: (n: number, text: string) =>
-    `Total pentru filtrele alese · ${counted(n, text, 'o achiziție', 'achiziții')}`,
+  // The rows the sum counts: accepted, at or under their limit. `apart` when some accepted
+  // ones are above it and left out, as the line above the table says.
+  total: (n: number, text: string, apart: boolean) =>
+    `Total pentru filtrele alese · ${counted(n, text, 'o achiziție', 'achiziții')}${
+      apart ? ' în limita plafonului' : ''
+    }`,
   timeTitle: {
     month: 'Valoare pe luni',
     day: 'Valoare pe zile',
   },
-  timeUnit: 'lei fără TVA, achiziții acceptate',
+  timeUnit: 'lei fără TVA, achiziții acceptate în limita plafonului',
   partiesTitle: {
     supplier: 'Cei mai mari furnizori',
     buyer: 'Cele mai mari instituții',

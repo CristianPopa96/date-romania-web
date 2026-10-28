@@ -10,9 +10,11 @@ describe('getFile', () => {
     const fetched = vi.fn(async (_url: URL) => new Response(sent))
     vi.stubGlobal('fetch', fetched)
 
-    const file = new Uint8Array(
-      await getFile('/v1/award-contracts', { format: 'csv', buyer: undefined }),
-    )
+    const stream = await getFile('/v1/award-contracts', {
+      format: 'csv',
+      buyer: undefined,
+    })
+    const file = new Uint8Array(await new Response(stream).arrayBuffer())
 
     expect([...file.slice(0, 3)]).toEqual([0xef, 0xbb, 0xbf])
     expect(file).toEqual(sent)

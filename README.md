@@ -159,14 +159,15 @@ keyed hash for its rate limit.
 | `__root.tsx`                                   | The shell: theme, top bar, footer                                             |
 
 Paging, sorting, tabs and filters are typed search parameters, parsed in each feature's
-`urls.ts` (`?lista=achizitii&pagina=2&ordine=valoare`), so a shared address
+`urls.ts` (`?lista=achizitii&pagina=2&ordine=valoare-desc`), so a shared address
 always means the same view. An entity page's `lista` is `contracte`, `achizitii`, or one
 of its EU lists, `coeziune` or `pnrr`, offered only when it has that kind; `pagina`
 pages the list shown, and a project page's `pagina` pages the SEAP contracts that cite
 it. The list of direct purchases follows the list pattern of the design system
 (`DataTable`): its filters (`q`, `de_la`, `pana_la`, `valoare_min`, `valoare_max`,
-`stare`, `tip`, `furnizor` or `institutie`, `cpv`), `ordine` (`valoare`, `valoare-cresc`,
-`furnizor`…), `pe_pagina` and `vedere=tabel` are parsed in
+`stare`, `tip`, `furnizor` or `institutie`, `cpv`), `ordine` (`valoare-desc`,
+`valoare-cresc`, `furnizor-cresc`…; an old `ordine=valoare` link opens the largest
+accepted purchases, as it did), `pe_pagina` and `vedere=tabel` are parsed in
 `src/features/purchases/list.ts`; the generic parts are `src/lib/list.ts` and
 `src/components/list/`. The institution and supplier pages share one route factory,
 `src/features/entities/route.tsx`. `src/routeTree.gen.ts` (from the dev server or

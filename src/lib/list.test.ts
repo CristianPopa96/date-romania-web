@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  amountFromText,
   choiceFromParam,
   choiceToParam,
+  dayFromParam,
   fillSteps,
   isOpen,
   marks,
@@ -42,16 +44,19 @@ describe('nextSort', () => {
 })
 
 describe('the sort in an address', () => {
-  it('names the column alone for its first direction', () => {
+  it('names the column and its direction', () => {
     expect(sortToParam({ column: 'valoare', dir: 'desc' }, COLUMNS)).toBe(
-      'valoare',
+      'valoare-desc',
     )
     expect(sortToParam({ column: 'valoare', dir: 'asc' }, COLUMNS)).toBe(
       'valoare-cresc',
     )
     expect(sortToParam({ column: 'furnizor', dir: 'asc' }, COLUMNS)).toBe(
-      'furnizor',
+      'furnizor-cresc',
     )
+    expect(
+      sortToParam({ column: 'nimic', dir: 'asc' }, COLUMNS),
+    ).toBeUndefined()
     expect(sortToParam({ column: 'furnizor', dir: 'desc' }, COLUMNS)).toBe(
       'furnizor-desc',
     )
@@ -190,5 +195,28 @@ describe('choices in an address', () => {
     expect(choiceToParam([7])).toBe(7)
     expect(choiceToParam([7, 3])).toBe('7,3')
     expect(choiceToParam([])).toBeUndefined()
+  })
+})
+
+describe('a day in an address', () => {
+  it('keeps a real day only', () => {
+    expect(dayFromParam('2026-02-28')).toBe('2026-02-28')
+    expect(dayFromParam('2028-02-29')).toBe('2028-02-29')
+    expect(dayFromParam('2026-02-31')).toBeUndefined()
+    expect(dayFromParam('2026-13-01')).toBeUndefined()
+    expect(dayFromParam('2026-2-1')).toBeUndefined()
+  })
+})
+
+describe('an amount typed in lei', () => {
+  it('reads whole lei, never decimals as more digits', () => {
+    expect(amountFromText('1500')).toBe(1500)
+    expect(amountFromText('1.500')).toBe(1500)
+    expect(amountFromText(' 1 500 ')).toBe(1500)
+    expect(amountFromText('1500,50')).toBe(1500)
+    expect(amountFromText('1500.50')).toBe(1500)
+    expect(amountFromText('1.500.000,9')).toBe(1500000)
+    expect(amountFromText('abc')).toBeUndefined()
+    expect(amountFromText('')).toBeUndefined()
   })
 })

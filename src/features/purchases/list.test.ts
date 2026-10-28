@@ -55,8 +55,17 @@ describe('the address of a list of direct purchases', () => {
     expect(
       validatePurchaseListSearch({ ordine: 'data' }).ordine,
     ).toBeUndefined()
-    expect(validatePurchaseListSearch({ ordine: 'valoare' }).ordine).toBe(
-      'valoare',
+    // The old "Cele mai mari acceptate": largest first, accepted only.
+    expect(validatePurchaseListSearch({ ordine: 'valoare' })).toMatchObject({
+      ordine: 'valoare-desc',
+      stare: 7,
+    })
+    // With a state of its own, the link keeps it.
+    expect(
+      validatePurchaseListSearch({ ordine: 'valoare', stare: '3' }).stare,
+    ).toBe(3)
+    expect(validatePurchaseListSearch({ ordine: 'valoare-desc' }).stare).toBe(
+      undefined,
     )
     expect(
       validatePurchaseListSearch({ ordine: 'recente' }).ordine,
