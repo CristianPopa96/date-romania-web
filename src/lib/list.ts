@@ -265,3 +265,60 @@ export function marks(
 export function pageCount(total: number, size: number) {
   return Math.max(Math.ceil(total / size), 1)
 }
+
+// The filters of a list, by their key; each key names the address parameters it sets:
+// { perioada: ['de_la', 'pana_la'], stare: ['stare'] }.
+export type FilterParams = Record<string, ReadonlyArray<string>>
+
+// The filters chosen in an address, in the order of the bar.
+export function chosenFilters<TKey extends string>(
+  params: Record<TKey, ReadonlyArray<string>>,
+  search: Record<string, unknown>,
+): Array<TKey> {
+  return (Object.keys(params) as Array<TKey>).filter((key) =>
+    params[key].some((param) => search[param] !== undefined),
+  )
+}
+
+// The address without some filters (all of them by default), back on the first page.
+export function withoutFilters<
+  TSearch extends Record<string, unknown>,
+  TKey extends string,
+>(
+  params: Record<TKey, ReadonlyArray<string>>,
+  search: TSearch,
+  keys: Array<TKey> = Object.keys(params) as Array<TKey>,
+): TSearch {
+  const next: Record<string, unknown> = { ...search, pagina: undefined }
+  for (const key of keys) {
+    for (const param of params[key]) delete next[param]
+  }
+  return next as TSearch
+}
+
+// The filter to suggest removing from an empty list: the first one, in the order of the
+// API's parameters, that alone keeps rows out. `byApiParam` names the filter of each
+// parameter the list sends.
+export function emptyHint<TKey extends string>(
+  without: Array<{ param: string; count: number }>,
+  byApiParam: Partial<Record<string, TKey>>,
+): { key: TKey; count: number } | null {
+  for (const each of without) {
+    const key = byApiParam[each.param]
+    if (key !== undefined && each.count > 0) return { key, count: each.count }
+  }
+  return null
+}
+
+// The address of a list as a file: its filter parameters and order, nothing about the page.
+export function fileParams(
+  params: FilterParams,
+  search: Record<string, unknown>,
+): Record<string, string> {
+  const out: Record<string, string> = {}
+  for (const key of [...Object.values(params).flat(), 'ordine']) {
+    const value = search[key]
+    if (value !== undefined) out[key] = String(value)
+  }
+  return out
+}

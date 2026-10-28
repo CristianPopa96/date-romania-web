@@ -69,7 +69,7 @@ export function purchaseFilterDecls({
       bands: overview.bands.map((band) => ({
         start: band.start,
         end: band.end ?? null,
-        count: band.purchases,
+        count: band.count,
       })),
       presets: [
         { label: t.purchaseList.valuePresets.small, max: SMALL },
@@ -88,7 +88,7 @@ export function purchaseFilterDecls({
       options: overview.states.map((option) => ({
         value: option.value,
         label: t.purchases.states[option.value] ?? String(option.value),
-        count: option.purchases,
+        count: option.count,
       })),
       chip: states.length
         ? chosenMany(
@@ -108,7 +108,7 @@ export function purchaseFilterDecls({
       options: overview.contract_types.map((option) => ({
         value: option.value,
         label: t.purchaseList.types[option.value] ?? String(option.value),
-        count: option.purchases,
+        count: option.count,
       })),
       chip: types.length
         ? chosenMany(
@@ -135,7 +135,7 @@ export function purchaseFilterDecls({
           value: String(option.cui),
           label: option.name,
           sub: `CUI ${option.cui}`,
-          count: option.purchases,
+          count: option.count,
         })),
       patch: (next) => ({
         [party.param]: next === undefined ? undefined : Number(next),
@@ -155,7 +155,7 @@ export function purchaseFilterDecls({
             value: option.code.split('-')[0],
             label: option.name ?? option.code,
             sub: option.code,
-            count: option.purchases,
+            count: option.count,
           }),
         ),
       patch: (next) => ({ cpv: next }),

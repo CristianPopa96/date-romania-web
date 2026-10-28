@@ -7,6 +7,7 @@ import {
   choiceFromParam,
   choiceToParam,
   dayFromParam,
+  fileParams,
   numberFromParam,
   pageSizeFromParam,
   sortFromParam,
@@ -144,8 +145,9 @@ export const PURCHASE_FILTER_PARAMS = {
 } as const satisfies Record<string, ReadonlyArray<keyof PurchaseListSearch>>
 export type PurchaseFilterKey = keyof typeof PURCHASE_FILTER_PARAMS
 
-// The filter an API parameter belongs to, for "Fără filtrul «Valoare» ar fi 12".
-const BY_API_PARAM: Record<string, PurchaseFilterKey> = {
+// The filter of each API parameter, for "Fără filtrul «Valoare» ar fi 12" (lib/list.ts
+// `emptyHint`).
+export const PURCHASE_BY_API_PARAM: Record<string, PurchaseFilterKey> = {
   q: 'q',
   date_from: 'perioada',
   date_to: 'perioada',
@@ -158,49 +160,14 @@ const BY_API_PARAM: Record<string, PurchaseFilterKey> = {
   cpv: 'cpv',
 }
 
-export function filterOfApiParam(param: string): PurchaseFilterKey | undefined {
-  return BY_API_PARAM[param]
-}
-
-// The filters chosen, in the order of the bar.
-export function chosenFilters(search: PurchaseListSearch) {
-  return (
-    Object.keys(PURCHASE_FILTER_PARAMS) as Array<PurchaseFilterKey>
-  ).filter((key) =>
-    PURCHASE_FILTER_PARAMS[key].some((param) => search[param] !== undefined),
-  )
-}
-
-// The address without one filter, or without them all; back on the first page.
-export function withoutFilters(
-  search: PurchaseListSearch,
-  keys: Array<PurchaseFilterKey> = Object.keys(
-    PURCHASE_FILTER_PARAMS,
-  ) as Array<PurchaseFilterKey>,
-): PurchaseListSearch {
-  const next: PurchaseListSearch = { ...search }
-  for (const key of keys) {
-    for (const param of PURCHASE_FILTER_PARAMS[key]) delete next[param]
-  }
-  return next
-}
-
 // The address of the list as a file, with every filter and the order shown.
 export function purchaseFileSearch(
   role: Role,
   cui: number,
   search: PurchaseListSearch,
 ): Record<string, string> {
-  const params: Record<string, string> = {
+  return {
     [role === 'institutions' ? 'cumparator' : 'vanzator']: String(cui),
+    ...fileParams(PURCHASE_FILTER_PARAMS, search),
   }
-  const keys = [
-    ...Object.values(PURCHASE_FILTER_PARAMS).flat(),
-    'ordine',
-  ] as const
-  for (const key of keys) {
-    const value = search[key]
-    if (value !== undefined) params[key] = String(value)
-  }
-  return params
 }

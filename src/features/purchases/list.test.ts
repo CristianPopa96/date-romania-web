@@ -4,14 +4,14 @@ import { messagesFor } from '#/i18n'
 import { formatFor } from '#/lib/format'
 import { periodChip, rangeChip } from '#/features/purchases/filters'
 import {
-  chosenFilters,
-  filterOfApiParam,
+  PURCHASE_BY_API_PARAM,
+  PURCHASE_FILTER_PARAMS,
   purchaseApiSort,
   purchaseFileSearch,
   purchaseFilter,
   validatePurchaseListSearch,
-  withoutFilters,
 } from '#/features/purchases/list'
+import { chosenFilters, emptyHint, withoutFilters } from '#/lib/list'
 
 const t = messagesFor('ro')
 const f = formatFor('ro')
@@ -89,13 +89,30 @@ describe('the address of a list of direct purchases', () => {
       pana_la: '2026-02-01',
       stare: '7',
     }
-    expect(chosenFilters(search)).toEqual(['q', 'perioada', 'stare'])
-    expect(withoutFilters(search, ['perioada'])).toEqual({ q: 'a', stare: '7' })
-    expect(withoutFilters({ ...search, ordine: 'valoare' })).toEqual({
-      ordine: 'valoare',
+    const params = PURCHASE_FILTER_PARAMS
+    expect(chosenFilters(params, search)).toEqual(['q', 'perioada', 'stare'])
+    expect(withoutFilters(params, search, ['perioada'])).toEqual({
+      q: 'a',
+      stare: '7',
+      pagina: undefined,
     })
-    expect(filterOfApiParam('value_min')).toBe('valoare')
-    expect(filterOfApiParam('scope')).toBeUndefined()
+    expect(
+      withoutFilters(params, { ...search, ordine: 'valoare', pagina: 3 }),
+    ).toEqual({ ordine: 'valoare', pagina: undefined })
+    // The first filter that alone keeps rows out; parameters it does not know are skipped.
+    expect(
+      emptyHint(
+        [
+          { param: 'scope', count: 9 },
+          { param: 'state', count: 0 },
+          { param: 'value_min', count: 12 },
+        ],
+        PURCHASE_BY_API_PARAM,
+      ),
+    ).toEqual({ key: 'valoare', count: 12 })
+    expect(emptyHint([{ param: 'q', count: 0 }], PURCHASE_BY_API_PARAM)).toBe(
+      null,
+    )
   })
 
   it('gives the file the filters and the order, never the page size or the view', () => {

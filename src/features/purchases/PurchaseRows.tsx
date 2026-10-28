@@ -1,19 +1,11 @@
 import { Link as RouterLink } from '@tanstack/react-router'
 import { ExternalLinkIcon } from '@radix-ui/react-icons'
-import {
-  Badge,
-  Box,
-  Card,
-  Code,
-  Flex,
-  Link,
-  Table,
-  Text,
-} from '@radix-ui/themes'
+import { Badge, Box, Code, Flex, Link, Text } from '@radix-ui/themes'
 
 import { DataState } from '#/components/DataState'
 import { EntityLink } from '#/components/EntityLink'
-import { SortHeader } from '#/components/list/SortHeader'
+import { ListRows } from '#/components/list/ListRows'
+import type { Column } from '#/components/list/ListRows'
 import { useI18n } from '#/i18n/context'
 import { rich } from '#/i18n/rich'
 import { ACCEPTED } from '#/lib/api'
@@ -22,9 +14,10 @@ import type { Role } from '#/lib/api'
 import { marks } from '#/lib/list'
 import type { Sort } from '#/lib/list'
 
-// The rows of a list of direct purchases: a table with sortable headers, and on a phone a
-// card per purchase with its value on the right. `total` is the row under the table, given
-// only when every row is one kind of money.
+// The rows of a list of direct purchases, declared to ListRows: the columns of the table
+// (day, purchase, the other party, state, value) and on a phone a card per purchase with
+// its value on the right. `total` is the row under the table, given only when every row is
+// one kind of money.
 export function PurchaseRows({
   role,
   items,
@@ -42,112 +35,70 @@ export function PurchaseRows({
 }) {
   const { t } = useI18n()
   const other: Role = role === 'institutions' ? 'suppliers' : 'institutions'
+  const columns: Array<Column<Purchase>> = [
+    {
+      key: 'data',
+      header: t.purchases.date,
+      sort: { column: 'data' },
+      nowrap: true,
+      cell: (purchase) => <Day purchase={purchase} />,
+    },
+    {
+      key: 'achizitie',
+      header: t.purchases.purchase,
+      maxWidth: 360,
+      cell: (purchase) => <Title purchase={purchase} q={q} />,
+    },
+    {
+      key: 'parte',
+      header:
+        role === 'institutions' ? t.common.supplier : t.common.institution,
+      sort: {
+        column: role === 'institutions' ? 'furnizor' : 'institutie',
+        text: true,
+      },
+      cell: (purchase) => <Party purchase={purchase} other={other} />,
+    },
+    {
+      key: 'stare',
+      header: t.purchases.state,
+      cell: (purchase) => <State purchase={purchase} />,
+    },
+    {
+      key: 'valoare',
+      header: t.purchases.value,
+      sort: { column: 'valoare' },
+      align: 'end',
+      nowrap: true,
+      cell: (purchase) => <Value purchase={purchase} />,
+    },
+  ]
   return (
-    <>
-      <Box display={{ initial: 'none', sm: 'block' }}>
-        <Table.Root variant="surface" size="1">
-          <Table.Header>
-            <Table.Row>
-              <SortHeader column="data" sort={sort} onSort={onSort}>
-                {t.purchases.date}
-              </SortHeader>
-              <Table.ColumnHeaderCell>
-                {t.purchases.purchase}
-              </Table.ColumnHeaderCell>
-              <SortHeader
-                column={role === 'institutions' ? 'furnizor' : 'institutie'}
-                sort={sort}
-                text
-                onSort={onSort}
-              >
-                {role === 'institutions'
-                  ? t.common.supplier
-                  : t.common.institution}
-              </SortHeader>
-              <Table.ColumnHeaderCell>
-                {t.purchases.state}
-              </Table.ColumnHeaderCell>
-              <SortHeader
-                column="valoare"
-                sort={sort}
-                justify="end"
-                onSort={onSort}
-              >
-                {t.purchases.value}
-              </SortHeader>
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
-            {items.map((purchase) => (
-              <Table.Row key={purchase.id}>
-                <Table.Cell style={{ whiteSpace: 'nowrap' }}>
-                  <Day purchase={purchase} />
-                </Table.Cell>
-                <Table.Cell>
-                  <Box style={{ maxWidth: 360 }}>
-                    <Title purchase={purchase} q={q} />
-                  </Box>
-                </Table.Cell>
-                <Table.Cell>
-                  <Party purchase={purchase} other={other} />
-                </Table.Cell>
-                <Table.Cell>
-                  <State purchase={purchase} />
-                </Table.Cell>
-                <Table.Cell justify="end" style={{ whiteSpace: 'nowrap' }}>
-                  <Value purchase={purchase} />
-                </Table.Cell>
-              </Table.Row>
-            ))}
-            {total ? (
-              <Table.Row>
-                <Table.Cell colSpan={4}>
-                  <Text weight="medium">{total.label}</Text>
-                </Table.Cell>
-                <Table.Cell justify="end" style={{ whiteSpace: 'nowrap' }}>
-                  <Text weight="bold">{total.value}</Text>
-                </Table.Cell>
-              </Table.Row>
-            ) : null}
-          </Table.Body>
-        </Table.Root>
-      </Box>
-      <Flex
-        direction="column"
-        gap="2"
-        display={{ initial: 'flex', sm: 'none' }}
-      >
-        {items.map((purchase) => (
-          <Card key={purchase.id} size="1">
-            <Flex justify="between" gap="3">
-              <Box minWidth="0">
-                <Title purchase={purchase} q={q} />
-                <Text as="div" size="1" color="gray" mt="1">
-                  <Day purchase={purchase} /> ·{' '}
-                  <Party purchase={purchase} other={other} />
-                </Text>
-                <Box mt="1">
-                  <State purchase={purchase} />
-                </Box>
-              </Box>
-              <Box style={{ whiteSpace: 'nowrap', textAlign: 'right' }}>
-                <Value purchase={purchase} />
-              </Box>
-            </Flex>
-          </Card>
-        ))}
-        {total ? (
-          <Flex justify="between" gap="3" px="2">
-            <Text size="2" weight="medium">
-              {total.label}
+    <ListRows
+      columns={columns}
+      rows={items}
+      rowKey={(purchase) => purchase.id}
+      sort={sort}
+      onSort={onSort}
+      total={total}
+      card={(purchase) => (
+        <Flex justify="between" gap="3">
+          <Box minWidth="0">
+            <Title purchase={purchase} q={q} />
+            <Text as="div" size="1" color="gray" mt="1">
+              <Day purchase={purchase} /> ·{' '}
+              <Party purchase={purchase} other={other} />
             </Text>
-            <Text size="2" weight="bold">
-              {total.value}
-            </Text>
-          </Flex>
-        ) : null}
-      </Flex>
-    </>
+            <Box mt="1">
+              <State purchase={purchase} />
+            </Box>
+          </Box>
+          <Box style={{ whiteSpace: 'nowrap', textAlign: 'right' }}>
+            <Value purchase={purchase} />
+          </Box>
+        </Flex>
+      )}
+    />
   )
 }
 

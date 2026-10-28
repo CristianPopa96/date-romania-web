@@ -963,15 +963,15 @@ export interface components {
         };
         /**
          * Band
-         * @description Purchases whose closing value is from `start` up to `end` (excluded; null: no end).
+         * @description Rows whose value is from `start` up to `end` (excluded; null: no end).
          */
         Band: {
             /** Start */
             start: number;
             /** End */
             end: number | null;
-            /** Purchases */
-            purchases: number;
+            /** Count */
+            count: number;
         };
         /**
          * Capital
@@ -1185,8 +1185,11 @@ export interface components {
             code: string;
             /** Name */
             name: string | null;
-            /** Purchases */
-            purchases: number;
+            /**
+             * Count
+             * @description Purchases under the other filters.
+             */
+            count: number;
         };
         /**
          * Dataset
@@ -1885,17 +1888,17 @@ export interface components {
         };
         /**
          * Option
-         * @description One option of a choice filter, with the purchases it leaves under the other filters.
+         * @description One option of a choice filter, with the rows it leaves under the other filters.
          */
         Option: {
             /** Value */
             value: number;
-            /** Purchases */
-            purchases: number;
+            /** Count */
+            count: number;
         };
         /**
          * Others
-         * @description The rest of the accepted purchases after the largest parties.
+         * @description The rest of the value after the largest parties.
          */
         Others: {
             /**
@@ -1933,8 +1936,11 @@ export interface components {
              * @description authority, company or other
              */
             kind: string;
-            /** Purchases */
-            purchases: number;
+            /**
+             * Count
+             * @description Purchases under the other filters.
+             */
+            count: number;
         };
         /**
          * Period
@@ -2373,7 +2379,7 @@ export interface components {
         };
         /**
          * Point
-         * @description Accepted purchases counted in totals, in one month or one day.
+         * @description The rows a list's totals count, in one month or one day, and their value.
          */
         Point: {
             /**
@@ -2382,8 +2388,8 @@ export interface components {
              * @description The first day of the month, or the day.
              */
             start: string;
-            /** Accepted */
-            accepted: number;
+            /** Count */
+            count: number;
             /** Value */
             value: number;
         };
@@ -3267,13 +3273,13 @@ export interface components {
         };
         /**
          * Without
-         * @description How many purchases one filter alone keeps out, for a list it leaves empty.
+         * @description How many rows one filter alone keeps out, for a list it leaves empty.
          */
         Without: {
             /** Param */
             param: string;
-            /** Purchases */
-            purchases: number;
+            /** Count */
+            count: number;
         };
     };
     responses: never;
