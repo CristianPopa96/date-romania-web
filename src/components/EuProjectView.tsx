@@ -13,6 +13,7 @@ import {
 } from '@radix-ui/themes'
 
 import { Facts, PaymentsTable } from '#/components/EuProjectFacts'
+import { EuSeapSection } from '#/components/EuSeapSection'
 import { Stat } from '#/components/ProgrammeFigures'
 import { SourceLine } from '#/components/SourceLine'
 import { useI18n } from '#/i18n/context'
@@ -21,15 +22,33 @@ import { euShare, periodLabel } from '#/lib/eu'
 import { euProjectQuery } from '#/lib/queries'
 
 // One EU cohesion project (`ScreenEUProject`, its SMIS kind): what it is worth and what
-// was paid up to its list's day, the facts, and the payments where the programme
-// publishes them one by one (Health).
-export function EuProjectView({ smis }: { smis: number }) {
+// was paid up to its list's day, the facts, the payments where the programme publishes
+// them one by one (Health), and the SEAP records that cite it (`page` of their contracts).
+export function EuProjectView({
+  smis,
+  page,
+  onPage,
+}: {
+  smis: number
+  page: number
+  onPage: (page: number) => void
+}) {
   const { data: project } = useSuspenseQuery(euProjectQuery(smis))
   // The route loader answers "not found" before this renders.
-  return project ? <ProjectView project={project} /> : null
+  return project ? (
+    <ProjectView project={project} page={page} onPage={onPage} />
+  ) : null
 }
 
-function ProjectView({ project }: { project: EuProject }) {
+function ProjectView({
+  project,
+  page,
+  onPage,
+}: {
+  project: EuProject
+  page: number
+  onPage: (page: number) => void
+}) {
   const { t, f } = useI18n()
   const e = t.eu
   const share = euShare(project.eu, project.total)
@@ -149,6 +168,12 @@ function ProjectView({ project }: { project: EuProject }) {
             <SourceLine source={project.payments_source} of="payments" />
           </Flex>
         ) : null}
+
+        <EuSeapSection
+          of={{ kind: 'smis', id: project.smis, page }}
+          beneficiary={project.beneficiary.entity?.cui ?? null}
+          onPage={onPage}
+        />
 
         <Flex direction="column" gap="3">
           <Heading as="h2" size="5">

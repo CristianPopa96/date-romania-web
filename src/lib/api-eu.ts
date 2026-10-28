@@ -54,3 +54,27 @@ export const getEuProjects = createServerFn({ method: 'GET' })
 export const getEuProject = createServerFn({ method: 'GET' })
   .inputValidator((smis: number) => smis)
   .handler(({ data }) => getJson<EuProject>(`${ROOT}/projects/${data}`))
+
+// The SEAP records whose text cites a project: the contracts of the award notices (one
+// page of them) and the accepted direct purchases. The rules live in the API
+// (eu_seap_links.py); every tie rests on the buyer's own text, so none is sure.
+export type EuSeapLinks = Schemas['EuSeapLinks']
+export type EuSeapContract = Schemas['EuSeapContract']
+export type EuSeapPurchase = Schemas['EuSeapPurchase']
+
+// Whose records: a cohesion project by its SMIS code, or a PNRR contract by its id.
+export type EuSeapOf = { kind: 'smis' | 'pnrr'; id: number; page: number }
+
+export const getEuSeap = createServerFn({ method: 'GET' })
+  .inputValidator((data: EuSeapOf) => data)
+  .handler(async ({ data }): Promise<EuSeapLinks> => {
+    const path =
+      data.kind === 'smis'
+        ? `${ROOT}/projects/${data.id}/seap`
+        : `/v1/programmes/pnrr/contracts/${data.id}/seap`
+    const found = await getJson<EuSeapLinks>(path, {
+      limit: PAGE_SIZE,
+      offset: (data.page - 1) * PAGE_SIZE,
+    })
+    return found ?? { contracts_total: 0, contracts: [], purchases: [] }
+  })

@@ -1,5 +1,10 @@
-import { getEuFunds, getEuProject, getEuProjects } from '#/lib/api-eu'
-import type { EuProjectFilter } from '#/lib/api-eu'
+import {
+  getEuFunds,
+  getEuProject,
+  getEuProjects,
+  getEuSeap,
+} from '#/lib/api-eu'
+import type { EuProjectFilter, EuSeapOf } from '#/lib/api-eu'
 import {
   getPnrr,
   getPnrrContract,
@@ -262,4 +267,10 @@ export const euProjectQuery = (smis: number) =>
   queryOptions({
     queryKey: ['eu-funds', 'project', smis],
     queryFn: () => getEuProject({ data: smis }),
+  })
+
+export const euSeapQuery = (of: EuSeapOf) =>
+  queryOptions({
+    queryKey: ['eu-funds', 'seap', of],
+    queryFn: () => getEuSeap({ data: of }),
   })

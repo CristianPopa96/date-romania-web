@@ -94,6 +94,49 @@ export const eu = {
   amount: 'Sumă',
   kind: 'Tip',
 
+  // The SEAP records whose text cites a project, on both kinds of project page: `smis` a
+  // cohesion project, `pnrr` a PNRR financing contract.
+  seap: {
+    title: 'Contracte plătite din acest proiect',
+    note: {
+      smis: 'găsite după codul SMIS citat în anunț sau în achiziție',
+      pnrr: 'găsite după numărul contractului de finanțare citat în anunț, la același cumpărător',
+    },
+    none: {
+      smis: 'Niciun anunț de atribuire și nicio achiziție directă dintre cele pe care le avem nu citează codul SMIS al proiectului.',
+      pnrr: 'Niciun anunț de atribuire și nicio achiziție directă dintre cele pe care le avem nu citează numărul acestui contract de finanțare.',
+    },
+    contracts: (n: number, text: string) =>
+      counted(
+        n,
+        text,
+        'Un contract din anunțuri de atribuire',
+        'contracte din anunțuri de atribuire',
+      ),
+    purchases: (n: number, text: string) =>
+      counted(n, text, 'O achiziție directă', 'achiziții directe'),
+    contractsCaption: 'Contractele din anunțurile de atribuire',
+    purchasesCaption: 'Achizițiile directe',
+    contract: 'Contract',
+    purchase: 'Achiziție',
+    supplier: 'Furnizor',
+    value: 'Valoare fără TVA',
+    link: 'Legătură',
+    badge: { smis: 'SMIS în anunț', pnrr: 'Nr. finanțare în anunț' },
+    help: {
+      smis: (cited: string) =>
+        `Legat de noi: codul SMIS ${cited} apare în textul scris de cumpărător în SEAP. SEAP nu are un câmp pentru proiect și nu verifică ce scrie cumpărătorul.`,
+      pnrr: (cited: string) =>
+        `Legat de noi: numărul „${cited}” apare în textul scris de cumpărător în SEAP și este numărul unui contract de finanțare PNRR al aceluiași cumpărător. SEAP nu verifică ce scrie cumpărătorul.`,
+    },
+    // A partner of the project buys for it too.
+    boughtBy: (name: string) => `cumpărat de ${name}`,
+    incomplete: {
+      smis: 'Lista poate fi incompletă. Codul SMIS apare în SEAP doar când autoritatea l-a scris în anunț; nu e un câmp obligatoriu. Citim doar anunțurile și achizițiile din perioada pe care o avem.',
+      pnrr: 'Lista poate fi incompletă. Numărul contractului de finanțare apare în anunț doar când autoritatea l-a scris acolo; nu e un câmp obligatoriu în SEAP. Citim doar anunțurile și achizițiile din perioada pe care o avem.',
+    },
+  },
+
   notPublicTitle: 'Ce nu este public',
   notPublic:
     'Cererile de rambursare, facturile decontate și data fiecărei plăți nu sunt publicate. Lista MIPE dă doar suma plătită până la data ei.',
