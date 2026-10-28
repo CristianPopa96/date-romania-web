@@ -15,7 +15,9 @@ Romanian words and acronyms you meet on the site, with what they mean here.
 | **Forexebug**               | The Finance Ministry's system for institutions' budget reports; its website asks for a verification code, so it cannot be read automatically |
 | **SIRUTA**                  | The national list of places (INS), with a code for every county, town hall area and village                                                  |
 | **UAT**                     | Unitate administrativ-teritorială: a commune, town, municipality or Bucharest sector, the area of one town hall                              |
-| **MIPE**                    | The ministry for EU funds; not collected yet                                                                                                 |
+| **MIPE**                    | Ministerul Investițiilor și Proiectelor Europene, the ministry for EU funds; publishes the lists of EU projects and the PNRR dashboard       |
+| **PNRR**                    | Planul Național de Redresare și Reziliență, the EU recovery plan: measures, financing contracts and payments to beneficiaries                |
+| **Fonduri de coeziune**     | EU cohesion funds, paid through programmes (POR, POIM, PEO…), each with its own list of projects                                             |
 | **TED**                     | The EU's Official Journal tenders database; not collected yet                                                                                |
 | **Primăria**                | Town hall                                                                                                                                    |
 | **Consiliul Județean**      | County council                                                                                                                               |
@@ -29,7 +31,7 @@ Romanian words and acronyms you meet on the site, with what they mean here.
 | **CUI**  | Cod unic de înregistrare, the tax ID of an institution or a company. It is the "spine" of the site: every page of an institution or a company is addressed by it. |
 | **CNP**  | Cod numeric personal, a person's ID number. Masked as `[CNP]` on the site.                                                                                        |
 | **CPV**  | Common Procurement Vocabulary, the EU code for what was bought (for example 45 for construction works)                                                            |
-| **SMIS** | The code of an EU-funded project                                                                                                                                  |
+| **SMIS** | The code of an EU cohesion project; buyers sometimes write it in the text of a SEAP notice                                                                        |
 | **PFA**  | Persoană fizică autorizată, a sole trader                                                                                                                         |
 
 ## Procurement words
@@ -50,33 +52,40 @@ Romanian words and acronyms you meet on the site, with what they mean here.
 | **Furnizor**                       | Supplier                                                                                                                                             |
 | **Cumpărător**                     | Buyer                                                                                                                                                |
 | **Constructor / Proiectant**       | Builder / designer (of an Anghel Saligny project)                                                                                                    |
+| **Contract de finanțare**          | Financing contract: the contract under which a beneficiary receives EU or programme money                                                            |
+| **Beneficiar**                     | Beneficiary: who receives the money of an EU project or a financing contract                                                                         |
 
 ## Labels on the site
 
-| Label                                      | Meaning                                                                  |
-| ------------------------------------------ | ------------------------------------------------------------------------ |
-| **Nepublicat**                             | The source does not publish this value                                   |
-| **Încă necolectat**                        | The source publishes it; not collected yet                               |
-| **Legătură sigură / probabilă / posibilă** | Sure / probable / possible link between two records                      |
-| **Listă incompletă**                       | The list is incomplete (contracts appear in SEAP weeks after signing)    |
-| **Peste plafon · nu intră în total**       | Published above the legal ceiling; left out of totals                    |
-| **Neacceptată · nu intră în total**        | Not accepted; left out of totals                                         |
-| **Tipar observat, nu o acuzație**          | An observed pattern, not an accusation                                   |
-| **Sursa: … · preluat …**                   | Source: … · read on …                                                    |
-| **De unde e cifra asta?**                  | "Where is this figure from?", the source panel of one record             |
-| **Localități**                             | Places: counties, towns and communes                                     |
-| **Buget · Venituri · Cheltuieli**          | Budget · revenue · spending                                              |
-| **Cheltuieli de capital**                  | Capital spending: money spent on investments (roads, buildings)          |
-| **Cele două capete ale banilor**           | "The two ends of the money": budget, contracts and payments side by side |
-| **Perioadele diferă**                      | "The periods differ": figures over different times, never added          |
-| **Proiecte în zonă**                       | Programme projects in the area                                           |
-| **Clasamente**                             | Rankings                                                                 |
-| **Tipare**                                 | Patterns                                                                 |
-| **Surse**                                  | Sources                                                                  |
-| **Metodologie**                            | Methodology                                                              |
-| **Corecturi**                              | Corrections                                                              |
-| **Raportează o eroare**                    | Report an error                                                          |
-| **Drumul banilor**                         | "The road of the money", the chain on a programme project page           |
+| Label                                      | Meaning                                                                     |
+| ------------------------------------------ | --------------------------------------------------------------------------- |
+| **Nepublicat**                             | The source does not publish this value                                      |
+| **Încă necolectat**                        | The source publishes it; not collected yet                                  |
+| **Legătură sigură / probabilă / posibilă** | Sure / probable / possible link between two records                         |
+| **Listă incompletă**                       | The list is incomplete (contracts appear in SEAP weeks after signing)       |
+| **Peste plafon · nu intră în total**       | Published above the legal ceiling; left out of totals                       |
+| **Neacceptată · nu intră în total**        | Not accepted; left out of totals                                            |
+| **Tipar observat, nu o acuzație**          | An observed pattern, not an accusation                                      |
+| **Sursa: … · preluat …**                   | Source: … · read on …                                                       |
+| **De unde e cifra asta?**                  | "Where is this figure from?", the source panel of one record                |
+| **Localități**                             | Places: counties, towns and communes                                        |
+| **Buget · Venituri · Cheltuieli**          | Budget · revenue · spending                                                 |
+| **Cheltuieli de capital**                  | Capital spending: money spent on investments (roads, buildings)             |
+| **Cele două capete ale banilor**           | "The two ends of the money": budget, contracts and payments side by side    |
+| **Perioadele diferă**                      | "The periods differ": figures over different times, never added             |
+| **Proiecte în zonă**                       | Programme projects in the area                                              |
+| **Clasamente**                             | Rankings                                                                    |
+| **Tipare**                                 | Patterns                                                                    |
+| **Surse**                                  | Sources                                                                     |
+| **Metodologie**                            | Methodology                                                                 |
+| **Corecturi**                              | Corrections                                                                 |
+| **Raportează o eroare**                    | Report an error                                                             |
+| **Drumul banilor**                         | "The road of the money", the chain on a programme project page              |
+| **Proiecte europene · Contracte PNRR**     | The EU tabs of an institution or company page                               |
+| **Plătit până la …**                       | Paid up to the day of the programme's list (no payment days are given)      |
+| **CUI în listă · Nume și localitate**      | How a project was tied to its beneficiary: tax ID given, or matched by name |
+| **Legat de noi după nume**                 | "Tied by us by name": matched by name, so only probable                     |
+| **Citează acest proiect**                  | "Cites this project": a SEAP record whose text names the project            |
 
 ## Laws mentioned
 

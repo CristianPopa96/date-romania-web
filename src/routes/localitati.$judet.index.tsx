@@ -7,13 +7,14 @@ import {
 import { Container, Flex, Grid, Heading, Link, Text } from '@radix-ui/themes'
 
 import { EntityLink } from '#/components/EntityLink'
+import { PlaceEuFunds } from '#/components/PlaceEuFunds'
 import { PlaceOverview } from '#/components/PlaceOverview'
 import { UatsTable } from '#/components/PlaceLists'
 import { WinnersCard } from '#/components/WinnersCard'
 import { messagesFor } from '#/i18n'
 import { useI18n } from '#/i18n/context'
 import { pageTitle } from '#/lib/copy'
-import { countyQuery } from '#/lib/queries'
+import { countyQuery, euBeneficiaryQuery } from '#/lib/queries'
 
 // A county (flow 6): the figures of its UATs and its council, each with its period, and
 // a table of its UATs to go on to (design round 8).
@@ -23,6 +24,11 @@ export const Route = createFileRoute('/localitati/$judet/')({
       countyQuery(params.judet),
     )
     if (!county) throw notFound()
+    if (county.council) {
+      await context.queryClient.ensureQueryData(
+        euBeneficiaryQuery(county.council.cui),
+      )
+    }
     return { name: county.place.name }
   },
   head: ({ loaderData, match }) => ({
@@ -91,6 +97,8 @@ function CountyPage() {
         <Grid columns={{ initial: '1', md: '2' }} gap="4">
           <WinnersCard winners={figures.top_winners} />
         </Grid>
+
+        {county.council ? <PlaceEuFunds entity={county.council} /> : null}
 
         <UatsTable
           uats={county.uats}

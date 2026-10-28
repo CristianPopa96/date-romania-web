@@ -1,7 +1,7 @@
 # Features and roadmap
 
 The site is planned as ten user flows, built in releases. This page is the state as of
-18.10.2026.
+28.10.2026.
 
 ## Built
 
@@ -17,6 +17,10 @@ The site is planned as ten user flows, built in releases. This page is the state
 | 2       | Download contracts (all, or one institution's or company's) and the pattern as spreadsheets                                               |
 | 3       | See the money coming in for a town hall or county council: its 2024 budget and the Anghel Saligny payments; see who funds any institution |
 | 3       | Look up any county, town or commune: its budget, programme money, contracts, projects and institutions; find a village by name            |
+| 4       | Follow the EU recovery plan (PNRR): its measures, every financing contract, the payments, the largest recipients                          |
+| 4       | Look up any EU cohesion project by programme, status, words or SMIS code, with what was paid up to the day of its list                    |
+| 4       | See the SEAP contracts and direct purchases that cite an EU project or a PNRR contract                                                    |
+| 4       | See the EU projects and PNRR money of an institution, a company, a town hall or a county council                                          |
 
 ## The data behind it
 
@@ -35,18 +39,26 @@ is collected each morning (as of 20.10.2026).
   town hall and county council and the population of every town hall area (Ministry of
   Development), and ANAF's record of all 87,472 institutions and companies held. All
   but two have their county and town hall area.
+- **EU money**: MIPE's PNRR dashboard (every financing contract, with the dated
+  payments to each beneficiary; the edition of 15.10.2026), and MIPE's lists of
+  contracted projects for 13 cohesion programmes (22,326 projects), with the Health
+  programme's payments one by one. 57% of the cohesion projects are tied to an
+  institution or company held, by tax ID or by name.
 
 ## Not built yet
 
 | Release | What it will do                                                                          | What it needs                                                                                                                |
 | ------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | Later   | "Money in" for institutions other than town halls and county councils                    | The Finance Ministry's per-institution budgets, published behind a verification code; a request for the whole set is planned |
-| 4       | EU funded projects                                                                       | The EU funds ministry's project lists, and project codes found in contract titles                                            |
 | 4       | From a gap to a Law 544 request: request missing documents, track the answer, publish it | The request tracker; the project team sends every request                                                                    |
 | On hold | Available versus unused funds, and who answers for them                                  | Dated EU absorption snapshots, budget commitments, office holders and their dates                                            |
 | Later   | Politicians and parties                                                                  | Not researched yet                                                                                                           |
 
 Also waiting:
+
+- The EU projects of the regional programmes of 2021–2027 (left out for now).
+- On a place's page, the EU projects of every institution and company located there,
+  not only the town hall's.
 
 - The items bought in each direct purchase, with payment and delivery conditions, below
   100,000 lei (shown as "Încă necolectat"). Accepted purchases of 100,000 lei or more

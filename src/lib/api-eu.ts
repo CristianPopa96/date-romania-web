@@ -32,6 +32,8 @@ export const getEuFunds = createServerFn({ method: 'GET' }).handler(() =>
 export type EuProjectFilter = {
   // A programme code as the API gives it ('POR', 'PoIDS').
   programme?: string
+  // The beneficiary's CUI: its projects, on an institution or supplier page.
+  beneficiary?: number
   status?: EuStatus
   q?: string
   page: number
@@ -42,6 +44,7 @@ export const getEuProjects = createServerFn({ method: 'GET' })
   .handler(async ({ data }): Promise<EuProjectPage> => {
     const found = await getJson<EuProjectPage>(`${ROOT}/projects`, {
       programme: data.programme,
+      beneficiary: data.beneficiary,
       status: data.status,
       q: data.q,
       limit: PAGE_SIZE,
@@ -80,6 +83,26 @@ export const getEuSeap = createServerFn({ method: 'GET' })
         limit: PAGE_SIZE,
         offset: (data.page - 1) * PAGE_SIZE,
       })
+    } catch {
+      return 'failed'
+    }
+  })
+
+// The EU money of one beneficiary, of both kinds, never added together: its cohesion
+// projects by programme and its PNRR contracts and payments.
+export type EuBeneficiaryFunds = Schemas['EuBeneficiaryFunds']
+export type EuBeneficiaryPnrr = Schemas['EuBeneficiaryPnrr']
+
+// The entity is found before this is asked: null when the API has no such endpoint (a
+// site deployed before its API) and 'failed' when it did not answer, so the page stays up
+// without the EU money and never says there is none.
+export const getEuBeneficiary = createServerFn({ method: 'GET' })
+  .inputValidator((cui: number) => cui)
+  .handler(async ({ data }): Promise<EuBeneficiaryFunds | null | 'failed'> => {
+    try {
+      return await getJson<EuBeneficiaryFunds>(
+        `/v1/programmes/eu-beneficiaries/${data}`,
+      )
     } catch {
       return 'failed'
     }

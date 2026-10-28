@@ -1,4 +1,5 @@
 import {
+  getEuBeneficiary,
   getEuFunds,
   getEuProject,
   getEuProjects,
@@ -12,6 +13,7 @@ import {
   getPnrrMeasure,
 } from '#/lib/api-pnrr'
 import type { PnrrContractFilter } from '#/lib/api-pnrr'
+import { euCounts, euLists } from '#/lib/eu'
 import { queryOptions } from '@tanstack/react-query'
 import type { QueryClient } from '@tanstack/react-query'
 
@@ -170,17 +172,25 @@ export async function loadEntityPage(
   cui: number,
   search: EntitySearch,
 ) {
-  const [page, totals] = await Promise.all([
+  const [page, totals, , , funds] = await Promise.all([
     client.ensureQueryData(entityQuery(role, cui)),
     client.ensureQueryData(entityContractsQuery(role, cui)),
     client.ensureQueryData(statsQuery),
     role === 'institutions' ? client.ensureQueryData(budgetQuery(cui)) : null,
+    client.ensureQueryData(euBeneficiaryQuery(cui)),
   ])
   if (!page || !totals) return null
-  const list = entityList(search, contractCount(totals) > 0)
+  const list = entityList(search, contractCount(totals) > 0, euLists(funds))
   const pageNumber = search.pagina ?? 1
   if (list === 'contracte') {
     await client.ensureQueryData(contractsQuery(role, cui, pageNumber))
+  } else if (list === 'coeziune') {
+    await client.ensureQueryData(entityEuProjectsQuery(cui, pageNumber))
+  } else if (list === 'pnrr') {
+    // Paid with no contract held: nothing to list.
+    if (euCounts(funds).pnrr > 0) {
+      await client.ensureQueryData(entityPnrrContractsQuery(cui, pageNumber))
+    }
   } else {
     await client.ensureQueryData(
       purchasesQuery(role, cui, pageNumber, search.ordine === 'valoare'),
@@ -267,6 +277,32 @@ export const euProjectQuery = (smis: number) =>
   queryOptions({
     queryKey: ['eu-funds', 'project', smis],
     queryFn: () => getEuProject({ data: smis }),
+  })
+
+export const euBeneficiaryQuery = (cui: number) =>
+  queryOptions({
+    queryKey: ['eu-funds', 'beneficiary', cui],
+    queryFn: () => getEuBeneficiary({ data: cui }),
+  })
+
+// The EU lists of an entity page: 'failed' when the API did not answer, so the
+// institution or company stays on screen with a note instead of an error page.
+export const entityEuProjectsQuery = (cui: number, page: number) =>
+  queryOptions({
+    queryKey: ['eu-funds', 'beneficiary', cui, 'projects', page],
+    queryFn: () =>
+      getEuProjects({ data: { beneficiary: cui, page } }).catch(
+        () => 'failed' as const,
+      ),
+  })
+
+export const entityPnrrContractsQuery = (cui: number, page: number) =>
+  queryOptions({
+    queryKey: ['eu-funds', 'beneficiary', cui, 'pnrr', page],
+    queryFn: () =>
+      getPnrrContracts({ data: { beneficiary: cui, page } }).catch(
+        () => 'failed' as const,
+      ),
   })
 
 export const euSeapQuery = (of: EuSeapOf) =>

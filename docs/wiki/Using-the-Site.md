@@ -15,7 +15,8 @@ exist today and a search field:
 
 - **"Localități"**: every county, town and commune.
 - **"Clasamente"**: rankings of the largest contracts, companies and institutions.
-- **"Programe"**: the Anghel Saligny investment programme.
+- **"Programe"**: the programmes followed: the EU recovery plan (PNRR), the EU cohesion
+  funds and the Anghel Saligny investment programme.
 - **"Surse"**: where the data comes from, how it is counted, and corrections.
 
 ## Home
@@ -71,14 +72,37 @@ The page of a public body as a **buyer** (a town hall, a hospital, a ministry…
 4. **Figures**: "Contracte atribuite" (contracts awarded, signed in the period held) and
    "Achiziții directe acceptate" (accepted direct purchases). The two are never added
    together.
-5. **Two tabs**:
+5. **Tabs**:
    - "Contracte": the contracts it awarded, with winner, value and signing date, and a
      CSV export.
    - "Achiziții directe": its top suppliers by value, then every direct purchase, sortable
      by newest or largest.
+   - "Proiecte europene" and "Contracte PNRR", when it is the beneficiary of EU money
+     (see below).
 
 The page opens on the tab that has something to show. The link in your browser keeps
 the tab, page and order you chose, so you can share exactly what you see.
+
+### EU money of an institution or a company
+
+![The EU projects tab of an institution](images/institution-eu.png)
+
+An institution or a company that receives EU money has one tab for each kind it has.
+The two kinds are never added together.
+
+- **"Proiecte europene"**: its cohesion projects. First comes a table by programme with
+  the number of projects, their value, what was paid and the day of the programme's
+  list. It has no total row, because each programme's list describes a different day.
+  Then come the projects one by one, largest first. The "Legătură" column says how the
+  project was tied to this institution or company: "CUI în listă" when the list gives
+  its tax ID, or "Nume și localitate" when the list gives only a name and Date România
+  matched it. When some projects were matched by name, a line above the table says how
+  many, and the programme table says it for each programme ("din care unul după nume").
+- **"Contracte PNRR"**: the value of its PNRR financing contracts, and the PNRR payments
+  it received with the first and last day. A payment names the beneficiary and a
+  measure, never the contract, so the payments are never split among its contracts.
+  Then comes the list of contracts. A beneficiary that was paid on a measure where it
+  has no contract still has the tab, with the payments and a line saying so.
 
 ## Company page
 
@@ -90,7 +114,8 @@ The same layout, flipped: a company as a **seller**.
   of an association, at the full value of the contract) and "Achiziții directe
   acceptate". They sit side by side and are never added, because a contract won in an
   association would otherwise be counted once per member.
-- Tabs: its contracts, and the institutions it sold to directly, with every sale.
+- Tabs: its contracts, and the institutions it sold to directly, with every sale. A
+  company that receives EU money has the same two EU tabs as an institution.
 
 ## Award notice page
 
@@ -147,7 +172,8 @@ municipalities, Bucharest sectors) and people. A county opens its page.
 ![A county page](images/county.png)
 
 **A county.** The same figures as a locality,
-added up over its UATs and its county council, then a table of every UAT with its
+added up over its UATs and its county council, the county council's EU money in short,
+then a table of every UAT with its
 population, capital spending in 2024 (the year of the UATs' budgets, the council's left
 out) and contracts signed in the period held.
 
@@ -158,14 +184,19 @@ out) and contracts signed in the period held.
 1. Its kind, county and population at 1 January 2024, and a lead saying every figure has
    its own period and none is added to another.
 2. Four figures, each with its period: the Anghel Saligny payments to its town hall
-   (other programmes are not collected yet), the town hall's capital spending in 2024,
+   (PNDL, another national programme, is not collected yet), the town hall's capital spending in 2024,
    the contracts of every institution located here, and the share of them won by
    suppliers of the county (an association counts only when all its members are; one
    with members in several counties is counted apart).
 3. The town hall's budget (its largest revenue lines, and a link to the whole budget on
    its page), and who gets the contracts, each supplier with its county.
 4. "Proiecte în zonă": the town hall's Anghel Saligny projects, with the progress as the
-   town hall types it and whether a SEAP contract was found.
+   town hall types it and whether a SEAP contract was found. Under them, "Fonduri
+   europene": the town hall's EU money in two lines ("2 contracte PNRR · plăți primite
+   2,3 mil. lei, 19.12.2025–02.10.2026"), each with a link to the full list on the town
+   hall's page. Projects matched to the town hall by name are counted as such. Only the
+   town hall's own projects are shown here, not those of every company or institution
+   located in the place.
 5. "Plăți ale primăriei": we do not hold whom the town hall paid; its payments can be
    asked for under Law 544/2001.
 6. "Instituții din localitate": every institution located here, with its contracts and,
@@ -206,7 +237,12 @@ value close to the ceiling does not prove a purchase was split. Services of Anne
 page says how many there are. Patterns that the data cannot give yet are listed with the
 reason.
 
-## Programme
+## Programmes
+
+"Programe" lists the three programmes followed, each with its own page: the PNRR, the
+EU cohesion funds and Anghel Saligny.
+
+### Anghel Saligny
 
 ![The Anghel Saligny programme page](images/programme.png)
 
@@ -239,7 +275,9 @@ are listed below. A project has one of four states:
 From a project you can open the builder's page, the town hall's page, the SEAP notice,
 or every project of the same builder.
 
-## PNRR
+### PNRR
+
+![The PNRR page](images/pnrr.png)
 
 `/programe/pnrr`, from MIPE's PNRR dashboard: one edition, named in the source line.
 
@@ -259,6 +297,44 @@ or every project of the same builder.
   otherwise "Plătit pe acest contract · Nu putem spune", with the beneficiary's payments
   and contracts on the measure side by side. A contract on several measures that report
   different progress shows each measure's.
+- Under the contract, the SEAP contracts and direct purchases that cite it (see below).
+
+![A PNRR contract page](images/pnrr-contract.png)
+
+### EU cohesion funds
+
+![The EU funds page](images/eu-funds.png)
+
+`/programe/fonduri-europene`, from the lists of contracted projects that MIPE (the
+ministry for EU funds) publishes for each programme: the 2014–2020 operational
+programmes and the national programmes of 2021–2027. The regional programmes of
+2021–2027 are not collected yet, and the page says so.
+
+- "Programele": one row per programme with its projects, value, paid so far and the day
+  its list describes. Each programme has its own list and its own day, so the programmes
+  are never added together.
+- "Proiectele": a finder by programme, by status ("În implementare", "Finalizat",
+  "Reziliat"), or by words in the title, the beneficiary's name or the SMIS code.
+
+![An EU project page](images/eu-project.png)
+
+**Project page** (`/programe/fonduri-europene/proiecte/{smis}`): the title, value, the
+EU share, "Plătit până la {day}" (what was paid up to the day of the list; the lists give
+no payment days), status, dates, place, partners and the beneficiary with how it was
+tied ("CUI în listă" or "Nume și localitate"). Projects of the Health programme also
+list their payments one by one, with their days, since that programme publishes them.
+
+**Contracts and purchases that cite a project.** On both kinds of project page (a
+cohesion project and a PNRR contract), "Contracte și achiziții care citează acest
+proiect" lists the SEAP contracts and the direct purchases whose text cites the project.
+For a cohesion project the text cites its SMIS code. For a PNRR contract it cites the
+financing contract number, and only purchases by the contract's own beneficiary count.
+SEAP has no field for the project: the buyer writes it in free text, when it does. So
+every such link is "probabil" (badges "SMIS în anunț", "Nr. finanțare în anunț" and so
+on), and the list may be incomplete. Contracts and direct purchases are in two tables,
+never added. A row bought by a partner rather than the beneficiary says "cumpărat de …".
+
+![The SEAP contracts that cite a project](images/eu-seap.png)
 
 ## Sources
 

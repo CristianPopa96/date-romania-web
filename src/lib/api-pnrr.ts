@@ -42,6 +42,8 @@ export type PnrrContractFilter = {
   measure?: string
   // As the dashboard writes it ('MUREȘ'), one of the measure's `counties`.
   county?: string
+  // The beneficiary's CUI: its contracts, on an institution or supplier page.
+  beneficiary?: number
   status?: PnrrStatus
   q?: string
   page: number
@@ -53,6 +55,7 @@ export const getPnrrContracts = createServerFn({ method: 'GET' })
     const found = await getJson<PnrrContractPage>(`${ROOT}/contracts`, {
       measure: data.measure,
       county: data.county,
+      beneficiary: data.beneficiary,
       status: data.status,
       q: data.q,
       limit: PAGE_SIZE,

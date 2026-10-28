@@ -31,16 +31,18 @@ in plain words in the second wiki,
 - A **journalist** opens the rankings to see the largest contracts, the companies that
   win the most, and patterns worth asking questions about.
 - A **local councillor** follows a road or water project paid by the Anghel Saligny
-  programme from the ministry down to the company that builds it.
+  programme from the ministry down to the company that builds it, or sees the EU
+  projects of the town hall and the contracts signed under them.
 - **Anyone** can download the lists, check where a number comes from, or report an
   error.
 
 ## Where things stand
 
-As of 20.10.2026 the site runs on the maintainer's computer and is not public yet. It
+As of 28.10.2026 the site runs on the maintainer's computer and is not public yet. It
 holds purchases and contracts from **1 January 2026**, with a new day collected each
-morning, town hall budgets for **2024**, and the Anghel Saligny payment files published
-up to **27 August 2026**. Three of the planned releases are built. See
+morning, town hall budgets for **2024**, the Anghel Saligny payment files published up
+to **27 August 2026**, the PNRR contracts and payments, and the EU cohesion projects of
+13 programmes. Three of the planned releases are built, and the EU part of the fourth. See
 [Features and roadmap](Features-and-Roadmap).
 
 The data can be reused freely under the CC BY 4.0 licence, naming the source. The code is
