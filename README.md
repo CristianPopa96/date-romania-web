@@ -133,29 +133,37 @@ keyed hash for its rate limit.
 
 ## Routes
 
-| File in `src/routes/`                      | Address                                                                |
-| ------------------------------------------ | ---------------------------------------------------------------------- |
-| `index.tsx`                                | `/`                                                                    |
-| `cautare.tsx`                              | `/cautare?q=`                                                          |
-| `institutii.$cui.tsx`                      | `/institutii/{cui}`                                                    |
-| `furnizori.$cui.tsx`                       | `/furnizori/{cui}`                                                     |
-| `contracte.$id.tsx`                        | `/contracte/{id}`                                                      |
-| `achizitii-directe.$id.tsx`                | `/achizitii-directe/{id}`                                              |
-| `clasamente.tsx`                           | `/clasamente?clasament=&castigate=&cpv=&ue=`                           |
-| `programe.index.tsx`                       | `/programe` (redirects to the one programme held)                      |
-| `programe.anghel-saligny.index.tsx`        | `/programe/anghel-saligny`                                             |
-| `programe.anghel-saligny.proiecte.$id.tsx` | `/programe/anghel-saligny/proiecte/{id}`                               |
-| `localitati.index.tsx`                     | `/localitati`: the 42 counties                                         |
-| `localitati.$judet.index.tsx`              | `/localitati/{judet}`, e.g. `/localitati/alba`                         |
-| `localitati.$judet.$uat.tsx`               | `/localitati/{judet}/{uat}?sat=`, e.g. `/localitati/alba/comuna-albac` |
-| `surse.tsx`                                | `/surse?fila=&despre=`                                                 |
-| `contracte[.]csv.ts`                       | `/contracte.csv` (`?institutie=` or `?furnizor=` for one CUI)          |
-| `tipare[.]csv.ts`                          | `/tipare.csv`                                                          |
-| `__root.tsx`                               | The shell: theme, top bar, footer                                      |
+| File in `src/routes/`                          | Address                                                                |
+| ---------------------------------------------- | ---------------------------------------------------------------------- |
+| `index.tsx`                                    | `/`                                                                    |
+| `cautare.tsx`                                  | `/cautare?q=`                                                          |
+| `institutii.$cui.tsx`                          | `/institutii/{cui}`                                                    |
+| `furnizori.$cui.tsx`                           | `/furnizori/{cui}`                                                     |
+| `contracte.$id.tsx`                            | `/contracte/{id}`                                                      |
+| `achizitii-directe.$id.tsx`                    | `/achizitii-directe/{id}`                                              |
+| `clasamente.tsx`                               | `/clasamente?clasament=&castigate=&cpv=&ue=`                           |
+| `programe.index.tsx`                           | `/programe`: the programmes held                                       |
+| `programe.anghel-saligny.index.tsx`            | `/programe/anghel-saligny`                                             |
+| `programe.anghel-saligny.proiecte.$id.tsx`     | `/programe/anghel-saligny/proiecte/{id}`                               |
+| `programe.pnrr.index.tsx`                      | `/programe/pnrr?tab=beneficiari`                                       |
+| `programe.pnrr.$masura.tsx`                    | `/programe/pnrr/{masura}?judet=&stare=&q=&pagina=`, e.g. `c10.i3`      |
+| `programe.pnrr.contracte.$id.tsx`              | `/programe/pnrr/contracte/{id_angajament}?pagina=`                     |
+| `programe.fonduri-europene.index.tsx`          | `/programe/fonduri-europene?program=&stare=&q=&pagina=`                |
+| `programe.fonduri-europene.proiecte.$smis.tsx` | `/programe/fonduri-europene/proiecte/{smis}?pagina=`                   |
+| `localitati.index.tsx`                         | `/localitati`: the 42 counties                                         |
+| `localitati.$judet.index.tsx`                  | `/localitati/{judet}`, e.g. `/localitati/alba`                         |
+| `localitati.$judet.$uat.tsx`                   | `/localitati/{judet}/{uat}?sat=`, e.g. `/localitati/alba/comuna-albac` |
+| `surse.tsx`                                    | `/surse?fila=&despre=`                                                 |
+| `contracte[.]csv.ts`                           | `/contracte.csv` (`?institutie=` or `?furnizor=` for one CUI)          |
+| `tipare[.]csv.ts`                              | `/tipare.csv`                                                          |
+| `__root.tsx`                                   | The shell: theme, top bar, footer                                      |
 
 Paging, sorting, tabs and filters are typed search parameters parsed in
 `src/lib/urls.ts` (`?lista=achizitii&pagina=2&ordine=valoare`), so a shared address
-always means the same view. The institution and supplier pages share one route factory,
+always means the same view. An entity page's `lista` is `contracte`, `achizitii`, or one
+of its EU lists, `coeziune` or `pnrr`, offered only when it has that kind; `pagina`
+pages the list shown, and a project page's `pagina` pages the SEAP contracts that cite
+it. The institution and supplier pages share one route factory,
 `src/lib/entity-route.tsx`. `src/routeTree.gen.ts` (from the dev server or
 `pnpm generate-routes`) and `src/lib/api-schema.gen.ts` (from `pnpm generate-api-types`)
 are generated: never edit them by hand.

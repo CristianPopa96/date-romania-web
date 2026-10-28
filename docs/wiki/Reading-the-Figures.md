@@ -50,6 +50,18 @@ In the Anghel Saligny trace, no link from a payment to a contract is ever "sure"
 payment files do not name the contract. Headline figures count only payments tied to
 exactly one contract.
 
+EU money has links of its own:
+
+- **A project and its beneficiary.** "Sure" when the programme's list gives the
+  beneficiary's tax ID. "Probable" when it gives only a name, which Date România matched
+  to the one town hall, institution or company of that name in the project's place (or,
+  for a company, in the country). Pages that count an institution's projects say how
+  many were matched by name.
+- **A SEAP contract or purchase and a project.** Always "probable": the buyer wrote the
+  project's SMIS code, or the number of its own PNRR financing contract, in the text of
+  the notice or purchase. SEAP does not check that text, and many buyers leave it out,
+  so these lists may be incomplete.
+
 ## What counts as money
 
 - **Only accepted direct purchases are money spent.** A direct purchase that the
@@ -83,6 +95,12 @@ Figures over **different periods are never added or subtracted**. A town hall's 
 covers the whole of 2024, its contracts the days held, its Anghel Saligny payments the
 dates of the ministry's files (18.05–27.08.2026): each figure names its own period, and
 none is put on one scale with another.
+
+EU money follows the same rule. Each cohesion programme's list describes its own day,
+so programmes are never added together, and what was paid is "Plătit până la {day}"
+because the lists give no payment days. A PNRR payment names the beneficiary and a
+measure but not the contract, so it is counted for the beneficiary and never split among
+its contracts. Cohesion projects and PNRR contracts are never added to each other.
 
 Contract totals also carry a note that **the list is incomplete**: SEAP publishes half of
 all contracts more than 17 days after signing and one in ten more than 50 days after, so

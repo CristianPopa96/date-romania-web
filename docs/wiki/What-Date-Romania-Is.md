@@ -87,6 +87,8 @@ the next best thing.
 - **Contracts** cover only 2026, from 1 January; earlier years are not collected.
 - **Payments**: it does not know whom a town hall paid, outside the Anghel Saligny
   programme, because those payments are mostly not published.
-- **EU-funded projects, politicians and parties** come later.
+- **EU-funded projects** are held for the PNRR and the national cohesion programmes,
+  not yet for the regional programmes of 2021–2027.
+- **Politicians and parties** come later.
 
 See [Features and roadmap](Features-and-Roadmap).
