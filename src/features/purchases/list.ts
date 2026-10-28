@@ -3,6 +3,7 @@
 // parameters English: /institutii/4305857?lista=achizitii&stare=7&valoare_min=50000.
 
 import type { Role } from '#/lib/api'
+import { searchParam } from '#/lib/urls'
 import {
   choiceFromParam,
   choiceToParam,
@@ -15,19 +16,21 @@ import {
 } from '#/lib/list'
 import type { PageSize, Sort } from '#/lib/list'
 
+// Text that reads as a number is kept as one (`q`, `stare`, `tip`, `cpv`), as on the
+// search page: as text, the router would write it in quotes, ?stare=%227%22.
 export type PurchaseListSearch = {
-  q?: string
+  q?: string | number
   de_la?: string
   pana_la?: string
-  stare?: string
-  tip?: string
+  stare?: string | number
+  tip?: string | number
   valoare_min?: number
   valoare_max?: number
   // The other party, by CUI: a supplier on an institution's page, an institution on a
   // supplier's.
   furnizor?: number
   institutie?: number
-  cpv?: string
+  cpv?: string | number
   ordine?: string
   pe_pagina?: PageSize
   vedere?: 'tabel'
@@ -51,13 +54,16 @@ export function partyOf(role: Role) {
 export function validatePurchaseListSearch(
   search: Record<string, unknown>,
 ): PurchaseListSearch {
-  const q = typeof search.q === 'string' ? search.q.trim().slice(0, 100) : ''
+  const q =
+    typeof search.q === 'string' || typeof search.q === 'number'
+      ? String(search.q).trim().slice(0, 100)
+      : ''
   const cpv = numberFromParam(search.cpv, 8)
   const stare = choiceFromParam(search.stare)
   const tip = choiceFromParam(search.tip)
   const sort = sortFromParam(search.ordine, PURCHASE_COLUMNS)
   return {
-    q: q || undefined,
+    q: q ? searchParam(q) : undefined,
     de_la: dayFromParam(search.de_la),
     pana_la: dayFromParam(search.pana_la),
     stare: stare && choiceToParam(stare),
@@ -69,7 +75,7 @@ export function validatePurchaseListSearch(
     // A CPV code is digits; the address may give it as a number, which drops a leading 0.
     cpv:
       cpv !== undefined && String(search.cpv).length >= 2
-        ? String(search.cpv)
+        ? searchParam(String(search.cpv))
         : undefined,
     // The list's own order (newest first) is left out of the address.
     ordine:
@@ -113,12 +119,12 @@ export function purchaseFilter(
   return {
     [role === 'institutions' ? 'buyer' : 'supplier']: cui,
     [partyOf(role).api]: party,
-    q: search.q,
+    q: search.q === undefined ? undefined : String(search.q),
     state: choiceFromParam(search.stare),
     contract_type: choiceFromParam(search.tip),
     value_min: search.valoare_min,
     value_max: search.valoare_max,
-    cpv: search.cpv,
+    cpv: search.cpv === undefined ? undefined : String(search.cpv),
     date_from: search.de_la,
     date_to: search.pana_la,
   }

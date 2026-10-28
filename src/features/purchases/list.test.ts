@@ -40,11 +40,15 @@ describe('the address of a list of direct purchases', () => {
       valoare_min: 50000,
       valoare_max: 270120,
       furnizor: 17886786,
-      cpv: '4523',
+      // Read back as numbers, as the router writes them without quotes.
+      cpv: 4523,
       ordine: 'valoare-cresc',
       pe_pagina: 50,
       vedere: 'tabel',
     })
+    expect(validatePurchaseListSearch({ stare: '7', cpv: '03' })).toMatchObject(
+      { stare: 7, cpv: '03' },
+    )
   })
 
   it('leaves out the order the list has anyway, and reads the old "valoare"', () => {

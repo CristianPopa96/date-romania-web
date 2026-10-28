@@ -145,8 +145,8 @@ export function purchaseFilterDecls({
       key: 'cpv',
       kind: 'code',
       label: labels.cpv,
-      value: search.cpv,
-      chip: search.cpv ?? null,
+      value: search.cpv === undefined ? undefined : String(search.cpv),
+      chip: search.cpv === undefined ? null : String(search.cpv),
       clear: { cpv: undefined },
       lookup: async (find) =>
         (await getPurchaseCpvCodes({ data: { filter, find } })).map(

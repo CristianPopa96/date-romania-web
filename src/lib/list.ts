@@ -114,8 +114,13 @@ export function choiceFromParam(value: unknown): Array<number> | undefined {
   return [...new Set(text.split(',').map(Number))]
 }
 
-export function choiceToParam(values: Array<number>): string | undefined {
-  return values.length ? values.join(',') : undefined
+// One value is written as a number: as text that reads as one, the router would put it
+// in quotes (?stare=%227%22).
+export function choiceToParam(
+  values: Array<number>,
+): string | number | undefined {
+  if (values.length === 0) return undefined
+  return values.length === 1 ? values[0] : values.join(',')
 }
 
 function iso(date: Date) {

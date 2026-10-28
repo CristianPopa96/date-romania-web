@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   choiceFromParam,
+  choiceToParam,
   fillSteps,
   isOpen,
   marks,
@@ -183,5 +184,11 @@ describe('choices in an address', () => {
     expect(choiceFromParam(7)).toEqual([7])
     expect(choiceFromParam('7,a')).toBeUndefined()
     expect(choiceFromParam('')).toBeUndefined()
+  })
+
+  it('writes one value as a number, so the router never quotes it', () => {
+    expect(choiceToParam([7])).toBe(7)
+    expect(choiceToParam([7, 3])).toBe('7,3')
+    expect(choiceToParam([])).toBeUndefined()
   })
 })

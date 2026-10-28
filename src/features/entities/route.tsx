@@ -30,7 +30,13 @@ export function entityRoute(role: Role) {
         cui={Number(cui)}
         search={search}
         // Changing list, page or order keeps the reader at the table, not back at the top.
-        onSearch={(next) => void navigate({ search: next, resetScroll: false })}
+        // The address is cleaned as a link's would be, so the router never rewrites it.
+        onSearch={(next) =>
+          void navigate({
+            search: validateEntitySearch(next),
+            resetScroll: false,
+          })
+        }
       />
     )
   }

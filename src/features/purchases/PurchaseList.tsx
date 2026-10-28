@@ -63,14 +63,15 @@ export function PurchaseList<TSearch extends Search>({
   const onSort = (next: Sort | null) =>
     apply({ ordine: next ? sortToParam(next, PURCHASE_COLUMNS) : undefined })
   const found = overview.summary
-  const acceptedOnly = search.stare === String(ACCEPTED)
+  const acceptedOnly = String(search.stare) === String(ACCEPTED)
+  const q = search.q === undefined ? undefined : String(search.q)
   const party = role === 'institutions' ? 'furnizor' : 'institutie'
   const back = emptyHint(overview.without, PURCHASE_BY_API_PARAM)
 
   return (
     <ListView
       search={{
-        q: search.q,
+        q,
         what: t.purchaseList.searchWhat[role],
         filters: purchaseFilterDecls({
           role,
@@ -131,7 +132,7 @@ export function PurchaseList<TSearch extends Search>({
         <PurchaseRows
           role={role}
           items={list.items}
-          q={search.q}
+          q={q}
           sort={sort}
           onSort={onSort}
           total={

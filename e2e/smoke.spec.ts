@@ -390,6 +390,8 @@ test('a filter in the address is a chip, and the list adds up what it keeps', as
   const main = page.getByRole('main')
 
   await expect(main.getByText('Stare: acceptate')).toBeVisible()
+  // A number stays a number: the router never puts it in quotes (?stare=%227%22).
+  await expect(page).toHaveURL(/\?lista=achizitii&stare=7$/)
   await expect(
     main.getByText('3 achiziții acceptate · 3.500 lei fără TVA'),
   ).toBeVisible()
@@ -422,8 +424,9 @@ test('a list emptied by its filters names the one to remove', async ({
     .getByRole('button', { name: 'Scoate filtrul «Stare»' })
     .last()
     .click()
+  // Every change writes the address in one order, so one view has one address.
   await expect(page).toHaveURL(
-    /lista=achizitii&furnizor=18288250&valoare_min=5000$/,
+    /lista=achizitii&valoare_min=5000&furnizor=18288250$/,
   )
   await expect(main.getByRole('link', { name: 'Purchase 4' })).toBeVisible()
 })
