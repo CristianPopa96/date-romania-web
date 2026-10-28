@@ -9,8 +9,7 @@ import {
   InstitutionHeader,
   InstitutionMoney,
 } from '#/components/InstitutionMoney'
-import { PartnerList } from '#/components/PartnerList'
-import { PurchaseTable } from '#/components/PurchaseTable'
+import { PurchaseList } from '#/components/PurchaseList'
 import { UrlTabs } from '#/components/UrlTabs'
 import { useI18n } from '#/i18n/context'
 import { rich } from '#/i18n/rich'
@@ -143,15 +142,13 @@ export function EntityView({
               onPage={onPage}
             />
           ) : (
-            <>
-              <PartnerList role={role} partners={data.partners} />
-              <PurchaseTable
-                role={role}
-                cui={cui}
-                search={search}
-                onSearch={onSearch}
-              />
-            </>
+            <PurchaseList
+              role={role}
+              cui={cui}
+              search={search}
+              held={stats?.direct_purchases ?? null}
+              onSearch={onSearch}
+            />
           )}
         </UrlTabs>
         {funds === 'failed' ? (

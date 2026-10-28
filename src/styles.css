@@ -10,3 +10,166 @@ body {
 .radix-themes {
   font-variant-numeric: tabular-nums;
 }
+
+/* The list pattern (DataTable in the design system, round 12): filter chips, sortable
+   headers, chart bars, the marks of the search words. Radix tokens only. */
+.dr-chip {
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 var(--space-3);
+  border-radius: 9999px;
+  background: var(--slate-3);
+  box-shadow: inset 0 0 0 1px var(--slate-6);
+  font-size: 13px;
+  color: var(--slate-12);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.dr-chip:hover {
+  background: var(--slate-4);
+}
+.dr-chip:focus-visible,
+.dr-sort:focus-visible,
+.dr-preset:focus-visible {
+  outline: 2px solid var(--focus-8);
+  outline-offset: 2px;
+}
+.dr-chip::after {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-right: 1.5px solid var(--slate-11);
+  border-bottom: 1.5px solid var(--slate-11);
+  transform: translateY(-2px) rotate(45deg);
+}
+.dr-chip.on {
+  background: var(--indigo-3);
+  box-shadow: inset 0 0 0 1px var(--indigo-6);
+  color: var(--indigo-11);
+}
+.dr-chip.on::after {
+  display: none;
+}
+.dr-chip-label {
+  all: unset;
+  cursor: pointer;
+}
+.dr-chip-label:focus-visible,
+.dr-chip-x:focus-visible {
+  outline: 2px solid var(--focus-8);
+  outline-offset: 2px;
+}
+.dr-chip-x {
+  all: unset;
+  font-size: 15px;
+  line-height: 1;
+  color: var(--indigo-11);
+  cursor: pointer;
+  padding: 0 2px;
+}
+.dr-preset {
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 var(--space-3);
+  border-radius: 9999px;
+  background: var(--slate-3);
+  font-size: 13px;
+  color: var(--slate-12);
+  cursor: pointer;
+}
+.dr-preset[aria-pressed='true'] {
+  background: var(--indigo-3);
+  color: var(--indigo-11);
+}
+.dr-sort {
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+.dr-sort::after {
+  content: '↕';
+  font-size: 11px;
+  color: var(--slate-9);
+}
+th[aria-sort] .dr-sort {
+  color: var(--indigo-11);
+}
+th[aria-sort='descending'] .dr-sort::after {
+  content: '↓';
+  color: var(--indigo-11);
+}
+th[aria-sort='ascending'] .dr-sort::after {
+  content: '↑';
+  color: var(--indigo-11);
+}
+.dr-chart {
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
+.dr-chart .bar {
+  fill: var(--indigo-6);
+  cursor: pointer;
+}
+.dr-chart .bar:hover,
+.dr-chart .bar:focus-visible {
+  fill: var(--indigo-8);
+  outline: none;
+}
+.dr-chart .bar.on {
+  fill: var(--indigo-9);
+}
+.dr-chart .bar.open {
+  fill: transparent;
+  stroke: var(--indigo-7);
+  stroke-dasharray: 4 3;
+}
+.dr-chart .grid {
+  stroke: var(--slate-5);
+}
+.dr-chart text {
+  fill: var(--slate-11);
+  font-size: 11px;
+}
+.dr-chart text.on {
+  fill: var(--slate-12);
+}
+.dr-rank {
+  all: unset;
+  display: block;
+  width: 100%;
+  cursor: pointer;
+  border-radius: var(--radius-2);
+}
+.dr-rank:hover .dr-rank-bar,
+.dr-rank:focus-visible .dr-rank-bar {
+  background: var(--indigo-8);
+}
+.dr-rank:focus-visible {
+  outline: 2px solid var(--focus-8);
+  outline-offset: 2px;
+}
+.dr-rank-bar {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--indigo-6);
+}
+.dr-rank[aria-pressed='true'] .dr-rank-bar {
+  background: var(--indigo-9);
+}
+.dr-mark {
+  background: var(--amber-3);
+  color: inherit;
+  border-radius: 2px;
+}
+.dr-dim {
+  opacity: 0.55;
+  transition: opacity 120ms;
+}

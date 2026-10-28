@@ -115,6 +115,27 @@ function build(locale: Locale) {
     }
   }
 
+  const monthShortFormat = new Intl.DateTimeFormat(tag, {
+    timeZone: 'UTC',
+    month: 'short',
+  })
+  const monthFormat = new Intl.DateTimeFormat(tag, {
+    timeZone: 'UTC',
+    month: 'long',
+    year: 'numeric',
+  })
+
+  // A month from its first day, for a chart's axis ("iun") and its label ("iunie 2026").
+  function monthShort(first: string) {
+    return monthShortFormat
+      .format(new Date(`${first}T00:00:00Z`))
+      .replace('.', '')
+  }
+
+  function month(first: string) {
+    return monthFormat.format(new Date(`${first}T00:00:00Z`))
+  }
+
   const listFormat = new Intl.ListFormat(tag, { type: 'conjunction' })
 
   // "un contract obișnuit, un acord-cadru și un contract subsecvent"
@@ -137,6 +158,8 @@ function build(locale: Locale) {
     euro,
     euroShort,
     day,
+    monthShort,
+    month,
     period,
     span,
     list,

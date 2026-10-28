@@ -126,44 +126,50 @@ cloudflared tunnel --url http://localhost:3000
 4. The component reads it with `useSuspenseQuery`.
 
 The browser never reaches the API, so there is no CORS to configure. The CSV exports
-(`/contracte.csv`, `/tipare.csv`) work the same way: a server route fetches the file
+(`/contracte.csv`, `/achizitii-directe.csv`, `/tipare.csv`) work the same way: a server route fetches the file
 from the API and passes it on. The error report form posts through a server function
 that forwards the reader's address in `X-Forwarded-For`, which the API turns into a
 keyed hash for its rate limit.
 
 ## Routes
 
-| File in `src/routes/`                          | Address                                                                |
-| ---------------------------------------------- | ---------------------------------------------------------------------- |
-| `index.tsx`                                    | `/`                                                                    |
-| `cautare.tsx`                                  | `/cautare?q=`                                                          |
-| `institutii.$cui.tsx`                          | `/institutii/{cui}`                                                    |
-| `furnizori.$cui.tsx`                           | `/furnizori/{cui}`                                                     |
-| `contracte.$id.tsx`                            | `/contracte/{id}`                                                      |
-| `achizitii-directe.$id.tsx`                    | `/achizitii-directe/{id}`                                              |
-| `clasamente.tsx`                               | `/clasamente?clasament=&castigate=&cpv=&ue=`                           |
-| `programe.index.tsx`                           | `/programe`: the programmes held                                       |
-| `programe.anghel-saligny.index.tsx`            | `/programe/anghel-saligny`                                             |
-| `programe.anghel-saligny.proiecte.$id.tsx`     | `/programe/anghel-saligny/proiecte/{id}`                               |
-| `programe.pnrr.index.tsx`                      | `/programe/pnrr?tab=beneficiari`                                       |
-| `programe.pnrr.$masura.tsx`                    | `/programe/pnrr/{masura}?judet=&stare=&q=&pagina=`, e.g. `c10.i3`      |
-| `programe.pnrr.contracte.$id.tsx`              | `/programe/pnrr/contracte/{id_angajament}?pagina=`                     |
-| `programe.fonduri-europene.index.tsx`          | `/programe/fonduri-europene?program=&stare=&q=&pagina=`                |
-| `programe.fonduri-europene.proiecte.$smis.tsx` | `/programe/fonduri-europene/proiecte/{smis}?pagina=`                   |
-| `localitati.index.tsx`                         | `/localitati`: the 42 counties                                         |
-| `localitati.$judet.index.tsx`                  | `/localitati/{judet}`, e.g. `/localitati/alba`                         |
-| `localitati.$judet.$uat.tsx`                   | `/localitati/{judet}/{uat}?sat=`, e.g. `/localitati/alba/comuna-albac` |
-| `surse.tsx`                                    | `/surse?fila=&despre=`                                                 |
-| `contracte[.]csv.ts`                           | `/contracte.csv` (`?institutie=` or `?furnizor=` for one CUI)          |
-| `tipare[.]csv.ts`                              | `/tipare.csv`                                                          |
-| `__root.tsx`                                   | The shell: theme, top bar, footer                                      |
+| File in `src/routes/`                          | Address                                                                       |
+| ---------------------------------------------- | ----------------------------------------------------------------------------- |
+| `index.tsx`                                    | `/`                                                                           |
+| `cautare.tsx`                                  | `/cautare?q=`                                                                 |
+| `institutii.$cui.tsx`                          | `/institutii/{cui}`                                                           |
+| `furnizori.$cui.tsx`                           | `/furnizori/{cui}`                                                            |
+| `contracte.$id.tsx`                            | `/contracte/{id}`                                                             |
+| `achizitii-directe.$id.tsx`                    | `/achizitii-directe/{id}`                                                     |
+| `clasamente.tsx`                               | `/clasamente?clasament=&castigate=&cpv=&ue=`                                  |
+| `programe.index.tsx`                           | `/programe`: the programmes held                                              |
+| `programe.anghel-saligny.index.tsx`            | `/programe/anghel-saligny`                                                    |
+| `programe.anghel-saligny.proiecte.$id.tsx`     | `/programe/anghel-saligny/proiecte/{id}`                                      |
+| `programe.pnrr.index.tsx`                      | `/programe/pnrr?tab=beneficiari`                                              |
+| `programe.pnrr.$masura.tsx`                    | `/programe/pnrr/{masura}?judet=&stare=&q=&pagina=`, e.g. `c10.i3`             |
+| `programe.pnrr.contracte.$id.tsx`              | `/programe/pnrr/contracte/{id_angajament}?pagina=`                            |
+| `programe.fonduri-europene.index.tsx`          | `/programe/fonduri-europene?program=&stare=&q=&pagina=`                       |
+| `programe.fonduri-europene.proiecte.$smis.tsx` | `/programe/fonduri-europene/proiecte/{smis}?pagina=`                          |
+| `localitati.index.tsx`                         | `/localitati`: the 42 counties                                                |
+| `localitati.$judet.index.tsx`                  | `/localitati/{judet}`, e.g. `/localitati/alba`                                |
+| `localitati.$judet.$uat.tsx`                   | `/localitati/{judet}/{uat}?sat=`, e.g. `/localitati/alba/comuna-albac`        |
+| `surse.tsx`                                    | `/surse?fila=&despre=`                                                        |
+| `contracte[.]csv.ts`                           | `/contracte.csv` (`?institutie=` or `?furnizor=` for one CUI)                 |
+| `achizitii-directe[.]csv.ts`                   | `/achizitii-directe.csv?cumparator=` or `?vanzator=`, with the list's filters |
+| `tipare[.]csv.ts`                              | `/tipare.csv`                                                                 |
+| `__root.tsx`                                   | The shell: theme, top bar, footer                                             |
 
 Paging, sorting, tabs and filters are typed search parameters parsed in
 `src/lib/urls.ts` (`?lista=achizitii&pagina=2&ordine=valoare`), so a shared address
 always means the same view. An entity page's `lista` is `contracte`, `achizitii`, or one
 of its EU lists, `coeziune` or `pnrr`, offered only when it has that kind; `pagina`
 pages the list shown, and a project page's `pagina` pages the SEAP contracts that cite
-it. The institution and supplier pages share one route factory,
+it. The list of direct purchases follows the list pattern of the design system
+(`DataTable`): its filters (`q`, `de_la`, `pana_la`, `valoare_min`, `valoare_max`,
+`stare`, `tip`, `furnizor` or `institutie`, `cpv`), `ordine` (`valoare`, `valoare-cresc`,
+`furnizor`…), `pe_pagina` and `vedere=tabel` are parsed in `src/lib/purchase-list.ts`;
+the generic parts are `src/lib/list.ts` and `src/components/list/`. The institution and
+supplier pages share one route factory,
 `src/lib/entity-route.tsx`. `src/routeTree.gen.ts` (from the dev server or
 `pnpm generate-routes`) and `src/lib/api-schema.gen.ts` (from `pnpm generate-api-types`)
 are generated: never edit them by hand.

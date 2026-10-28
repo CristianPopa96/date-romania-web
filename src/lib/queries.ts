@@ -20,7 +20,6 @@ import type { QueryClient } from '@tanstack/react-query'
 import {
   getDatasets,
   getEntityPage,
-  getPurchases,
   getRanking,
   getStats,
   searchEntities,
@@ -48,6 +47,10 @@ import { getProgramme, getProject, getProjects } from '#/lib/api-programme'
 import type { ProjectFilter } from '#/lib/api-programme'
 import { getCorrections } from '#/lib/api-reports'
 import { contractCount } from '#/lib/contracts'
+import {
+  purchaseListQuery,
+  purchaseOverviewQuery,
+} from '#/lib/queries-purchases'
 import { entityList } from '#/lib/urls'
 import type { EntitySearch, RankingFilter } from '#/lib/urls'
 
@@ -76,17 +79,6 @@ export const entityQuery = (role: Role, cui: number) =>
   queryOptions({
     queryKey: ['entity', role, cui],
     queryFn: () => getEntityPage({ data: { role, cui } }),
-  })
-
-export const purchasesQuery = (
-  role: Role,
-  cui: number,
-  page: number,
-  byValue: boolean,
-) =>
-  queryOptions({
-    queryKey: ['purchases', role, cui, page, byValue],
-    queryFn: () => getPurchases({ data: { role, cui, page, byValue } }),
   })
 
 export const rankingQuery = (role: Role, cpv?: string) =>
@@ -192,9 +184,10 @@ export async function loadEntityPage(
       await client.ensureQueryData(entityPnrrContractsQuery(cui, pageNumber))
     }
   } else {
-    await client.ensureQueryData(
-      purchasesQuery(role, cui, pageNumber, search.ordine === 'valoare'),
-    )
+    await Promise.all([
+      client.ensureQueryData(purchaseListQuery(role, cui, search)),
+      client.ensureQueryData(purchaseOverviewQuery(role, cui, search)),
+    ])
   }
   return page
 }

@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AchizitiiDirecteDotcsvRouteImport } from './routes/achizitii-directe[.]csv'
 import { Route as CautareRouteImport } from './routes/cautare'
 import { Route as ClasamenteRouteImport } from './routes/clasamente'
 import { Route as ContracteDotcsvRouteImport } from './routes/contracte[.]csv'
@@ -34,6 +35,11 @@ import { Route as ProgramePnrrContracteIdRouteImport } from './routes/programe.p
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AchizitiiDirecteDotcsvRoute = AchizitiiDirecteDotcsvRouteImport.update({
+  id: '/achizitii-directe.csv',
+  path: '/achizitii-directe.csv',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CautareRoute = CautareRouteImport.update({
@@ -143,6 +149,7 @@ const ProgramePnrrContracteIdRoute = ProgramePnrrContracteIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/achizitii-directe.csv': typeof AchizitiiDirecteDotcsvRoute
   '/cautare': typeof CautareRoute
   '/clasamente': typeof ClasamenteRoute
   '/contracte.csv': typeof ContracteDotcsvRoute
@@ -166,6 +173,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/achizitii-directe.csv': typeof AchizitiiDirecteDotcsvRoute
   '/cautare': typeof CautareRoute
   '/clasamente': typeof ClasamenteRoute
   '/contracte.csv': typeof ContracteDotcsvRoute
@@ -190,6 +198,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/achizitii-directe.csv': typeof AchizitiiDirecteDotcsvRoute
   '/cautare': typeof CautareRoute
   '/clasamente': typeof ClasamenteRoute
   '/contracte.csv': typeof ContracteDotcsvRoute
@@ -215,6 +224,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/achizitii-directe.csv'
     | '/cautare'
     | '/clasamente'
     | '/contracte.csv'
@@ -238,6 +248,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/achizitii-directe.csv'
     | '/cautare'
     | '/clasamente'
     | '/contracte.csv'
@@ -261,6 +272,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/achizitii-directe.csv'
     | '/cautare'
     | '/clasamente'
     | '/contracte.csv'
@@ -285,6 +297,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AchizitiiDirecteDotcsvRoute: typeof AchizitiiDirecteDotcsvRoute
   CautareRoute: typeof CautareRoute
   ClasamenteRoute: typeof ClasamenteRoute
   ContracteDotcsvRoute: typeof ContracteDotcsvRoute
@@ -314,6 +327,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/achizitii-directe.csv': {
+      id: '/achizitii-directe.csv'
+      path: '/achizitii-directe.csv'
+      fullPath: '/achizitii-directe.csv'
+      preLoaderRoute: typeof AchizitiiDirecteDotcsvRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cautare': {
@@ -461,6 +481,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AchizitiiDirecteDotcsvRoute: AchizitiiDirecteDotcsvRoute,
   CautareRoute: CautareRoute,
   ClasamenteRoute: ClasamenteRoute,
   ContracteDotcsvRoute: ContracteDotcsvRoute,

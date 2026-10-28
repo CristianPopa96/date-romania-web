@@ -21,6 +21,7 @@ The site is planned as ten user flows, built in releases. This page is the state
 | 4       | Look up any EU cohesion project by programme, status, words or SMIS code, with what was paid up to the day of its list                    |
 | 4       | See the SEAP contracts and direct purchases that cite an EU project or a PNRR contract                                                    |
 | 4       | See the EU projects and PNRR money of an institution, a company, a town hall or a county council                                          |
+| 4       | Filter, sort and chart the direct purchases of an institution or a company, and download them as filtered                                 |
 
 ## The data behind it
 
@@ -56,6 +57,8 @@ is collected each morning (as of 20.10.2026).
 
 Also waiting:
 
+- The same filters, column sorting and charts on the other lists (contracts, rankings,
+  the programme and project finders), and a new search page with suggestions.
 - The EU projects of the regional programmes of 2021–2027 (left out for now).
 - On a place's page, the EU projects of every institution and company located there,
   not only the town hall's.

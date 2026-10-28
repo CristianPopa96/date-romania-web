@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import type { Locator } from '@playwright/test'
 
 // Smoke tests: each page opens in a real browser and shows the figures the API gave.
 // The data is the handful of records in e2e/stub/answers.json: one town hall, one
@@ -211,7 +212,7 @@ test('an institution page keeps contracts and direct purchases apart', async ({
   await main.getByRole('tab', { name: /Achiziții directe/ }).click()
   await expect(page).toHaveURL(/\/institutii\/4981310\?lista=achizitii$/)
   await expect(
-    main.getByRole('heading', { name: 'Achiziții directe (4)' }),
+    main.getByText('4 achiziții directe · 3 acceptate: 3.500 lei fără TVA'),
   ).toBeVisible()
 })
 
@@ -307,9 +308,11 @@ test('an institution page counts only accepted purchases', async ({ page }) => {
 
   await expect(page).toHaveTitle(`${TOWN_HALL} · Date România`)
   const main = page.getByRole('main')
-  await expect(main.getByText('3.500 lei').first()).toBeVisible()
   await expect(
-    main.getByRole('heading', { name: 'Achiziții directe (4)' }),
+    main.getByText('4 achiziții directe · 3 acceptate: 3.500 lei fără TVA'),
+  ).toBeVisible()
+  await expect(
+    main.getByText('din 4 achiziții directe · 05.10–06.10.2026'),
   ).toBeVisible()
   // The refused offer is listed with its value, and marked as not counted.
   const refused = main.getByRole('row').filter({ hasText: 'Purchase 4' })
@@ -321,21 +324,121 @@ test('an institution page counts only accepted purchases', async ({ page }) => {
     'href',
     /e-licitatie\.ro\/pub\/direct-acquisition\/view\/4$/,
   )
+  // The list's own order is the newest first, and its header says so.
+  await expect(
+    main.getByRole('columnheader', { name: 'Data' }),
+  ).toHaveAttribute('aria-sort', 'descending')
+  await expect(
+    main.getByRole('link', { name: /Exportă CSV · 4 rânduri/ }),
+  ).toHaveAttribute('href', '/achizitii-directe.csv?cumparator=4981310')
 })
 
-test('sorting by value keeps the choice in the address', async ({ page }) => {
+test('the purchases chart their value per day and their largest suppliers', async ({
+  page,
+}) => {
   await page.goto('/institutii/4981310?lista=achizitii')
-  await page.getByRole('radio', { name: 'Cele mai mari acceptate' }).click()
+  const main = page.getByRole('main')
 
-  await expect(page).toHaveURL(
-    /\/institutii\/4981310\?lista=achizitii&ordine=valoare$/,
+  await expect(
+    main.getByRole('heading', { name: /Valoare pe zile/ }),
+  ).toBeVisible()
+  await expect(
+    main.getByRole('button', { name: '06.10.2026: 2.500 lei' }),
+  ).toBeVisible()
+  await main.getByRole('button', { name: /ALFA CONSTRUCT/ }).click()
+  await expect(page).toHaveURL(/lista=achizitii&furnizor=17886786$/)
+  await expect(main.getByText('Furnizor: ALFA CONSTRUCT S.R.L.')).toBeVisible()
+  await expect(main.getByRole('link', { name: 'Purchase 3' })).toHaveCount(0)
+
+  // "Doar tabel" hides the charts, and the address keeps it.
+  await main.getByRole('radio', { name: 'Doar tabel' }).click()
+  await expect(page).toHaveURL(/vedere=tabel/)
+  await expect(
+    main.getByRole('heading', { name: /Valoare pe zile/ }),
+  ).toHaveCount(0)
+})
+
+// The rows of the list of purchases, not those of the charts' tables of figures.
+function purchaseRows(main: Locator) {
+  return main.getByRole('row').filter({ hasText: /Purchase \d/ })
+}
+
+test('a column header sorts the whole list, both ways, then back', async ({
+  page,
+}) => {
+  await page.goto('/institutii/4981310?lista=achizitii')
+  const main = page.getByRole('main')
+  const value = main.getByRole('columnheader', { name: 'Valoare' })
+
+  await value.getByRole('button').click()
+  await expect(page).toHaveURL(/lista=achizitii&ordine=valoare$/)
+  await expect(value).toHaveAttribute('aria-sort', 'descending')
+  await expect(purchaseRows(main).first()).toContainText('Purchase 4')
+
+  await value.getByRole('button').click()
+  await expect(page).toHaveURL(/ordine=valoare-cresc$/)
+  await expect(purchaseRows(main).first()).toContainText('Purchase 3')
+
+  await value.getByRole('button').click()
+  await expect(page).toHaveURL(/\/institutii\/4981310\?lista=achizitii$/)
+})
+
+test('a filter in the address is a chip, and the list adds up what it keeps', async ({
+  page,
+}) => {
+  await page.goto('/institutii/4981310?lista=achizitii&stare=7')
+  const main = page.getByRole('main')
+
+  await expect(main.getByText('Stare: acceptate')).toBeVisible()
+  await expect(
+    main.getByText('3 achiziții acceptate · 3.500 lei fără TVA'),
+  ).toBeVisible()
+  // Every row is money spent: a total row repeats the sum.
+  const total = main
+    .getByRole('row')
+    .filter({ hasText: 'Total pentru filtrele alese' })
+  await expect(total).toContainText('3 achiziții')
+  await expect(total).toContainText('3.500 lei')
+
+  await main.getByRole('button', { name: 'Scoate filtrul «Stare»' }).click()
+  await expect(page).toHaveURL(/\/institutii\/4981310\?lista=achizitii$/)
+})
+
+test('a list emptied by its filters names the one to remove', async ({
+  page,
+}) => {
+  await page.goto(
+    '/institutii/4981310?lista=achizitii&furnizor=18288250&stare=7&valoare_min=5000',
   )
   const main = page.getByRole('main')
+
   await expect(
-    main.getByRole('heading', { name: 'Achiziții directe acceptate (3)' }),
+    main.getByText('Nimic nu se potrivește cu filtrele alese.'),
   ).toBeVisible()
-  await expect(main.getByRole('row').nth(1)).toContainText('Purchase 2')
-  await expect(main.getByText('Purchase 4')).toHaveCount(0)
+  await expect(
+    main.getByText('Fără filtrul «Stare» ar fi o achiziție directă.'),
+  ).toBeVisible()
+  await main
+    .getByRole('button', { name: 'Scoate filtrul «Stare»' })
+    .last()
+    .click()
+  await expect(page).toHaveURL(
+    /lista=achizitii&furnizor=18288250&valoare_min=5000$/,
+  )
+  await expect(main.getByRole('link', { name: 'Purchase 4' })).toBeVisible()
+})
+
+test('the supplier filter offers the suppliers of the list', async ({
+  page,
+}) => {
+  await page.goto('/institutii/4981310?lista=achizitii')
+  const main = page.getByRole('main')
+
+  await main.getByRole('button', { name: 'Furnizor', exact: true }).click()
+  const panel = page.getByRole('dialog')
+  await expect(panel.getByText('Beta Birotică SRL')).toBeVisible()
+  await panel.getByRole('button', { name: /ALFA CONSTRUCT/ }).click()
+  await expect(page).toHaveURL(/lista=achizitii&furnizor=17886786$/)
 })
 
 test('a supplier page keeps the purchase above the limit out of the total', async ({
@@ -348,6 +451,9 @@ test('a supplier page keeps the purchase above the limit out of the total', asyn
     main.getByRole('heading', { name: 'ALFA CONSTRUCT S.R.L.' }),
   ).toBeVisible()
   await expect(main.getByText('3.000 lei').first()).toBeVisible()
+  await expect(
+    main.getByText(/una peste plafon, neadunate: 5\.000\.000 lei/),
+  ).toBeVisible()
   const above = main.getByRole('row').filter({ hasText: 'Purchase 5' })
   await expect(above).toContainText('peste plafon, nu intră în total')
   await expect(

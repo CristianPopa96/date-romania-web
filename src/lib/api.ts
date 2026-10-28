@@ -9,13 +9,19 @@ import type { components } from '#/lib/api-schema.gen'
 // generate-api-types`). Each file names the ones it uses.
 export type Schemas = components['schemas']
 
-type Params = Record<string, string | number | undefined>
+type Params = Record<
+  string,
+  string | number | ReadonlyArray<string | number> | undefined
+>
 
-// A parameter left undefined is not sent.
+// A parameter left undefined is not sent; a list is sent once per value (state=7&state=3).
 function apiUrl(path: string, params: Params = {}) {
   const url = new URL(path, process.env.API_URL ?? 'http://127.0.0.1:8000')
   for (const [key, value] of Object.entries(params)) {
-    if (value !== undefined) url.searchParams.set(key, String(value))
+    if (value === undefined) continue
+    for (const each of Array.isArray(value) ? value : [value]) {
+      url.searchParams.append(key, String(each))
+    }
   }
   return url
 }
@@ -135,23 +141,6 @@ export const getEntityPage = createServerFn({ method: 'GET' })
   .handler(({ data }) =>
     getJson<EntityPage>(`/v1/${data.role}/${data.cui}`, { partners: 10 }),
   )
-
-export const getPurchases = createServerFn({ method: 'GET' })
-  .inputValidator(
-    (data: { role: Role; cui: number; page: number; byValue: boolean }) => data,
-  )
-  .handler(async ({ data }): Promise<PurchasePage> => {
-    const found = await getJson<PurchasePage>('/v1/direct-purchases', {
-      [data.role === 'institutions' ? 'buyer' : 'supplier']: data.cui,
-      sort: data.byValue ? 'value' : 'newest',
-      // The largest are ranked among accepted purchases only: a refused offer can carry
-      // any value and is not money spent.
-      state: data.byValue ? ACCEPTED : undefined,
-      limit: PAGE_SIZE,
-      offset: (data.page - 1) * PAGE_SIZE,
-    })
-    return found ?? { total: 0, items: [] }
-  })
 
 export const getRanking = createServerFn({ method: 'GET' })
   .inputValidator((data: { role: Role; cpv?: string }) => data)

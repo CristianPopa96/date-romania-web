@@ -7,6 +7,7 @@
 
 import { budget } from '#/i18n/ro-budget'
 import { counted, plural } from '#/i18n/ro-plural'
+import { list, purchaseList } from '#/i18n/ro-list'
 import { places } from '#/i18n/ro-places'
 import { eu } from '#/i18n/ro-eu'
 import { pnrr } from '#/i18n/ro-pnrr'
@@ -392,7 +393,7 @@ export const ro = {
     undivided: 'valoarea întreagă a contractelor, nedivizată între membri',
     directAccepted: 'Achiziții directe acceptate',
     withoutVat: 'Sumele sunt fără TVA.',
-    lists: 'Contracte și achiziții',
+    lists: 'Contracte, achiziții și proiecte',
     tabContracts: 'Contracte',
     tabPurchases: 'Achiziții directe',
     purchasesCount: (n: number, text: string) =>
@@ -442,24 +443,11 @@ export const ro = {
   },
 
   partners: {
-    institutions: {
-      title: 'Furnizori la achiziții directe, după valoare',
-      none: 'Nicio achiziție acceptată în această perioadă.',
-    },
-    suppliers: {
-      title: 'Instituții cărora le-a vândut direct, după valoare',
-      none: 'Nicio vânzare acceptată în această perioadă.',
-    },
     accepted: (n: number, text: string) =>
       counted(n, text, 'o achiziție acceptată', 'achiziții acceptate'),
   },
 
   purchases: {
-    title: 'Achiziții directe',
-    titleAccepted: 'Achiziții directe acceptate',
-    heading: (title: string, total: string) => `${title} (${total})`,
-    newest: 'Cele mai recente',
-    largest: 'Cele mai mari acceptate',
     date: 'Data',
     purchase: 'Achiziție',
     state: 'Stare',
@@ -478,6 +466,9 @@ export const ro = {
   },
 
   rankings,
+
+  list,
+  purchaseList,
 
   notes: {
     period: (days: string) =>

@@ -142,6 +142,70 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/direct-purchases/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Direct Purchases Overview
+         * @description The list of direct purchases under the filters given, in figures: the summary, accepted
+         *     value per month (or per day), the largest parties, the options of each choice filter and
+         *     the purchases by value band.
+         */
+        get: operations["direct_purchases_overview_v1_direct_purchases_overview_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/direct-purchases/parties": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Direct Purchase Parties
+         * @description The parties on one side of the purchases the other filters give, most purchases first:
+         *     the options of a typeahead filter.
+         */
+        get: operations["direct_purchase_parties_v1_direct_purchases_parties_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/direct-purchases/cpv-codes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Direct Purchase Cpv Codes
+         * @description The CPV codes of the purchases the other filters give, most purchases first: the
+         *     options of the CPV filter.
+         */
+        get: operations["direct_purchase_cpv_codes_v1_direct_purchases_cpv_codes_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/direct-purchases": {
         parameters: {
             query?: never;
@@ -151,7 +215,9 @@ export interface paths {
         };
         /**
          * Direct Purchases
-         * @description Direct purchases by finalization day, newest or largest first.
+         * @description Direct purchases under the filters given, by finalization day, value or party.
+         *
+         *     As csv, the whole list in the same order; a file needs a buyer or a supplier.
          */
         get: operations["direct_purchases_v1_direct_purchases_get"];
         put?: never;
@@ -896,6 +962,18 @@ export interface components {
             source: components["schemas"]["Source"];
         };
         /**
+         * Band
+         * @description Purchases whose closing value is from `start` up to `end` (excluded; null: no end).
+         */
+        Band: {
+            /** Start */
+            start: number;
+            /** End */
+            end: number | null;
+            /** Purchases */
+            purchases: number;
+        };
+        /**
          * Capital
          * @description Capital spending executed in a year, by town halls (and a county's council).
          */
@@ -1100,6 +1178,15 @@ export interface components {
              * @description SEAP's name for the division, where a row gives it.
              */
             name: string | null;
+        };
+        /** CpvOption */
+        CpvOption: {
+            /** Code */
+            code: string;
+            /** Name */
+            name: string | null;
+            /** Purchases */
+            purchases: number;
         };
         /**
          * Dataset
@@ -1796,6 +1883,29 @@ export interface components {
             /** Eu Project */
             eu_project: string | null;
         };
+        /**
+         * Option
+         * @description One option of a choice filter, with the purchases it leaves under the other filters.
+         */
+        Option: {
+            /** Value */
+            value: number;
+            /** Purchases */
+            purchases: number;
+        };
+        /**
+         * Others
+         * @description The rest of the accepted purchases after the largest parties.
+         */
+        Others: {
+            /**
+             * Parties
+             * @description How many other parties, told apart by CUI or by text.
+             */
+            parties: number;
+            /** Value */
+            value: number;
+        };
         /** Partner */
         Partner: {
             /** Cui */
@@ -1811,6 +1921,20 @@ export interface components {
             accepted: number;
             /** Value */
             value: number;
+        };
+        /** PartyOption */
+        PartyOption: {
+            /** Cui */
+            cui: number;
+            /** Name */
+            name: string;
+            /**
+             * Kind
+             * @description authority, company or other
+             */
+            kind: string;
+            /** Purchases */
+            purchases: number;
         };
         /**
          * Period
@@ -2247,6 +2371,22 @@ export interface components {
             /** Last Received On */
             last_received_on: string | null;
         };
+        /**
+         * Point
+         * @description Accepted purchases counted in totals, in one month or one day.
+         */
+        Point: {
+            /**
+             * Start
+             * Format: date
+             * @description The first day of the month, or the day.
+             */
+            start: string;
+            /** Accepted */
+            accepted: number;
+            /** Value */
+            value: number;
+        };
         /** Population */
         Population: {
             /** People */
@@ -2663,6 +2803,66 @@ export interface components {
              */
             rejected: boolean | null;
         };
+        /**
+         * PurchaseOverview
+         * @description The list of direct purchases under the filters chosen, in figures.
+         *
+         *     Every figure counts the rows the filters give; `value` and the charts only the accepted
+         *     purchases at or under their legal limit, as every total does.
+         */
+        PurchaseOverview: {
+            summary: components["schemas"]["Summary"];
+            /**
+             * Whole
+             * @description Purchases of the same buyer or supplier, with no filter.
+             */
+            whole: number;
+            /**
+             * Last Day Held
+             * @description The newest day collected: a month or day after it is not over yet.
+             */
+            last_day_held: string | null;
+            /**
+             * Step
+             * @description Months, or days when the purchases found span under two months.
+             * @enum {string}
+             */
+            step: "month" | "day";
+            /** Points */
+            points: components["schemas"]["Point"][];
+            /**
+             * Party
+             * @description The side `parties` lists: the other side of the buyer or supplier asked.
+             * @enum {string}
+             */
+            party: "supplier" | "buyer";
+            /**
+             * Parties
+             * @description The largest by value, at most five.
+             */
+            parties: components["schemas"]["Partner"][];
+            others: components["schemas"]["Others"];
+            /**
+             * States
+             * @description SEAP's states, most purchases first.
+             */
+            states: components["schemas"]["Option"][];
+            /**
+             * Contract Types
+             * @description 1 goods, 2 services, 3 works, 0 for a purchase whose type is not known.
+             */
+            contract_types: components["schemas"]["Option"][];
+            /**
+             * Bands
+             * @description Purchases by closing value, whatever their state.
+             */
+            bands: components["schemas"]["Band"][];
+            /**
+             * Without
+             * @description Only when no purchase is found: what each filter given would leave out if it alone were removed, in the order of the parameters.
+             */
+            without: components["schemas"]["Without"][];
+        };
         /** PurchasePage */
         PurchasePage: {
             /** Total */
@@ -3065,6 +3265,16 @@ export interface components {
             /** Country */
             country: string | null;
         };
+        /**
+         * Without
+         * @description How many purchases one filter alone keeps out, for a list it leaves empty.
+         */
+        Without: {
+            /** Param */
+            param: string;
+            /** Purchases */
+            purchases: number;
+        };
     };
     responses: never;
     parameters: never;
@@ -3265,24 +3475,194 @@ export interface operations {
             };
         };
     };
-    direct_purchases_v1_direct_purchases_get: {
+    direct_purchases_overview_v1_direct_purchases_overview_get: {
         parameters: {
             query?: {
+                /** @description The party whose list this is: the figures say what part of it the filters keep, and the chart of parties names the other side. */
+                scope?: ("buyer" | "supplier") | null;
                 /** @description CUI of the buying institution. */
                 buyer?: number | null;
                 /** @description CUI of the supplier. */
                 supplier?: number | null;
-                /** @description Start of a CPV code, e.g. 4523. */
+                /** @description Words of the name, the DA code or either party. */
+                q?: string | null;
+                /** @description SEAP state ids, any of them; 7 is accepted. */
+                state?: number[] | null;
+                /** @description 1 goods, 2 services, 3 works, 0 for a type not known; any of them. */
+                contract_type?: number[] | null;
+                /** @description Lei without VAT, included. */
+                value_min?: number | null;
+                /** @description Lei without VAT, excluded. */
+                value_max?: number | null;
+                /** @description Start of a CPV code: 45 for the division of works, 4523 for a narrower class. */
                 cpv?: string | null;
-                /** @description SEAP state id; 7 is accepted. */
-                state?: number | null;
                 /** @description A day in Romanian time, YYYY-MM-DD. */
                 date_from?: string | null;
                 /** @description A day in Romanian time, YYYY-MM-DD. */
                 date_to?: string | null;
-                sort?: "newest" | "value";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PurchaseOverview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    direct_purchase_parties_v1_direct_purchases_parties_get: {
+        parameters: {
+            query: {
+                /** @description The side to list. */
+                side: "buyer" | "supplier";
+                /** @description Words of the name, or the CUI. */
+                find?: string | null;
+                /** @description CUI of the buying institution. */
+                buyer?: number | null;
+                /** @description CUI of the supplier. */
+                supplier?: number | null;
+                /** @description Words of the name, the DA code or either party. */
+                q?: string | null;
+                /** @description SEAP state ids, any of them; 7 is accepted. */
+                state?: number[] | null;
+                /** @description 1 goods, 2 services, 3 works, 0 for a type not known; any of them. */
+                contract_type?: number[] | null;
+                /** @description Lei without VAT, included. */
+                value_min?: number | null;
+                /** @description Lei without VAT, excluded. */
+                value_max?: number | null;
+                /** @description Start of a CPV code: 45 for the division of works, 4523 for a narrower class. */
+                cpv?: string | null;
+                /** @description A day in Romanian time, YYYY-MM-DD. */
+                date_from?: string | null;
+                /** @description A day in Romanian time, YYYY-MM-DD. */
+                date_to?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartyOption"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    direct_purchase_cpv_codes_v1_direct_purchases_cpv_codes_get: {
+        parameters: {
+            query?: {
+                /** @description The start of a code, or words of its name. */
+                find?: string | null;
+                /** @description CUI of the buying institution. */
+                buyer?: number | null;
+                /** @description CUI of the supplier. */
+                supplier?: number | null;
+                /** @description Words of the name, the DA code or either party. */
+                q?: string | null;
+                /** @description SEAP state ids, any of them; 7 is accepted. */
+                state?: number[] | null;
+                /** @description 1 goods, 2 services, 3 works, 0 for a type not known; any of them. */
+                contract_type?: number[] | null;
+                /** @description Lei without VAT, included. */
+                value_min?: number | null;
+                /** @description Lei without VAT, excluded. */
+                value_max?: number | null;
+                /** @description Start of a CPV code: 45 for the division of works, 4523 for a narrower class. */
+                cpv?: string | null;
+                /** @description A day in Romanian time, YYYY-MM-DD. */
+                date_from?: string | null;
+                /** @description A day in Romanian time, YYYY-MM-DD. */
+                date_to?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CpvOption"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    direct_purchases_v1_direct_purchases_get: {
+        parameters: {
+            query?: {
+                /** @description The finalization day, the closing value or a party's name; `newest` is the day, as before. */
+                sort?: "date" | "value" | "supplier" | "buyer" | "newest";
+                order?: "desc" | "asc";
                 limit?: number;
                 offset?: number;
+                /** @description csv gives the whole list as a file. */
+                format?: "json" | "csv";
+                /** @description CUI of the buying institution. */
+                buyer?: number | null;
+                /** @description CUI of the supplier. */
+                supplier?: number | null;
+                /** @description Words of the name, the DA code or either party. */
+                q?: string | null;
+                /** @description SEAP state ids, any of them; 7 is accepted. */
+                state?: number[] | null;
+                /** @description 1 goods, 2 services, 3 works, 0 for a type not known; any of them. */
+                contract_type?: number[] | null;
+                /** @description Lei without VAT, included. */
+                value_min?: number | null;
+                /** @description Lei without VAT, excluded. */
+                value_max?: number | null;
+                /** @description Start of a CPV code: 45 for the division of works, 4523 for a narrower class. */
+                cpv?: string | null;
+                /** @description A day in Romanian time, YYYY-MM-DD. */
+                date_from?: string | null;
+                /** @description A day in Romanian time, YYYY-MM-DD. */
+                date_to?: string | null;
             };
             header?: never;
             path?: never;

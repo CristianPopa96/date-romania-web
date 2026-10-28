@@ -1,4 +1,6 @@
 // What a shared address means: the parts of a URL that decide which page is shown.
+import { validatePurchaseListSearch } from '#/lib/purchase-list'
+import type { PurchaseListSearch } from '#/lib/purchase-list'
 import { sitePath } from '#/lib/reports'
 
 // Search params shared by the institution and the supplier page.
@@ -12,10 +14,11 @@ export const ENTITY_LISTS = [
   'pnrr',
 ] as const
 export type EntityList = (typeof ENTITY_LISTS)[number]
-export type EntitySearch = {
+// The list of direct purchases adds its filters, order and page size
+// (`PurchaseListSearch`).
+export type EntitySearch = PurchaseListSearch & {
   lista?: EntityList
   pagina?: number
-  ordine?: 'valoare'
 }
 
 export function validateEntitySearch(
@@ -25,7 +28,7 @@ export function validateEntitySearch(
   return {
     lista: ENTITY_LISTS.find((list) => list === search.lista),
     pagina: Number.isInteger(page) && page > 1 ? page : undefined,
-    ordine: search.ordine === 'valoare' ? 'valoare' : undefined,
+    ...validatePurchaseListSearch(search),
   }
 }
 
