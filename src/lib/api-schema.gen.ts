@@ -715,6 +715,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/programmes/eu-funds/projects/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Eu Projects Overview
+         * @description The projects under the filters given, in figures: how many, the value and the amount
+         *     paid per programme (never added across programmes), the options of each choice filter,
+         *     and the projects by value band.
+         */
+        get: operations["eu_projects_overview_v1_programmes_eu_funds_projects_overview_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/programmes/eu-funds": {
         parameters: {
             query?: never;
@@ -744,7 +766,7 @@ export interface paths {
         };
         /**
          * Projects
-         * @description Projects, the largest first.
+         * @description Projects under the filters given, the largest first, or in any column's order.
          */
         get: operations["projects_v1_programmes_eu_funds_projects_get"];
         put?: never;
@@ -1682,6 +1704,40 @@ export interface components {
             payments_source: components["schemas"]["Source"] | null;
             source: components["schemas"]["Source"];
         };
+        /**
+         * EuProjectOverview
+         * @description The projects under the filters chosen, in figures.
+         */
+        EuProjectOverview: {
+            summary: components["schemas"]["EuProjectSummary"];
+            /**
+             * Whole
+             * @description Projects of the same beneficiary, with no other filter.
+             */
+            whole: number;
+            /**
+             * Programmes
+             * @description Under every filter but the programme: the options of that filter, and each programme's value and amount paid, most projects first.
+             */
+            programmes: components["schemas"]["ProgrammeOption"][];
+            /** Statuses */
+            statuses: components["schemas"]["StatusOption"][];
+            /**
+             * Other Statuses
+             * @description Projects whose status the lists write in words of their own.
+             */
+            other_statuses: number;
+            /**
+             * Bands
+             * @description Projects by total value in lei.
+             */
+            bands: components["schemas"]["Band"][];
+            /**
+             * Without
+             * @description Only when no project is found: what each filter given would leave out if it alone were removed, in the order of the parameters.
+             */
+            without: components["schemas"]["Without"][];
+        };
         /** EuProjectPage */
         EuProjectPage: {
             /** Total */
@@ -1714,6 +1770,18 @@ export interface components {
              * @description The status as the list writes it.
              */
             status_written: string | null;
+        };
+        /** EuProjectSummary */
+        EuProjectSummary: {
+            /** Projects */
+            projects: number;
+            /**
+             * First Start
+             * @description The earliest start of a project found.
+             */
+            first_start: string | null;
+            /** Last Start */
+            last_start: string | null;
         };
         /** EuSeapContract */
         EuSeapContract: {
@@ -2696,6 +2764,31 @@ export interface components {
             unnamed: components["schemas"]["MatchCount"];
         };
         /**
+         * ProgrammeOption
+         * @description One programme of the list under the other filters, with its own figures.
+         */
+        ProgrammeOption: {
+            /**
+             * Value
+             * @description The programme's code, e.g. 'POR'.
+             */
+            value: string;
+            /** Count */
+            count: number;
+            /**
+             * Total
+             * @description Lei; never add it to another programme's.
+             */
+            total: number | null;
+            /** Paid */
+            paid: number | null;
+            /**
+             * Cut Off
+             * @description The day its list counts `paid` up to.
+             */
+            cut_off: string | null;
+        };
+        /**
          * ProgrammePayments
          * @description The Anghel Saligny payments to this town hall or county council, from the
          *     ministry's files. Never added to the budget's state subsidies: the periods differ,
@@ -3231,6 +3324,16 @@ export interface components {
              */
             limit_goods_services: number;
             source: components["schemas"]["Source"];
+        };
+        /** StatusOption */
+        StatusOption: {
+            /**
+             * Value
+             * @enum {string}
+             */
+            value: "in_progress" | "finished" | "terminated";
+            /** Count */
+            count: number;
         };
         /**
          * Summary
@@ -4704,6 +4807,50 @@ export interface operations {
             };
         };
     };
+    eu_projects_overview_v1_programmes_eu_funds_projects_overview_get: {
+        parameters: {
+            query?: {
+                /** @description The beneficiary whose list this is: `whole` counts all of its. */
+                scope?: "beneficiary" | null;
+                /** @description Programme codes, e.g. 'POR'; any of them. */
+                programme?: string[] | null;
+                /** @description The beneficiary's CUI. */
+                beneficiary?: number | null;
+                /** @description Any of these statuses. */
+                status?: ("in_progress" | "finished" | "terminated")[] | null;
+                /** @description Words of the title or the beneficiary's name, or a SMIS code. */
+                q?: string | null;
+                /** @description Lei, included. */
+                value_min?: number | null;
+                /** @description Lei, excluded. */
+                value_max?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EuProjectOverview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     eu_funds_v1_programmes_eu_funds_get: {
         parameters: {
             query?: never;
@@ -4727,15 +4874,23 @@ export interface operations {
     projects_v1_programmes_eu_funds_projects_get: {
         parameters: {
             query?: {
-                /** @description A programme code, e.g. 'POR'. */
-                programme?: string | null;
-                /** @description The beneficiary's CUI. */
-                beneficiary?: number | null;
-                status?: ("in_progress" | "finished" | "terminated") | null;
-                /** @description Part of the title or the beneficiary's name, or a SMIS code. */
-                q?: string | null;
+                /** @description The total value, or the amount paid. */
+                sort?: "value" | "paid";
+                order?: "desc" | "asc";
                 limit?: number;
                 offset?: number;
+                /** @description Programme codes, e.g. 'POR'; any of them. */
+                programme?: string[] | null;
+                /** @description The beneficiary's CUI. */
+                beneficiary?: number | null;
+                /** @description Any of these statuses. */
+                status?: ("in_progress" | "finished" | "terminated")[] | null;
+                /** @description Words of the title or the beneficiary's name, or a SMIS code. */
+                q?: string | null;
+                /** @description Lei, included. */
+                value_min?: number | null;
+                /** @description Lei, excluded. */
+                value_max?: number | null;
             };
             header?: never;
             path?: never;

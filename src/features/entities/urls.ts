@@ -1,5 +1,7 @@
 import { validateContractListSearch } from '#/features/contracts'
 import type { ContractListSearch } from '#/features/contracts'
+import { validateEuProjectListSearch } from '#/features/eu-projects'
+import type { EuProjectListSearch } from '#/features/eu-projects'
 import { validatePurchaseListSearch } from '#/features/purchases'
 import type { PurchaseListSearch } from '#/features/purchases'
 import { pageFromParam } from '#/lib/urls'
@@ -21,7 +23,8 @@ export type EntityList = (typeof ENTITY_LISTS)[number]
 // (`ContractListSearch`, `PurchaseListSearch`). The names they share mean the same, and a
 // change of tab clears them.
 export type EntitySearch = ContractListSearch &
-  PurchaseListSearch & {
+  PurchaseListSearch &
+  EuProjectListSearch & {
     lista?: EntityList
     pagina?: number
   }
@@ -32,8 +35,11 @@ export function validateEntitySearch(
   return {
     lista: ENTITY_LISTS.find((list) => list === search.lista),
     pagina: pageFromParam(search.pagina),
-    ...validateContractListSearch(search),
-    ...validatePurchaseListSearch(search),
+    // A name two lists share (`stare`) keeps the value of the list that reads it: one
+    // list's undefined never erases another's.
+    ...defined(validateContractListSearch(search)),
+    ...defined(validatePurchaseListSearch(search)),
+    ...defined(validateEuProjectListSearch(search)),
   }
 }
 
@@ -60,4 +66,10 @@ export function entityListSearch(
   hasContracts: boolean,
 ): EntitySearch {
   return { lista: list === entityList({}, hasContracts) ? undefined : list }
+}
+
+function defined<T extends Record<string, unknown>>(search: T): Partial<T> {
+  return Object.fromEntries(
+    Object.entries(search).filter(([, value]) => value !== undefined),
+  ) as Partial<T>
 }

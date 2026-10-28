@@ -44,6 +44,38 @@ export const eu = {
     terminated: 'Reziliat',
   },
 
+  // A beneficiary's projects in the list pattern (DataTable). A programme's figures are
+  // never added to another's: a sum is shown only when one programme is chosen.
+  list: {
+    title: 'Proiectele',
+    searchWhat: 'titlu, beneficiar, cod SMIS',
+    filters: {
+      q: 'Căutare',
+      program: 'Program',
+      stare: 'Stare',
+      valoare: 'Valoare',
+    },
+    valuePresets: {
+      small: 'Sub 1.000.000 lei',
+      middle: '1.000.000–25.000.000 lei',
+      large: '25.000.000 lei sau mai mult',
+    },
+    projects: (n: number, text: string) =>
+      counted(n, text, 'un proiect', 'proiecte'),
+    programme: (value: string, paid: string, day: string | null) =>
+      `valoare ${value} · plătit ${paid}${day ? ` până la ${day}` : ''}`,
+    of: (whole: string) =>
+      `din ${whole} ale beneficiarului; sumele nu se adună între programe, fiecare are data listei lui`,
+    otherStatuses: (n: number, text: string) =>
+      `${counted(n, text, 'unul', 'proiecte')} cu o stare scrisă altfel în listă`,
+    otherStatus: 'Altă stare, scrisă de listă',
+    programmesTitle: 'Valoare pe programe',
+    programmesUnit: 'lei, fiecare program la data listei lui',
+    statusTitle: 'Stare',
+    statusUnit: 'proiecte, aceleași filtre',
+    total: (programme: string) => `Total ${programme}`,
+  },
+
   // How a project's beneficiary is tied to an institution or a company we hold.
   tie: {
     cui: 'CUI în listă',

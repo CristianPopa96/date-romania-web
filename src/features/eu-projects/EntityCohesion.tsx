@@ -1,34 +1,28 @@
-import { useSuspenseQuery } from '@tanstack/react-query'
-import { Link as RouterLink } from '@tanstack/react-router'
-import { Code, Flex, Heading, Link, Table, Text } from '@radix-ui/themes'
+import { Flex, Heading, Table, Text } from '@radix-ui/themes'
 
-import { ConfidenceBadge } from '#/components/ConfidenceBadge'
 import { DataState } from '#/components/DataState'
-import { EuStatusBadge } from '#/features/eu-projects/EuProjectFacts'
-import { Pager } from '#/components/Pager'
 import { SourceLine } from '#/components/SourceLine'
-import { useI18n } from '#/i18n/context'
-import { PAGE_SIZE } from '#/lib/api'
+import { EuProjectList } from '#/features/eu-projects/EuProjectList'
 import type { EuBeneficiaryFunds } from '#/features/eu-projects/api'
-import { pageCount } from '#/lib/list'
-import { beneficiaryTie, periodLabel } from '#/features/eu-projects/eu'
-import { entityEuProjectsQuery } from '#/features/eu-projects/queries'
+import { periodLabel } from '#/features/eu-projects/eu'
+import type { EuProjectListSearch } from '#/features/eu-projects/list'
+import { useI18n } from '#/i18n/context'
 
 // The cohesion projects of the entity a page is about (flow 7, "arrive from a
 // beneficiary's page"), by programme and one by one; its PNRR contracts are in
 // EntityPnrr. The two kinds are never added together, nor two programmes' figures: each
 // has the day of its own list.
 
-export function EntityCohesion({
+export function EntityCohesion<TSearch extends EuProjectListSearch>({
   cui,
   funds,
-  page,
-  onPage,
+  search,
+  onSearch,
 }: {
   cui: number
   funds: EuBeneficiaryFunds
-  page: number
-  onPage: (page: number) => void
+  search: TSearch & { pagina?: number }
+  onSearch: (search: TSearch) => void
 }) {
   const { t, f } = useI18n()
   const e = t.eu
@@ -102,100 +96,12 @@ export function EntityCohesion({
         <SourceLine source={funds.cohesion_source} />
       ) : null}
 
-      <CohesionList cui={cui} page={page} onPage={onPage} />
-    </Flex>
-  )
-}
-
-// The projects one by one, largest first, each with how it was tied to this entity.
-function CohesionList({
-  cui,
-  page,
-  onPage,
-}: {
-  cui: number
-  page: number
-  onPage: (page: number) => void
-}) {
-  const { t, f } = useI18n()
-  const e = t.eu
-  const { data: projects } = useSuspenseQuery(entityEuProjectsQuery(cui, page))
-  if (projects === 'failed') {
-    return (
-      <Text size="2" color="gray">
-        {e.held.failed}
-      </Text>
-    )
-  }
-  const money = (value: number | null) =>
-    value === null ? <DataState kind="notPublished" /> : f.lei(value)
-  return (
-    <>
-      <Text size="2" color="gray">
-        {e.found(projects.total, f.count(projects.total))}
-      </Text>
-      <Table.Root variant="surface" size="1">
-        <Table.Header>
-          <Table.Row>
-            <Table.ColumnHeaderCell>{e.project}</Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell justify="end">
-              {e.value}
-            </Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell justify="end">
-              {e.paid}
-            </Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell>{e.state}</Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell>{e.held.tie}</Table.ColumnHeaderCell>
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {projects.items.map((row) => {
-            const tie = beneficiaryTie(row.beneficiary)
-            return (
-              <Table.Row key={row.smis}>
-                <Table.RowHeaderCell>
-                  <Link asChild>
-                    <RouterLink
-                      to="/programe/fonduri-europene/proiecte/$smis"
-                      params={{ smis: String(row.smis) }}
-                    >
-                      {row.title ?? e.fallbackTitle}
-                    </RouterLink>
-                  </Link>
-                  <Text as="div" size="1" color="gray">
-                    <Code variant="ghost">{e.smis(String(row.smis))}</Code>
-                    {` · ${row.programme}`}
-                  </Text>
-                </Table.RowHeaderCell>
-                <Table.Cell justify="end" style={{ whiteSpace: 'nowrap' }}>
-                  {money(row.total)}
-                </Table.Cell>
-                <Table.Cell justify="end" style={{ whiteSpace: 'nowrap' }}>
-                  {money(row.paid)}
-                </Table.Cell>
-                <Table.Cell>
-                  <EuStatusBadge
-                    status={row.status}
-                    written={row.status_written}
-                  />
-                </Table.Cell>
-                <Table.Cell>
-                  <ConfidenceBadge
-                    level={tie.level}
-                    label={e.tie[tie.label]}
-                    help={e.tieHelp[tie.label]}
-                  />
-                </Table.Cell>
-              </Table.Row>
-            )
-          })}
-        </Table.Body>
-      </Table.Root>
-      <Pager
-        page={page}
-        pages={pageCount(projects.total, PAGE_SIZE)}
-        onPage={onPage}
+      <EuProjectList
+        cui={cui}
+        programmes={funds.cohesion}
+        search={search}
+        onSearch={onSearch}
       />
-    </>
+    </Flex>
   )
 }
