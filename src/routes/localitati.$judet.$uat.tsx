@@ -18,6 +18,7 @@ import {
 
 import { AmountBars } from '#/components/AmountBars'
 import { EntityLink } from '#/components/EntityLink'
+import { PlaceEuFunds } from '#/components/PlaceEuFunds'
 import { PlaceOverview } from '#/components/PlaceOverview'
 import { InstitutionsTable, ProjectsTable } from '#/components/PlaceLists'
 import { WinnersCard } from '#/components/WinnersCard'
@@ -32,7 +33,7 @@ import {
   validateLocalitySearch,
   villageOf,
 } from '#/lib/places'
-import { localityQuery } from '#/lib/queries'
+import { euBeneficiaryQuery, localityQuery } from '#/lib/queries'
 
 // One UAT (flow 6, ScreenLocality): a commune, town, municipality or Bucharest sector.
 // Every figure names its own period and none is added to another (design round 8).
@@ -43,6 +44,11 @@ export const Route = createFileRoute('/localitati/$judet/$uat')({
       localityQuery(params.judet, params.uat),
     )
     if (!found) throw notFound()
+    if (found.town_hall) {
+      await context.queryClient.ensureQueryData(
+        euBeneficiaryQuery(found.town_hall.cui),
+      )
+    }
     return { name: found.place.name }
   },
   head: ({ loaderData, match }) => ({
@@ -130,7 +136,12 @@ function LocalityPage() {
           <WinnersCard winners={figures.top_winners} />
         </Grid>
 
-        <ProjectsTable projects={locality.projects} />
+        <Flex direction="column" gap="5">
+          <ProjectsTable projects={locality.projects} />
+          {locality.town_hall ? (
+            <PlaceEuFunds entity={locality.town_hall} />
+          ) : null}
+        </Flex>
 
         <Flex direction="column" gap="2">
           <Heading as="h2" size="5">

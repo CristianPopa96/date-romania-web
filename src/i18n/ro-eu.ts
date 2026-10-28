@@ -147,6 +147,45 @@ export const eu = {
     },
   },
 
+  // The EU money of one beneficiary, on its institution or supplier page (two lists, one
+  // per kind) and on its place's page (the town hall's or county council's, in short).
+  // The two kinds are never added together, nor two programmes' figures.
+  held: {
+    tabCohesion: 'Proiecte europene',
+    tabPnrr: 'Contracte PNRR',
+    cohesionTitle: 'Proiecte cu fonduri europene',
+    cohesionLead:
+      'Proiectele de coeziune în care apare ca beneficiar, din listele de proiecte contractate ale MIPE. Fiecare program are lista lui, la data ei: sumele nu se adună între programe.',
+    tie: 'Legătură',
+    pnrrTitle: 'Contracte de finanțare PNRR',
+    pnrrLead: (day: string) =>
+      `Contractele pe care le are ca beneficiar și plățile primite, din tabloul de bord PNRR, ediția ${day}.`,
+    contracted: 'Valoarea contractelor',
+    contracts: (n: number, text: string) =>
+      counted(n, text, 'un contract', 'contracte'),
+    received: 'Plăți primite din PNRR',
+    receivedDetail: (n: number, text: string, days: string | null) =>
+      `${counted(n, text, 'o plată', 'plăți')}${days ? ` · ${days}` : ''}`,
+    receivedNote:
+      'pe toate măsurile · o plată numește beneficiarul și măsura, nu contractul, așa că nu o împărțim pe contracte',
+    noPayments: 'nicio plată în fișierul de plăți',
+    failed:
+      'Nu am putut citi acum fondurile europene ale acestui beneficiar. Încearcă din nou mai târziu.',
+    // On a place's page: the town hall's or county council's, with links to its lists.
+    placeTitle: 'Fonduri europene',
+    placeLead: (name: string) =>
+      `Proiectele europene în care ${name} apare ca beneficiar.`,
+    placeCohesion: (n: number, text: string, programmes: number) =>
+      `${counted(n, text, 'Un proiect de coeziune', 'proiecte de coeziune')}, ${programmes === 1 ? 'într-un program' : `în ${programmes} programe`}`,
+    placePnrr: (n: number, text: string) =>
+      counted(n, text, 'Un contract PNRR', 'contracte PNRR'),
+    placeReceived: (sum: string, days: string | null) =>
+      `plăți primite ${sum}${days ? `, ${days}` : ''}`,
+    placeNone:
+      'Niciun proiect european în listele MIPE și în tabloul de bord PNRR pe care le avem.',
+    seeList: 'Vezi lista',
+  },
+
   notPublicTitle: 'Ce nu este public',
   notPublic:
     'Cererile de rambursare, facturile decontate și data fiecărei plăți nu sunt publicate. Lista MIPE dă doar suma plătită până la data ei.',

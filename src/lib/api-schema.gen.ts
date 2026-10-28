@@ -688,6 +688,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/programmes/eu-beneficiaries/{cui}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Beneficiary
+         * @description What one beneficiary holds of both kinds of EU money. 404 when the CUI is not held.
+         */
+        get: operations["beneficiary_v1_programmes_eu_beneficiaries__cui__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/places": {
         parameters: {
             query?: never;
@@ -1191,6 +1211,58 @@ export interface components {
             confidence: ("sure" | "probable") | null;
             /** Method */
             method: ("cui-in-list" | "administration-name+place" | "name+place" | "company-name") | null;
+        };
+        /**
+         * EuBeneficiaryFunds
+         * @description The EU money of one beneficiary, of both kinds, never added together: its cohesion
+         *     projects by programme, each at its own list's day, and its PNRR contracts and
+         *     payments. The projects and contracts themselves are listed by
+         *     `/programmes/eu-funds/projects` and `/programmes/pnrr/contracts`, by `beneficiary`.
+         */
+        EuBeneficiaryFunds: {
+            entity: components["schemas"]["EntityRef"];
+            /**
+             * Cohesion
+             * @description Its projects in each programme, tied by eu_links.py; empty when none.
+             */
+            cohesion: components["schemas"]["EuProgramme"][];
+            /** @description Null when it has no project. */
+            cohesion_source: components["schemas"]["Source"] | null;
+            /** @description Null when it has no contract or payment. */
+            pnrr: components["schemas"]["EuBeneficiaryPnrr"] | null;
+        };
+        /**
+         * EuBeneficiaryPnrr
+         * @description A beneficiary's PNRR contracts and the payments it received, from one dashboard
+         *     edition. The payments name the beneficiary and a measure, never the contract: they are
+         *     counted for the beneficiary, not shared out among its contracts.
+         */
+        EuBeneficiaryPnrr: {
+            /** Contracts */
+            contracts: number;
+            /**
+             * Total
+             * @description Lei, its contracts' values added up.
+             */
+            total: number | null;
+            /**
+             * Paid
+             * @description Lei paid to it on every measure.
+             */
+            paid: number;
+            /** Payments */
+            payments: number;
+            /** First Day */
+            first_day: string | null;
+            /** Last Day */
+            last_day: string | null;
+            /**
+             * Edition
+             * Format: date
+             * @description The day of the dashboard edition held.
+             */
+            edition: string;
+            source: components["schemas"]["Source"];
         };
         /**
          * EuFunds
@@ -3994,6 +4066,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["EuSeapLinks"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    beneficiary_v1_programmes_eu_beneficiaries__cui__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                cui: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EuBeneficiaryFunds"];
                 };
             };
             /** @description Validation Error */

@@ -141,6 +141,16 @@ describe('the list of an entity page', () => {
     expect(entityList({ lista: 'contracte' }, false)).toBe('contracte')
   })
 
+  it('shows an EU list only when the entity has that kind', () => {
+    const both = { coeziune: true, pnrr: true }
+    expect(validateEntitySearch({ lista: 'pnrr' }).lista).toBe('pnrr')
+    expect(entityList({ lista: 'coeziune' }, true, both)).toBe('coeziune')
+    expect(entityList({ lista: 'pnrr' }, false, both)).toBe('pnrr')
+    const none = { coeziune: false, pnrr: false }
+    expect(entityList({ lista: 'pnrr' }, true, none)).toBe('contracte')
+    expect(entityList({ lista: 'coeziune' }, false)).toBe('achizitii')
+  })
+
   it('leaves the default list out of the address', () => {
     expect(entityListSearch('contracte', true)).toEqual({ lista: undefined })
     expect(entityListSearch('achizitii', true)).toEqual({ lista: 'achizitii' })

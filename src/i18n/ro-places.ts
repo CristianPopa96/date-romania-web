@@ -35,7 +35,7 @@ export const places = {
     payments: 'Plăți Anghel Saligny către primărie',
     paymentsCounty: 'Plăți Anghel Saligny în județ',
     paymentsSectors: 'Plăți Anghel Saligny, primăria și sectoarele',
-    paymentsMissing: 'PNDL, PNRR, fonduri UE: încă necolectat',
+    paymentsMissing: 'PNDL: încă necolectat',
     noPayments: 'nicio plată în fișierele programului',
     capital: 'Cheltuieli de capital ale primăriei',
     capitalCounty: 'Cheltuieli de capital, primării și consiliul județean',
@@ -60,7 +60,7 @@ export const places = {
 
   projects: 'Proiecte în zonă',
   projectsLead:
-    'Proiectele Anghel Saligny ale primăriei. Proiectele PNDL, PNRR și cu fonduri europene: {notCollected}',
+    'Proiectele Anghel Saligny ale primăriei. Proiectele PNDL: {notCollected}',
   projectsNone:
     'Primăria nu are proiecte în fișierele programului Anghel Saligny.',
   project: 'Proiect',

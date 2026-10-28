@@ -2,6 +2,8 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { Badge, Code, Container, Flex, Heading, Text } from '@radix-ui/themes'
 
 import { EntityContractList } from '#/components/EntityContractList'
+import { EntityCohesion } from '#/components/EntityCohesion'
+import { EntityPnrr } from '#/components/EntityPnrr'
 import { EntityFigures } from '#/components/EntityFigures'
 import {
   InstitutionHeader,
@@ -14,12 +16,19 @@ import { useI18n } from '#/i18n/context'
 import { rich } from '#/i18n/rich'
 import type { Role } from '#/lib/api'
 import { contractCount } from '#/lib/contracts'
-import { entityContractsQuery, entityQuery, statsQuery } from '#/lib/queries'
+import { euCounts, euLists } from '#/lib/eu'
+import {
+  entityContractsQuery,
+  entityQuery,
+  euBeneficiaryQuery,
+  statsQuery,
+} from '#/lib/queries'
 import { entityList, entityListSearch } from '#/lib/urls'
-import type { EntitySearch } from '#/lib/urls'
+import type { EntityList, EntitySearch } from '#/lib/urls'
 
 // The page of one institution (as a buyer) or one supplier (as a seller): its contracts
-// and its direct purchases, as separate figures and separate lists.
+// and its direct purchases, as separate figures and separate lists, and the EU projects
+// and PNRR contracts it is the beneficiary of, a list for each kind it has.
 export function EntityView({
   role,
   cui,
@@ -35,12 +44,26 @@ export function EntityView({
   const { data } = useSuspenseQuery(entityQuery(role, cui))
   const { data: contracts } = useSuspenseQuery(entityContractsQuery(role, cui))
   const { data: stats } = useSuspenseQuery(statsQuery)
+  const { data: funds } = useSuspenseQuery(euBeneficiaryQuery(cui))
   // The route loader answers "not found" before this renders.
   if (!data || !contracts) return null
 
   const summary = data.direct_purchases
   const held = contractCount(contracts)
-  const list = entityList(search, held > 0)
+  const eu = euCounts(funds)
+  const list = entityList(search, held > 0, euLists(funds))
+  const page = search.pagina ?? 1
+  const onPage = (next: number) =>
+    onSearch({ ...search, pagina: next > 1 ? next : undefined })
+  const tab = (value: EntityList, label: string, count: number) => ({
+    value,
+    label: (
+      <Flex gap="2" align="center">
+        {label}
+        <Badge color="gray">{f.count(count)}</Badge>
+      </Flex>
+    ),
+  })
 
   return (
     <Container size="4" px="5" py="7">
@@ -89,24 +112,12 @@ export function EntityView({
         <UrlTabs
           value={list}
           tabs={[
-            {
-              value: 'contracte',
-              label: (
-                <Flex gap="2" align="center">
-                  {t.entity.tabContracts}
-                  <Badge color="gray">{f.count(held)}</Badge>
-                </Flex>
-              ),
-            },
-            {
-              value: 'achizitii',
-              label: (
-                <Flex gap="2" align="center">
-                  {t.entity.tabPurchases}
-                  <Badge color="gray">{f.count(summary.purchases)}</Badge>
-                </Flex>
-              ),
-            },
+            tab('contracte', t.entity.tabContracts, held),
+            tab('achizitii', t.entity.tabPurchases, summary.purchases),
+            ...(eu.cohesion > 0
+              ? [tab('coeziune', t.eu.held.tabCohesion, eu.cohesion)]
+              : []),
+            ...(eu.pnrr > 0 ? [tab('pnrr', t.eu.held.tabPnrr, eu.pnrr)] : []),
           ]}
           onChange={(value) => onSearch(entityListSearch(value, held > 0))}
         >
@@ -114,10 +125,22 @@ export function EntityView({
             <EntityContractList
               role={role}
               cui={cui}
-              page={search.pagina ?? 1}
-              onPage={(page) =>
-                onSearch({ ...search, pagina: page > 1 ? page : undefined })
-              }
+              page={page}
+              onPage={onPage}
+            />
+          ) : list === 'coeziune' && funds && funds !== 'failed' ? (
+            <EntityCohesion
+              cui={cui}
+              funds={funds}
+              page={page}
+              onPage={onPage}
+            />
+          ) : list === 'pnrr' && funds && funds !== 'failed' && funds.pnrr ? (
+            <EntityPnrr
+              cui={cui}
+              pnrr={funds.pnrr}
+              page={page}
+              onPage={onPage}
             />
           ) : (
             <>
@@ -131,6 +154,11 @@ export function EntityView({
             </>
           )}
         </UrlTabs>
+        {funds === 'failed' ? (
+          <Text size="2" color="gray">
+            {t.eu.held.failed}
+          </Text>
+        ) : null}
       </Flex>
     </Container>
   )

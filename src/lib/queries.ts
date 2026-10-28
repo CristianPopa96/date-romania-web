@@ -1,4 +1,5 @@
 import {
+  getEuBeneficiary,
   getEuFunds,
   getEuProject,
   getEuProjects,
@@ -12,6 +13,7 @@ import {
   getPnrrMeasure,
 } from '#/lib/api-pnrr'
 import type { PnrrContractFilter } from '#/lib/api-pnrr'
+import { euLists } from '#/lib/eu'
 import { queryOptions } from '@tanstack/react-query'
 import type { QueryClient } from '@tanstack/react-query'
 
@@ -177,10 +179,19 @@ export async function loadEntityPage(
     role === 'institutions' ? client.ensureQueryData(budgetQuery(cui)) : null,
   ])
   if (!page || !totals) return null
-  const list = entityList(search, contractCount(totals) > 0)
+  const funds = await client.ensureQueryData(euBeneficiaryQuery(cui))
+  const list = entityList(search, contractCount(totals) > 0, euLists(funds))
   const pageNumber = search.pagina ?? 1
   if (list === 'contracte') {
     await client.ensureQueryData(contractsQuery(role, cui, pageNumber))
+  } else if (list === 'coeziune') {
+    await client.ensureQueryData(
+      euProjectsQuery({ beneficiary: cui, page: pageNumber }),
+    )
+  } else if (list === 'pnrr') {
+    await client.ensureQueryData(
+      pnrrContractsQuery({ beneficiary: cui, page: pageNumber }),
+    )
   } else {
     await client.ensureQueryData(
       purchasesQuery(role, cui, pageNumber, search.ordine === 'valoare'),
@@ -267,6 +278,12 @@ export const euProjectQuery = (smis: number) =>
   queryOptions({
     queryKey: ['eu-funds', 'project', smis],
     queryFn: () => getEuProject({ data: smis }),
+  })
+
+export const euBeneficiaryQuery = (cui: number) =>
+  queryOptions({
+    queryKey: ['eu-funds', 'beneficiary', cui],
+    queryFn: () => getEuBeneficiary({ data: cui }),
   })
 
 export const euSeapQuery = (of: EuSeapOf) =>

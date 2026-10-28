@@ -2,7 +2,12 @@
 // named in an address, and what share of a project the EU pays. Kept here so it can be
 // tested.
 
-import type { EuBeneficiary, EuProgramme } from '#/lib/api-eu'
+import type {
+  EuBeneficiary,
+  EuBeneficiaryFunds,
+  EuProgramme,
+} from '#/lib/api-eu'
+import type { EuLists } from '#/lib/urls'
 
 // How the tie between a project and its beneficiary is marked (the ConfidenceBadge of the
 // design system): 'sure' when the list gives the CUI, 'probable' when we tied it by name.
@@ -61,4 +66,23 @@ export function euShare(
 // '2021-2027' as the site writes a span of years, with an en dash.
 export function periodLabel(period: string): string {
   return period.replace('-', '–')
+}
+
+// What an entity holds of EU money, as its page counts it: its cohesion projects (every
+// programme's, a count only) and its PNRR contracts. Nothing when the answer is missing.
+export function euCounts(funds: EuBeneficiaryFunds | null | 'failed') {
+  if (!funds || funds === 'failed') return { cohesion: 0, pnrr: 0 }
+  return {
+    cohesion: funds.cohesion.reduce(
+      (n, programme) => n + programme.projects,
+      0,
+    ),
+    pnrr: funds.pnrr?.contracts ?? 0,
+  }
+}
+
+// The EU lists an entity page offers: one per kind it has.
+export function euLists(funds: EuBeneficiaryFunds | null | 'failed'): EuLists {
+  const counts = euCounts(funds)
+  return { coeziune: counts.cohesion > 0, pnrr: counts.pnrr > 0 }
 }
