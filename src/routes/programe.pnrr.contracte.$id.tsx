@@ -1,11 +1,12 @@
 import { createFileRoute, notFound, redirect } from '@tanstack/react-router'
 
-import { PnrrContractView } from '#/components/PnrrContractView'
+import { PnrrContractView } from '#/features/pnrr/PnrrContractView'
 import { messagesFor } from '#/i18n'
 import { PAGE_SIZE } from '#/lib/api'
-import { pageCount } from '#/lib/contracts'
+import { pageCount } from '#/lib/list'
 import { pageTitle } from '#/lib/copy'
-import { euSeapQuery, pnrrContractQuery } from '#/lib/queries'
+import { euSeapQuery } from '#/features/eu-projects/queries'
+import { pnrrContractQuery } from '#/features/pnrr/queries'
 import { idFromPath, validatePageSearch } from '#/lib/urls'
 
 // One PNRR financing contract, by MIPE's commitment id (the contract number is not unique).

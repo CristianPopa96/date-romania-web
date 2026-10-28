@@ -6,8 +6,7 @@ import {
   DIRECT_PURCHASE_LIMIT,
   DIRECT_PURCHASE_LIMIT_GOODS_SERVICES,
 } from '#/lib/api'
-import type { Summary } from '#/lib/api'
-import type { Period } from '#/lib/api-contracts'
+import type { Summary, Period } from '#/lib/api'
 
 // We hold only the days collected so far, so every total says which days it covers.
 export function PeriodNote({ summary }: { summary: Summary }) {

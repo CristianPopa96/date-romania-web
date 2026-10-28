@@ -16,24 +16,25 @@ import {
   Text,
 } from '@radix-ui/themes'
 
-import { AmountBars } from '#/components/AmountBars'
+import { AmountBars } from '#/features/budget/AmountBars'
 import { EntityLink } from '#/components/EntityLink'
-import { PlaceEuFunds } from '#/components/PlaceEuFunds'
-import { PlaceOverview } from '#/components/PlaceOverview'
-import { InstitutionsTable, ProjectsTable } from '#/components/PlaceLists'
-import { WinnersCard } from '#/components/WinnersCard'
+import { PlaceEuFunds } from '#/features/eu-projects/PlaceEuFunds'
+import { PlaceOverview } from '#/features/places/PlaceOverview'
+import { InstitutionsTable, ProjectsTable } from '#/features/places/PlaceLists'
+import { WinnersCard } from '#/features/places/WinnersCard'
 import { SourceLine } from '#/components/SourceLine'
 import { messagesFor } from '#/i18n'
 import { useI18n } from '#/i18n/context'
-import type { Locality } from '#/lib/api-places'
+import type { Locality } from '#/features/places/api'
 import { pageTitle } from '#/lib/copy'
 import {
   placeLink,
   topRevenue,
   validateLocalitySearch,
   villageOf,
-} from '#/lib/places'
-import { euBeneficiaryQuery, localityQuery } from '#/lib/queries'
+} from '#/features/places/places'
+import { euBeneficiaryQuery } from '#/features/eu-projects/queries'
+import { localityQuery } from '#/features/places/queries'
 
 // One UAT (flow 6, ScreenLocality): a commune, town, municipality or Bucharest sector.
 // Every figure names its own period and none is added to another (design round 8).

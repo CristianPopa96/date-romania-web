@@ -260,3 +260,8 @@ export function marks(
   }
   return parts
 }
+
+// How many pages a list of `total` rows has; a list with no rows still has one.
+export function pageCount(total: number, size: number) {
+  return Math.max(Math.ceil(total / size), 1)
+}

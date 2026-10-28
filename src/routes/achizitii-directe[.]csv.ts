@@ -5,7 +5,7 @@ import {
   purchaseApiSort,
   purchaseFilter,
   validatePurchaseListSearch,
-} from '#/lib/purchase-list'
+} from '#/features/purchases/list'
 import { cuiFromPath } from '#/lib/urls'
 
 // The direct purchases of one institution or one company as a CSV file, with the filters

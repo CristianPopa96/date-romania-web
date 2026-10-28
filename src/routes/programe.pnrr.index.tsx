@@ -3,17 +3,17 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Card, Container, Flex, Grid, Heading, Text } from '@radix-ui/themes'
 
 import { Unavailable } from '#/components/Notes'
-import { PnrrMeasuresTable, PnrrTopTable } from '#/components/PnrrTables'
-import { Stat } from '#/components/ProgrammeFigures'
+import { PnrrMeasuresTable, PnrrTopTable } from '#/features/pnrr/PnrrTables'
+import { Stat } from '#/features/programme/ProgrammeFigures'
 import { SourceLine } from '#/components/SourceLine'
 import { UrlTabs } from '#/components/UrlTabs'
 import { messagesFor } from '#/i18n'
 import { useI18n } from '#/i18n/context'
-import type { PnrrProgramme } from '#/lib/api-pnrr'
+import type { PnrrProgramme } from '#/features/pnrr/api'
 import { pageTitle } from '#/lib/copy'
-import { paidShare } from '#/lib/pnrr'
-import { pnrrQuery } from '#/lib/queries'
-import { validatePnrrProgrammeSearch } from '#/lib/urls-programmes'
+import { paidShare } from '#/features/pnrr/pnrr'
+import { pnrrQuery } from '#/features/pnrr/queries'
+import { validatePnrrProgrammeSearch } from '#/features/pnrr/urls'
 
 // The Recovery and Resilience Plan: its money from one dashboard edition, its measures by
 // component, and the largest recipients.

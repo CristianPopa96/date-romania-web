@@ -1,10 +1,9 @@
 import { createContext, useContext, useMemo } from 'react'
+import { DEFAULT_LOCALE, messagesFor } from './index'
+import type { Locale, Messages } from './index'
 
 import { formatFor } from '#/lib/format'
 import type { Format } from '#/lib/format'
-
-import { DEFAULT_LOCALE, messagesFor } from './index'
-import type { Locale, Messages } from './index'
 
 type I18n = { locale: Locale; t: Messages; f: Format }
 

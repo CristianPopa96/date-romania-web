@@ -16,22 +16,26 @@ import {
   Text,
 } from '@radix-ui/themes'
 
-import { PnrrContractFinder } from '#/components/PnrrContractFinder'
-import { Stat } from '#/components/ProgrammeFigures'
+import { PnrrContractFinder } from '#/features/pnrr/PnrrContractFinder'
+import { Stat } from '#/features/programme/ProgrammeFigures'
 import { SourceLine } from '#/components/SourceLine'
 import { messagesFor } from '#/i18n'
 import { useI18n } from '#/i18n/context'
-import type { PnrrContractFilter, PnrrMeasure } from '#/lib/api-pnrr'
+import type { PnrrContractFilter, PnrrMeasure } from '#/features/pnrr/api'
 import { pageTitle } from '#/lib/copy'
 import {
   countyBySlug,
   measureBySlug,
   measureLabel,
   paidShare,
-} from '#/lib/pnrr'
-import { pnrrContractsQuery, pnrrMeasureQuery, pnrrQuery } from '#/lib/queries'
-import { statusOfParam, validatePnrrSearch } from '#/lib/urls-programmes'
-import type { PnrrSearch } from '#/lib/urls-programmes'
+} from '#/features/pnrr/pnrr'
+import {
+  pnrrContractsQuery,
+  pnrrMeasureQuery,
+  pnrrQuery,
+} from '#/features/pnrr/queries'
+import { statusOfParam, validatePnrrSearch } from '#/features/pnrr/urls'
+import type { PnrrSearch } from '#/features/pnrr/urls'
 
 // What the address asks of the list of contracts, in the API's words.
 function filterOf(

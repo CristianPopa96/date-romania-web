@@ -59,6 +59,7 @@ export async function postJson(
 export type Source = Schemas['Source']
 
 export type EntityRef = Schemas['EntityRef']
+
 export type Entity = Schemas['EntityOut']
 
 export type Summary = Schemas['Summary']
@@ -66,18 +67,6 @@ export type Summary = Schemas['Summary']
 export type Stats = Schemas['Stats']
 
 export type Partner = Schemas['Partner']
-
-export type EntityPage = Schemas['EntityPage']
-
-export type Purchase = Schemas['Purchase']
-// One purchase on its own page, with its lines and conditions once collected.
-export type PurchaseWithDetail = Schemas['PurchaseWithDetail']
-export type PurchaseDetail = Schemas['PurchaseDetail']
-
-export type PurchasePage = Schemas['PurchasePage']
-
-export type RankingRow = Schemas['RankingRow']
-export type Ranking = Schemas['Ranking']
 
 // 'institutions' looks at an entity as a buyer, 'suppliers' as a seller.
 export type Role = 'institutions' | 'suppliers'
@@ -91,27 +80,13 @@ export const ACCEPTED = 7
 // for goods and services. The API holds each purchase to the one of its type for
 // `above_limit`; these keep every page's wording in agreement with it.
 export const DIRECT_PURCHASE_LIMIT = 900_400
+
 export const DIRECT_PURCHASE_LIMIT_GOODS_SERVICES = 270_120
 
 // The detail of a purchase (its lines and conditions) is one request to SEAP each, so the
 // API collects it for accepted purchases from this value up, newest first. Keep it equal
 // to `MIN_VALUE` in the API's `collectors/seap_direct/details.py`.
 export const DETAIL_MIN_VALUE = 100_000
-
-// One source as we hold it: its days, how many records, when it was last read.
-export type Dataset = Schemas['Dataset']
-
-// Like the totals, the table of what we hold must not take the home page down.
-export const getDatasets = createServerFn({ method: 'GET' }).handler(
-  async (): Promise<Array<Dataset>> => {
-    try {
-      const found = await getJson<{ items: Array<Dataset> }>('/v1/datasets')
-      return found?.items ?? []
-    } catch {
-      return []
-    }
-  },
-)
 
 // The home page must still render when the API is down, so this one never throws.
 export const getStats = createServerFn({ method: 'GET' }).handler(
@@ -124,29 +99,4 @@ export const getStats = createServerFn({ method: 'GET' }).handler(
   },
 )
 
-export const searchEntities = createServerFn({ method: 'GET' })
-  .inputValidator((data: { q: string }) => data)
-  .handler(async ({ data }): Promise<Array<Entity>> => {
-    const q = data.q.trim().slice(0, 100)
-    if (q.length < 2) return []
-    const found = await getJson<{ items: Array<Entity> }>('/v1/search', {
-      q,
-      limit: 30,
-    })
-    return found?.items ?? []
-  })
-
-export const getEntityPage = createServerFn({ method: 'GET' })
-  .inputValidator((data: { role: Role; cui: number }) => data)
-  .handler(({ data }) =>
-    getJson<EntityPage>(`/v1/${data.role}/${data.cui}`, { partners: 10 }),
-  )
-
-export const getRanking = createServerFn({ method: 'GET' })
-  .inputValidator((data: { role: Role; cpv?: string }) => data)
-  .handler(({ data }) =>
-    getJson<Ranking>(`/v1/rankings/${data.role}`, {
-      cpv: data.cpv,
-      limit: 20,
-    }),
-  )
+export type Period = Schemas['Period']

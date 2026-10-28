@@ -5,14 +5,15 @@
 // typed into a string here. A message that needs a link or a styled part inside it names
 // the place as `{part}` and is filled with `rich()`. Data is never translated.
 
-import { budget } from '#/i18n/ro-budget'
+import { budget } from '#/features/budget/i18n'
 import { counted, plural } from '#/i18n/ro-plural'
-import { list, purchaseList } from '#/i18n/ro-list'
-import { places } from '#/i18n/ro-places'
-import { eu } from '#/i18n/ro-eu'
-import { pnrr } from '#/i18n/ro-pnrr'
-import { programme } from '#/i18n/ro-programme'
-import { rankings } from '#/i18n/ro-rankings'
+import { list } from '#/i18n/ro-list'
+import { purchaseList } from '#/features/purchases/i18n'
+import { places } from '#/features/places/i18n'
+import { eu } from '#/features/eu-projects/i18n'
+import { pnrr } from '#/features/pnrr/i18n'
+import { programme } from '#/features/programme/i18n'
+import { rankings } from '#/features/rankings/i18n'
 
 export const ro = {
   common: {
