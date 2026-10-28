@@ -1620,3 +1620,88 @@ test('an EU project not held has no page', async ({ page }) => {
     page.getByRole('heading', { name: 'Pagina nu există' }),
   ).toBeVisible()
 })
+
+test('a cohesion project lists the SEAP contracts whose notice cites its SMIS code', async ({
+  page,
+}) => {
+  await page.goto(`${EU}/proiecte/118001`)
+  const main = page.getByRole('main')
+  await expect(
+    main.getByRole('heading', {
+      name: 'Contracte și achiziții care citează acest proiect',
+    }),
+  ).toBeVisible()
+  await expect(
+    main.getByText('4 contracte din anunțuri de atribuire'),
+  ).toBeVisible()
+  const table = main.getByRole('table', {
+    name: 'Contractele din anunțurile de atribuire',
+  })
+  await expect(table.getByRole('row')).toHaveCount(5)
+  await expect(
+    table.getByRole('link', { name: 'Contract 101' }),
+  ).toHaveAttribute('href', '/contracte/9001')
+  await expect(table.getByText('SMIS în anunț')).toHaveCount(4)
+  // The framework agreement is a ceiling, never money spent.
+  await expect(
+    table.getByText('Acord-cadru · plafon · nu intră în total'),
+  ).toBeVisible()
+  await expect(main.getByText('Lista poate fi incompletă.')).toBeVisible()
+})
+
+test('a PNRR contract lists the purchases of its beneficiary that cite its number', async ({
+  page,
+}) => {
+  await page.goto('/programe/pnrr/contracte/701')
+  const main = page.getByRole('main')
+  const table = main.getByRole('table', { name: 'Achizițiile directe' })
+  await expect(table.getByRole('link', { name: 'Purchase 3' })).toHaveAttribute(
+    'href',
+    '/achizitii-directe/3',
+  )
+  await expect(table.getByText('Nr. finanțare în achiziție')).toBeVisible()
+  await expect(
+    main.getByRole('table', {
+      name: 'Contractele din anunțurile de atribuire',
+    }),
+  ).toHaveCount(0)
+})
+
+test('a project no SEAP record cites says so', async ({ page }) => {
+  await page.goto(`${EU}/proiecte/312456`)
+  await expect(
+    page
+      .getByRole('main')
+      .getByText(
+        'Niciun anunț de atribuire și nicio achiziție directă dintre cele pe care le avem nu citează codul SMIS al proiectului.',
+      ),
+  ).toBeVisible()
+})
+
+test('a page past the end of the SEAP contracts goes back to the first', async ({
+  page,
+}) => {
+  await page.goto(`${EU}/proiecte/118001?pagina=9`)
+  await expect(page).toHaveURL(/\/proiecte\/118001$/)
+  await expect(
+    page.getByRole('main').getByText('4 contracte din anunțuri de atribuire'),
+  ).toBeVisible()
+})
+
+test('a project page stays up when its SEAP records cannot be read', async ({
+  page,
+}) => {
+  // The stub has the project, not its SEAP records: the API's call fails.
+  await page.goto(`${EU}/proiecte/118003`)
+  const main = page.getByRole('main')
+  await expect(main.getByRole('heading', { level: 1 })).toBeVisible()
+  await expect(
+    main.getByText(
+      'Nu am putut citi acum contractele și achizițiile din SEAP.',
+      {
+        exact: false,
+      },
+    ),
+  ).toBeVisible()
+  await expect(main.getByText('Ce nu este public')).toBeVisible()
+})

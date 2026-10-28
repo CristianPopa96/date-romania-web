@@ -12,6 +12,7 @@ import {
   Text,
 } from '@radix-ui/themes'
 
+import { EuSeapSection } from '#/components/EuSeapSection'
 import { Facts, ProgressBars } from '#/components/PnrrContractFacts'
 import { PnrrPaymentsSection } from '#/components/PnrrPayments'
 import { Stat } from '#/components/ProgrammeFigures'
@@ -22,14 +23,33 @@ import { measureLabel, measureSlug, paidSoFar } from '#/lib/pnrr'
 import { pnrrContractQuery } from '#/lib/queries'
 
 // One PNRR financing contract (`ScreenEUProject`, its PNRR kind): what it is worth, the
-// progress the ministry reports, the facts, and the payments that can be told to be its.
-export function PnrrContractView({ id }: { id: number }) {
+// progress the ministry reports, the facts, the payments that can be told to be its, and
+// the SEAP records that cite its number (`page` of their contracts).
+export function PnrrContractView({
+  id,
+  page,
+  onPage,
+}: {
+  id: number
+  page: number
+  onPage: (page: number) => void
+}) {
   const { data: contract } = useSuspenseQuery(pnrrContractQuery(id))
   // The route loader answers "not found" before this renders.
-  return contract ? <ContractView contract={contract} /> : null
+  return contract ? (
+    <ContractView contract={contract} page={page} onPage={onPage} />
+  ) : null
 }
 
-function ContractView({ contract }: { contract: PnrrContract }) {
+function ContractView({
+  contract,
+  page,
+  onPage,
+}: {
+  contract: PnrrContract
+  page: number
+  onPage: (page: number) => void
+}) {
   const { t, f } = useI18n()
   const p = t.pnrr
   const first = contract.lines.at(0)
@@ -137,6 +157,12 @@ function ContractView({ contract }: { contract: PnrrContract }) {
         </Grid>
 
         <PnrrPaymentsSection contract={contract} />
+
+        <EuSeapSection
+          of={{ kind: 'pnrr', id: contract.id, page }}
+          beneficiary={contract.beneficiary?.cui ?? null}
+          onPage={onPage}
+        />
 
         <Flex direction="column" gap="3">
           <Heading as="h2" size="5">

@@ -646,6 +646,48 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/programmes/eu-funds/projects/{smis}/seap": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Eu Project Seap
+         * @description The SEAP contracts (`limit` and `offset` page them) and direct purchases whose text
+         *     cites the project's SMIS code.
+         */
+        get: operations["eu_project_seap_v1_programmes_eu_funds_projects__smis__seap_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/pnrr/contracts/{contract_id}/seap": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Pnrr Contract Seap
+         * @description The SEAP contracts and direct purchases of the beneficiary whose text cites the
+         *     contract's number.
+         */
+        get: operations["pnrr_contract_seap_v1_programmes_pnrr_contracts__contract_id__seap_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/places": {
         parameters: {
             query?: never;
@@ -1301,6 +1343,65 @@ export interface components {
              * @description The status as the list writes it.
              */
             status_written: string | null;
+        };
+        /** EuSeapContract */
+        EuSeapContract: {
+            /**
+             * Cited
+             * @description What SEAP's text cites, as written: '341497', '12321/26.08.2024'.
+             */
+            cited: string;
+            /**
+             * Method
+             * @enum {string}
+             */
+            method: "smis-in-text" | "financing-number+buyer";
+            /**
+             * Confidence
+             * @description Always probable: the buyer's own text.
+             * @enum {string}
+             */
+            confidence: "sure" | "probable";
+            contract: components["schemas"]["Contract"];
+        };
+        /**
+         * EuSeapLinks
+         * @description The SEAP records whose text cites a project. Incomplete by nature: SEAP has no field
+         *     for the project, and many buyers never write it.
+         */
+        EuSeapLinks: {
+            /** Contracts Total */
+            contracts_total: number;
+            /**
+             * Contracts
+             * @description The contracts of the award notices tied, in a notice still in force, the newest first, one page of them. A framework agreement is a ceiling, never a sum spent.
+             */
+            contracts: components["schemas"]["EuSeapContract"][];
+            /**
+             * Purchases
+             * @description The accepted direct purchases tied, the newest first, all of them.
+             */
+            purchases: components["schemas"]["EuSeapPurchase"][];
+        };
+        /** EuSeapPurchase */
+        EuSeapPurchase: {
+            /**
+             * Cited
+             * @description What SEAP's text cites, as written: '341497', '12321/26.08.2024'.
+             */
+            cited: string;
+            /**
+             * Method
+             * @enum {string}
+             */
+            method: "smis-in-text" | "financing-number+buyer";
+            /**
+             * Confidence
+             * @description Always probable: the buyer's own text.
+             * @enum {string}
+             */
+            confidence: "sure" | "probable";
+            purchase: components["schemas"]["Purchase"];
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -3825,6 +3926,74 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["EuProject"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    eu_project_seap_v1_programmes_eu_funds_projects__smis__seap_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path: {
+                smis: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EuSeapLinks"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    pnrr_contract_seap_v1_programmes_pnrr_contracts__contract_id__seap_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path: {
+                contract_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EuSeapLinks"];
                 };
             };
             /** @description Validation Error */
