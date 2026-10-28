@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { getFile } from '#/lib/api'
-import { patternCsvFilterFromSearch } from '#/lib/urls'
+import { patternCsvFilterFromSearch } from '#/features/patterns/urls'
 
 // The purchases of the "just under the limit" pattern, one line each with its pair, as a
 // CSV file. The site passes on what the API writes, so the browser never calls the API.

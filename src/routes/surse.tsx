@@ -3,17 +3,18 @@ import { createFileRoute } from '@tanstack/react-router'
 import { DownloadIcon } from '@radix-ui/react-icons'
 import { Button, Container, Flex, Heading, Text } from '@radix-ui/themes'
 
-import { Corrections } from '#/components/Corrections'
-import { Methodology } from '#/components/Methodology'
+import { Corrections } from '#/features/sources/Corrections'
+import { Methodology } from '#/features/sources/Methodology'
 import { Unavailable } from '#/components/Notes'
 import { ReportForm } from '#/components/ReportForm'
-import { SourcesTable, SourcesToCome } from '#/components/SourcesTable'
+import { SourcesTable, SourcesToCome } from '#/features/sources/SourcesTable'
 import { UrlTabs } from '#/components/UrlTabs'
 import { messagesFor } from '#/i18n'
 import { useI18n } from '#/i18n/context'
 import { pageTitle } from '#/lib/copy'
-import { correctionsQuery, datasetsQuery } from '#/lib/queries'
-import { contractsCsvPath, validateSourcesSearch } from '#/lib/urls'
+import { correctionsQuery, datasetsQuery } from '#/features/sources/queries'
+import { contractsCsvPath } from '#/features/contracts/urls'
+import { validateSourcesSearch } from '#/features/sources/urls'
 
 // Where the data comes from: the sources we hold, the ones still to come, how the
 // figures are counted, and what readers reported and we corrected.

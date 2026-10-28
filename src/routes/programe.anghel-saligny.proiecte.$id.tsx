@@ -1,9 +1,9 @@
 import { createFileRoute, notFound } from '@tanstack/react-router'
 
-import { ProjectView } from '#/components/ProjectView'
+import { ProjectView } from '#/features/programme/ProjectView'
 import { messagesFor } from '#/i18n'
 import { pageTitle } from '#/lib/copy'
-import { programmeQuery, projectQuery } from '#/lib/queries'
+import { programmeQuery, projectQuery } from '#/features/programme/queries'
 import { idFromPath } from '#/lib/urls'
 
 // One project of the programme, by the ministry's own id for it.

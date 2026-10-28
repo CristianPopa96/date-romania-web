@@ -7,14 +7,15 @@ import {
 import { Container, Flex, Grid, Heading, Link, Text } from '@radix-ui/themes'
 
 import { EntityLink } from '#/components/EntityLink'
-import { PlaceEuFunds } from '#/components/PlaceEuFunds'
-import { PlaceOverview } from '#/components/PlaceOverview'
-import { UatsTable } from '#/components/PlaceLists'
-import { WinnersCard } from '#/components/WinnersCard'
+import { PlaceEuFunds } from '#/features/eu-projects/PlaceEuFunds'
+import { PlaceOverview } from '#/features/places/PlaceOverview'
+import { UatsTable } from '#/features/places/PlaceLists'
+import { WinnersCard } from '#/features/places/WinnersCard'
 import { messagesFor } from '#/i18n'
 import { useI18n } from '#/i18n/context'
 import { pageTitle } from '#/lib/copy'
-import { countyQuery, euBeneficiaryQuery } from '#/lib/queries'
+import { countyQuery } from '#/features/places/queries'
+import { euBeneficiaryQuery } from '#/features/eu-projects/queries'
 
 // A county (flow 6): the figures of its UATs and its council, each with its period, and
 // a table of its UATs to go on to (design round 8).

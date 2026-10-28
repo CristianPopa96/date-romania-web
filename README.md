@@ -117,54 +117,60 @@ cloudflared tunnel --url http://localhost:3000
 
 1. A route file in `src/routes/` declares a `loader`.
 2. The loader calls `context.queryClient.ensureQueryData(...)` with query options from
-   `src/lib/queries.ts`.
-3. Each query calls a server function (`createServerFn`) in `src/lib/api.ts` or its
-   companions (`api-budget.ts`, `api-contracts.ts`, `api-patterns.ts`, `api-places.ts`,
-   `api-programme.ts`, `api-reports.ts`). These run **on the server**, call the API at
+   the feature that owns the data (`src/features/<feature>/queries.ts`).
+3. Each query calls a server function (`createServerFn`) in that feature's `api.ts`,
+   built on `getJson()` in `src/lib/api.ts`. These run **on the server**, call the API at
    `API_URL` and return the answer, typed from the API's own schema
    (`src/lib/api-schema.gen.ts`).
 4. The component reads it with `useSuspenseQuery`.
 
 The browser never reaches the API, so there is no CORS to configure. The CSV exports
-(`/contracte.csv`, `/tipare.csv`) work the same way: a server route fetches the file
+(`/contracte.csv`, `/achizitii-directe.csv`, `/tipare.csv`) work the same way: a server route fetches the file
 from the API and passes it on. The error report form posts through a server function
 that forwards the reader's address in `X-Forwarded-For`, which the API turns into a
 keyed hash for its rate limit.
 
 ## Routes
 
-| File in `src/routes/`                          | Address                                                                |
-| ---------------------------------------------- | ---------------------------------------------------------------------- |
-| `index.tsx`                                    | `/`                                                                    |
-| `cautare.tsx`                                  | `/cautare?q=`                                                          |
-| `institutii.$cui.tsx`                          | `/institutii/{cui}`                                                    |
-| `furnizori.$cui.tsx`                           | `/furnizori/{cui}`                                                     |
-| `contracte.$id.tsx`                            | `/contracte/{id}`                                                      |
-| `achizitii-directe.$id.tsx`                    | `/achizitii-directe/{id}`                                              |
-| `clasamente.tsx`                               | `/clasamente?clasament=&castigate=&cpv=&ue=`                           |
-| `programe.index.tsx`                           | `/programe`: the programmes held                                       |
-| `programe.anghel-saligny.index.tsx`            | `/programe/anghel-saligny`                                             |
-| `programe.anghel-saligny.proiecte.$id.tsx`     | `/programe/anghel-saligny/proiecte/{id}`                               |
-| `programe.pnrr.index.tsx`                      | `/programe/pnrr?tab=beneficiari`                                       |
-| `programe.pnrr.$masura.tsx`                    | `/programe/pnrr/{masura}?judet=&stare=&q=&pagina=`, e.g. `c10.i3`      |
-| `programe.pnrr.contracte.$id.tsx`              | `/programe/pnrr/contracte/{id_angajament}?pagina=`                     |
-| `programe.fonduri-europene.index.tsx`          | `/programe/fonduri-europene?program=&stare=&q=&pagina=`                |
-| `programe.fonduri-europene.proiecte.$smis.tsx` | `/programe/fonduri-europene/proiecte/{smis}?pagina=`                   |
-| `localitati.index.tsx`                         | `/localitati`: the 42 counties                                         |
-| `localitati.$judet.index.tsx`                  | `/localitati/{judet}`, e.g. `/localitati/alba`                         |
-| `localitati.$judet.$uat.tsx`                   | `/localitati/{judet}/{uat}?sat=`, e.g. `/localitati/alba/comuna-albac` |
-| `surse.tsx`                                    | `/surse?fila=&despre=`                                                 |
-| `contracte[.]csv.ts`                           | `/contracte.csv` (`?institutie=` or `?furnizor=` for one CUI)          |
-| `tipare[.]csv.ts`                              | `/tipare.csv`                                                          |
-| `__root.tsx`                                   | The shell: theme, top bar, footer                                      |
+| File in `src/routes/`                          | Address                                                                       |
+| ---------------------------------------------- | ----------------------------------------------------------------------------- |
+| `index.tsx`                                    | `/`                                                                           |
+| `cautare.tsx`                                  | `/cautare?q=`                                                                 |
+| `institutii.$cui.tsx`                          | `/institutii/{cui}`                                                           |
+| `furnizori.$cui.tsx`                           | `/furnizori/{cui}`                                                            |
+| `contracte.$id.tsx`                            | `/contracte/{id}`                                                             |
+| `achizitii-directe.$id.tsx`                    | `/achizitii-directe/{id}`                                                     |
+| `clasamente.tsx`                               | `/clasamente?clasament=&castigate=&cpv=&ue=`                                  |
+| `programe.index.tsx`                           | `/programe`: the programmes held                                              |
+| `programe.anghel-saligny.index.tsx`            | `/programe/anghel-saligny`                                                    |
+| `programe.anghel-saligny.proiecte.$id.tsx`     | `/programe/anghel-saligny/proiecte/{id}`                                      |
+| `programe.pnrr.index.tsx`                      | `/programe/pnrr?tab=beneficiari`                                              |
+| `programe.pnrr.$masura.tsx`                    | `/programe/pnrr/{masura}?judet=&stare=&q=&pagina=`, e.g. `c10.i3`             |
+| `programe.pnrr.contracte.$id.tsx`              | `/programe/pnrr/contracte/{id_angajament}?pagina=`                            |
+| `programe.fonduri-europene.index.tsx`          | `/programe/fonduri-europene?program=&stare=&q=&pagina=`                       |
+| `programe.fonduri-europene.proiecte.$smis.tsx` | `/programe/fonduri-europene/proiecte/{smis}?pagina=`                          |
+| `localitati.index.tsx`                         | `/localitati`: the 42 counties                                                |
+| `localitati.$judet.index.tsx`                  | `/localitati/{judet}`, e.g. `/localitati/alba`                                |
+| `localitati.$judet.$uat.tsx`                   | `/localitati/{judet}/{uat}?sat=`, e.g. `/localitati/alba/comuna-albac`        |
+| `surse.tsx`                                    | `/surse?fila=&despre=`                                                        |
+| `contracte[.]csv.ts`                           | `/contracte.csv` (`?institutie=` or `?furnizor=` for one CUI)                 |
+| `achizitii-directe[.]csv.ts`                   | `/achizitii-directe.csv?cumparator=` or `?vanzator=`, with the list's filters |
+| `tipare[.]csv.ts`                              | `/tipare.csv`                                                                 |
+| `__root.tsx`                                   | The shell: theme, top bar, footer                                             |
 
-Paging, sorting, tabs and filters are typed search parameters parsed in
-`src/lib/urls.ts` (`?lista=achizitii&pagina=2&ordine=valoare`), so a shared address
+Paging, sorting, tabs and filters are typed search parameters, parsed in each feature's
+`urls.ts` (`?lista=achizitii&pagina=2&ordine=valoare-desc`), so a shared address
 always means the same view. An entity page's `lista` is `contracte`, `achizitii`, or one
 of its EU lists, `coeziune` or `pnrr`, offered only when it has that kind; `pagina`
 pages the list shown, and a project page's `pagina` pages the SEAP contracts that cite
-it. The institution and supplier pages share one route factory,
-`src/lib/entity-route.tsx`. `src/routeTree.gen.ts` (from the dev server or
+it. The list of direct purchases follows the list pattern of the design system
+(`DataTable`): its filters (`q`, `de_la`, `pana_la`, `valoare_min`, `valoare_max`,
+`stare`, `tip`, `furnizor` or `institutie`, `cpv`), `ordine` (`valoare-desc`,
+`valoare-cresc`, `furnizor-cresc`…; an old `ordine=valoare` link opens the largest
+accepted purchases, as it did), `pe_pagina` and `vedere=tabel` are parsed in
+`src/features/purchases/list.ts`; the generic parts are `src/lib/list.ts` and
+`src/components/list/`. The institution and supplier pages share one route factory,
+`src/features/entities/route.tsx`. `src/routeTree.gen.ts` (from the dev server or
 `pnpm generate-routes`) and `src/lib/api-schema.gen.ts` (from `pnpm generate-api-types`)
 are generated: never edit them by hand.
 
@@ -172,20 +178,36 @@ are generated: never edit them by hand.
 
 ```
 src/
-  routes/       one file per page or file download
-  components/   the pieces pages are built from (EntityView, NoticeView, TraceChain,
-                GapPanel, SourceLine, Rankings, Patterns, ReportForm…)
-  lib/          logic with unit tests: API calls, queries, formats, URLs, money and
-                programme rules as the site needs them
-  i18n/         every piece of interface text
+  routes/       one file per page or file download: search params, loader, one view
+  features/     one folder per kind of data, with everything about it:
+    purchases/    the list, a purchase's page, its file
+    contracts/    an entity's contracts, a notice and its contracts, the file
+    eu-projects/  the cohesion projects: finder, entity tab, project page, SEAP links
+    pnrr/         measures, contracts (finder, entity tab, page), payments
+    programme/    Anghel Saligny: finder, project page, trace
+    rankings/  patterns/  places/  budget/  sources/  search/
+    entities/     the institution and supplier page, which puts the others together
+  components/   shared pieces that know no dataset (DataState, SourceLine, EntityLink,
+                TopBar, ReportForm…) and list/, the list pattern (FilterBar, SortHeader,
+                ListPager, ChartCard…)
+  lib/          shared logic: the API client, formats, the generic list logic, shared
+                address parts (CUI, page), reports, copy
+  i18n/         the dictionary, assembled from ro.ts and each feature's i18n.ts
   styles.css
 e2e/            browser tests and the stub API they run against
 docs/wiki/      the wiki pages, published by the Wiki workflow
 ```
 
-Keep logic out of components and in `src/lib/`, where it is unit tested. Modules,
-components and routes stay under about 300 lines; tests, generated files and the i18n
-dictionaries are exempt.
+A feature holds its components, `api.ts` (server calls), `queries.ts`, `urls.ts` (its
+search params), its logic with unit tests, `i18n.ts` (its texts) and `index.ts`. Two
+rules, enforced by ESLint: shared code (`components/`, `lib/`) never imports a feature,
+and a feature uses another only through that feature's `index.ts`
+(`#/features/contracts`, not `#/features/contracts/api`). Routes may import any feature
+file. A piece moves to `components/` or `lib/` once a second feature needs it.
+
+Keep logic out of components, in the feature's (or `lib/`'s) modules, where it is unit
+tested. Modules, components and routes stay under about 300 lines; tests, generated
+files and the i18n dictionaries are exempt.
 
 ## Scripts
 
@@ -210,7 +232,7 @@ same before calling work done.
 ## Tests
 
 - **Unit tests** (`pnpm test`): vitest, next to the code as `src/**/*.test.ts`, for the
-  logic in `src/lib/` and `src/i18n/`.
+  logic in `src/features/`, `src/lib/` and `src/i18n/`.
 - **Browser tests** (`pnpm build`, then `pnpm e2e`): Playwright opens the built site in
   Chromium. The first time, run `pnpm exec playwright install chromium`.
 
@@ -226,7 +248,7 @@ starts asking for something new fails instead of showing an empty state.
 The types of the API's answers are not written by hand either. `openapi.json` is a copy
 of `tests/fixtures/openapi.json` in date-romania-api, also kept equal to the API by a
 test there; `pnpm generate-api-types` turns it into `src/lib/api-schema.gen.ts`, and
-`src/lib/api*.ts` name the shapes they use from it. When the API's schema changes, copy
+each feature's `api.ts` names the shapes it uses from it. When the API's schema changes, copy
 the file here and regenerate: a field renamed or removed is then a type error, not a
 blank on a page. CI fails if the generated file does not match the copy.
 
@@ -234,8 +256,8 @@ blank on a page. CI fails if the generated file does not match the copy.
 
 - Interface text is Romanian, plain and in the second person singular, sentence case, no
   exclamation marks or emoji; facts, never accusations. All of it lives in
-  `src/i18n/ro.ts` and its companions (`ro-budget.ts`, `ro-places.ts`,
-  `ro-programme.ts`, `ro-rankings.ts`); components read it with `useI18n()` and never
+  `src/i18n/ro.ts`, `ro-list.ts` and the features' `i18n.ts` files, which `ro.ts`
+  assembles into one dictionary; components read it with `useI18n()` and never
   hold text themselves. A second language is a file of the same shape (`Messages`) and
   an entry in `src/i18n/index.ts`; a missing or extra message fails the type check.
   Route paths stay Romanian in every language, and data is never translated.
@@ -247,7 +269,7 @@ blank on a page. CI fails if the generated file does not match the copy.
   "Nepublicat" and "Încă necolectat", never as a dash, a zero or "necunoscut".
 - Imports use the `#/` alias for `src/`. Prettier: no semicolons, single quotes, trailing
   commas.
-- Server calls are in `src/lib/api.ts`, their query options in `src/lib/queries.ts`,
+- Server calls are in each feature's `api.ts`, their query options in its `queries.ts`,
   number and date formats in `src/lib/format.ts`, shared pieces in `src/components/`.
 
 ## Design

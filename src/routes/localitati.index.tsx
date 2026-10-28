@@ -6,8 +6,8 @@ import { DataState } from '#/components/DataState'
 import { messagesFor } from '#/i18n'
 import { useI18n } from '#/i18n/context'
 import { pageTitle } from '#/lib/copy'
-import { placeLink } from '#/lib/places'
-import { countiesQuery } from '#/lib/queries'
+import { placeLink } from '#/features/places/places'
+import { countiesQuery } from '#/features/places/queries'
 
 // The 42 counties, Bucharest among them, as a list: the way in to a locality until the
 // county map exists (design round 8).

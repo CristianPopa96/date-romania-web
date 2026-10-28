@@ -75,13 +75,46 @@ The page of a public body as a **buyer** (a town hall, a hospital, a ministry…
 5. **Tabs**:
    - "Contracte": the contracts it awarded, with winner, value and signing date, and a
      CSV export.
-   - "Achiziții directe": its top suppliers by value, then every direct purchase, sortable
-     by newest or largest.
+   - "Achiziții directe": every direct purchase, as a list you can filter, sort and
+     chart (see below).
    - "Proiecte europene" and "Contracte PNRR", when it is the beneficiary of EU money
      (see below).
 
 The page opens on the tab that has something to show. The link in your browser keeps
 the tab, page and order you chose, so you can share exactly what you see.
+
+### Filtering, sorting and charting the direct purchases
+
+![The direct purchases of an institution, with filters and charts](images/purchase-list.png)
+
+_Shown with made-up test data._
+
+The "Achiziții directe" tab of an institution or a company is one list with these parts,
+top to bottom:
+
+- **"Caută în listă"**: words of the purchase's name, the other party or the DA code.
+  The words found are marked in the rows.
+- **Filters**, one button each: "Perioada" (with "Ultimele 30 de zile", "Luna trecută",
+  each year held, or two days), "Valoare" (a range in lei, with the purchases in each
+  band of value), "Stare" (accepted, refused, unanswered), "Tip" (goods, services,
+  works), "Furnizor" or "Instituție" (the other party, by name or CUI) and "CPV" (a code,
+  or a word of its name). Each option says how many purchases it would leave. A filter
+  chosen shows its value and a × that removes it; "Șterge filtrele" removes them all.
+- **The summary line**: how many purchases the filters keep, how many were accepted and
+  what those add up to, out of how many the institution or company has, and over which
+  days. Only accepted purchases under their legal limit are added, as everywhere on the
+  site; those published above it are named apart.
+- **Two charts**, of accepted purchases only: their value per month (per day for a short
+  period; a month not over yet is outlined), and the largest suppliers or institutions.
+  Clicking a month or a name filters the list by it. "Doar tabel" hides the charts.
+- **The table**: click "Data", "Valoare" or the other party's column to sort the whole
+  list, not just the page shown; a second click reverses it, a third goes back to newest
+  first. With "Stare: acceptate" alone, a last row gives the total.
+- **"Exportă CSV"** downloads the list as filtered and sorted, every row with its source.
+- **The pager**: page numbers, and 25, 50 or 100 rows a page.
+
+When the filters leave nothing, the page names the filter that would give purchases
+back, and how many, with a button that removes it. Every choice is kept in the link.
 
 ### EU money of an institution or a company
 

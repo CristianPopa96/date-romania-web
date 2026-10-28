@@ -15,16 +15,16 @@ import {
 } from '@radix-ui/themes'
 
 import { DataState } from '#/components/DataState'
-import { EuProjectFinder } from '#/components/EuProjectFinder'
+import { EuProjectFinder } from '#/features/eu-projects/EuProjectFinder'
 import { SourceLine } from '#/components/SourceLine'
 import { messagesFor } from '#/i18n'
 import { useI18n } from '#/i18n/context'
-import type { EuFunds, EuProjectFilter } from '#/lib/api-eu'
+import type { EuFunds, EuProjectFilter } from '#/features/eu-projects/api'
 import { pageTitle } from '#/lib/copy'
-import { periodLabel, programmeBySlug } from '#/lib/eu'
-import { euFundsQuery, euProjectsQuery } from '#/lib/queries'
-import { euStatusOfParam, validateEuSearch } from '#/lib/urls-programmes'
-import type { EuSearch } from '#/lib/urls-programmes'
+import { periodLabel, programmeBySlug } from '#/features/eu-projects/eu'
+import { euFundsQuery, euProjectsQuery } from '#/features/eu-projects/queries'
+import { euStatusOfParam, validateEuSearch } from '#/features/eu-projects/urls'
+import type { EuSearch } from '#/features/eu-projects/urls'
 
 // What the address asks of the list of projects, in the API's words. A programme not
 // held is dropped rather than listing everything under a link that looks filtered.

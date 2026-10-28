@@ -5,13 +5,15 @@
 // typed into a string here. A message that needs a link or a styled part inside it names
 // the place as `{part}` and is filled with `rich()`. Data is never translated.
 
-import { budget } from '#/i18n/ro-budget'
+import { budget } from '#/features/budget/i18n'
 import { counted, plural } from '#/i18n/ro-plural'
-import { places } from '#/i18n/ro-places'
-import { eu } from '#/i18n/ro-eu'
-import { pnrr } from '#/i18n/ro-pnrr'
-import { programme } from '#/i18n/ro-programme'
-import { rankings } from '#/i18n/ro-rankings'
+import { list } from '#/i18n/ro-list'
+import { purchaseList } from '#/features/purchases/i18n'
+import { places } from '#/features/places/i18n'
+import { eu } from '#/features/eu-projects/i18n'
+import { pnrr } from '#/features/pnrr/i18n'
+import { programme } from '#/features/programme/i18n'
+import { rankings } from '#/features/rankings/i18n'
 
 export const ro = {
   common: {
@@ -392,7 +394,7 @@ export const ro = {
     undivided: 'valoarea întreagă a contractelor, nedivizată între membri',
     directAccepted: 'Achiziții directe acceptate',
     withoutVat: 'Sumele sunt fără TVA.',
-    lists: 'Contracte și achiziții',
+    lists: 'Contracte, achiziții și proiecte',
     tabContracts: 'Contracte',
     tabPurchases: 'Achiziții directe',
     purchasesCount: (n: number, text: string) =>
@@ -442,24 +444,11 @@ export const ro = {
   },
 
   partners: {
-    institutions: {
-      title: 'Furnizori la achiziții directe, după valoare',
-      none: 'Nicio achiziție acceptată în această perioadă.',
-    },
-    suppliers: {
-      title: 'Instituții cărora le-a vândut direct, după valoare',
-      none: 'Nicio vânzare acceptată în această perioadă.',
-    },
     accepted: (n: number, text: string) =>
       counted(n, text, 'o achiziție acceptată', 'achiziții acceptate'),
   },
 
   purchases: {
-    title: 'Achiziții directe',
-    titleAccepted: 'Achiziții directe acceptate',
-    heading: (title: string, total: string) => `${title} (${total})`,
-    newest: 'Cele mai recente',
-    largest: 'Cele mai mari acceptate',
     date: 'Data',
     purchase: 'Achiziție',
     state: 'Stare',
@@ -478,6 +467,9 @@ export const ro = {
   },
 
   rankings,
+
+  list,
+  purchaseList,
 
   notes: {
     period: (days: string) =>

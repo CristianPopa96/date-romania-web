@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { getFile } from '#/lib/api'
-import { csvFilterFromSearch } from '#/lib/urls'
+import { csvFilterFromSearch } from '#/features/contracts/urls'
 
 // The contracts of one institution or one company, or of the whole period, as a CSV
 // file. The site passes on what the API writes, so the browser never calls the API.

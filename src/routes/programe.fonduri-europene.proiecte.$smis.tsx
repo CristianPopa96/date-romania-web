@@ -1,11 +1,11 @@
 import { createFileRoute, notFound, redirect } from '@tanstack/react-router'
 
-import { EuProjectView } from '#/components/EuProjectView'
+import { EuProjectView } from '#/features/eu-projects/EuProjectView'
 import { messagesFor } from '#/i18n'
 import { PAGE_SIZE } from '#/lib/api'
-import { pageCount } from '#/lib/contracts'
+import { pageCount } from '#/lib/list'
 import { pageTitle } from '#/lib/copy'
-import { euSeapQuery, euProjectQuery } from '#/lib/queries'
+import { euSeapQuery, euProjectQuery } from '#/features/eu-projects/queries'
 import { idFromPath, validatePageSearch } from '#/lib/urls'
 
 // One EU cohesion project, by its SMIS code.

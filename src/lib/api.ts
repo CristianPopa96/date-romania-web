@@ -9,13 +9,19 @@ import type { components } from '#/lib/api-schema.gen'
 // generate-api-types`). Each file names the ones it uses.
 export type Schemas = components['schemas']
 
-type Params = Record<string, string | number | undefined>
+type Params = Record<
+  string,
+  string | number | ReadonlyArray<string | number> | undefined
+>
 
-// A parameter left undefined is not sent.
+// A parameter left undefined is not sent; a list is sent once per value (state=7&state=3).
 function apiUrl(path: string, params: Params = {}) {
   const url = new URL(path, process.env.API_URL ?? 'http://127.0.0.1:8000')
   for (const [key, value] of Object.entries(params)) {
-    if (value !== undefined) url.searchParams.set(key, String(value))
+    if (value === undefined) continue
+    for (const each of Array.isArray(value) ? value : [value]) {
+      url.searchParams.append(key, String(each))
+    }
   }
   return url
 }
@@ -28,12 +34,15 @@ export async function getJson<T>(path: string, params: Params = {}) {
   return (await response.json()) as T
 }
 
-// A file the API writes (a CSV export), passed on byte for byte. Reading it as text
-// would drop the mark at its start that makes spreadsheet programs read the diacritics.
+// A file the API writes (a CSV export), passed on byte for byte as it arrives, so a long
+// one is never held whole here either. Reading it as text would drop the mark at its
+// start that makes spreadsheet programs read the diacritics.
 export async function getFile(path: string, params: Params = {}) {
   const response = await fetch(apiUrl(path, params))
-  if (!response.ok) throw new Error(`API ${response.status} for ${path}`)
-  return response.arrayBuffer()
+  if (!response.ok || !response.body) {
+    throw new Error(`API ${response.status} for ${path}`)
+  }
+  return response.body
 }
 
 // The one thing the site sends to the API: a reader's error report. Returns the status.
@@ -53,6 +62,7 @@ export async function postJson(
 export type Source = Schemas['Source']
 
 export type EntityRef = Schemas['EntityRef']
+
 export type Entity = Schemas['EntityOut']
 
 export type Summary = Schemas['Summary']
@@ -60,18 +70,6 @@ export type Summary = Schemas['Summary']
 export type Stats = Schemas['Stats']
 
 export type Partner = Schemas['Partner']
-
-export type EntityPage = Schemas['EntityPage']
-
-export type Purchase = Schemas['Purchase']
-// One purchase on its own page, with its lines and conditions once collected.
-export type PurchaseWithDetail = Schemas['PurchaseWithDetail']
-export type PurchaseDetail = Schemas['PurchaseDetail']
-
-export type PurchasePage = Schemas['PurchasePage']
-
-export type RankingRow = Schemas['RankingRow']
-export type Ranking = Schemas['Ranking']
 
 // 'institutions' looks at an entity as a buyer, 'suppliers' as a seller.
 export type Role = 'institutions' | 'suppliers'
@@ -85,27 +83,13 @@ export const ACCEPTED = 7
 // for goods and services. The API holds each purchase to the one of its type for
 // `above_limit`; these keep every page's wording in agreement with it.
 export const DIRECT_PURCHASE_LIMIT = 900_400
+
 export const DIRECT_PURCHASE_LIMIT_GOODS_SERVICES = 270_120
 
 // The detail of a purchase (its lines and conditions) is one request to SEAP each, so the
 // API collects it for accepted purchases from this value up, newest first. Keep it equal
 // to `MIN_VALUE` in the API's `collectors/seap_direct/details.py`.
 export const DETAIL_MIN_VALUE = 100_000
-
-// One source as we hold it: its days, how many records, when it was last read.
-export type Dataset = Schemas['Dataset']
-
-// Like the totals, the table of what we hold must not take the home page down.
-export const getDatasets = createServerFn({ method: 'GET' }).handler(
-  async (): Promise<Array<Dataset>> => {
-    try {
-      const found = await getJson<{ items: Array<Dataset> }>('/v1/datasets')
-      return found?.items ?? []
-    } catch {
-      return []
-    }
-  },
-)
 
 // The home page must still render when the API is down, so this one never throws.
 export const getStats = createServerFn({ method: 'GET' }).handler(
@@ -118,46 +102,4 @@ export const getStats = createServerFn({ method: 'GET' }).handler(
   },
 )
 
-export const searchEntities = createServerFn({ method: 'GET' })
-  .inputValidator((data: { q: string }) => data)
-  .handler(async ({ data }): Promise<Array<Entity>> => {
-    const q = data.q.trim().slice(0, 100)
-    if (q.length < 2) return []
-    const found = await getJson<{ items: Array<Entity> }>('/v1/search', {
-      q,
-      limit: 30,
-    })
-    return found?.items ?? []
-  })
-
-export const getEntityPage = createServerFn({ method: 'GET' })
-  .inputValidator((data: { role: Role; cui: number }) => data)
-  .handler(({ data }) =>
-    getJson<EntityPage>(`/v1/${data.role}/${data.cui}`, { partners: 10 }),
-  )
-
-export const getPurchases = createServerFn({ method: 'GET' })
-  .inputValidator(
-    (data: { role: Role; cui: number; page: number; byValue: boolean }) => data,
-  )
-  .handler(async ({ data }): Promise<PurchasePage> => {
-    const found = await getJson<PurchasePage>('/v1/direct-purchases', {
-      [data.role === 'institutions' ? 'buyer' : 'supplier']: data.cui,
-      sort: data.byValue ? 'value' : 'newest',
-      // The largest are ranked among accepted purchases only: a refused offer can carry
-      // any value and is not money spent.
-      state: data.byValue ? ACCEPTED : undefined,
-      limit: PAGE_SIZE,
-      offset: (data.page - 1) * PAGE_SIZE,
-    })
-    return found ?? { total: 0, items: [] }
-  })
-
-export const getRanking = createServerFn({ method: 'GET' })
-  .inputValidator((data: { role: Role; cpv?: string }) => data)
-  .handler(({ data }) =>
-    getJson<Ranking>(`/v1/rankings/${data.role}`, {
-      cpv: data.cpv,
-      limit: 20,
-    }),
-  )
+export type Period = Schemas['Period']

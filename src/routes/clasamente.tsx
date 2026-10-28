@@ -1,32 +1,31 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Container, Flex, Heading, Text } from '@radix-ui/themes'
 
-import { Patterns } from '#/components/Patterns'
-import { RankingFilters } from '#/components/RankingFilters'
+import { Patterns } from '#/features/patterns/Patterns'
+import { RankingFilters } from '#/features/rankings/RankingFilters'
 import {
   ContractRanking,
   DirectRankings,
   LargestContracts,
-} from '#/components/Rankings'
+} from '#/features/rankings/Rankings'
 import { UrlTabs } from '#/components/UrlTabs'
 import { messagesFor } from '#/i18n'
 import { useI18n } from '#/i18n/context'
 import { pageTitle } from '#/lib/copy'
 import {
   contractRankingQuery,
-  cpvDivisionsQuery,
   largestContractsQuery,
-  nearLimitQuery,
   rankingQuery,
-  statsQuery,
-} from '#/lib/queries'
+} from '#/features/rankings/queries'
+import { cpvDivisionsQuery, nearLimitQuery } from '#/features/patterns/queries'
+import { statsQuery } from '#/lib/queries'
 import {
   RANKINGS,
   isContractTab,
   rankingFilter,
   validateRankingSearch,
-} from '#/lib/urls'
-import type { RankingSearch } from '#/lib/urls'
+} from '#/features/rankings/urls'
+import type { RankingSearch } from '#/features/rankings/urls'
 
 export const Route = createFileRoute('/clasamente')({
   validateSearch: validateRankingSearch,

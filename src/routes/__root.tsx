@@ -16,6 +16,8 @@ import {
   Text,
   Theme,
 } from '@radix-ui/themes'
+import radixCss from '@radix-ui/themes/styles.css?url'
+import appCss from '../styles.css?url'
 
 import { Unavailable } from '#/components/Notes'
 import { REPORT_ANCHOR } from '#/components/ReportForm'
@@ -25,9 +27,6 @@ import type { Locale } from '#/i18n'
 import { I18nProvider, useI18n } from '#/i18n/context'
 import { rich } from '#/i18n/rich'
 import { SITE_NAME } from '#/lib/copy'
-
-import radixCss from '@radix-ui/themes/styles.css?url'
-import appCss from '../styles.css?url'
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient

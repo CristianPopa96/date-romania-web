@@ -11,13 +11,14 @@ import {
   Text,
 } from '@radix-ui/themes'
 
-import { DatasetTable } from '#/components/DatasetTable'
+import { DatasetTable } from '#/features/sources/DatasetTable'
 import { Figure } from '#/components/Figure'
 import { AboveLimitNote, PeriodNote, Unavailable } from '#/components/Notes'
 import { SearchBox } from '#/components/SearchBox'
 import { SourceLine } from '#/components/SourceLine'
 import { useI18n } from '#/i18n/context'
-import { datasetsQuery, statsQuery } from '#/lib/queries'
+import { datasetsQuery } from '#/features/sources/queries'
+import { statsQuery } from '#/lib/queries'
 
 export const Route = createFileRoute('/')({
   loader: ({ context }) =>

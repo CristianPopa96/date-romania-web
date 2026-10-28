@@ -1,11 +1,11 @@
 import { createFileRoute, notFound, redirect } from '@tanstack/react-router'
 
-import { NoticeView } from '#/components/NoticeView'
-import { NOTICE_PAGE_SIZE } from '#/lib/api-contracts'
-import { pageCount } from '#/lib/contracts'
+import { NoticeView } from '#/features/contracts/NoticeView'
+import { NOTICE_PAGE_SIZE } from '#/features/contracts/api'
+import { pageCount } from '#/lib/list'
 import { messagesFor } from '#/i18n'
 import { pageTitle } from '#/lib/copy'
-import { noticeContractsQuery, noticeQuery } from '#/lib/queries'
+import { noticeContractsQuery, noticeQuery } from '#/features/contracts/queries'
 import { idFromPath, validatePageSearch } from '#/lib/urls'
 
 // One award notice, by SEAP's own id. A notice is not a contract: it holds one or many.

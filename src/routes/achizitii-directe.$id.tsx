@@ -1,9 +1,9 @@
 import { createFileRoute, notFound } from '@tanstack/react-router'
 
-import { PurchaseView } from '#/components/PurchaseView'
+import { PurchaseView } from '#/features/purchases/PurchaseView'
 import { messagesFor } from '#/i18n'
 import { pageTitle } from '#/lib/copy'
-import { pairSummaryQuery, purchaseQuery } from '#/lib/queries'
+import { pairSummaryQuery, purchaseQuery } from '#/features/purchases/queries'
 import { idFromPath } from '#/lib/urls'
 
 // One direct purchase, by SEAP's own id.
