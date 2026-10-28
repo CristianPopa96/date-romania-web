@@ -69,20 +69,27 @@ export function periodLabel(period: string): string {
 }
 
 // What an entity holds of EU money, as its page counts it: its cohesion projects (every
-// programme's, a count only) and its PNRR contracts. Nothing when the answer is missing.
+// programme's, a count only) and how many of them we tied by name, its PNRR contracts,
+// and whether it was paid from PNRR (it can be, on a measure with no contract held).
+// Nothing when the answer is missing.
 export function euCounts(funds: EuBeneficiaryFunds | null | 'failed') {
-  if (!funds || funds === 'failed') return { cohesion: 0, pnrr: 0 }
+  if (!funds || funds === 'failed') {
+    return { cohesion: 0, byName: 0, pnrr: 0, pnrrPaid: false }
+  }
   return {
-    cohesion: funds.cohesion.reduce(
-      (n, programme) => n + programme.projects,
-      0,
-    ),
+    cohesion: funds.cohesion.reduce((n, row) => n + row.projects, 0),
+    byName: funds.cohesion.reduce((n, row) => n + row.by_name, 0),
     pnrr: funds.pnrr?.contracts ?? 0,
+    pnrrPaid: (funds.pnrr?.payments ?? 0) > 0,
   }
 }
 
-// The EU lists an entity page offers: one per kind it has.
+// The EU lists an entity page offers: one per kind it has. PNRR counts a payment with no
+// contract too: the money was received, and the page says on what.
 export function euLists(funds: EuBeneficiaryFunds | null | 'failed'): EuLists {
   const counts = euCounts(funds)
-  return { coeziune: counts.cohesion > 0, pnrr: counts.pnrr > 0 }
+  return {
+    coeziune: counts.cohesion > 0,
+    pnrr: counts.pnrr > 0 || counts.pnrrPaid,
+  }
 }

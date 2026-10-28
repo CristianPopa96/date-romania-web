@@ -1223,9 +1223,9 @@ export interface components {
             entity: components["schemas"]["EntityRef"];
             /**
              * Cohesion
-             * @description Its projects in each programme, tied by eu_links.py; empty when none.
+             * @description Its projects in each programme, tied by eu_links.py, by the CUI in the list or by name; empty when none.
              */
-            cohesion: components["schemas"]["EuProgramme"][];
+            cohesion: components["schemas"]["EuBeneficiaryProgramme"][];
             /** @description Null when it has no project. */
             cohesion_source: components["schemas"]["Source"] | null;
             /** @description Null when it has no contract or payment. */
@@ -1238,7 +1238,10 @@ export interface components {
          *     counted for the beneficiary, not shared out among its contracts.
          */
         EuBeneficiaryPnrr: {
-            /** Contracts */
+            /**
+             * Contracts
+             * @description 0 when it was paid on a measure with no contract held.
+             */
             contracts: number;
             /**
              * Total
@@ -1263,6 +1266,43 @@ export interface components {
              */
             edition: string;
             source: components["schemas"]["Source"];
+        };
+        /** EuBeneficiaryProgramme */
+        EuBeneficiaryProgramme: {
+            /**
+             * Code
+             * @description 'POR', 'PEO', 'PoIDS'...
+             */
+            code: string;
+            /** Name */
+            name: string;
+            /**
+             * Period
+             * @description '2014-2020' or '2021-2027'.
+             */
+            period: string;
+            /** Projects */
+            projects: number;
+            /**
+             * Total
+             * @description Lei, the projects' total value added up.
+             */
+            total: number | null;
+            /**
+             * Paid
+             * @description Lei paid up to `cut_off`; null when not published.
+             */
+            paid: number | null;
+            /**
+             * Cut Off
+             * @description The day the programme's newest list describes.
+             */
+            cut_off: string | null;
+            /**
+             * By Name
+             * @description Of `projects`, those tied by name and place (probable): the list gives no CUI for them.
+             */
+            by_name: number;
         };
         /**
          * EuFunds

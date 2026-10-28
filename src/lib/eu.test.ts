@@ -109,7 +109,7 @@ it('writes a programming period with an en dash', () => {
 })
 
 describe('euCounts and euLists', () => {
-  const programme = (code: string, projects: number): EuProgramme => ({
+  const programme = (code: string, projects: number, byName = 0) => ({
     code,
     name: code,
     period: '2014-2020',
@@ -117,6 +117,7 @@ describe('euCounts and euLists', () => {
     total: null,
     paid: null,
     cut_off: null,
+    by_name: byName,
   })
   const source = {
     publisher: 'MIPE',
@@ -138,7 +139,7 @@ describe('euCounts and euLists', () => {
 
   it('counts the projects of every programme, and the PNRR contracts', () => {
     const held = funds({
-      cohesion: [programme('POR', 3), programme('POIM', 2)],
+      cohesion: [programme('POR', 3, 1), programme('POIM', 2, 2)],
       pnrr: {
         contracts: 4,
         total: 10,
@@ -150,13 +151,39 @@ describe('euCounts and euLists', () => {
         source,
       },
     })
-    expect(euCounts(held)).toEqual({ cohesion: 5, pnrr: 4 })
+    expect(euCounts(held)).toEqual({
+      cohesion: 5,
+      byName: 3,
+      pnrr: 4,
+      pnrrPaid: true,
+    })
     expect(euLists(held)).toEqual({ coeziune: true, pnrr: true })
   })
 
   it('offers no EU list without an answer or without projects', () => {
     expect(euLists(null)).toEqual({ coeziune: false, pnrr: false })
     expect(euLists('failed')).toEqual({ coeziune: false, pnrr: false })
-    expect(euCounts(funds({}))).toEqual({ cohesion: 0, pnrr: 0 })
+    expect(euCounts(funds({}))).toEqual({
+      cohesion: 0,
+      byName: 0,
+      pnrr: 0,
+      pnrrPaid: false,
+    })
+  })
+
+  it('offers the PNRR list to a beneficiary paid with no contract held', () => {
+    const paid = funds({
+      pnrr: {
+        contracts: 0,
+        total: null,
+        paid: 40000,
+        payments: 1,
+        first_day: '2026-04-01',
+        last_day: '2026-04-01',
+        edition: '2026-10-15',
+        source,
+      },
+    })
+    expect(euLists(paid)).toEqual({ coeziune: false, pnrr: true })
   })
 })

@@ -156,6 +156,11 @@ export const eu = {
     cohesionTitle: 'Proiecte cu fonduri europene',
     cohesionLead:
       'Proiectele de coeziune în care apare ca beneficiar, din listele de proiecte contractate ale MIPE. Fiecare program are lista lui, la data ei: sumele nu se adună între programe.',
+    // When some were tied by name: the list gave no CUI for them, and a name can be wrong.
+    byNameNote: (n: number, text: string) =>
+      `${counted(n, text, 'Un proiect este legat', 'proiecte sunt legate')} de noi după nume și localitate, fiindcă lista nu dă CUI-ul beneficiarului. Coloana „Legătură” spune care.`,
+    byName: (n: number, text: string) =>
+      `din care ${n === 1 ? 'unul' : text} după nume`,
     tie: 'Legătură',
     pnrrTitle: 'Contracte de finanțare PNRR',
     pnrrLead: (day: string) =>
@@ -169,6 +174,8 @@ export const eu = {
     receivedNote:
       'pe toate măsurile · o plată numește beneficiarul și măsura, nu contractul, așa că nu o împărțim pe contracte',
     noPayments: 'nicio plată în fișierul de plăți',
+    noContracts:
+      'Niciun contract în tabloul de bord: plățile sunt pe măsuri pe care nu are un contract.',
     failed:
       'Nu am putut citi acum fondurile europene ale acestui beneficiar. Încearcă din nou mai târziu.',
     // On a place's page: the town hall's or county council's, with links to its lists.
@@ -177,8 +184,17 @@ export const eu = {
       `Proiectele europene în care ${name} apare ca beneficiar.`,
     placeCohesion: (n: number, text: string, programmes: number) =>
       `${counted(n, text, 'Un proiect de coeziune', 'proiecte de coeziune')}, ${programmes === 1 ? 'într-un program' : `în ${programmes} programe`}`,
+    // `all`: every one of them; "legat" then agrees with the project counted before it.
+    placeByName: (n: number, text: string, all: boolean) =>
+      all
+        ? n === 1
+          ? ', legat de noi după nume'
+          : ', toate legate de noi după nume'
+        : `, din care ${n === 1 ? 'unul este legat' : `${text} sunt legate`} de noi după nume`,
     placePnrr: (n: number, text: string) =>
-      counted(n, text, 'Un contract PNRR', 'contracte PNRR'),
+      n === 0
+        ? 'Niciun contract PNRR'
+        : counted(n, text, 'Un contract PNRR', 'contracte PNRR'),
     placeReceived: (sum: string, days: string | null) =>
       `plăți primite ${sum}${days ? `, ${days}` : ''}`,
     placeNone:

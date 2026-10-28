@@ -32,7 +32,7 @@ export function PlaceEuFunds({ entity }: { entity: EntityRef }) {
         <Text size="2" color="gray">
           {e.failed}
         </Text>
-      ) : counts.cohesion === 0 && counts.pnrr === 0 ? (
+      ) : counts.cohesion === 0 && counts.pnrr === 0 && !counts.pnrrPaid ? (
         <Text size="2" color="gray">
           {e.placeNone}
         </Text>
@@ -47,6 +47,13 @@ export function PlaceEuFunds({ entity }: { entity: EntityRef }) {
                     f.count(counts.cohesion),
                     funds.cohesion.length,
                   )}
+                  {counts.byName > 0
+                    ? e.placeByName(
+                        counts.byName,
+                        f.count(counts.byName),
+                        counts.byName === counts.cohesion,
+                      )
+                    : null}
                 </Text>
                 <Link asChild size="2">
                   <RouterLink
@@ -60,7 +67,7 @@ export function PlaceEuFunds({ entity }: { entity: EntityRef }) {
               </Flex>
             </Card>
           ) : null}
-          {pnrr && pnrr.contracts > 0 ? (
+          {pnrr && (pnrr.contracts > 0 || pnrr.payments > 0) ? (
             <Card>
               <Flex justify="between" align="center" gap="3" wrap="wrap">
                 <Text size="2">

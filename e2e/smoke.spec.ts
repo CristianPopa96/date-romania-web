@@ -1733,6 +1733,11 @@ test('an institution lists the EU projects and PNRR contracts it is the benefici
   // By programme, at its list's day, then each project with how it was tied.
   const programme = main.getByRole('row').filter({ hasText: 'POR 2014–2020' })
   await expect(programme).toContainText('31.08.2025')
+  // Its one project was tied by the name of its administration: the page says so.
+  await expect(programme).toContainText('din care unul după nume')
+  await expect(
+    main.getByText(/Un proiect este legat de noi după nume și localitate/),
+  ).toBeVisible()
   const road = main.getByRole('row').filter({ hasText: 'SMIS 118001' })
   await expect(road).toContainText('6.100.000 lei')
   await expect(road).toContainText('Nume și localitate')
@@ -1751,6 +1756,7 @@ test('a hospital lists its projects of two programmes, each at its own day', asy
   ).toContainText('31.08.2026')
   await expect(main.getByText('2 proiecte')).toBeVisible()
   await expect(main.getByText('CUI în listă')).toHaveCount(2)
+  await expect(main.getByText(/legate? de noi după nume/)).toHaveCount(0)
 })
 
 test('a company with no EU money has no EU list, even when the address asks', async ({
@@ -1777,7 +1783,9 @@ test("a commune shows its town hall's EU projects and leads to their lists", asy
     main.getByRole('heading', { name: 'Fonduri europene' }),
   ).toBeVisible()
   await expect(
-    main.getByText('Un proiect de coeziune, într-un program'),
+    main.getByText(
+      'Un proiect de coeziune, într-un program, legat de noi după nume',
+    ),
   ).toBeVisible()
   await expect(
     main.getByText(

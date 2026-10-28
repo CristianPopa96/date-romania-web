@@ -19,7 +19,7 @@ import { useI18n } from '#/i18n/context'
 import { PAGE_SIZE } from '#/lib/api'
 import type { EuBeneficiaryPnrr } from '#/lib/api-eu'
 import { pageCount } from '#/lib/contracts'
-import { pnrrContractsQuery } from '#/lib/queries'
+import { entityPnrrContractsQuery } from '#/lib/queries'
 
 // The PNRR contracts of the entity a page is about, with every payment it received from
 // one dashboard edition. A payment names the beneficiary and a measure, never the
@@ -37,10 +37,6 @@ export function EntityPnrr({
 }) {
   const { t, f } = useI18n()
   const e = t.eu.held
-  const p = t.pnrr
-  const { data: contracts } = useSuspenseQuery(
-    pnrrContractsQuery({ beneficiary: cui, page }),
-  )
   const days = f.span(pnrr.first_day, pnrr.last_day)
 
   return (
@@ -94,6 +90,41 @@ export function EntityPnrr({
       </Grid>
       <SourceLine source={pnrr.source} />
 
+      {pnrr.contracts > 0 ? (
+        <PnrrList cui={cui} page={page} onPage={onPage} />
+      ) : (
+        <Text size="2" color="gray">
+          {e.noContracts}
+        </Text>
+      )}
+    </Flex>
+  )
+}
+
+// Its contracts, largest first, with the finder's columns but the beneficiary's.
+function PnrrList({
+  cui,
+  page,
+  onPage,
+}: {
+  cui: number
+  page: number
+  onPage: (page: number) => void
+}) {
+  const { t, f } = useI18n()
+  const p = t.pnrr
+  const { data: contracts } = useSuspenseQuery(
+    entityPnrrContractsQuery(cui, page),
+  )
+  if (contracts === 'failed') {
+    return (
+      <Text size="2" color="gray">
+        {t.eu.held.failed}
+      </Text>
+    )
+  }
+  return (
+    <>
       <Table.Root variant="surface" size="1">
         <Table.Header>
           <Table.Row>
@@ -164,6 +195,6 @@ export function EntityPnrr({
         pages={pageCount(contracts.total, PAGE_SIZE)}
         onPage={onPage}
       />
-    </Flex>
+    </>
   )
 }

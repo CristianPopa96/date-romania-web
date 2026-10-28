@@ -12,7 +12,7 @@ import { PAGE_SIZE } from '#/lib/api'
 import type { EuBeneficiaryFunds } from '#/lib/api-eu'
 import { pageCount } from '#/lib/contracts'
 import { beneficiaryTie, periodLabel } from '#/lib/eu'
-import { euProjectsQuery } from '#/lib/queries'
+import { entityEuProjectsQuery } from '#/lib/queries'
 
 // The cohesion projects of the entity a page is about (flow 7, "arrive from a
 // beneficiary's page"), by programme and one by one; its PNRR contracts are in
@@ -32,9 +32,7 @@ export function EntityCohesion({
 }) {
   const { t, f } = useI18n()
   const e = t.eu
-  const { data: projects } = useSuspenseQuery(
-    euProjectsQuery({ beneficiary: cui, page }),
-  )
+  const byName = funds.cohesion.reduce((n, row) => n + row.by_name, 0)
   const money = (value: number | null) =>
     value === null ? <DataState kind="notPublished" /> : f.lei(value)
 
@@ -46,6 +44,11 @@ export function EntityCohesion({
       <Text size="2" color="gray" style={{ maxWidth: '70ch' }}>
         {e.held.cohesionLead}
       </Text>
+      {byName > 0 ? (
+        <Text size="2" style={{ maxWidth: '70ch' }}>
+          {e.held.byNameNote(byName, f.count(byName))}
+        </Text>
+      ) : null}
       <Table.Root variant="surface" size="1">
         <Table.Header>
           <Table.Row>
@@ -73,6 +76,14 @@ export function EntityCohesion({
               </Table.RowHeaderCell>
               <Table.Cell justify="end">
                 {f.count(programme.projects)}
+                {programme.by_name > 0 ? (
+                  <Text as="div" size="1" color="gray">
+                    {e.held.byName(
+                      programme.by_name,
+                      f.count(programme.by_name),
+                    )}
+                  </Text>
+                ) : null}
               </Table.Cell>
               <Table.Cell justify="end">{money(programme.total)}</Table.Cell>
               <Table.Cell justify="end">{money(programme.paid)}</Table.Cell>
@@ -91,6 +102,35 @@ export function EntityCohesion({
         <SourceLine source={funds.cohesion_source} />
       ) : null}
 
+      <CohesionList cui={cui} page={page} onPage={onPage} />
+    </Flex>
+  )
+}
+
+// The projects one by one, largest first, each with how it was tied to this entity.
+function CohesionList({
+  cui,
+  page,
+  onPage,
+}: {
+  cui: number
+  page: number
+  onPage: (page: number) => void
+}) {
+  const { t, f } = useI18n()
+  const e = t.eu
+  const { data: projects } = useSuspenseQuery(entityEuProjectsQuery(cui, page))
+  if (projects === 'failed') {
+    return (
+      <Text size="2" color="gray">
+        {e.held.failed}
+      </Text>
+    )
+  }
+  const money = (value: number | null) =>
+    value === null ? <DataState kind="notPublished" /> : f.lei(value)
+  return (
+    <>
       <Text size="2" color="gray">
         {e.found(projects.total, f.count(projects.total))}
       </Text>
@@ -156,6 +196,6 @@ export function EntityCohesion({
         pages={pageCount(projects.total, PAGE_SIZE)}
         onPage={onPage}
       />
-    </Flex>
+    </>
   )
 }
