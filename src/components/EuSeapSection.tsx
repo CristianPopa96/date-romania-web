@@ -26,11 +26,11 @@ import type { EuSeapOf } from '#/lib/api-eu'
 import { PAGE_SIZE } from '#/lib/api'
 import { euSeapQuery } from '#/lib/queries'
 
-// The SEAP records whose text cites a project (`ScreenEUProject`, "Contracte plătite din
-// acest proiect"): the contracts of its award notices, paged, and its direct purchases, in
+// The SEAP records whose text cites a project (the SEAP section of `ScreenEUProject`):
+// the contracts of its award notices, paged, and its direct purchases, in
 // two tables, since the site never puts the two together. Every row is tied by what the
-// buyer wrote, so every badge is medium. `beneficiary` is the project's own entity: a
-// row bought by another (a partner) names its buyer.
+// buyer wrote, so every badge is medium. `beneficiary` is the project's own entity, when
+// tied: a row bought by another (a partner) names its buyer.
 export function EuSeapSection({
   of,
   beneficiary,
@@ -43,15 +43,33 @@ export function EuSeapSection({
   const { t, f } = useI18n()
   const s = t.eu.seap
   const { data: links } = useSuspenseQuery(euSeapQuery(of))
-  const badge = (cited: string) => (
+  // The API has no such endpoint yet: no section rather than a false "nothing".
+  if (links === null) return null
+  if (links === 'failed') {
+    return (
+      <Flex direction="column" gap="3">
+        <Heading as="h2" size="5">
+          {s.title}
+        </Heading>
+        <Text size="2" color="gray">
+          {s.failed}
+        </Text>
+      </Flex>
+    )
+  }
+  const badge = (record: 'notice' | 'purchase', cited: string) => (
     <ConfidenceBadge
       level="probable"
-      label={s.badge[of.kind]}
+      label={s.badge[of.kind][record]}
       help={s.help[of.kind](cited)}
     />
   )
+  // Only against a beneficiary we hold: with none, the lead's own rows would read as bought
+  // by someone else.
   const boughtBy = (buyer: EntityRef | null) =>
-    buyer && buyer.cui !== beneficiary ? s.boughtBy(buyer.name) : null
+    buyer && beneficiary !== null && buyer.cui !== beneficiary
+      ? s.boughtBy(buyer.name)
+      : null
   const empty = links.contracts_total === 0 && links.purchases.length === 0
 
   return (
@@ -114,7 +132,7 @@ export function EuSeapSection({
                     </Text>
                   )}
                 </Table.Cell>
-                <Table.Cell>{badge(cited)}</Table.Cell>
+                <Table.Cell>{badge('notice', cited)}</Table.Cell>
               </Table.Row>
             ))}
           </SeapTable>
@@ -170,7 +188,7 @@ export function EuSeapSection({
                     f.lei(purchase.value)
                   )}
                 </Table.Cell>
-                <Table.Cell>{badge(cited)}</Table.Cell>
+                <Table.Cell>{badge('purchase', cited)}</Table.Cell>
               </Table.Row>
             ))}
           </SeapTable>

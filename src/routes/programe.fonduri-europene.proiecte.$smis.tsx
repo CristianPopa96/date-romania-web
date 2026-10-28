@@ -1,7 +1,9 @@
-import { createFileRoute, notFound } from '@tanstack/react-router'
+import { createFileRoute, notFound, redirect } from '@tanstack/react-router'
 
 import { EuProjectView } from '#/components/EuProjectView'
 import { messagesFor } from '#/i18n'
+import { PAGE_SIZE } from '#/lib/api'
+import { pageCount } from '#/lib/contracts'
 import { pageTitle } from '#/lib/copy'
 import { euSeapQuery, euProjectQuery } from '#/lib/queries'
 import { idFromPath, validatePageSearch } from '#/lib/urls'
@@ -19,9 +21,20 @@ export const Route = createFileRoute(
       euProjectQuery(smis),
     )
     if (!project) throw notFound()
-    await context.queryClient.ensureQueryData(
+    const seap = await context.queryClient.ensureQueryData(
       euSeapQuery({ kind: 'smis', id: smis, page: deps.page }),
     )
+    // A page past the end of the SEAP contracts goes to the last one that has rows.
+    if (typeof seap === 'object' && seap !== null) {
+      const last = pageCount(seap.contracts_total, PAGE_SIZE)
+      if (deps.page > last) {
+        throw redirect({
+          to: '/programe/fonduri-europene/proiecte/$smis',
+          params,
+          search: { pagina: last > 1 ? last : undefined },
+        })
+      }
+    }
     return { title: project.title }
   },
   head: ({ loaderData, match }) => ({

@@ -97,7 +97,8 @@ export const eu = {
   // The SEAP records whose text cites a project, on both kinds of project page: `smis` a
   // cohesion project, `pnrr` a PNRR financing contract.
   seap: {
-    title: 'Contracte plătite din acest proiect',
+    // Only what the tie supports: the buyer's text cites the project, nothing proves it paid.
+    title: 'Contracte și achiziții care citează acest proiect',
     note: {
       smis: 'găsite după codul SMIS citat în anunț sau în achiziție',
       pnrr: 'găsite după numărul contractului de finanțare citat în anunț, la același cumpărător',
@@ -122,7 +123,16 @@ export const eu = {
     supplier: 'Furnizor',
     value: 'Valoare fără TVA',
     link: 'Legătură',
-    badge: { smis: 'SMIS în anunț', pnrr: 'Nr. finanțare în anunț' },
+    // By the kind of project, then of record: a direct purchase is not a notice.
+    badge: {
+      smis: { notice: 'SMIS în anunț', purchase: 'SMIS în achiziție' },
+      pnrr: {
+        notice: 'Nr. finanțare în anunț',
+        purchase: 'Nr. finanțare în achiziție',
+      },
+    },
+    failed:
+      'Nu am putut citi acum contractele și achizițiile din SEAP. Încearcă din nou mai târziu.',
     help: {
       smis: (cited: string) =>
         `Legat de noi: codul SMIS ${cited} apare în textul scris de cumpărător în SEAP. SEAP nu are un câmp pentru proiect și nu verifică ce scrie cumpărătorul.`,

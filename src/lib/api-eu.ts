@@ -65,16 +65,22 @@ export type EuSeapPurchase = Schemas['EuSeapPurchase']
 // Whose records: a cohesion project by its SMIS code, or a PNRR contract by its id.
 export type EuSeapOf = { kind: 'smis' | 'pnrr'; id: number; page: number }
 
+// The project is found before this is asked, so a 404 means the API has no such
+// endpoint (a site deployed before its API): null, and the page shows no section, never
+// "nothing cites it". 'failed' when the API did not answer: the page stays up without it.
 export const getEuSeap = createServerFn({ method: 'GET' })
   .inputValidator((data: EuSeapOf) => data)
-  .handler(async ({ data }): Promise<EuSeapLinks> => {
+  .handler(async ({ data }): Promise<EuSeapLinks | null | 'failed'> => {
     const path =
       data.kind === 'smis'
         ? `${ROOT}/projects/${data.id}/seap`
         : `/v1/programmes/pnrr/contracts/${data.id}/seap`
-    const found = await getJson<EuSeapLinks>(path, {
-      limit: PAGE_SIZE,
-      offset: (data.page - 1) * PAGE_SIZE,
-    })
-    return found ?? { contracts_total: 0, contracts: [], purchases: [] }
+    try {
+      return await getJson<EuSeapLinks>(path, {
+        limit: PAGE_SIZE,
+        offset: (data.page - 1) * PAGE_SIZE,
+      })
+    } catch {
+      return 'failed'
+    }
   })
