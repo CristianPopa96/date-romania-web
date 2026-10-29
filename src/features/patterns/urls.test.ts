@@ -16,8 +16,14 @@ describe('the address of the pattern file', () => {
     expect(read('cpv=45')).toEqual({ cpv: '45' })
   })
 
-  it('refuses a filter it cannot apply or a CPV that is not one', () => {
+  it('carries the contract type too', () => {
+    expect(patternCsvPath('45', 3)).toBe('/tipare.csv?cpv=45&tip=3')
+    expect(read('tip=3')).toEqual({ contract_type: 3 })
+  })
+
+  it('refuses a filter it cannot apply or a value that is not one', () => {
     expect(read('cpv=4x')).toBeNull()
     expect(read('ue=da')).toBeNull()
+    expect(read('tip=4')).toBeNull()
   })
 })

@@ -277,7 +277,7 @@ export interface paths {
         };
         /**
          * Ranking Suppliers
-         * @description Suppliers by the value of their accepted direct purchases.
+         * @description Suppliers by the value of their accepted direct purchases, or by how many.
          */
         get: operations["ranking_suppliers_v1_rankings_suppliers_get"];
         put?: never;
@@ -297,7 +297,7 @@ export interface paths {
         };
         /**
          * Ranking Institutions
-         * @description Institutions by the value of the direct purchases they accepted.
+         * @description Institutions by the value of the direct purchases they accepted, or by how many.
          */
         get: operations["ranking_institutions_v1_rankings_institutions_get"];
         put?: never;
@@ -345,7 +345,7 @@ export interface paths {
          *
          *     A purchase is near the limit from `rule.share` of it to just under it. A purchase whose type is
          *     not known cannot be checked: `checked` of `accepted_total` were, and `first_day` and
-         *     `last_day` bound those. As csv: every pair, one line per purchase.
+         *     `last_day` bound those. As csv: every pair in the order asked for, one line per purchase.
          */
         get: operations["near_limit_v1_patterns_near_limit_get"];
         put?: never;
@@ -559,7 +559,8 @@ export interface paths {
         };
         /**
          * Ranking Contract Institutions
-         * @description Institutions by the value of the contracts they awarded; each contract counted once.
+         * @description Institutions by the value of the contracts they awarded, or by how many; each
+         *     contract counted once.
          */
         get: operations["ranking_contract_institutions_v1_rankings_contract_institutions_get"];
         put?: never;
@@ -1284,7 +1285,15 @@ export interface components {
              * @description alone or association, for a ranking of winners.
              */
             won: ("alone" | "association") | null;
-            /** Items */
+            /**
+             * Total
+             * @description Every party ranked under the filters, beyond the page.
+             */
+            total: number;
+            /**
+             * Items
+             * @description `rank` is the place in the order asked for, counted from the first page.
+             */
             items: components["schemas"]["ContractRankingRow"][];
             source: components["schemas"]["Source"];
         };
@@ -3408,7 +3417,15 @@ export interface components {
             date_from: string | null;
             /** Date To */
             date_to: string | null;
-            /** Items */
+            /**
+             * Total
+             * @description Every party ranked under the filters, beyond the page.
+             */
+            total: number;
+            /**
+             * Items
+             * @description `rank` is the place in the order asked for, counted from the first page.
+             */
             items: components["schemas"]["RankingRow"][];
             source: components["schemas"]["Source"];
         };
@@ -4270,7 +4287,13 @@ export interface operations {
                 date_to?: string | null;
                 /** @description Start of a CPV code: 45 for the division of works, 4523 for a narrower class. */
                 cpv?: string | null;
+                /** @description The value added up, or how many rows it is added up from. */
+                sort?: "value" | "count";
+                order?: "desc" | "asc";
+                /** @description Words of the party's name, or its CUI: the parties found keep their place in the ranking. */
+                q?: string | null;
                 limit?: number;
+                offset?: number;
             };
             header?: never;
             path?: never;
@@ -4307,7 +4330,13 @@ export interface operations {
                 date_to?: string | null;
                 /** @description Start of a CPV code: 45 for the division of works, 4523 for a narrower class. */
                 cpv?: string | null;
+                /** @description The value added up, or how many rows it is added up from. */
+                sort?: "value" | "count";
+                order?: "desc" | "asc";
+                /** @description Words of the party's name, or its CUI: the parties found keep their place in the ranking. */
+                q?: string | null;
                 limit?: number;
+                offset?: number;
             };
             header?: never;
             path?: never;
@@ -4360,7 +4389,13 @@ export interface operations {
             query?: {
                 /** @description Start of a CPV code: 45 for the division of works, 4523 for a narrower class. */
                 cpv?: string | null;
+                /** @description SEAP's contract type: 1 goods, 2 services, 3 works. */
+                contract_type?: number | null;
+                /** @description How many purchases near the limit, or their value added up. */
+                sort?: "purchases" | "value";
+                order?: "desc" | "asc";
                 limit?: number;
+                offset?: number;
                 /** @description csv gives the whole list as a file. */
                 format?: "json" | "csv";
             };
@@ -4748,7 +4783,13 @@ export interface operations {
                 cpv?: string | null;
                 /** @description true: notices with a lot paid from EU funds; false: notices that say no lot is. A notice whose form does not ask, or not read in detail, is only in the list without this filter. */
                 eu_funded?: boolean | null;
+                /** @description The value added up, or how many rows it is added up from. */
+                sort?: "value" | "count";
+                order?: "desc" | "asc";
+                /** @description Words of the party's name, or its CUI: the parties found keep their place in the ranking. */
+                q?: string | null;
                 limit?: number;
+                offset?: number;
             };
             header?: never;
             path?: never;
@@ -4783,7 +4824,13 @@ export interface operations {
                 cpv?: string | null;
                 /** @description true: notices with a lot paid from EU funds; false: notices that say no lot is. A notice whose form does not ask, or not read in detail, is only in the list without this filter. */
                 eu_funded?: boolean | null;
+                /** @description The value added up, or how many rows it is added up from. */
+                sort?: "value" | "count";
+                order?: "desc" | "asc";
+                /** @description Words of the party's name, or its CUI: the parties found keep their place in the ranking. */
+                q?: string | null;
                 limit?: number;
+                offset?: number;
             };
             header?: never;
             path?: never;

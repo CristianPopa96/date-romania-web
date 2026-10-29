@@ -30,13 +30,25 @@ export type NearLimitPair = Schemas['NearLimitPair']
 
 export type NearLimitPattern = Schemas['NearLimitPattern']
 
-export const NEAR_LIMIT_ROWS = 50
+// A page of the pairs, under the list's filters and order.
+export type NearLimitQuery = {
+  cpv?: string
+  contract_type?: number
+  sort: 'purchases' | 'value'
+  order: 'asc' | 'desc'
+  size: number
+  page: number
+}
 
 export const getNearLimit = createServerFn({ method: 'GET' })
-  .inputValidator((data: { cpv?: string }) => data)
+  .inputValidator((data: NearLimitQuery) => data)
   .handler(({ data }) =>
     getJson<NearLimitPattern>('/v1/patterns/near-limit', {
       cpv: data.cpv,
-      limit: NEAR_LIMIT_ROWS,
+      contract_type: data.contract_type,
+      sort: data.sort,
+      order: data.order,
+      limit: data.size,
+      offset: (data.page - 1) * data.size,
     }),
   )

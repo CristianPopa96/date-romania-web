@@ -1,27 +1,25 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import { Container, Flex, Heading, Text } from '@radix-ui/themes'
 
 import { Patterns } from '#/features/patterns/Patterns'
 import { RankingFilters } from '#/features/rankings/RankingFilters'
-import {
-  ContractRanking,
-  DirectRankings,
-  LargestContracts,
-} from '#/features/rankings/Rankings'
+import { RankingList } from '#/features/rankings/RankingList'
+import { LargestContracts } from '#/features/rankings/Rankings'
 import { UrlTabs } from '#/components/UrlTabs'
 import { messagesFor } from '#/i18n'
 import { useI18n } from '#/i18n/context'
 import { pageTitle } from '#/lib/copy'
+import { pageCount } from '#/lib/list'
 import {
-  contractRankingQuery,
   largestContractsQuery,
-  rankingQuery,
+  rankingListQuery,
+  rankingTopQuery,
 } from '#/features/rankings/queries'
 import { cpvDivisionsQuery, nearLimitQuery } from '#/features/patterns/queries'
 import { statsQuery } from '#/lib/queries'
 import {
   RANKINGS,
-  isContractTab,
+  isRankingTab,
   rankingFilter,
   validateRankingSearch,
 } from '#/features/rankings/urls'
@@ -31,40 +29,44 @@ export const Route = createFileRoute('/clasamente')({
   validateSearch: validateRankingSearch,
   loaderDeps: ({ search }) => search,
   // Only the ranking the address asks for is read, and the list behind the filters.
-  loader: ({ context: { queryClient }, deps }) => {
+  loader: async ({ context: { queryClient }, deps }) => {
     const filter = rankingFilter(deps)
-    const ranking = () => {
+    // The rows of the list the tab pages through, when it is one.
+    const ranking = async () => {
       switch (deps.clasament) {
         case 'furnizori':
-          return queryClient.ensureQueryData(
-            contractRankingQuery(
-              'suppliers',
-              filter,
-              deps.castigate === 'asociere' ? 'association' : 'alone',
-            ),
-          )
         case 'institutii':
-          return queryClient.ensureQueryData(
-            contractRankingQuery('institutions', filter),
-          )
-        case 'achizitii':
-          return Promise.all([
+        case 'achizitii': {
+          const [, list] = await Promise.all([
             queryClient.ensureQueryData(statsQuery),
-            queryClient.ensureQueryData(rankingQuery('suppliers', filter.cpv)),
-            queryClient.ensureQueryData(
-              rankingQuery('institutions', filter.cpv),
-            ),
+            queryClient.ensureQueryData(rankingListQuery(deps)),
+            queryClient.ensureQueryData(rankingTopQuery(deps)),
           ])
-        case 'tipare':
-          return queryClient.ensureQueryData(nearLimitQuery(filter.cpv))
+          return list === 'failed' || !list ? null : list.total
+        }
+        case 'tipare': {
+          const pattern = await queryClient.ensureQueryData(
+            nearLimitQuery(deps),
+          )
+          return pattern === 'failed' || !pattern ? null : pattern.pairs
+        }
         default:
-          return queryClient.ensureQueryData(largestContractsQuery(filter))
+          await queryClient.ensureQueryData(largestContractsQuery(filter))
+          return null
       }
     }
-    return Promise.all([
+    const [total] = await Promise.all([
       ranking(),
       queryClient.ensureQueryData(cpvDivisionsQuery),
     ])
+    // A page past the end of the list goes to the last one that has rows.
+    const last = total === null ? null : pageCount(total, deps.pe_pagina ?? 25)
+    if (last !== null && (deps.pagina ?? 1) > last) {
+      throw redirect({
+        to: '/clasamente',
+        search: { ...deps, pagina: last > 1 ? last : undefined },
+      })
+    }
   },
   head: ({ match }) => ({
     meta: [
@@ -104,30 +106,25 @@ function Rankings() {
             go({ clasament: value, cpv: search.cpv, ue: search.ue })
           }
         >
-          <RankingFilters
-            search={search}
-            contracts={isContractTab(tab)}
-            onSearch={(filters) => go({ ...search, ...filters })}
-          />
-          {tab === 'contracte' ? <LargestContracts filter={filter} /> : null}
-          {tab === 'furnizori' ? (
-            <ContractRanking
-              role="suppliers"
-              filter={filter}
-              won={search.castigate === 'asociere' ? 'association' : 'alone'}
-              onWon={(won) =>
-                go({
-                  ...search,
-                  castigate: won === 'association' ? 'asociere' : undefined,
-                })
-              }
+          {isRankingTab(tab) ? (
+            // A ranking declares its filters to its own bar, as the pattern's list does.
+            <RankingList tab={tab} search={search} onSearch={go} />
+          ) : null}
+          {tab === 'tipare' ? (
+            <Patterns
+              search={search}
+              onApply={(patch) => go({ ...search, ...patch })}
             />
           ) : null}
-          {tab === 'achizitii' ? <DirectRankings cpv={filter.cpv} /> : null}
-          {tab === 'institutii' ? (
-            <ContractRanking role="institutions" filter={filter} />
+          {tab === 'contracte' ? (
+            <>
+              <RankingFilters
+                search={search}
+                onSearch={(filters) => go({ ...search, ...filters })}
+              />
+              <LargestContracts filter={filter} />
+            </>
           ) : null}
-          {tab === 'tipare' ? <Patterns cpv={filter.cpv} /> : null}
         </UrlTabs>
       </Flex>
     </Container>
