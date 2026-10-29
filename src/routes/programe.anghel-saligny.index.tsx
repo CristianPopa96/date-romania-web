@@ -1,41 +1,48 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import { Container, Flex, Heading, Text } from '@radix-ui/themes'
 
 import { Unavailable } from '#/components/Notes'
 import { ProgrammeFigures } from '#/features/programme/ProgrammeFigures'
 import { ProgrammeMatch } from '#/features/programme/ProgrammeMatch'
-import { ProjectFinder } from '#/features/programme/ProjectFinder'
+import { ProjectList } from '#/features/programme/ProjectList'
 import { messagesFor } from '#/i18n'
 import { useI18n } from '#/i18n/context'
-import type { ProjectFilter } from '#/features/programme/api'
 import { pageTitle } from '#/lib/copy'
-import { MATCH_PARAMS, countyKey } from '#/features/programme/programme'
-import { programmeQuery, projectsQuery } from '#/features/programme/queries'
-import { validateProgrammeSearch } from '#/features/programme/urls'
-import type { ProgrammeSearch } from '#/features/programme/urls'
+import { pageCount } from '#/lib/list'
+import { validateProjectListSearch } from '#/features/programme/list'
+import {
+  programmeQuery,
+  projectListQuery,
+  projectOverviewQuery,
+} from '#/features/programme/queries'
 
-// What the address asks of the list of projects, in the API's words.
-function filterOf(search: ProgrammeSearch): ProjectFilter {
-  return {
-    county: search.judet ? countyKey(search.judet) : undefined,
-    q: search.q,
-    match: search.legatura ? MATCH_PARAMS[search.legatura] : undefined,
-    builder: search.firma,
-    page: search.pagina ?? 1,
-  }
-}
-
-// The Anghel Saligny programme: what the ministry paid, a way to find one project, and
-// how its payments were tied to SEAP contracts.
+// The Anghel Saligny programme: what the ministry paid, its projects as a list of the
+// DataTable pattern, and how its payments were tied to SEAP contracts.
 export const Route = createFileRoute('/programe/anghel-saligny/')({
-  validateSearch: validateProgrammeSearch,
+  validateSearch: validateProjectListSearch,
   loaderDeps: ({ search }) => search,
-  loader: ({ context, deps }) =>
-    Promise.all([
-      context.queryClient.ensureQueryData(programmeQuery),
-      context.queryClient.ensureQueryData(projectsQuery(filterOf(deps))),
-    ]),
+  loader: async ({ context, deps }) => {
+    const programme = await context.queryClient.ensureQueryData(programmeQuery)
+    // The kinds of works the address may name come with the programme.
+    const categories = programme?.categories ?? []
+    const [list] = await Promise.all([
+      context.queryClient.ensureQueryData(projectListQuery(deps, categories)),
+      context.queryClient.ensureQueryData(
+        projectOverviewQuery(deps, categories),
+      ),
+    ])
+    // A page past the end of the list goes to the last one that has rows.
+    if (list !== 'failed') {
+      const last = pageCount(list.total, deps.pe_pagina ?? 25)
+      if ((deps.pagina ?? 1) > last) {
+        throw redirect({
+          to: '/programe/anghel-saligny',
+          search: { ...deps, pagina: last > 1 ? last : undefined },
+        })
+      }
+    }
+  },
   head: ({ match }) => ({
     meta: [
       { title: pageTitle(messagesFor(match.context.locale).programme.title) },
@@ -50,7 +57,6 @@ function ProgrammePage() {
   const search = Route.useSearch()
   const navigate = Route.useNavigate()
   const { data: programme } = useSuspenseQuery(programmeQuery)
-  const { data: projects } = useSuspenseQuery(projectsQuery(filterOf(search)))
 
   return (
     <Container size="4" px="5" py="7">
@@ -73,15 +79,16 @@ function ProgrammePage() {
         ) : (
           <>
             <ProgrammeFigures programme={programme} />
-            <ProjectFinder
-              // A new address gives the search field its words again.
-              key={search.q ?? ''}
-              programme={programme}
-              projects={projects}
+            <ProjectList
+              categories={programme.categories}
               search={search}
-              // Choosing keeps the reader at the list, not back at the top.
+              // Choosing keeps the reader at the list, not back at the top. The address
+              // is cleaned as a link's would be, so the router never rewrites it.
               onSearch={(next) =>
-                void navigate({ search: next, resetScroll: false })
+                void navigate({
+                  search: validateProjectListSearch(next),
+                  resetScroll: false,
+                })
               }
             />
             <ProgrammeMatch programme={programme} />
