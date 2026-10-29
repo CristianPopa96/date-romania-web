@@ -24,6 +24,7 @@ import type { PageSize, Sort } from '#/lib/list'
 // the address: the list turns each change into a new address.
 export function ListView({
   title,
+  titleAs = 'h2',
   search,
   summary,
   views,
@@ -36,6 +37,8 @@ export function ListView({
 }: {
   // The list's heading (h2), for the page outline.
   title: string
+  // h3 for a list under a tab's own heading.
+  titleAs?: 'h2' | 'h3'
   search: {
     q: string | undefined
     // What the field searches in: "obiect, furnizor, cod DA".
@@ -74,7 +77,7 @@ export function ListView({
 
   return (
     <Flex direction="column" gap="4">
-      <Heading as="h2" size="4">
+      <Heading as={titleAs} size="4">
         {title}
       </Heading>
       <FilterBar

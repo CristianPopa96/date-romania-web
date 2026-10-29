@@ -131,7 +131,11 @@ export function euProjectFilter(
     beneficiary: cui,
     programme: codes,
     status: euStatusesFromParam(search.stare),
-    q: search.q === undefined ? undefined : String(search.q),
+    // `q` is shared with lists that keep one letter: the API reads two or more.
+    q:
+      search.q !== undefined && String(search.q).length >= 2
+        ? String(search.q)
+        : undefined,
     value_min: search.valoare_min,
     value_max: search.valoare_max,
   }
