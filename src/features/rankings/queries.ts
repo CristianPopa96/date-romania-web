@@ -50,12 +50,11 @@ export const rankingListQuery = (search: RankingSearch) => {
   })
 }
 
-// The ten largest under the same filters, for the chart: whatever the page, order or
-// words of the list.
+// The ten largest under the same filters and words, for the chart: whatever the page or
+// order of the list. A party found by its words keeps its place in the whole ranking.
 export const rankingTopQuery = (search: RankingSearch) => {
   const data: RankingQuery = {
     ...rankingQuery(search),
-    q: undefined,
     sort: 'value',
     order: 'desc',
     size: 10,

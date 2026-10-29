@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import { Container, Flex, Heading, Text } from '@radix-ui/themes'
 
 import { Patterns } from '#/features/patterns/Patterns'
@@ -9,6 +9,7 @@ import { UrlTabs } from '#/components/UrlTabs'
 import { messagesFor } from '#/i18n'
 import { useI18n } from '#/i18n/context'
 import { pageTitle } from '#/lib/copy'
+import { pageCount } from '#/lib/list'
 import {
   largestContractsQuery,
   rankingListQuery,
@@ -18,7 +19,6 @@ import { cpvDivisionsQuery, nearLimitQuery } from '#/features/patterns/queries'
 import { statsQuery } from '#/lib/queries'
 import {
   RANKINGS,
-  isContractTab,
   isRankingTab,
   rankingFilter,
   validateRankingSearch,
@@ -29,28 +29,44 @@ export const Route = createFileRoute('/clasamente')({
   validateSearch: validateRankingSearch,
   loaderDeps: ({ search }) => search,
   // Only the ranking the address asks for is read, and the list behind the filters.
-  loader: ({ context: { queryClient }, deps }) => {
+  loader: async ({ context: { queryClient }, deps }) => {
     const filter = rankingFilter(deps)
-    const ranking = () => {
+    // The rows of the list the tab pages through, when it is one.
+    const ranking = async () => {
       switch (deps.clasament) {
         case 'furnizori':
         case 'institutii':
-        case 'achizitii':
-          return Promise.all([
+        case 'achizitii': {
+          const [, list] = await Promise.all([
             queryClient.ensureQueryData(statsQuery),
             queryClient.ensureQueryData(rankingListQuery(deps)),
             queryClient.ensureQueryData(rankingTopQuery(deps)),
           ])
-        case 'tipare':
-          return queryClient.ensureQueryData(nearLimitQuery(deps))
+          return list === 'failed' || !list ? null : list.total
+        }
+        case 'tipare': {
+          const pattern = await queryClient.ensureQueryData(
+            nearLimitQuery(deps),
+          )
+          return pattern === 'failed' || !pattern ? null : pattern.pairs
+        }
         default:
-          return queryClient.ensureQueryData(largestContractsQuery(filter))
+          await queryClient.ensureQueryData(largestContractsQuery(filter))
+          return null
       }
     }
-    return Promise.all([
+    const [total] = await Promise.all([
       ranking(),
       queryClient.ensureQueryData(cpvDivisionsQuery),
     ])
+    // A page past the end of the list goes to the last one that has rows.
+    const last = total === null ? null : pageCount(total, deps.pe_pagina ?? 25)
+    if (last !== null && (deps.pagina ?? 1) > last) {
+      throw redirect({
+        to: '/clasamente',
+        search: { ...deps, pagina: last > 1 ? last : undefined },
+      })
+    }
   },
   head: ({ match }) => ({
     meta: [
@@ -104,7 +120,6 @@ function Rankings() {
             <>
               <RankingFilters
                 search={search}
-                contracts={isContractTab(tab)}
                 onSearch={(filters) => go({ ...search, ...filters })}
               />
               <LargestContracts filter={filter} />

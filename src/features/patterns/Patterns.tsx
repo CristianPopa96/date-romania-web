@@ -62,6 +62,13 @@ function NearLimit({
   const { data } = useSuspenseQuery(nearLimitQuery(search))
   const { data: divisions } = useSuspenseQuery(cpvDivisionsQuery)
   const words = t.rankings.patterns.nearLimit
+  if (data === 'failed') {
+    return (
+      <Text size="2" color="gray">
+        {t.list.failed}
+      </Text>
+    )
+  }
   if (!data) return <Unavailable />
   const limits = ruleLimits(data)
   const days = f.period(data.first_day, data.last_day)
@@ -225,7 +232,9 @@ function Later() {
   const { elsewhere } = t.rankings.patterns
   return (
     <Flex direction="column" gap="2">
-      <Heading size="4">{t.rankings.patterns.laterTitle}</Heading>
+      <Heading as="h2" size="4">
+        {t.rankings.patterns.laterTitle}
+      </Heading>
       {t.rankings.patterns.later.map((pattern) => (
         <Flex key={pattern.title} direction="column" gap="1">
           <Flex gap="2" align="center" wrap="wrap">

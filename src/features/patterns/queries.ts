@@ -23,10 +23,11 @@ export function nearLimitRequest(search: PatternSearch): NearLimitQuery {
   }
 }
 
+// 'failed' when the API did not answer, so the tab shows a note instead of an error page.
 export const nearLimitQuery = (search: PatternSearch) => {
   const data = nearLimitRequest(search)
   return queryOptions({
     queryKey: ['patterns', 'near-limit', data],
-    queryFn: () => getNearLimit({ data }),
+    queryFn: () => getNearLimit({ data }).catch(() => 'failed' as const),
   })
 }

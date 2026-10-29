@@ -817,6 +817,12 @@ test('a ranking sorts by count, and a name searched keeps its place', async ({
   await expect(rankRows(main)).toHaveCount(1)
   // Its place in the whole ranking, not in what the search found.
   await expect(rankRows(main).first().getByRole('cell').first()).toHaveText('2')
+
+  // A page past the end, from an old link, goes to the last one.
+  await page.goto('/clasamente?clasament=institutii&pagina=9')
+  await expect(page).toHaveURL(/\/clasamente\?clasament=institutii$/)
+  await page.goto('/clasamente?clasament=tipare&pagina=9')
+  await expect(page).toHaveURL(/\/clasamente\?clasament=tipare$/)
 })
 
 test('a purchase opens its own page, with what is not collected marked as such', async ({
