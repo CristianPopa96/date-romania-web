@@ -277,7 +277,7 @@ export interface paths {
         };
         /**
          * Ranking Suppliers
-         * @description Suppliers by the value of their accepted direct purchases.
+         * @description Suppliers by the value of their accepted direct purchases, or by how many.
          */
         get: operations["ranking_suppliers_v1_rankings_suppliers_get"];
         put?: never;
@@ -297,7 +297,7 @@ export interface paths {
         };
         /**
          * Ranking Institutions
-         * @description Institutions by the value of the direct purchases they accepted.
+         * @description Institutions by the value of the direct purchases they accepted, or by how many.
          */
         get: operations["ranking_institutions_v1_rankings_institutions_get"];
         put?: never;
@@ -345,7 +345,7 @@ export interface paths {
          *
          *     A purchase is near the limit from `rule.share` of it to just under it. A purchase whose type is
          *     not known cannot be checked: `checked` of `accepted_total` were, and `first_day` and
-         *     `last_day` bound those. As csv: every pair, one line per purchase.
+         *     `last_day` bound those. As csv: every pair in the order asked for, one line per purchase.
          */
         get: operations["near_limit_v1_patterns_near_limit_get"];
         put?: never;
@@ -559,9 +559,32 @@ export interface paths {
         };
         /**
          * Ranking Contract Institutions
-         * @description Institutions by the value of the contracts they awarded; each contract counted once.
+         * @description Institutions by the value of the contracts they awarded, or by how many; each
+         *     contract counted once.
          */
         get: operations["ranking_contract_institutions_v1_rankings_contract_institutions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/anghel-saligny/projects/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Projects Overview
+         * @description The projects under the filters given, in figures: how many, their payments and what
+         *     was paid, the options of each choice filter with their counts, and the projects by the
+         *     amount paid.
+         */
+        get: operations["projects_overview_v1_programmes_anghel_saligny_projects_overview_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -600,7 +623,8 @@ export interface paths {
         };
         /**
          * Projects
-         * @description The projects of the programme, the most paid first.
+         * @description The projects of the programme under the filters given, the most paid first, or in
+         *     any column's order.
          */
         get: operations["projects_v1_programmes_anghel_saligny_projects_get"];
         put?: never;
@@ -1262,7 +1286,15 @@ export interface components {
              * @description alone or association, for a ranking of winners.
              */
             won: ("alone" | "association") | null;
-            /** Items */
+            /**
+             * Total
+             * @description Every party ranked under the filters, beyond the page.
+             */
+            total: number;
+            /**
+             * Items
+             * @description `rank` is the place in the order asked for, counted from the first page.
+             */
             items: components["schemas"]["ContractRankingRow"][];
             source: components["schemas"]["Source"];
         };
@@ -2024,6 +2056,16 @@ export interface components {
              * @default 0
              */
             amount: number;
+        };
+        /** MatchOption */
+        MatchOption: {
+            /**
+             * Value
+             * @enum {string}
+             */
+            value: "one" | "several" | "none" | "unnamed";
+            /** Count */
+            count: number;
         };
         /** MeasureOption */
         MeasureOption: {
@@ -2830,6 +2872,11 @@ export interface components {
             networks: components["schemas"]["ProgrammeGroup"][];
             /** Counties */
             counties: components["schemas"]["ProgrammeGroup"][];
+            /**
+             * Categories
+             * @description The kinds of works of the projects, as the ministry writes them, the most projects first: the values `category` filters the projects by.
+             */
+            categories: string[];
             /** Files */
             files: components["schemas"]["ProgrammeFile"][];
             payments_match: components["schemas"]["ProgrammeMatch"];
@@ -2845,6 +2892,23 @@ export interface components {
             contracts_last_day: string | null;
             source: components["schemas"]["Source"];
             contracts_source: components["schemas"]["Source"];
+        };
+        /** ProgrammeCountyOption */
+        ProgrammeCountyOption: {
+            /**
+             * Value
+             * @description The county's key, as in `county`.
+             */
+            value: string;
+            /** Name */
+            name: string;
+            /** Count */
+            count: number;
+            /**
+             * Paid
+             * @description Lei paid for its projects, under the other filters.
+             */
+            paid: number;
         };
         /**
          * ProgrammeFile
@@ -3039,6 +3103,45 @@ export interface components {
             source: components["schemas"]["Source"];
             contracts_source: components["schemas"]["Source"];
         };
+        /**
+         * ProjectOverview
+         * @description The projects under the filters chosen, in figures.
+         */
+        ProjectOverview: {
+            summary: components["schemas"]["ProjectSummary"];
+            /**
+             * Whole
+             * @description Every project of the programme held.
+             */
+            whole: number;
+            /** @description The builder filtered by, where it is held. */
+            builder: components["schemas"]["EntityRef"] | null;
+            /**
+             * Counties
+             * @description Under every filter but the county, the most paid first.
+             */
+            counties: components["schemas"]["ProgrammeCountyOption"][];
+            /**
+             * Matches
+             * @description Under every filter but the match.
+             */
+            matches: components["schemas"]["MatchOption"][];
+            /**
+             * Categories
+             * @description Under every filter but the category.
+             */
+            categories: components["schemas"]["WorksOption"][];
+            /**
+             * Bands
+             * @description Projects by the amount paid, in lei.
+             */
+            bands: components["schemas"]["Band"][];
+            /**
+             * Without
+             * @description Only when no project is found: what each filter given would leave out if it alone were removed, in the order of the parameters.
+             */
+            without: components["schemas"]["Without"][];
+        };
         /** ProjectPage */
         ProjectPage: {
             /** Total */
@@ -3111,6 +3214,18 @@ export interface components {
              * @enum {string}
              */
             match: "one" | "several" | "none" | "unnamed";
+        };
+        /** ProjectSummary */
+        ProjectSummary: {
+            /** Projects */
+            projects: number;
+            /** Payments */
+            payments: number;
+            /**
+             * Paid
+             * @description Lei, every payment held for these projects.
+             */
+            paid: number;
         };
         /** Purchase */
         Purchase: {
@@ -3351,7 +3466,15 @@ export interface components {
             date_from: string | null;
             /** Date To */
             date_to: string | null;
-            /** Items */
+            /**
+             * Total
+             * @description Every party ranked under the filters, beyond the page.
+             */
+            total: number;
+            /**
+             * Items
+             * @description `rank` is the place in the order asked for, counted from the first page.
+             */
             items: components["schemas"]["RankingRow"][];
             source: components["schemas"]["Source"];
         };
@@ -3711,6 +3834,16 @@ export interface components {
              * @enum {string}
              */
             value: "alone" | "association";
+            /** Count */
+            count: number;
+        };
+        /** WorksOption */
+        WorksOption: {
+            /**
+             * Value
+             * @description The kind of works as the ministry writes it.
+             */
+            value: string;
             /** Count */
             count: number;
         };
@@ -4203,7 +4336,13 @@ export interface operations {
                 date_to?: string | null;
                 /** @description Start of a CPV code: 45 for the division of works, 4523 for a narrower class. */
                 cpv?: string | null;
+                /** @description The value added up, or how many rows it is added up from. */
+                sort?: "value" | "count";
+                order?: "desc" | "asc";
+                /** @description Words of the party's name, or its CUI: the parties found keep their place in the ranking. */
+                q?: string | null;
                 limit?: number;
+                offset?: number;
             };
             header?: never;
             path?: never;
@@ -4240,7 +4379,13 @@ export interface operations {
                 date_to?: string | null;
                 /** @description Start of a CPV code: 45 for the division of works, 4523 for a narrower class. */
                 cpv?: string | null;
+                /** @description The value added up, or how many rows it is added up from. */
+                sort?: "value" | "count";
+                order?: "desc" | "asc";
+                /** @description Words of the party's name, or its CUI: the parties found keep their place in the ranking. */
+                q?: string | null;
                 limit?: number;
+                offset?: number;
             };
             header?: never;
             path?: never;
@@ -4293,7 +4438,13 @@ export interface operations {
             query?: {
                 /** @description Start of a CPV code: 45 for the division of works, 4523 for a narrower class. */
                 cpv?: string | null;
+                /** @description SEAP's contract type: 1 goods, 2 services, 3 works. */
+                contract_type?: number | null;
+                /** @description How many purchases near the limit, or their value added up. */
+                sort?: "purchases" | "value";
+                order?: "desc" | "asc";
                 limit?: number;
+                offset?: number;
                 /** @description csv gives the whole list as a file. */
                 format?: "json" | "csv";
             };
@@ -4681,7 +4832,13 @@ export interface operations {
                 cpv?: string | null;
                 /** @description true: notices with a lot paid from EU funds; false: notices that say no lot is. A notice whose form does not ask, or not read in detail, is only in the list without this filter. */
                 eu_funded?: boolean | null;
+                /** @description The value added up, or how many rows it is added up from. */
+                sort?: "value" | "count";
+                order?: "desc" | "asc";
+                /** @description Words of the party's name, or its CUI: the parties found keep their place in the ranking. */
+                q?: string | null;
                 limit?: number;
+                offset?: number;
             };
             header?: never;
             path?: never;
@@ -4716,7 +4873,13 @@ export interface operations {
                 cpv?: string | null;
                 /** @description true: notices with a lot paid from EU funds; false: notices that say no lot is. A notice whose form does not ask, or not read in detail, is only in the list without this filter. */
                 eu_funded?: boolean | null;
+                /** @description The value added up, or how many rows it is added up from. */
+                sort?: "value" | "count";
+                order?: "desc" | "asc";
+                /** @description Words of the party's name, or its CUI: the parties found keep their place in the ranking. */
+                q?: string | null;
                 limit?: number;
+                offset?: number;
             };
             header?: never;
             path?: never;
@@ -4731,6 +4894,50 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ContractRanking"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    projects_overview_v1_programmes_anghel_saligny_projects_overview_get: {
+        parameters: {
+            query?: {
+                /** @description The builder's CUI. */
+                builder?: number | null;
+                /** @description As in `counties[].value`. */
+                county?: string | null;
+                /** @description Part of the town hall or the investment. */
+                q?: string | null;
+                /** @description Any of these match states of the project. */
+                match?: ("one" | "several" | "none" | "unnamed")[] | null;
+                /** @description Kinds of works as the ministry writes them. */
+                category?: string[] | null;
+                /** @description Lei paid, included. */
+                paid_min?: number | null;
+                /** @description Lei paid, excluded. */
+                paid_max?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectOverview"];
                 };
             };
             /** @description Validation Error */
@@ -4767,16 +4974,25 @@ export interface operations {
     projects_v1_programmes_anghel_saligny_projects_get: {
         parameters: {
             query?: {
-                /** @description As in `counties[].key`. */
+                /** @description The amount paid, or the project's value as the ministry gives it. */
+                sort?: "paid" | "value";
+                order?: "desc" | "asc";
+                limit?: number;
+                offset?: number;
+                /** @description As in `counties[].value`. */
                 county?: string | null;
                 /** @description Part of the town hall or the investment. */
                 q?: string | null;
                 /** @description The builder's CUI. */
                 builder?: number | null;
-                /** @description The match state of the project. */
-                match?: ("one" | "several" | "none" | "unnamed") | null;
-                limit?: number;
-                offset?: number;
+                /** @description Any of these match states of the project. */
+                match?: ("one" | "several" | "none" | "unnamed")[] | null;
+                /** @description Kinds of works as the ministry writes them. */
+                category?: string[] | null;
+                /** @description Lei paid, included. */
+                paid_min?: number | null;
+                /** @description Lei paid, excluded. */
+                paid_max?: number | null;
             };
             header?: never;
             path?: never;

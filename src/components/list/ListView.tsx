@@ -41,8 +41,9 @@ export function ListView({
   titleAs?: 'h2' | 'h3'
   search: {
     q: string | undefined
-    // What the field searches in: "obiect, furnizor, cod DA".
-    what: string
+    // What the field searches in: "obiect, furnizor, cod DA"; null for a list with no
+    // search by words.
+    what: string | null
     filters: Array<FilterDecl>
     onApply: (patch: Patch) => void
   }

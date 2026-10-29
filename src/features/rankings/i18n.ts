@@ -1,6 +1,7 @@
 // The Romanian text of the rankings page. Part of `ro` (see ro.ts for the rules).
 
 import { counted } from '#/i18n/ro-plural'
+import type { Role } from '#/lib/api'
 
 export const rankings = {
   title: 'Clasamente',
@@ -17,17 +18,13 @@ export const rankings = {
   },
   wonAlone: 'Singur',
   wonTogether: 'În asociere',
-  wonLabel: 'Cum au fost câștigate contractele',
   // A member's place says what the contracts were worth, not what the member received.
   associationNote:
     'Un contract câștigat în asociere apare la fiecare membru, cu valoarea întreagă.',
-  bySuppliers: 'Furnizori, după valoarea contractelor câștigate',
-  byInstitutions: 'Instituții, după valoarea contractelor atribuite',
-  directIntro: 'După valoarea achizițiilor directe acceptate.',
   none: 'Niciun contract semnat în această perioadă nu apare în anunțurile preluate.',
   noneFiltered: 'Nimic nu se potrivește cu filtrele alese.',
 
-  // The filters above every ranking. A trigger names its field: "CPV: toate".
+  // The filters above the largest contracts. A trigger names its field: "CPV: toate".
   filters: {
     label: 'Filtre',
     field: (name: string, value: string) => `${name}: ${value}`,
@@ -41,6 +38,49 @@ export const rankings = {
       'Fonduri UE după anunțul de atribuire: „da” dacă un lot e plătit din fonduri europene. Un anunț care nu spune cum e plătit apare doar la „toate”.',
     missing:
       'Anul, județul și tipul instituției nu pot fi alese încă: avem o singură perioadă, filtrul după județ nu e construit încă, iar tipul instituției nu îl avem.',
+  },
+
+  // A ranking as a list (DataTable): parties, a page at a time, in any column's order.
+  list: {
+    titles: {
+      'contract-suppliers': 'Furnizori, după contractele câștigate',
+      'contract-institutions': 'Instituții, după contractele atribuite',
+      suppliers: 'Furnizori, după achizițiile directe',
+      institutions: 'Instituții, după achizițiile directe',
+    },
+    searchWhat: 'nume sau CUI',
+    filters: {
+      q: 'Căutare',
+      castigate: 'Câștigat',
+      parte: 'Clasament',
+      perioada: 'Perioada',
+      cpv: 'CPV',
+      ue: 'Fonduri UE',
+    },
+    place: 'Loc',
+    name: 'Nume',
+    value: 'Valoare',
+    contracts: 'Contracte',
+    purchases: 'Achiziții',
+    cui: (cui: string) => `CUI ${cui}`,
+    parties: (role: Role, n: number, text: string) =>
+      role === 'suppliers'
+        ? `${counted(n, text, 'un furnizor', 'furnizori')} în clasament`
+        : `${counted(n, text, 'o instituție', 'instituții')} în clasament`,
+    // What the places count, in the order chosen.
+    order: {
+      value: (contracts: boolean) =>
+        contracts
+          ? 'locul după valoarea contractelor semnate în perioada pe care o avem'
+          : 'locul după valoarea achizițiilor directe acceptate, fără TVA',
+      count: (contracts: boolean) =>
+        contracts
+          ? 'locul după numărul de contracte semnate în perioada pe care o avem'
+          : 'locul după numărul de achiziții directe acceptate',
+    },
+    topTitle: 'Primii 10',
+    topUnit: 'lei, aceleași filtre',
+    topHint: 'clic pe o bară deschide pagina',
   },
 
   // The patterns tab. A pattern is a fact worth asking documents for, never an accusation.
@@ -65,11 +105,9 @@ export const rankings = {
         `${n === 1 ? 'Una nu are' : `${text} nu au`} tipul contractului în datele SEAP preluate, mai ales în zilele cu puține achiziții, și nu ${n === 1 ? 'poate fi verificată' : 'pot fi verificate'}.`,
       checkedPeriod: (days: string) =>
         `Achizițiile verificate sunt finalizate în perioada ${days}. Sumele sunt fără TVA.`,
+      filters: { cpv: 'CPV', tip: 'Tip contract' },
       pairs: (n: number, text: string) =>
         `${counted(n, text, 'O pereche', 'perechi')} cumpărător–furnizor`,
-      shown: (shown: string, all: string) =>
-        `Arătăm primele ${shown} din ${all}.`,
-      none: 'Nicio pereche nu se potrivește cu ce ai ales.',
       buyer: 'Cumpărător',
       supplier: 'Furnizor',
       purchases: 'Achiziții',
