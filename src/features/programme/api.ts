@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
 
-import { PAGE_SIZE, getJson } from '#/lib/api'
+import { getJson } from '#/lib/api'
 import type { Schemas } from '#/lib/api'
 
 // The Anghel Saligny programme: the ministry's payments, the projects they pay for, and
@@ -51,28 +51,6 @@ const ROOT = '/v1/programmes/anghel-saligny'
 export const getProgramme = createServerFn({ method: 'GET' }).handler(() =>
   getJson<Programme>(ROOT),
 )
-
-export type ProjectFilter = {
-  county?: string
-  q?: string
-  match?: Match
-  builder?: number
-  page: number
-}
-
-export const getProjects = createServerFn({ method: 'GET' })
-  .inputValidator((data: ProjectFilter) => data)
-  .handler(async ({ data }): Promise<ProjectPage> => {
-    const found = await getJson<ProjectPage>(`${ROOT}/projects`, {
-      county: data.county,
-      q: data.q,
-      match: data.match,
-      builder: data.builder,
-      limit: PAGE_SIZE,
-      offset: (data.page - 1) * PAGE_SIZE,
-    })
-    return found ?? { total: 0, items: [] }
-  })
 
 export const getProject = createServerFn({ method: 'GET' })
   .inputValidator((id: number) => id)

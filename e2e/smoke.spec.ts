@@ -1263,39 +1263,65 @@ test('the programme page adds up the payment files and says how much was tied', 
   await expect(august).toContainText('4.260.000 lei')
 })
 
+// The rows of the list of projects (their town hall's county), not those of its charts.
+function projectRows(main: Locator) {
+  return main.getByRole('row').filter({ hasText: /județul / })
+}
+
 test('a project is found by county, by words and by what was tied', async ({
   page,
 }) => {
   await page.goto(PROGRAMME)
   const main = page.getByRole('main')
-  await expect(main.getByText('4 proiecte', { exact: true })).toBeVisible()
+  await expect(main.getByText(/^4 proiecte · plătit /)).toBeVisible()
+  await expect(projectRows(main)).toHaveCount(4)
+  // The most paid first; the paid column sorts the whole list.
+  await expect(
+    main.getByRole('columnheader', { name: 'Plătit' }),
+  ).toHaveAttribute('aria-sort', 'descending')
 
-  await main.getByRole('combobox', { name: 'Județ' }).click()
-  await page.getByRole('option', { name: 'Gorj' }).click()
+  // A county bar of the chart becomes a filter.
+  await main.getByRole('button', { name: /^Gorj/ }).click()
   await expect(page).toHaveURL(/\?judet=gorj$/)
-  await expect(main.getByText('2 proiecte', { exact: true })).toBeVisible()
-  await expect(main.getByRole('cell', { name: 'TURCENI' })).toBeVisible()
+  await expect(main.getByText('Județ: Gorj')).toBeVisible()
+  await expect(projectRows(main)).toHaveCount(2)
+  await expect(projectRows(main).filter({ hasText: 'TURCENI' })).toHaveCount(1)
 
   await page.goto(`${PROGRAMME}?legatura=mai-multe`)
-  await expect(main.getByText('Un proiect', { exact: true })).toBeVisible()
-  await expect(main.getByText('județul Cluj', { exact: true })).toBeVisible()
+  await expect(
+    main.getByText('Contract SEAP: Mai multe contracte posibile'),
+  ).toBeVisible()
+  await expect(projectRows(main)).toHaveCount(1)
+  await expect(projectRows(main)).toContainText('județul Cluj')
 
-  await page.goto(PROGRAMME)
-  await main.getByRole('textbox', { name: 'Caută în proiecte' }).fill('turceni')
-  await main.getByRole('button', { name: 'Caută' }).click()
-  await expect(page).toHaveURL(/\?q=turceni$/)
-  await expect(main.getByText('Un proiect', { exact: true })).toBeVisible()
+  await page.goto(`${PROGRAMME}?q=turceni`)
+  await expect(projectRows(main)).toHaveCount(1)
 
   await page.goto(`${PROGRAMME}?q=zzzz`)
   await expect(
-    main.getByText('Niciun proiect nu se potrivește cu ce ai ales.'),
+    main.getByText('Nimic nu se potrivește cu filtrele alese.'),
   ).toBeVisible()
   // A filter the address does not know is dropped, not shown as an error; so is a
   // word every object answers to.
   for (const unknown of ['altceva', 'toString']) {
     await page.goto(`${PROGRAMME}?legatura=${unknown}`)
-    await expect(main.getByText('4 proiecte', { exact: true })).toBeVisible()
+    await expect(projectRows(main)).toHaveCount(4)
   }
+})
+
+test("a builder's projects are a filter that can be removed", async ({
+  page,
+}) => {
+  await page.goto(`${PROGRAMME}?firma=17886786`)
+  const main = page.getByRole('main')
+  await expect(
+    main.getByText('Constructor: ALFA CONSTRUCT S.R.L.'),
+  ).toBeVisible()
+  await expect(projectRows(main)).toHaveCount(1)
+  await main
+    .getByRole('button', { name: 'Scoate filtrul «Constructor»' })
+    .click()
+  await expect(page).toHaveURL(/\/programe\/anghel-saligny$/)
 })
 
 test('a project is traced from the ministry to its contract', async ({

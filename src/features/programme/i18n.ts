@@ -27,18 +27,37 @@ export const programme = {
   tiedPossible: (n: number, text: string) =>
     `${counted(n, text, 'o plată are', 'plăți au')} un contract legat doar posibil și nu ${n === 1 ? 'e numărată' : 'sunt numărate'} aici`,
 
-  // Finding a project.
+  // Finding a project: the list of the projects.
   findTitle: 'Urmărește un proiect',
-  county: 'Județ',
-  allCounties: 'Toate județele',
-  searchLabel: 'Caută în proiecte',
-  searchPlaceholder: 'Caută primăria sau lucrarea',
-  allProjects: 'Toate',
-  found: (n: number, text: string) =>
-    counted(n, text, 'Un proiect', 'proiecte'),
-  noProjects: 'Niciun proiect nu se potrivește cu ce ai ales.',
-  byBuilder: 'Proiectele la care lucrează constructorul cu {cui}.',
-  showAll: 'Arată toate proiectele',
+  list: {
+    searchWhat: 'primăria sau lucrarea',
+    filters: {
+      q: 'Căutare',
+      firma: 'Constructor',
+      judet: 'Județ',
+      legatura: 'Contract SEAP',
+      lucrari: 'Lucrări',
+      platit: 'Plătit',
+    },
+    paidPresets: {
+      small: 'Sub 1.000.000 lei',
+      middle: '1.000.000–5.000.000 lei',
+      large: '5.000.000 lei sau mai mult',
+    },
+    value: 'Valoare proiect',
+    projects: (n: number, text: string) =>
+      counted(n, text, 'un proiect', 'proiecte'),
+    paid: (amount: string, n: number, text: string) =>
+      `plătit ${amount} în ${counted(n, text, 'o plată', 'plăți')}`,
+    of: (whole: string) =>
+      `din ${whole} ale programului, din fișierele de plăți ale ministerului`,
+    total: (n: number, text: string) =>
+      `Plătit pentru filtrele alese · ${counted(n, text, 'un proiect', 'proiecte')}`,
+    countiesTitle: 'Plătit pe județe',
+    countiesUnit: 'lei, aceleași filtre',
+    matchTitle: 'Contract SEAP găsit',
+    matchUnit: 'proiecte, aceleași filtre',
+  },
   project: 'Proiectul',
   townHall: 'Primăria',
   paidColumn: 'Plătit',
