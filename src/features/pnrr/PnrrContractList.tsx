@@ -48,7 +48,8 @@ export function PnrrContractList<TSearch extends Search>({
   if (list === 'failed' || overview === 'failed' || !overview) {
     return (
       <Text size="2" color="gray">
-        {t.eu.held.failed}
+        {/* A beneficiary's list, or a measure's. */}
+        {'beneficiary' in of ? t.eu.held.failed : t.list.failed}
       </Text>
     )
   }

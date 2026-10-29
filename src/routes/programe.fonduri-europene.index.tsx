@@ -3,6 +3,7 @@ import {
   Link as RouterLink,
   createFileRoute,
   notFound,
+  redirect,
 } from '@tanstack/react-router'
 import {
   Card,
@@ -21,6 +22,7 @@ import { messagesFor } from '#/i18n'
 import { useI18n } from '#/i18n/context'
 import type { EuFunds } from '#/features/eu-projects/api'
 import { pageTitle } from '#/lib/copy'
+import { pageCount } from '#/lib/list'
 import { periodLabel } from '#/features/eu-projects/eu'
 import {
   programmeCodes,
@@ -49,7 +51,7 @@ export const Route = createFileRoute('/programe/fonduri-europene/')({
     if (!funds) throw notFound()
     // A programme not held names no code, and the list is not filtered by it.
     const codes = programmeCodes(funds.programmes, deps.program)
-    await Promise.all([
+    const [list] = await Promise.all([
       context.queryClient.ensureQueryData(
         euProjectListQuery(undefined, deps, codes),
       ),
@@ -57,6 +59,16 @@ export const Route = createFileRoute('/programe/fonduri-europene/')({
         euProjectOverviewQuery(undefined, deps, codes),
       ),
     ])
+    // A page past the end of the list goes to the last one that has rows.
+    if (list !== 'failed') {
+      const last = pageCount(list.total, deps.pe_pagina ?? 25)
+      if ((deps.pagina ?? 1) > last) {
+        throw redirect({
+          to: '/programe/fonduri-europene',
+          search: { ...deps, pagina: last > 1 ? last : undefined },
+        })
+      }
+    }
   },
   head: ({ match }) => ({
     meta: [{ title: pageTitle(messagesFor(match.context.locale).eu.title) }],

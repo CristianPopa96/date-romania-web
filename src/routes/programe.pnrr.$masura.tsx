@@ -37,6 +37,7 @@ import {
 } from '#/features/pnrr/queries'
 import { validatePnrrMeasureSearch } from '#/features/pnrr/list'
 import type { PnrrListOf, PnrrListSearch } from '#/features/pnrr/list'
+import { pageCount } from '#/lib/list'
 import { pageFromParam } from '#/lib/urls'
 
 // Whose list the contracts are: the measure's, in the counties it has contracts in.
@@ -73,12 +74,23 @@ export const Route = createFileRoute('/programe/pnrr/$masura')({
         replace: true,
       })
     }
-    await Promise.all([
+    const [list] = await Promise.all([
       context.queryClient.ensureQueryData(pnrrListQuery(listOf(measure), deps)),
       context.queryClient.ensureQueryData(
         pnrrOverviewQuery(listOf(measure), deps),
       ),
     ])
+    // A page past the end of the list goes to the last one that has rows.
+    if (list !== 'failed') {
+      const last = pageCount(list.total, deps.pe_pagina ?? 25)
+      if ((deps.pagina ?? 1) > last) {
+        throw redirect({
+          to: '/programe/pnrr/$masura',
+          params,
+          search: { ...deps, pagina: last > 1 ? last : undefined },
+        })
+      }
+    }
     return {
       code: measure.code,
       title: measureLabel(measure.code, measure.name),

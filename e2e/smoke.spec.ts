@@ -1813,6 +1813,15 @@ test('a SMIS code typed in the search finds its project', async ({ page }) => {
   ).toBeVisible()
 })
 
+test('a page of a programme list past the end goes to the last one', async ({
+  page,
+}) => {
+  await page.goto(`${EU}?pagina=9`)
+  await expect(page).toHaveURL(/\/programe\/fonduri-europene$/)
+  await page.goto(`${PNRR}/c10.i3?pagina=9`)
+  await expect(page).toHaveURL(/\/programe\/pnrr\/c10\.i3$/)
+})
+
 test('a cohesion project says what was paid up to its list, with no payment day', async ({
   page,
 }) => {

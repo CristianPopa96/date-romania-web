@@ -60,7 +60,8 @@ export function EuProjectList<TSearch extends Search>({
   if (list === 'failed' || overview === 'failed' || !overview) {
     return (
       <Text size="2" color="gray">
-        {t.eu.held.failed}
+        {/* A beneficiary's list, or every project held. */}
+        {cui === undefined ? t.list.failed : t.eu.held.failed}
       </Text>
     )
   }
