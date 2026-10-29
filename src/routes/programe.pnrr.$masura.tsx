@@ -16,12 +16,12 @@ import {
   Text,
 } from '@radix-ui/themes'
 
-import { PnrrContractFinder } from '#/features/pnrr/PnrrContractFinder'
+import { PnrrContractList } from '#/features/pnrr/PnrrContractList'
 import { Stat } from '#/features/programme/ProgrammeFigures'
 import { SourceLine } from '#/components/SourceLine'
 import { messagesFor } from '#/i18n'
 import { useI18n } from '#/i18n/context'
-import type { PnrrContractFilter, PnrrMeasure } from '#/features/pnrr/api'
+import type { PnrrMeasure } from '#/features/pnrr/api'
 import { pageTitle } from '#/lib/copy'
 import {
   countyBySlug,
@@ -30,31 +30,30 @@ import {
   paidShare,
 } from '#/features/pnrr/pnrr'
 import {
-  pnrrContractsQuery,
+  pnrrListQuery,
   pnrrMeasureQuery,
+  pnrrOverviewQuery,
   pnrrQuery,
 } from '#/features/pnrr/queries'
-import { statusOfParam, validatePnrrSearch } from '#/features/pnrr/urls'
-import type { PnrrSearch } from '#/features/pnrr/urls'
+import { validatePnrrMeasureSearch } from '#/features/pnrr/list'
+import type { PnrrListOf, PnrrListSearch } from '#/features/pnrr/list'
+import { pageFromParam } from '#/lib/urls'
 
-// What the address asks of the list of contracts, in the API's words.
-function filterOf(
-  measure: PnrrMeasure,
-  search: PnrrSearch,
-): PnrrContractFilter {
-  return {
-    measure: measure.code,
-    county: countyBySlug(measure.counties, search.judet),
-    status: statusOfParam(search.stare),
-    q: search.q,
-    page: search.pagina ?? 1,
-  }
+// Whose list the contracts are: the measure's, in the counties it has contracts in.
+function listOf(measure: PnrrMeasure): PnrrListOf {
+  return { measure: measure.code, counties: measure.counties }
 }
 
-// One measure of the plan: its money and its contracts. The address is the measure's code
-// in lower case ('/programe/pnrr/c10.i3'), found back in the programme's list.
+// One measure of the plan: its money and its contracts as a list of the DataTable pattern.
+// The address is the measure's code in lower case ('/programe/pnrr/c10.i3'), found back in
+// the programme's list: /programe/pnrr/c10.i3?judet=gorj&stare=finalizat&q=scoala.
 export const Route = createFileRoute('/programe/pnrr/$masura')({
-  validateSearch: validatePnrrSearch,
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): PnrrListSearch & { pagina?: number } => ({
+    ...validatePnrrMeasureSearch(search),
+    pagina: pageFromParam(search.pagina),
+  }),
   loaderDeps: ({ search }) => search,
   loader: async ({ context, params, deps }) => {
     const programme = await context.queryClient.ensureQueryData(pnrrQuery)
@@ -74,9 +73,12 @@ export const Route = createFileRoute('/programe/pnrr/$masura')({
         replace: true,
       })
     }
-    await context.queryClient.ensureQueryData(
-      pnrrContractsQuery(filterOf(measure, deps)),
-    )
+    await Promise.all([
+      context.queryClient.ensureQueryData(pnrrListQuery(listOf(measure), deps)),
+      context.queryClient.ensureQueryData(
+        pnrrOverviewQuery(listOf(measure), deps),
+      ),
+    ])
     return {
       code: measure.code,
       title: measureLabel(measure.code, measure.name),
@@ -106,9 +108,6 @@ function MeasureView({ measure }: { measure: PnrrMeasure }) {
   const p = t.pnrr
   const search = Route.useSearch()
   const navigate = Route.useNavigate()
-  const { data: contracts } = useSuspenseQuery(
-    pnrrContractsQuery(filterOf(measure, search)),
-  )
   const share = paidShare(measure.paid_eur, measure.allocated_eur)
 
   return (
@@ -194,10 +193,9 @@ function MeasureView({ measure }: { measure: PnrrMeasure }) {
           </Flex>
         </Card>
 
-        <PnrrContractFinder
-          key={search.q ?? ''}
-          measure={measure}
-          contracts={contracts}
+        <PnrrContractList
+          of={listOf(measure)}
+          edition={measure.edition}
           search={search}
           onSearch={(next) =>
             void navigate({ search: next, resetScroll: false })

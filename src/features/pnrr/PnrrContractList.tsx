@@ -13,7 +13,7 @@ import {
   PNRR_FILTER_PARAMS,
   pnrrSort,
 } from '#/features/pnrr/list'
-import type { PnrrListSearch } from '#/features/pnrr/list'
+import type { PnrrListOf, PnrrListSearch } from '#/features/pnrr/list'
 import { pnrrListQuery, pnrrOverviewQuery } from '#/features/pnrr/queries'
 import { useI18n } from '#/i18n/context'
 import {
@@ -26,24 +26,25 @@ import type { Sort } from '#/lib/list'
 
 type Search = PnrrListSearch & { pagina?: number }
 
-// The PNRR contracts of one beneficiary, declared to the list pattern (ListView): its
-// filters, its summary line, two charts and its columns. All are of one dashboard edition,
-// so their values may be added.
+// The PNRR contracts of one beneficiary or of one measure, declared to the list pattern
+// (ListView): its filters, its summary line, its charts (a measure's adds the largest
+// beneficiaries) and its columns. All are of one dashboard edition, so their values may be
+// added. Natural persons' contracts are counted, never listed.
 export function PnrrContractList<TSearch extends Search>({
-  cui,
+  of,
   edition,
   search,
   onSearch,
 }: {
-  cui: number
+  of: PnrrListOf
   // The day of the dashboard edition the contracts are read from.
   edition: string
   search: TSearch
   onSearch: (search: TSearch) => void
 }) {
   const { t, f } = useI18n()
-  const { data: list } = useSuspenseQuery(pnrrListQuery(cui, search))
-  const { data: overview } = useSuspenseQuery(pnrrOverviewQuery(cui, search))
+  const { data: list } = useSuspenseQuery(pnrrListQuery(of, search))
+  const { data: overview } = useSuspenseQuery(pnrrOverviewQuery(of, search))
   if (list === 'failed' || overview === 'failed' || !overview) {
     return (
       <Text size="2" color="gray">
@@ -62,15 +63,17 @@ export function PnrrContractList<TSearch extends Search>({
   const back = emptyHint(overview.without, PNRR_BY_API_PARAM)
   const found = overview.summary
   const l = t.pnrr.list
+  const measure = !('beneficiary' in of)
 
   return (
     <ListView
-      title={l.title}
-      titleAs="h3"
+      // A beneficiary's list sits under the entity tabs' own heading, one level below it.
+      title={measure ? t.pnrr.findTitle : l.title}
+      titleAs={measure ? 'h2' : 'h3'}
       search={{
         q,
-        what: l.searchWhat,
-        filters: pnrrFilterDecls({ search, overview, t, f }),
+        what: measure ? l.searchWhatMeasure : l.searchWhat,
+        filters: pnrrFilterDecls({ of, search, overview, t, f }),
         onApply: apply,
       }}
       summary={{
@@ -84,7 +87,16 @@ export function PnrrContractList<TSearch extends Search>({
         ),
         detail: (
           <>
-            {l.of(f.count(overview.whole), f.day(edition))}
+            {(measure ? l.ofMeasure : l.of)(
+              f.count(overview.whole),
+              f.day(edition),
+            )}
+            {found.natural_persons > 0
+              ? ` · ${l.natural(
+                  found.natural_persons,
+                  f.count(found.natural_persons),
+                )}`
+              : null}
             {overview.measures_differ > 0
               ? ` · ${l.differ(
                   overview.measures_differ,
@@ -117,12 +129,14 @@ export function PnrrContractList<TSearch extends Search>({
         <PnrrContractCharts
           search={search}
           overview={overview}
+          beneficiaries={measure}
           onApply={apply}
         />
       }
       rows={
         <PnrrContractRows
           items={list.items}
+          withBeneficiary={measure}
           q={q}
           sort={sort}
           onSort={onSort}

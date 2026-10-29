@@ -15,38 +15,48 @@ import {
 } from '@radix-ui/themes'
 
 import { DataState } from '#/components/DataState'
-import { EuProjectFinder } from '#/features/eu-projects/EuProjectFinder'
+import { EuProjectList } from '#/features/eu-projects/EuProjectList'
 import { SourceLine } from '#/components/SourceLine'
 import { messagesFor } from '#/i18n'
 import { useI18n } from '#/i18n/context'
-import type { EuFunds, EuProjectFilter } from '#/features/eu-projects/api'
+import type { EuFunds } from '#/features/eu-projects/api'
 import { pageTitle } from '#/lib/copy'
-import { periodLabel, programmeBySlug } from '#/features/eu-projects/eu'
-import { euFundsQuery, euProjectsQuery } from '#/features/eu-projects/queries'
-import { euStatusOfParam, validateEuSearch } from '#/features/eu-projects/urls'
-import type { EuSearch } from '#/features/eu-projects/urls'
+import { periodLabel } from '#/features/eu-projects/eu'
+import {
+  programmeCodes,
+  validateEuProjectListSearch,
+} from '#/features/eu-projects/list'
+import type { EuProjectListSearch } from '#/features/eu-projects/list'
+import {
+  euFundsQuery,
+  euProjectListQuery,
+  euProjectOverviewQuery,
+} from '#/features/eu-projects/queries'
+import { pageFromParam } from '#/lib/urls'
 
-// What the address asks of the list of projects, in the API's words. A programme not
-// held is dropped rather than listing everything under a link that looks filtered.
-function filterOf(funds: EuFunds, search: EuSearch): EuProjectFilter {
-  return {
-    programme: programmeBySlug(funds.programmes, search.program)?.code,
-    status: euStatusOfParam(search.stare),
-    q: search.q,
-    page: search.pagina ?? 1,
-  }
-}
-
-// The EU cohesion programmes held, each from its own list, and their projects.
+// The EU cohesion programmes held, each from its own list, and their projects as a list of
+// the DataTable pattern: /programe/fonduri-europene?program=por-2014&stare=reziliat&q=drum.
 export const Route = createFileRoute('/programe/fonduri-europene/')({
-  validateSearch: validateEuSearch,
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): EuProjectListSearch & { pagina?: number } => ({
+    ...validateEuProjectListSearch(search),
+    pagina: pageFromParam(search.pagina),
+  }),
   loaderDeps: ({ search }) => search,
   loader: async ({ context, deps }) => {
     const funds = await context.queryClient.ensureQueryData(euFundsQuery)
     if (!funds) throw notFound()
-    await context.queryClient.ensureQueryData(
-      euProjectsQuery(filterOf(funds, deps)),
-    )
+    // A programme not held names no code, and the list is not filtered by it.
+    const codes = programmeCodes(funds.programmes, deps.program)
+    await Promise.all([
+      context.queryClient.ensureQueryData(
+        euProjectListQuery(undefined, deps, codes),
+      ),
+      context.queryClient.ensureQueryData(
+        euProjectOverviewQuery(undefined, deps, codes),
+      ),
+    ])
   },
   head: ({ match }) => ({
     meta: [{ title: pageTitle(messagesFor(match.context.locale).eu.title) }],
@@ -65,9 +75,6 @@ function EuFundsView({ funds }: { funds: EuFunds }) {
   const e = t.eu
   const search = Route.useSearch()
   const navigate = Route.useNavigate()
-  const { data: projects } = useSuspenseQuery(
-    euProjectsQuery(filterOf(funds, search)),
-  )
   const money = (value: number | null) =>
     value === null ? <DataState kind="notPublished" /> : f.leiShort(value)
 
@@ -155,10 +162,8 @@ function EuFundsView({ funds }: { funds: EuFunds }) {
           <SourceLine source={funds.source} />
         </Flex>
 
-        <EuProjectFinder
-          key={search.q ?? ''}
+        <EuProjectList
           programmes={funds.programmes}
-          projects={projects}
           search={search}
           onSearch={(next) =>
             void navigate({ search: next, resetScroll: false })

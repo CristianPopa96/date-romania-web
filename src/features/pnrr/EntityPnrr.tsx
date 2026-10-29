@@ -78,7 +78,7 @@ export function EntityPnrr<TSearch extends PnrrListSearch>({
 
       {pnrr.contracts > 0 ? (
         <PnrrContractList
-          cui={cui}
+          of={{ beneficiary: cui }}
           edition={pnrr.edition}
           search={search}
           onSearch={onSearch}

@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
 
-import { PAGE_SIZE, getJson } from '#/lib/api'
+import { getJson } from '#/lib/api'
 import type { Schemas } from '#/lib/api'
 
 // The Recovery and Resilience Plan (PNRR), from MIPE's dashboard: the programme and its
@@ -37,32 +37,6 @@ export const getPnrrMeasure = createServerFn({ method: 'GET' })
   .handler(({ data }) =>
     getJson<PnrrMeasure>(`${ROOT}/measures/${encodeURIComponent(data)}`),
   )
-
-export type PnrrContractFilter = {
-  measure?: string
-  // As the dashboard writes it ('MUREȘ'), one of the measure's `counties`.
-  county?: string
-  // The beneficiary's CUI: its contracts, on an institution or supplier page.
-  beneficiary?: number
-  status?: PnrrStatus
-  q?: string
-  page: number
-}
-
-export const getPnrrContracts = createServerFn({ method: 'GET' })
-  .inputValidator((data: PnrrContractFilter) => data)
-  .handler(async ({ data }): Promise<PnrrContractPage> => {
-    const found = await getJson<PnrrContractPage>(`${ROOT}/contracts`, {
-      measure: data.measure,
-      county: data.county,
-      beneficiary: data.beneficiary,
-      status: data.status,
-      q: data.q,
-      limit: PAGE_SIZE,
-      offset: (data.page - 1) * PAGE_SIZE,
-    })
-    return found ?? { total: 0, items: [], natural_persons: 0 }
-  })
 
 // Null for a contract not held, and for a natural person's, which has no page.
 export const getPnrrContract = createServerFn({ method: 'GET' })

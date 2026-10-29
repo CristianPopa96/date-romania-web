@@ -5,7 +5,6 @@
 import type {
   EuBeneficiary,
   EuBeneficiaryFunds,
-  EuProgramme,
 } from '#/features/eu-projects/api'
 import type { EuLists } from '#/features/entities'
 
@@ -42,17 +41,6 @@ export function programmeSlug(programme: {
   period: string
 }): string {
   return `${programme.code.toLowerCase()}-${programme.period.slice(0, 4)}`
-}
-
-export function programmeBySlug(
-  programmes: ReadonlyArray<EuProgramme>,
-  slug: string | undefined,
-): EuProgramme | null {
-  if (!slug) return null
-  return (
-    programmes.find((each) => programmeSlug(each) === slug.toLowerCase()) ??
-    null
-  )
 }
 
 // The EU's share of a project's value; null when either is missing or the value is zero.

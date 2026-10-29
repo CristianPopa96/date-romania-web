@@ -2,6 +2,7 @@ import { Link as RouterLink } from '@tanstack/react-router'
 import { Box, Code, Flex, Link, Text } from '@radix-ui/themes'
 
 import { DataState } from '#/components/DataState'
+import { EntityLink, roleOfKind } from '#/components/EntityLink'
 import { ListRows } from '#/components/list/ListRows'
 import type { Column } from '#/components/list/ListRows'
 import { PnrrStatusBadge } from '#/features/pnrr/PnrrTables'
@@ -10,17 +11,19 @@ import { useI18n } from '#/i18n/context'
 import { marks } from '#/lib/list'
 import type { Sort } from '#/lib/list'
 
-// The rows of a beneficiary's PNRR contracts, declared to ListRows: the contract (it opens
-// its page), its value, and the status and physical progress its measures agree on ("diferă
-// pe măsuri" when they do not).
+// The rows of a list of PNRR contracts, declared to ListRows: the contract (it opens its
+// page), its value, and the status and physical progress its measures agree on ("diferă pe
+// măsuri" when they do not). A measure's list also names each beneficiary.
 export function PnrrContractRows({
   items,
+  withBeneficiary,
   q,
   sort,
   onSort,
   total,
 }: {
   items: Array<PnrrContractRow>
+  withBeneficiary: boolean
   q: string | undefined
   sort: Sort
   onSort: (sort: Sort | null) => void
@@ -35,6 +38,16 @@ export function PnrrContractRows({
       maxWidth: 380,
       cell: (row) => <Title row={row} q={q} />,
     },
+    ...(withBeneficiary
+      ? [
+          {
+            key: 'beneficiar',
+            header: p.beneficiary,
+            maxWidth: 240,
+            cell: (row: PnrrContractRow) => <Beneficiary row={row} />,
+          },
+        ]
+      : []),
     {
       key: 'valoare',
       header: p.value,
@@ -69,6 +82,11 @@ export function PnrrContractRows({
         <Flex justify="between" gap="3">
           <Box minWidth="0">
             <Title row={row} q={q} />
+            {withBeneficiary ? (
+              <Text as="div" size="1" mt="1">
+                <Beneficiary row={row} />
+              </Text>
+            ) : null}
             <Flex gap="2" mt="1" align="center" wrap="wrap">
               <Status row={row} />
               <Text size="1" color="gray">
@@ -116,6 +134,25 @@ function Title({ row, q }: { row: PnrrContractRow; q: string | undefined }) {
         </Text>
       ) : null}
     </>
+  )
+}
+
+// The entity held for its CUI, else the name as the dashboard writes it.
+function Beneficiary({ row }: { row: PnrrContractRow }) {
+  if (row.beneficiary) {
+    return (
+      <EntityLink
+        role={roleOfKind(row.beneficiary.kind)}
+        cui={row.beneficiary.cui}
+      >
+        {row.beneficiary.name}
+      </EntityLink>
+    )
+  }
+  return row.beneficiary_name ? (
+    <>{row.beneficiary_name}</>
+  ) : (
+    <DataState kind="notPublished" />
   )
 }
 

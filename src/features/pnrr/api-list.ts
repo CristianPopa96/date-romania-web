@@ -5,7 +5,7 @@ import type { PnrrListFilter } from '#/features/pnrr/list'
 import { getJson } from '#/lib/api'
 import type { Schemas } from '#/lib/api'
 
-// The PNRR contracts of one beneficiary as a list with filters: a page of it, and what it
+// The PNRR contracts of one beneficiary or one measure as a list with filters: a page of it, and what it
 // says about itself under the filters. See api.ts for how the site reaches the API.
 
 const ROOT = '/v1/programmes/pnrr/contracts'
@@ -34,10 +34,14 @@ export const getPnrrList = createServerFn({ method: 'GET' })
   })
 
 export const getPnrrOverview = createServerFn({ method: 'GET' })
-  .inputValidator((data: PnrrListFilter) => data)
+  .inputValidator(
+    (data: { filter: PnrrListFilter; scope: 'beneficiary' | 'measure' }) =>
+      data,
+  )
   .handler(({ data }) =>
     getJson<PnrrContractOverview>(`${ROOT}/overview`, {
-      ...data,
-      scope: 'beneficiary',
+      ...data.filter,
+      // `whole` counts every contract of the beneficiary or the measure.
+      scope: data.scope,
     }),
   )

@@ -1,11 +1,13 @@
-// The PNRR contracts of one beneficiary as a list of the DataTable pattern: what its
-// address holds, and what it asks the API for:
-// /institutii/4981310?lista=pnrr&masura=c10.i3&stare=finalizat&progres_min=50&progres_max=75.
+// The PNRR contracts of one beneficiary, or of one measure, as a list of the DataTable
+// pattern: what its address holds, and what it asks the API for:
+// /institutii/4981310?lista=pnrr&masura=c10.i3&stare=finalizat&progres_min=50&progres_max=75,
+// /programe/pnrr/c10.i3?judet=gorj&beneficiar=4981310.
 
 import { PNRR_STATUSES } from '#/features/pnrr/api'
 import type { PnrrStatus } from '#/features/pnrr/api'
 import { PNRR_STATUS_PARAMS, statusOfParam } from '#/features/pnrr/urls'
 import type { PnrrStatusParam } from '#/features/pnrr/urls'
+import { countyBySlug } from '#/features/pnrr/pnrr'
 import {
   numberFromParam,
   pageSizeFromParam,
@@ -19,8 +21,12 @@ import { searchParam } from '#/lib/urls'
 // (their own words): each list reads only the words it knows.
 export type PnrrListSearch = {
   q?: string | number
-  // Measure codes in lower case, several separated by commas: 'c10.i3,c15.i9'.
+  // Measure codes in lower case, several separated by commas: 'c10.i3,c15.i9'. A
+  // beneficiary's list only.
   masura?: string
+  // The county without its marks (pnrr.ts) and a beneficiary's CUI: a measure's list only.
+  judet?: string
+  beneficiar?: number
   stare?: string | number
   valoare_min?: number
   valoare_max?: number
@@ -107,6 +113,22 @@ export function validatePnrrListSearch(
   }
 }
 
+// A measure's list reads the same address, with a county and a beneficiary in place of
+// the measures.
+export function validatePnrrMeasureSearch(
+  search: Record<string, unknown>,
+): PnrrListSearch {
+  return {
+    ...validatePnrrListSearch(search),
+    masura: undefined,
+    judet:
+      typeof search.judet === 'string' && /^[a-z0-9-]{2,40}$/.test(search.judet)
+        ? search.judet
+        : undefined,
+    beneficiar: numberFromParam(search.beneficiar, 10),
+  }
+}
+
 export function pnrrSort(search: PnrrListSearch): Sort {
   return (
     sortFromParam(search.ordine, PNRR_COLUMNS) ?? {
@@ -125,9 +147,15 @@ export function progressBand(search: PnrrListSearch): number {
   )
 }
 
+// Whose list it is: a beneficiary's, or a measure's with the counties it has contracts in
+// (the address names one without its marks).
+export type PnrrListOf =
+  { beneficiary: number } | { measure: string; counties: ReadonlyArray<string> }
+
 export type PnrrListFilter = {
-  beneficiary: number
+  beneficiary?: number
   measure?: Array<string>
+  county?: string
   status?: Array<PnrrStatus>
   q?: string
   value_min?: number
@@ -138,12 +166,17 @@ export type PnrrListFilter = {
 
 // The measures as the API names them ('C10.I3'): it finds them whatever their case.
 export function pnrrFilter(
-  cui: number,
+  of: PnrrListOf,
   search: PnrrListSearch,
 ): PnrrListFilter {
+  const own = 'beneficiary' in of
   return {
-    beneficiary: cui,
-    measure: search.masura?.split(',').map((code) => code.toUpperCase()),
+    beneficiary: own ? of.beneficiary : search.beneficiar,
+    measure: own
+      ? search.masura?.split(',').map((code) => code.toUpperCase())
+      : [of.measure],
+    // A county the measure has no contract in is not asked for.
+    county: own ? undefined : countyBySlug(of.counties, search.judet),
     status: pnrrStatusesFromParam(search.stare),
     // `q` is shared with lists that keep one letter: the API reads two or more.
     q:
@@ -170,6 +203,8 @@ export function pnrrApiSort(search: PnrrListSearch) {
 export const PNRR_FILTER_PARAMS = {
   q: ['q'],
   masura: ['masura'],
+  judet: ['judet'],
+  beneficiar: ['beneficiar'],
   stare: ['stare'],
   valoare: ['valoare_min', 'valoare_max'],
   progres: ['progres_min', 'progres_max'],
@@ -179,6 +214,8 @@ export type PnrrFilterKey = keyof typeof PNRR_FILTER_PARAMS
 export const PNRR_BY_API_PARAM: Record<string, PnrrFilterKey> = {
   q: 'q',
   measure: 'masura',
+  county: 'judet',
+  beneficiary: 'beneficiar',
   status: 'stare',
   value_min: 'valoare',
   value_max: 'valoare',

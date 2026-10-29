@@ -4,6 +4,7 @@ import {
   pnrrFilter,
   progressBand,
   validatePnrrListSearch,
+  validatePnrrMeasureSearch,
 } from '#/features/pnrr/list'
 
 describe('the address of a list of PNRR contracts', () => {
@@ -30,12 +31,15 @@ describe('the address of a list of PNRR contracts', () => {
 
   it('asks the API in fractions and its own measure codes', () => {
     expect(
-      pnrrFilter(4981310, {
-        masura: 'c10.i3',
-        stare: 'finalizat',
-        progres_min: 50,
-        progres_max: 75,
-      }),
+      pnrrFilter(
+        { beneficiary: 4981310 },
+        {
+          masura: 'c10.i3',
+          stare: 'finalizat',
+          progres_min: 50,
+          progres_max: 75,
+        },
+      ),
     ).toMatchObject({
       beneficiary: 4981310,
       measure: ['C10.I3'],
@@ -46,13 +50,46 @@ describe('the address of a list of PNRR contracts', () => {
   })
 
   it('never sends a one-letter search, which other lists keep in the address', () => {
-    expect(pnrrFilter(4981310, { q: 'a' }).q).toBeUndefined()
-    expect(pnrrFilter(4981310, { q: 'ab' }).q).toBe('ab')
+    expect(pnrrFilter({ beneficiary: 4981310 }, { q: 'a' }).q).toBeUndefined()
+    expect(pnrrFilter({ beneficiary: 4981310 }, { q: 'ab' }).q).toBe('ab')
   })
 
   it('knows the band of a progress range, or none', () => {
     expect(progressBand({ progres_min: 50, progres_max: 75 })).toBe(2)
     expect(progressBand({ progres_min: 100 })).toBe(4)
     expect(progressBand({ progres_min: 50 })).toBe(-1)
+  })
+})
+
+describe("the address of a measure's list of PNRR contracts", () => {
+  const measure = { measure: 'C10.I3', counties: ['GORJ', 'MUREȘ'] }
+
+  it('reads a county and a beneficiary, never measures', () => {
+    expect(
+      validatePnrrMeasureSearch({
+        judet: 'mures',
+        beneficiar: '4981310',
+        masura: 'c15.i9',
+        stare: 'finalizat',
+      }),
+    ).toMatchObject({
+      judet: 'mures',
+      beneficiar: 4981310,
+      masura: undefined,
+      stare: 'finalizat',
+    })
+    expect(validatePnrrMeasureSearch({ judet: '../x' }).judet).toBeUndefined()
+  })
+
+  it("asks for the measure, and a county in the dashboard's spelling", () => {
+    expect(
+      pnrrFilter(measure, { judet: 'mures', beneficiar: 4981310 }),
+    ).toMatchObject({
+      measure: ['C10.I3'],
+      county: 'MUREȘ',
+      beneficiary: 4981310,
+    })
+    // A county the measure has no contract in is not asked for.
+    expect(pnrrFilter(measure, { judet: 'vaslui' }).county).toBeUndefined()
   })
 })

@@ -25,18 +25,10 @@ export const eu = {
   notCollectedRegional:
     'Programele regionale 2021–2027 nu sunt încă colectate.',
 
-  // The finder.
-  findTitle: 'Proiectele',
-  allProgrammes: 'Toate programele',
-  allStatuses: 'Orice stare',
+  // The list's columns.
   state: 'Stare',
-  searchLabel: 'Caută după titlu, beneficiar sau cod SMIS',
-  searchPlaceholder: 'Titlu, beneficiar, SMIS',
   project: 'Proiect',
   beneficiary: 'Beneficiar',
-  noProjects: 'Niciun proiect nu se potrivește.',
-  found: (n: number, text: string) =>
-    counted(n, text, 'Un proiect', 'proiecte'),
 
   status: {
     in_progress: 'În implementare',
@@ -66,6 +58,8 @@ export const eu = {
       `valoare ${value} · plătit ${paid}${day ? ` până la ${day}` : ''}`,
     of: (whole: string) =>
       `din ${whole} ale beneficiarului; sumele nu se adună între programe, fiecare are data listei lui`,
+    ofAll: (whole: string) =>
+      `din ${whole} în listele pe care le avem; sumele nu se adună între programe, fiecare are data listei lui`,
     otherStatuses: (n: number, text: string) =>
       `${counted(n, text, 'unul', 'proiecte')} cu o stare scrisă altfel în listă`,
     otherStatus: 'Altă stare, scrisă de listă',

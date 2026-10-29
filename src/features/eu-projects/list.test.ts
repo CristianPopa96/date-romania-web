@@ -38,6 +38,22 @@ describe('the address of a list of EU projects', () => {
     expect(programmeCodes(HELD, 'por-2014')).toBeUndefined()
   })
 
+  it('reads a SMIS code typed as a number, and keeps old finder addresses', () => {
+    expect(String(validateEuProjectListSearch({ q: 312456 }).q)).toBe('312456')
+    // The funds page took one programme and one status: still read the same.
+    expect(
+      validateEuProjectListSearch({ program: 'PoIDS-2021', stare: 'reziliat' }),
+    ).toMatchObject({ program: 'poids-2021', stare: 'reziliat' })
+  })
+
+  it('asks for every beneficiary on the funds page', () => {
+    expect(euProjectFilter(undefined, { q: 'drum' }, ['POR'])).toMatchObject({
+      beneficiary: undefined,
+      programme: ['POR'],
+      q: 'drum',
+    })
+  })
+
   it('never sends a one-letter search, which other lists keep in the address', () => {
     expect(euProjectFilter(4491342, { q: 'a' }, undefined).q).toBeUndefined()
     expect(euProjectFilter(4491342, { q: 'ab' }, undefined).q).toBe('ab')
