@@ -15,8 +15,9 @@ import { FilterPanel } from '#/components/list/FilterPanels'
 import type { FilterDecl, Patch } from '#/components/list/filter-types'
 import { useI18n } from '#/i18n/context'
 
-// The row above a list (FilterBar in the design system): a search field for this list,
-// one chip per filter the list declares, and "Șterge filtrele". On a phone the chips fold
+// The row above a list (FilterBar in the design system): a search field for this list
+// (none where the list cannot be searched by words), one chip per filter the list
+// declares, and "Șterge filtrele". On a phone the chips fold
 // into one "Filtre (2)" button that opens the same panels in a sheet.
 export function FilterBar({
   q,
@@ -25,7 +26,7 @@ export function FilterBar({
   onApply,
 }: {
   q: string | undefined
-  searchWhat: string
+  searchWhat: string | null
   filters: Array<FilterDecl>
   onApply: (patch: Patch) => void
 }) {
@@ -39,11 +40,13 @@ export function FilterBar({
 
   return (
     <Flex gap="2" align="center" wrap="wrap">
-      <SearchField
-        q={q}
-        placeholder={t.list.search(searchWhat)}
-        onSearch={(next) => onApply({ q: next })}
-      />
+      {searchWhat === null ? null : (
+        <SearchField
+          q={q}
+          placeholder={t.list.search(searchWhat)}
+          onSearch={(next) => onApply({ q: next })}
+        />
+      )}
       <Flex
         gap="2"
         align="center"

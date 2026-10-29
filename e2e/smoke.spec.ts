@@ -653,14 +653,19 @@ test('the filters narrow a ranking and stay in the address', async ({
   ).toBeVisible()
 
   // The CPV filter goes with the reader to the direct purchases, the EU one does not.
+  // A ranking takes its filters as chips; they stay from one ranking to the next.
   await page.goto('/clasamente?clasament=furnizori&cpv=45')
-  await expect(main.getByText('1. ALFA CONSTRUCT S.R.L.')).toBeVisible()
+  await expect(main.getByText('CPV: 45 · Lucrari de constructii')).toBeVisible()
+  await expect(rankRows(main).first()).toContainText('ALFA CONSTRUCT S.R.L.')
   await main.getByRole('tab', { name: 'Achiziții directe' }).click()
   await expect(page).toHaveURL(/\/clasamente\?clasament=achizitii&cpv=45$/)
-  await expect(main.getByRole('combobox', { name: 'Fonduri UE' })).toHaveCount(
-    0,
-  )
+  await expect(main.getByRole('button', { name: /^Fonduri UE/ })).toHaveCount(0)
 })
+
+// The rows of a ranking (each names its CUI), not those of its chart's table.
+function rankRows(main: Locator) {
+  return main.getByRole('row').filter({ hasText: /CUI \d+/ })
+}
 
 test('the patterns tab lists purchases just under their limit, as facts', async ({
   page,
@@ -723,15 +728,22 @@ test('the patterns tab lists purchases just under their limit, as facts', async 
   // Narrowed to one CPV division, the works pair is left out.
   await page.goto('/clasamente?clasament=tipare&cpv=30')
   await expect(main.getByText('O pereche cumpărător–furnizor')).toBeVisible()
-  await expect(main.getByRole('combobox', { name: 'CPV' })).toHaveText(
-    'CPV: 30',
-  )
+  await expect(main.getByText('CPV: 30', { exact: true })).toBeVisible()
   await expect(
     main.getByRole('row').filter({ hasText: 'ALFA CONSTRUCT' }),
   ).toHaveCount(0)
   await expect(main.getByRole('link', { name: 'Exportă CSV' })).toHaveAttribute(
     'href',
     '/tipare.csv?cpv=30',
+  )
+
+  // By contract type, a chip of the list; the file carries it too.
+  await page.goto('/clasamente?clasament=tipare&tip=3')
+  await expect(main.getByText('Tip contract: lucrări')).toBeVisible()
+  await expect(main.getByText('O pereche cumpărător–furnizor')).toBeVisible()
+  await expect(main.getByRole('link', { name: 'Exportă CSV' })).toHaveAttribute(
+    'href',
+    '/tipare.csv?tip=3',
   )
 })
 
@@ -740,7 +752,6 @@ test('winners are ranked by what they won alone or in associations', async ({
 }) => {
   await page.goto('/clasamente')
   const main = page.getByRole('main')
-  // Every tab has its panel, and an arrow key moves between tabs without opening one.
   await expect(main.getByRole('tabpanel')).toHaveCount(1)
   await main.getByRole('tab', { name: 'Contracte' }).focus()
   await page.keyboard.press('ArrowRight')
@@ -749,22 +760,22 @@ test('winners are ranked by what they won alone or in associations', async ({
   await page.keyboard.press('Enter')
 
   await expect(page).toHaveURL(/\/clasamente\?clasament=furnizori$/)
-  await expect(main.getByText('1. ALFA CONSTRUCT S.R.L.')).toBeVisible()
-  await expect(main.getByText('210.000 lei')).toBeVisible()
-  await expect(main.getByText('Beta Birotică SRL')).toHaveCount(0)
+  await expect(main.getByText('Câștigat: Singur')).toHaveCount(0)
+  await expect(rankRows(main)).toHaveCount(1)
+  await expect(rankRows(main).first()).toContainText('ALFA CONSTRUCT S.R.L.')
+  await expect(rankRows(main).first()).toContainText('210.000 lei')
+  await expect(main.getByRole('heading', { name: /Primii 10/ })).toBeVisible()
 
-  await main.getByRole('radio', { name: 'În asociere' }).click()
-  await expect(page).toHaveURL(
-    /\/clasamente\?clasament=furnizori&castigate=asociere$/,
-  )
-  // Every member carries the whole value of the contract, and the page says so.
+  await page.goto('/clasamente?clasament=furnizori&castigate=asociere')
+  await expect(main.getByText('Câștigat: În asociere')).toBeVisible()
   await expect(
     main.getByText(
       'Un contract câștigat în asociere apare la fiecare membru, cu valoarea întreagă.',
     ),
   ).toBeVisible()
-  await expect(main.getByText('2. Beta Birotică SRL')).toBeVisible()
-  await expect(main.getByText('6.120.000 lei')).toHaveCount(2)
+  await expect(rankRows(main)).toHaveCount(2)
+  await expect(rankRows(main).nth(1)).toContainText('Beta Birotică SRL')
+  await expect(rankRows(main).nth(1)).toContainText('6.120.000 lei')
 })
 
 test('direct purchases and institutions have rankings of their own', async ({
@@ -773,22 +784,39 @@ test('direct purchases and institutions have rankings of their own', async ({
   await page.goto('/clasamente?clasament=achizitii')
   const main = page.getByRole('main')
   await expect(
-    main.getByText('După valoarea achizițiilor directe acceptate.'),
+    main.getByRole('heading', { name: 'Furnizori, după achizițiile directe' }),
   ).toBeVisible()
-  await expect(main.getByText('1. ALFA CONSTRUCT S.R.L.')).toBeVisible()
-  await expect(main.getByText(`1. ${TOWN_HALL}`)).toBeVisible()
-  // No contract figure here, so no note about the list of contracts.
+  await expect(rankRows(main).first()).toContainText('ALFA CONSTRUCT S.R.L.')
   await expect(main.getByText('Lista contractelor nu e completă.')).toHaveCount(
     0,
   )
+  await page.goto('/clasamente?clasament=achizitii&parte=institutii')
+  await expect(rankRows(main).first()).toContainText(TOWN_HALL)
 
   await main.getByRole('tab', { name: 'Instituții' }).click()
   await expect(page).toHaveURL(/\/clasamente\?clasament=institutii$/)
-  await expect(main.getByText(`1. ${TOWN_HALL}`)).toBeVisible()
-  await expect(main.getByText('6.330.000 lei')).toBeVisible()
-  await expect(
-    main.getByText('2. SPITALUL JUDETEAN DE URGENTA CLUJ'),
-  ).toBeVisible()
+  await expect(rankRows(main).first()).toContainText(TOWN_HALL)
+  await expect(rankRows(main).first()).toContainText('6.330.000 lei')
+  await expect(rankRows(main).nth(1)).toContainText(
+    'SPITALUL JUDETEAN DE URGENTA CLUJ',
+  )
+})
+
+test('a ranking sorts by count, and a name searched keeps its place', async ({
+  page,
+}) => {
+  await page.goto('/clasamente?clasament=institutii')
+  const main = page.getByRole('main')
+  await main
+    .getByRole('columnheader', { name: 'Contracte' })
+    .getByRole('button')
+    .click()
+  await expect(page).toHaveURL(/\?clasament=institutii&ordine=numar-desc$/)
+
+  await page.goto('/clasamente?clasament=institutii&q=spital')
+  await expect(rankRows(main)).toHaveCount(1)
+  // Its place in the whole ranking, not in what the search found.
+  await expect(rankRows(main).first().getByRole('cell').first()).toHaveText('2')
 })
 
 test('a purchase opens its own page, with what is not collected marked as such', async ({

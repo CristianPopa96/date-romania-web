@@ -15,6 +15,7 @@ export const Route = createFileRoute('/tipare.csv')({
         if (!filter) return new Response('Not found', { status: 404 })
         const file = await getFile('/v1/patterns/near-limit', {
           cpv: filter.cpv,
+          contract_type: filter.contract_type,
           format: 'csv',
         })
         return new Response(file, {

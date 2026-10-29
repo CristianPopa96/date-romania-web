@@ -3,25 +3,23 @@ import { Container, Flex, Heading, Text } from '@radix-ui/themes'
 
 import { Patterns } from '#/features/patterns/Patterns'
 import { RankingFilters } from '#/features/rankings/RankingFilters'
-import {
-  ContractRanking,
-  DirectRankings,
-  LargestContracts,
-} from '#/features/rankings/Rankings'
+import { RankingList } from '#/features/rankings/RankingList'
+import { LargestContracts } from '#/features/rankings/Rankings'
 import { UrlTabs } from '#/components/UrlTabs'
 import { messagesFor } from '#/i18n'
 import { useI18n } from '#/i18n/context'
 import { pageTitle } from '#/lib/copy'
 import {
-  contractRankingQuery,
   largestContractsQuery,
-  rankingQuery,
+  rankingListQuery,
+  rankingTopQuery,
 } from '#/features/rankings/queries'
 import { cpvDivisionsQuery, nearLimitQuery } from '#/features/patterns/queries'
 import { statsQuery } from '#/lib/queries'
 import {
   RANKINGS,
   isContractTab,
+  isRankingTab,
   rankingFilter,
   validateRankingSearch,
 } from '#/features/rankings/urls'
@@ -36,27 +34,15 @@ export const Route = createFileRoute('/clasamente')({
     const ranking = () => {
       switch (deps.clasament) {
         case 'furnizori':
-          return queryClient.ensureQueryData(
-            contractRankingQuery(
-              'suppliers',
-              filter,
-              deps.castigate === 'asociere' ? 'association' : 'alone',
-            ),
-          )
         case 'institutii':
-          return queryClient.ensureQueryData(
-            contractRankingQuery('institutions', filter),
-          )
         case 'achizitii':
           return Promise.all([
             queryClient.ensureQueryData(statsQuery),
-            queryClient.ensureQueryData(rankingQuery('suppliers', filter.cpv)),
-            queryClient.ensureQueryData(
-              rankingQuery('institutions', filter.cpv),
-            ),
+            queryClient.ensureQueryData(rankingListQuery(deps)),
+            queryClient.ensureQueryData(rankingTopQuery(deps)),
           ])
         case 'tipare':
-          return queryClient.ensureQueryData(nearLimitQuery(filter.cpv))
+          return queryClient.ensureQueryData(nearLimitQuery(deps))
         default:
           return queryClient.ensureQueryData(largestContractsQuery(filter))
       }
@@ -104,30 +90,26 @@ function Rankings() {
             go({ clasament: value, cpv: search.cpv, ue: search.ue })
           }
         >
-          <RankingFilters
-            search={search}
-            contracts={isContractTab(tab)}
-            onSearch={(filters) => go({ ...search, ...filters })}
-          />
-          {tab === 'contracte' ? <LargestContracts filter={filter} /> : null}
-          {tab === 'furnizori' ? (
-            <ContractRanking
-              role="suppliers"
-              filter={filter}
-              won={search.castigate === 'asociere' ? 'association' : 'alone'}
-              onWon={(won) =>
-                go({
-                  ...search,
-                  castigate: won === 'association' ? 'asociere' : undefined,
-                })
-              }
+          {isRankingTab(tab) ? (
+            // A ranking declares its filters to its own bar, as the pattern's list does.
+            <RankingList tab={tab} search={search} onSearch={go} />
+          ) : null}
+          {tab === 'tipare' ? (
+            <Patterns
+              search={search}
+              onApply={(patch) => go({ ...search, ...patch })}
             />
           ) : null}
-          {tab === 'achizitii' ? <DirectRankings cpv={filter.cpv} /> : null}
-          {tab === 'institutii' ? (
-            <ContractRanking role="institutions" filter={filter} />
+          {tab === 'contracte' ? (
+            <>
+              <RankingFilters
+                search={search}
+                contracts={isContractTab(tab)}
+                onSearch={(filters) => go({ ...search, ...filters })}
+              />
+              <LargestContracts filter={filter} />
+            </>
           ) : null}
-          {tab === 'tipare' ? <Patterns cpv={filter.cpv} /> : null}
         </UrlTabs>
       </Flex>
     </Container>

@@ -1,22 +1,15 @@
 import { createServerFn } from '@tanstack/react-start'
 
 import { getJson } from '#/lib/api'
-import type { Role, Schemas } from '#/lib/api'
-import type { RankingFilter } from '#/features/rankings/urls'
+import type { Schemas } from '#/lib/api'
 import { filterParams } from '#/features/contracts'
+
+// The rankings: parties by the value of their contracts or direct purchases, a page at a
+// time, in any column's order. See api.ts of the site for how it reaches the API.
 
 export type RankingRow = Schemas['RankingRow']
 
 export type Ranking = Schemas['Ranking']
-
-export const getRanking = createServerFn({ method: 'GET' })
-  .inputValidator((data: { role: Role; cpv?: string }) => data)
-  .handler(({ data }) =>
-    getJson<Ranking>(`/v1/rankings/${data.role}`, {
-      cpv: data.cpv,
-      limit: 20,
-    }),
-  )
 
 export type Won = NonNullable<Schemas['ContractRanking']['won']>
 
@@ -24,20 +17,93 @@ export type ContractRankingRow = Schemas['ContractRankingRow']
 
 export type ContractRanking = Schemas['ContractRanking']
 
-// Winners by what they won alone or in associations; institutions by what they awarded.
-export const getContractRanking = createServerFn({ method: 'GET' })
-  .inputValidator(
-    (data: { role: Role; won?: Won; filter: RankingFilter }) => data,
-  )
-  .handler(({ data }) =>
-    data.role === 'suppliers'
-      ? getJson<ContractRanking>('/v1/rankings/contract-suppliers', {
-          won: data.won ?? 'alone',
-          ...filterParams(data.filter),
-          limit: 20,
-        })
-      : getJson<ContractRanking>('/v1/rankings/contract-institutions', {
-          ...filterParams(data.filter),
-          limit: 20,
-        }),
-  )
+// Which ranking: winners and institutions of contracts, suppliers and institutions of
+// direct purchases. Two kinds of money, never in one list.
+export type RankingKind =
+  'contract-suppliers' | 'contract-institutions' | 'suppliers' | 'institutions'
+
+export type RankingQuery = {
+  kind: RankingKind
+  // For winners: how the contracts were won.
+  won?: Won
+  cpv?: string
+  eu?: boolean
+  // Direct purchases only.
+  date_from?: string
+  date_to?: string
+  q?: string
+  sort: 'value' | 'count'
+  order: 'asc' | 'desc'
+  size: number
+  page: number
+}
+
+// One row of any ranking: its place, the party, how many rows its value adds up and the
+// value.
+export type RankedParty = {
+  rank: number
+  cui: number
+  name: string
+  kind: string
+  count: number
+  value: number
+}
+
+export type RankedList = {
+  total: number
+  items: Array<RankedParty>
+  // Contracts: the days the contracts were signed in; purchases: the days asked for.
+  contract: ContractRanking | null
+  direct: Ranking | null
+}
+
+export const getRankingList = createServerFn({ method: 'GET' })
+  .inputValidator((data: RankingQuery) => data)
+  .handler(async ({ data }): Promise<RankedList | null> => {
+    const page = {
+      q: data.q,
+      sort: data.sort,
+      order: data.order,
+      limit: data.size,
+      offset: (data.page - 1) * data.size,
+    }
+    const filter = { cpv: data.cpv, eu: data.eu }
+    if (
+      data.kind === 'contract-suppliers' ||
+      data.kind === 'contract-institutions'
+    ) {
+      const found = await getJson<ContractRanking>(
+        `/v1/rankings/${data.kind}`,
+        {
+          won:
+            data.kind === 'contract-suppliers'
+              ? (data.won ?? 'alone')
+              : undefined,
+          ...filterParams(filter),
+          ...page,
+        },
+      )
+      return (
+        found && {
+          total: found.total,
+          items: found.items.map((row) => ({ ...row, count: row.contracts })),
+          contract: found,
+          direct: null,
+        }
+      )
+    }
+    const found = await getJson<Ranking>(`/v1/rankings/${data.kind}`, {
+      date_from: data.date_from,
+      date_to: data.date_to,
+      cpv: data.cpv,
+      ...page,
+    })
+    return (
+      found && {
+        total: found.total,
+        items: found.items.map((row) => ({ ...row, count: row.accepted })),
+        contract: null,
+        direct: found,
+      }
+    )
+  })
