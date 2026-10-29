@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { Link as RouterLink, useRouterState } from '@tanstack/react-router'
 import {
   BarChartIcon,
@@ -42,14 +43,17 @@ function LogoMark() {
   )
 }
 
-// A section is open on its own page and on the pages under it.
-function isOpen(path: string, section: string) {
-  return path === section || path.startsWith(`${section}/`)
+// A section is open on its own page and on the pages under it, and on the other places
+// it reaches: the programme overviews belong to Proiecte.
+function isOpen(path: string, section: string, also: ReadonlyArray<string>) {
+  return [section, ...also].some(
+    (each) => path === each || path.startsWith(`${each}/`),
+  )
 }
 
 // On every page: the logo, the sections that exist, and a compact search. A section
 // joins the bar when its page ships, never as a placeholder, in its place in the full
-// order of the design (Fonduri, Caută, Clasamente, Programe, Localități, Surse), so the
+// order of the design (Proiecte, Achiziții, Clasamente, Localități, Surse), so the
 // items never reshuffle. The search field is the way
 // in to search, so there is no "Caută" item next to it.
 export function TopBar() {
@@ -59,11 +63,21 @@ export function TopBar() {
   // to it would be the same field twice.
   const ownSearch = path === '/' || path === '/cautare'
   const sections = [
+    {
+      to: '/proiecte',
+      label: t.nav.projects,
+      icon: <Share2Icon />,
+      also: ['/programe'],
+    },
     { to: '/clasamente', label: t.nav.rankings, icon: <BarChartIcon /> },
-    { to: '/programe', label: t.nav.programmes, icon: <Share2Icon /> },
     { to: '/localitati', label: t.nav.places, icon: <SewingPinIcon /> },
     { to: '/surse', label: t.nav.sources, icon: <FileTextIcon /> },
-  ] as const
+  ] as const satisfies ReadonlyArray<{
+    to: string
+    label: string
+    icon: ReactNode
+    also?: ReadonlyArray<string>
+  }>
 
   return (
     <Box asChild style={{ borderBottom: '1px solid var(--gray-a5)' }}>
@@ -82,31 +96,35 @@ export function TopBar() {
             </Link>
             <Flex asChild gap="4" align="center" flexGrow="1">
               <nav aria-label={t.nav.label}>
-                {sections.map((section) => (
-                  <Link
-                    key={section.to}
-                    asChild
-                    color={isOpen(path, section.to) ? undefined : 'gray'}
-                  >
-                    <RouterLink
-                      to={section.to}
-                      // On a page under the section, the section is where the
-                      // reader is, not the page itself.
-                      aria-current={
-                        path === section.to
-                          ? 'page'
-                          : isOpen(path, section.to)
-                            ? 'location'
-                            : undefined
-                      }
+                {sections.map((section) => {
+                  const also = 'also' in section ? section.also : []
+                  const open = isOpen(path, section.to, also)
+                  return (
+                    <Link
+                      key={section.to}
+                      asChild
+                      color={open ? undefined : 'gray'}
                     >
-                      <Flex align="center" gap="1">
-                        {section.icon}
-                        {section.label}
-                      </Flex>
-                    </RouterLink>
-                  </Link>
-                ))}
+                      <RouterLink
+                        to={section.to}
+                        // On a page under the section, the section is where the
+                        // reader is, not the page itself.
+                        aria-current={
+                          path === section.to
+                            ? 'page'
+                            : open
+                              ? 'location'
+                              : undefined
+                        }
+                      >
+                        <Flex align="center" gap="1">
+                          {section.icon}
+                          {section.label}
+                        </Flex>
+                      </RouterLink>
+                    </Link>
+                  )
+                })}
               </nav>
             </Flex>
             {/* The key empties the field once a search has been sent. */}

@@ -59,12 +59,12 @@ test('the top bar lists only what exists, and searches from every page but home'
   await expect(bar.getByRole('link')).toHaveCount(4)
   // In the order of the design, which does not change as sections join.
   await expect(bar.getByRole('link')).toHaveText([
+    'Proiecte',
     'Clasamente',
-    'Programe',
     'Localități',
     'Surse',
   ])
-  await expect(bar.getByRole('link', { name: 'Programe' })).toBeVisible()
+  await expect(bar.getByRole('link', { name: 'Proiecte' })).toBeVisible()
   await expect(bar.getByRole('link', { name: 'Surse' })).toBeVisible()
   await expect(bar.getByRole('link', { name: 'Clasamente' })).toBeVisible()
   // On the home page the large search box is the page.
@@ -1237,15 +1237,21 @@ test('the programme page adds up the payment files and says how much was tied', 
   page,
 }) => {
   await page.goto('/')
+  const bar = page.getByRole('navigation', { name: 'Secțiuni' })
+  await bar.getByRole('link', { name: 'Proiecte' }).click()
+  await expect(page).toHaveURL(/\/proiecte$/)
+  // The programme overviews are reached from the projects, and keep Proiecte marked.
   await page
-    .getByRole('navigation', { name: 'Secțiuni' })
-    .getByRole('link', { name: 'Programe' })
+    .getByRole('link', { name: 'Programele, cu cifrele și sursele lor' })
     .click()
-  // The section lists its programmes; this one opens from the list.
   await expect(page).toHaveURL(/\/programe$/)
   await page.getByRole('link', { name: 'Programul Anghel Saligny' }).click()
   await expect(page).toHaveURL(/\/programe\/anghel-saligny$/)
   await expect(page).toHaveTitle('Programul Anghel Saligny · Date România')
+  await expect(bar.getByRole('link', { name: 'Proiecte' })).toHaveAttribute(
+    'aria-current',
+    'location',
+  )
   const main = page.getByRole('main')
 
   await expect(
@@ -1297,87 +1303,146 @@ test('the programme page adds up the payment files and says how much was tied', 
   await expect(august).toContainText('4.260.000 lei')
 })
 
-// The rows of the list of projects (their town hall's county), not those of its charts.
+// The rows of a list of projects (each names its beneficiary's county), not those of its
+// charts.
 function projectRows(main: Locator) {
-  return main.getByRole('row').filter({ hasText: /județul / })
+  return main
+    .getByRole('row')
+    .filter({ hasText: /Gorj|Cluj|Timiș|Ialomița|național/ })
 }
 
-test('a project is found by county, by words and by what was tied', async ({
+test('every project of every programme is one list, never added up', async ({
   page,
 }) => {
-  await page.goto(PROGRAMME)
+  await page.goto('/proiecte')
+  await expect(page).toHaveTitle('Proiecte cu bani publici · Date România')
   const main = page.getByRole('main')
-  await expect(main.getByText(/^4 proiecte · plătit /)).toBeVisible()
-  await expect(projectRows(main)).toHaveCount(4)
-  // The most paid first; the paid column sorts the whole list.
   await expect(
-    main.getByRole('columnheader', { name: 'Plătit' }),
+    main.getByText(/^14 proiecte în 3 programe · 4 urmărite până la firme$/),
+  ).toBeVisible()
+  // Programmes are never added: no value until one is chosen.
+  await expect(
+    main.getByText('sumele nu se adună între programe', { exact: false }),
+  ).toBeVisible()
+  // A natural person's project is counted, never listed by name.
+  await expect(
+    main.getByText(
+      'Include un contract al unei persoane fizice, pe care nu le afișăm nominal.',
+      { exact: false },
+    ),
+  ).toBeVisible()
+  await expect(projectRows(main)).toHaveCount(14)
+  // The largest first.
+  await expect(
+    main.getByRole('columnheader', { name: 'Valoare' }),
   ).toHaveAttribute('aria-sort', 'descending')
 
-  // A county bar of the chart becomes a filter.
-  await main.getByRole('button', { name: /^Gorj/ }).click()
-  await expect(page).toHaveURL(/\?judet=gorj$/)
+  // A bar of the chart that counts projects by programme becomes a filter, and with one
+  // programme chosen its value is given.
+  await main.getByRole('button', { name: /^Anghel Saligny/ }).click()
+  await expect(page).toHaveURL(/\/proiecte\?program=anghel-saligny$/)
+  await expect(main.getByText('Program: Anghel Saligny')).toBeVisible()
+  await expect(projectRows(main)).toHaveCount(4)
+  await expect(main.getByText(/valoare 67,5 mil\. lei$/)).toBeVisible()
+
+  await page.goto('/proiecte?judet=gorj')
   await expect(main.getByText('Județ: Gorj')).toBeVisible()
-  await expect(projectRows(main)).toHaveCount(2)
-  await expect(projectRows(main).filter({ hasText: 'TURCENI' })).toHaveCount(1)
+  await page.goto('/proiecte?drum=firme')
+  await expect(main.getByText('Drum urmărit: până la firme')).toBeVisible()
+  await expect(projectRows(main)).toHaveCount(4)
 
-  await page.goto(`${PROGRAMME}?legatura=mai-multe`)
-  await expect(
-    main.getByText('Contract SEAP: Mai multe contracte posibile'),
-  ).toBeVisible()
-  await expect(projectRows(main)).toHaveCount(1)
-  await expect(projectRows(main)).toContainText('județul Cluj')
-
-  await page.goto(`${PROGRAMME}?q=turceni`)
-  await expect(projectRows(main)).toHaveCount(1)
-
-  await page.goto(`${PROGRAMME}?q=zzzz`)
+  await page.goto('/proiecte?q=zzzz')
   await expect(
     main.getByText('Nimic nu se potrivește cu filtrele alese.'),
   ).toBeVisible()
-  // A filter the address does not know is dropped, not shown as an error; so is a
-  // word every object answers to.
+  // A word the address does not know is dropped, not shown as an error.
   for (const unknown of ['altceva', 'toString']) {
-    await page.goto(`${PROGRAMME}?legatura=${unknown}`)
-    await expect(projectRows(main)).toHaveCount(4)
+    await page.goto(`/proiecte?drum=${unknown}`)
+    await expect(projectRows(main)).toHaveCount(14)
   }
-
   // A page past the end, from an old link, goes to the last one.
-  await page.goto(`${PROGRAMME}?pagina=9`)
-  await expect(page).toHaveURL(/\/programe\/anghel-saligny$/)
-})
+  await page.goto('/proiecte?pagina=9')
+  await expect(page).toHaveURL(/\/proiecte$/)
 
-test("a builder's projects are a filter that can be removed", async ({
-  page,
-}) => {
-  await page.goto(`${PROGRAMME}?firma=17886786`)
-  const main = page.getByRole('main')
-  await expect(
-    main.getByText('Constructor: ALFA CONSTRUCT S.R.L.'),
-  ).toBeVisible()
-  await expect(projectRows(main)).toHaveCount(1)
-  await expect(
-    main.getByText('și către alți constructori', { exact: false }),
-  ).toBeVisible()
-  await main
-    .getByRole('button', { name: 'Scoate filtrul «Constructor»' })
-    .click()
-  await expect(page).toHaveURL(/\/programe\/anghel-saligny$/)
-})
-
-test('a project is traced from the ministry to its contract', async ({
-  page,
-}) => {
-  await page.goto(PROGRAMME)
-  const main = page.getByRole('main')
+  // A row opens its project's own page.
   await main
     .getByRole('link', {
       name: /Modernizare drumuri comunale în comuna Țânțăreni/,
     })
     .click()
-  await expect(page).toHaveURL(/\/programe\/anghel-saligny\/proiecte\/101$/)
-  // The link to the contract is ours: the page says "probabil" wherever it shows it.
-  await expect(main.getByText('Probabil un singur contract')).toBeVisible()
+  await expect(page).toHaveURL(/\/proiecte\/anghel-saligny\/101$/)
+})
+
+test("a programme's page lists its own projects, and nothing else", async ({
+  page,
+}) => {
+  await page.goto(PROGRAMME)
+  const main = page.getByRole('main')
+  await expect(
+    main.getByRole('heading', { name: 'Proiectele programului' }),
+  ).toBeVisible()
+  await expect(projectRows(main)).toHaveCount(4)
+  // Its programme is not a filter here, so it cannot be removed.
+  await expect(main.getByRole('button', { name: /^Program$/ })).toHaveCount(0)
+  await page.goto(`${PROGRAMME}?q=turceni`)
+  await expect(projectRows(main)).toHaveCount(1)
+  await page.goto(`${PROGRAMME}?pagina=9`)
+  await expect(page).toHaveURL(/\/programe\/anghel-saligny$/)
+})
+
+test('a project is followed from the ministry to its contract', async ({
+  page,
+}) => {
+  // The old address of a project leads to its page under /proiecte.
+  await page.goto(`${PROGRAMME}/proiecte/101`)
+  await expect(page).toHaveURL(/\/proiecte\/anghel-saligny\/101$/)
+  const main = page.getByRole('main')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1)
+  await expect(
+    main.getByText('Proiect · Anghel Saligny · ȚÂNȚĂRENI, județul Gorj'),
+  ).toBeVisible()
+  // The figures first, each with its own day.
+  await expect(main.getByText('Plătit în fișierele MDLPA')).toBeVisible()
+  await expect(main.getByText('contract de finanțare 18.05.2023')).toBeVisible()
+  await expect(main.getByText('64 %', { exact: true })).toBeVisible()
+
+  const road = main.getByRole('list', { name: 'Drumul banilor' })
+  await expect(road.getByRole('listitem')).toHaveCount(7)
+  await expect(road).toContainText('MDLPA · Anghel Saligny')
+  await expect(road).toContainText('nr. 1872')
+  // The payment from the file without tax IDs goes with the two that name the builder.
+  await expect(road).toContainText('3 plăți')
+  await expect(road).toContainText('5,4 mil. lei')
+  await expect(road.getByRole('link', { name: 'ȚÂNȚĂRENI' })).toHaveAttribute(
+    'href',
+    '/institutii/4981310',
+  )
+  await expect(
+    road.getByRole('link', { name: 'ALFA CONSTRUCT S.R.L.' }),
+  ).toHaveAttribute('href', '/furnizori/17886786')
+  // The notice is one we also hold from SEAP, so it opens on its page.
+  await expect(road.getByRole('link', { name: 'CAN0000001' })).toHaveAttribute(
+    'href',
+    '/contracte/9001',
+  )
+  await expect(road).toContainText('72 % din valoarea proiectului')
+  // The link to the contract is ours: it says "Probabil", never more.
+  await expect(road).toContainText('Probabil')
+  // What SEAP does not publish ends the road; nothing offers to request it yet.
+  await expect(road).toContainText('Nepublicat')
+  await expect(main.getByText('Cere lista')).toHaveCount(0)
+  // The lines of the road are drawings; each is also said in words.
+  await expect(road).toContainText('legat de noi, probabil: Achiziții')
+  await expect(main.getByText('legat de noi, probabil').last()).toBeVisible()
+
+  await expect(
+    main.getByRole('heading', {
+      name: 'Contracte și achiziții legate de proiect',
+    }),
+  ).toBeVisible()
+  await expect(
+    main.getByText('găsite după constructorul din fișierul de plăți'),
+  ).toBeVisible()
   await expect(
     main.getByRole('heading', { name: 'Contractul probabil' }),
   ).toBeVisible()
@@ -1386,47 +1451,6 @@ test('a project is traced from the ministry to its contract', async ({
       'Legătură probabilă: același constructor, după CUI; instituția are numele primăriei și e din același județ.',
     ),
   ).toBeVisible()
-  await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1)
-  await expect(
-    main.getByText('Contract de finanțare MDLPA 1872 din 18.05.2023'),
-  ).toBeVisible()
-
-  const chain = main.getByRole('list', {
-    name: 'Lanțul pentru ALFA CONSTRUCT S.R.L.',
-  })
-  await expect(chain.getByRole('listitem')).toHaveCount(6)
-  // The payment from the file without tax IDs goes with the two that name the builder.
-  await expect(chain).toContainText('3 plăți · 5,4 mil. lei')
-  await expect(chain.getByRole('link', { name: 'ȚÂNȚĂRENI' })).toHaveAttribute(
-    'href',
-    '/institutii/4981310',
-  )
-  await expect(chain).toContainText('progres 64 %')
-  await expect(
-    chain.getByRole('link', { name: 'ALFA CONSTRUCT S.R.L.' }),
-  ).toHaveAttribute('href', '/furnizori/17886786')
-  // The notice is one we also hold from SEAP, so it opens on its page.
-  await expect(chain.getByRole('link', { name: 'CAN0000001' })).toHaveAttribute(
-    'href',
-    '/contracte/9001',
-  )
-  await expect(chain).toContainText(
-    '6,1 mil. lei · 72 % din valoarea proiectului',
-  )
-  // What SEAP does not publish ends the chain; nothing offers to request it yet.
-  await expect(chain).toContainText('Nepublicat')
-  await expect(main.getByText('Cere lista')).toHaveCount(0)
-  // The lines of the chain are drawings; each is also said in words, in the chain for
-  // a screen reader and in the legend under it.
-  await expect(chain).toContainText(
-    'legătură probabilă: CUI constructor + nume primărie: Contract SEAP',
-  )
-  await expect(
-    main
-      .getByText('legătură probabilă: CUI constructor + nume primărie')
-      .last(),
-  ).toBeVisible()
-
   // Won by two: one value, the partner named, never the word "lider".
   await expect(
     main.getByText(
@@ -1434,26 +1458,28 @@ test('a project is traced from the ministry to its contract', async ({
     ),
   ).toBeVisible()
   await expect(main.getByText(/lider/i)).toHaveCount(0)
-  const total = main.getByRole('row').filter({ hasText: '3 plăți' })
+  // The payments by file: the files give no payment day.
+  await expect(
+    main.getByText('fișierele MDLPA nu dau ziua plății, doar ziua fișierului'),
+  ).toBeVisible()
+  const total = main.getByRole('row').filter({ hasText: '3 plăți în' })
   await expect(total).toContainText('5.400.000 lei')
-  await expect(main.getByText('ASA4-25001')).toBeVisible()
+  await expect(
+    main.getByRole('heading', { name: 'Ce nu este public' }),
+  ).toBeVisible()
 })
 
 test('a project with several contracts lists them and picks none', async ({
   page,
 }) => {
-  await page.goto(`${PROGRAMME}/proiecte/102`)
+  await page.goto('/proiecte/anghel-saligny/102')
   const main = page.getByRole('main')
-  await expect(
-    main.getByText('Mai multe contracte posibile').first(),
-  ).toBeVisible()
-  const chain = main.getByRole('list', {
-    name: 'Lanțul pentru Delta Drumuri SRL',
-  })
-  await expect(chain).toContainText('Consiliul județean')
-  await expect(chain).toContainText('2 anunțuri posibile')
+  const road = main.getByRole('list', { name: 'Drumul banilor' })
+  await expect(road).toContainText('Delta Drumuri SRL')
+  await expect(road).toContainText('2 anunțuri posibile')
+  await expect(road).toContainText('Posibil')
   // A progress that is not a share is shown as the town hall wrote it.
-  await expect(chain).toContainText('progres: PT RECEPTIONAT SI APROBAT')
+  await expect(main.getByText('PT RECEPTIONAT SI APROBAT')).toBeVisible()
   await expect(
     main.getByRole('heading', { name: 'Contractele posibile' }),
   ).toBeVisible()
@@ -1465,7 +1491,6 @@ test('a project with several contracts lists them and picks none', async ({
       )
       .first(),
   ).toBeVisible()
-  await expect(chain).toContainText('legătură posibilă')
   // A framework agreement is a ceiling: it gets no share of the project's value.
   const framework = main.getByRole('row').filter({ hasText: 'CAN1070002' })
   await expect(framework).not.toContainText('%')
@@ -1475,33 +1500,30 @@ test('a project with several contracts lists them and picks none', async ({
   ).toBeVisible()
   // The builder has no page of its own, so its name is not a link.
   await expect(
-    chain.getByRole('link', { name: 'Delta Drumuri SRL' }),
+    road.getByRole('link', { name: 'Delta Drumuri SRL' }),
   ).toHaveCount(0)
 })
 
-test('a chain that stops at the builder says why', async ({ page }) => {
-  await page.goto(`${PROGRAMME}/proiecte/103`)
+test('a road that stops at the builder says why', async ({ page }) => {
+  await page.goto('/proiecte/anghel-saligny/103')
   const main = page.getByRole('main')
-  const chain = main.getByRole('list', { name: 'Lanțul pentru Omega Gaz SRL' })
-  await expect(chain.getByRole('listitem')).toHaveCount(5)
-  await expect(chain).toContainText('Niciun contract găsit')
-  await expect(chain).toContainText('căutat în SEAP, 03.06.2021–02.04.2024')
+  const road = main.getByRole('list', { name: 'Drumul banilor' })
+  await expect(road.getByRole('listitem')).toHaveCount(6)
+  await expect(road).toContainText('Niciun contract găsit')
+  await expect(road).toContainText('căutat în SEAP, 03.06.2021–02.04.2024')
   await expect(main.getByText('De ce nu găsim un contract.')).toBeVisible()
   await expect(
     main.getByText('finanțat și din fonduri europene (POIM)'),
   ).toBeVisible()
 
-  await page.goto(`${PROGRAMME}/proiecte/104`)
-  const unnamed = main.getByRole('list', {
-    name: 'Lanțul pentru Sigma Canal SRL',
-  })
-  await expect(unnamed).toContainText('fără CUI în fișier')
-  await expect(unnamed).toContainText('Nu putem căuta')
+  await page.goto('/proiecte/anghel-saligny/104')
+  await expect(road).toContainText('fără CUI în fișier')
+  await expect(road).toContainText('Nu putem căuta')
   await expect(
     main.getByText('De ce unele plăți nu pot fi legate.'),
   ).toBeVisible()
 
-  const missing = await page.goto(`${PROGRAMME}/proiecte/999`)
+  const missing = await page.goto('/proiecte/anghel-saligny/999')
   expect(missing?.status()).toBe(404)
   await expect(main.getByText('Pagina nu există')).toBeVisible()
 })
