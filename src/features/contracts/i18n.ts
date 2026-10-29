@@ -55,11 +55,16 @@ export const contractList = {
   },
   total: (n: number, text: string) =>
     `Total pentru filtrele alese · ${contracts(n, text)}`,
+  totalWhole: (n: number, text: string) =>
+    `Total pentru filtrele alese · ${contracts(n, text)} · valoarea întreagă, neîmpărțită între membri`,
   timeTitle: {
     month: 'Valoare pe luni',
     day: 'Valoare pe zile',
   },
   timeUnit: 'lei fără TVA, contracte semnate în perioadă',
+  // A company's contracts won with others: each with its whole value, never split.
+  wholeUnit:
+    'lei fără TVA, valoarea întreagă a fiecărui contract, neîmpărțită între membri',
   partiesTitle: {
     supplier: 'Cei mai mari câștigători',
     buyer: 'Cele mai mari instituții',

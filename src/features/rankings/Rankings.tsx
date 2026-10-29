@@ -64,7 +64,7 @@ export function LargestContracts({ filter }: { filter: RankingFilter }) {
           </a>
         </Button>
       </Flex>
-      <ContractTable contracts={data.items} view="ranking" />
+      <ContractTable contracts={data.items} />
       <SourceLine source={source} />
     </Flex>
   )

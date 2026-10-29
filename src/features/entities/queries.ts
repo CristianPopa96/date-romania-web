@@ -59,7 +59,10 @@ export async function loadEntityPage(
     ])
     return {
       page,
-      last: pageCount(contracts.total, search.pe_pagina ?? 25),
+      last:
+        contracts === 'failed'
+          ? null
+          : pageCount(contracts.total, search.pe_pagina ?? 25),
     }
   } else if (list === 'coeziune') {
     const codes =

@@ -71,6 +71,7 @@ export const list = {
   },
 
   empty: 'Nimic nu se potrivește cu filtrele alese.',
+  failed: 'Nu am putut încărca lista acum. Încearcă din nou mai târziu.',
   without: (label: string, count: string) =>
     `Fără filtrul «${label}» ar fi ${count}.`,
 
