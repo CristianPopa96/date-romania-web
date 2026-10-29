@@ -1307,6 +1307,10 @@ test('a project is found by county, by words and by what was tied', async ({
     await page.goto(`${PROGRAMME}?legatura=${unknown}`)
     await expect(projectRows(main)).toHaveCount(4)
   }
+
+  // A page past the end, from an old link, goes to the last one.
+  await page.goto(`${PROGRAMME}?pagina=9`)
+  await expect(page).toHaveURL(/\/programe\/anghel-saligny$/)
 })
 
 test("a builder's projects are a filter that can be removed", async ({
@@ -1318,6 +1322,9 @@ test("a builder's projects are a filter that can be removed", async ({
     main.getByText('Constructor: ALFA CONSTRUCT S.R.L.'),
   ).toBeVisible()
   await expect(projectRows(main)).toHaveCount(1)
+  await expect(
+    main.getByText('și către alți constructori', { exact: false }),
+  ).toBeVisible()
   await main
     .getByRole('button', { name: 'Scoate filtrul «Constructor»' })
     .click()

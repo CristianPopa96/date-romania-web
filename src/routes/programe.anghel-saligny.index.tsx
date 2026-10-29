@@ -1,5 +1,5 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import { Container, Flex, Heading, Text } from '@radix-ui/themes'
 
 import { Unavailable } from '#/components/Notes'
@@ -9,6 +9,7 @@ import { ProjectList } from '#/features/programme/ProjectList'
 import { messagesFor } from '#/i18n'
 import { useI18n } from '#/i18n/context'
 import { pageTitle } from '#/lib/copy'
+import { pageCount } from '#/lib/list'
 import { validateProjectListSearch } from '#/features/programme/list'
 import {
   programmeQuery,
@@ -25,12 +26,22 @@ export const Route = createFileRoute('/programe/anghel-saligny/')({
     const programme = await context.queryClient.ensureQueryData(programmeQuery)
     // The kinds of works the address may name come with the programme.
     const categories = programme?.categories ?? []
-    await Promise.all([
+    const [list] = await Promise.all([
       context.queryClient.ensureQueryData(projectListQuery(deps, categories)),
       context.queryClient.ensureQueryData(
         projectOverviewQuery(deps, categories),
       ),
     ])
+    // A page past the end of the list goes to the last one that has rows.
+    if (list !== 'failed') {
+      const last = pageCount(list.total, deps.pe_pagina ?? 25)
+      if ((deps.pagina ?? 1) > last) {
+        throw redirect({
+          to: '/programe/anghel-saligny',
+          search: { ...deps, pagina: last > 1 ? last : undefined },
+        })
+      }
+    }
   },
   head: ({ match }) => ({
     meta: [
@@ -71,9 +82,13 @@ function ProgrammePage() {
             <ProjectList
               categories={programme.categories}
               search={search}
-              // Choosing keeps the reader at the list, not back at the top.
+              // Choosing keeps the reader at the list, not back at the top. The address
+              // is cleaned as a link's would be, so the router never rewrites it.
               onSearch={(next) =>
-                void navigate({ search: next, resetScroll: false })
+                void navigate({
+                  search: validateProjectListSearch(next),
+                  resetScroll: false,
+                })
               }
             />
             <ProgrammeMatch programme={programme} />

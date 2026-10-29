@@ -51,6 +51,8 @@ export const programme = {
       `plătit ${amount} în ${counted(n, text, 'o plată', 'plăți')}`,
     of: (whole: string) =>
       `din ${whole} ale programului, din fișierele de plăți ale ministerului`,
+    paidAllBuilders:
+      'Plătit înseamnă tot ce s-a plătit pentru aceste proiecte, și către alți constructori.',
     total: (n: number, text: string) =>
       `Plătit pentru filtrele alese · ${counted(n, text, 'un proiect', 'proiecte')}`,
     countiesTitle: 'Plătit pe județe',

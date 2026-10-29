@@ -86,7 +86,15 @@ export function ProjectList({
               : null}
           </>
         ),
-        detail: l.of(f.count(overview.whole)),
+        detail: (
+          <>
+            {l.of(f.count(overview.whole))}
+            {/* A builder's projects: what they were paid is the whole project's. */}
+            {search.firma !== undefined && found.projects > 0
+              ? ` ${l.paidAllBuilders}`
+              : null}
+          </>
+        ),
       }}
       views={
         found.projects > 0
