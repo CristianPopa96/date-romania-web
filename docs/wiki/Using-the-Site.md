@@ -116,6 +116,25 @@ top to bottom:
 When the filters leave nothing, the page names the filter that would give purchases
 back, and how many, with a button that removes it. Every choice is kept in the link.
 
+### The other lists of an institution or a company
+
+The tabs "Contracte", "Proiecte europene" and "Contracte PNRR" work the same way: a
+search, filters, a summary line, charts, sortable columns and the pager. What differs:
+
+- **Contracte**: filters by period (the day signed), value, the other party, CPV, "Fel"
+  (an ordinary or a subsequent contract) and "Fonduri UE". A company's list is either the
+  contracts it won alone or those it won in an association, never the two added: it
+  opens on what it won alone, and "Câștigat" switches. On an institution's page the
+  chart ranks the winners by what they won alone; the contracts won by associations are
+  a bar of their own, never given to one member.
+- **Proiecte europene**: filters by programme, status and value. Each programme's figures
+  are of its own list's day, so they are never added: the summary gives a value only
+  when one programme is chosen. The charts show the value per programme, side by side,
+  and the projects by status.
+- **Contracte PNRR**: filters by measure, status, value and physical progress. A
+  contract's status and progress are those all its measures agree on; one whose measures
+  differ is counted apart. The charts show the contracts by status and by progress.
+
 ### EU money of an institution or a company
 
 ![The EU projects tab of an institution](images/institution-eu.png)

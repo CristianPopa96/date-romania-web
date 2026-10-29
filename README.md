@@ -168,8 +168,12 @@ it. The list of direct purchases follows the list pattern of the design system
 `stare`, `tip`, `furnizor` or `institutie`, `cpv`), `ordine` (`valoare-desc`,
 `valoare-cresc`, `furnizor-cresc`…; an old `ordine=valoare` link opens the largest
 accepted purchases, as it did), `pe_pagina` and `vedere=tabel` are parsed in
-`src/features/purchases/list.ts`; the generic parts are `src/lib/list.ts` and
-`src/components/list/`. The institution and supplier pages share one route factory,
+`src/features/purchases/list.ts`. The other tabs follow the same pattern, each with its
+own `list.ts`: contracts (`fel`, `ue`, `castig` for how a company won them),
+EU projects (`program`, `stare` in words) and PNRR contracts (`masura`, `stare`,
+`progres_min`, `progres_max`). A name two lists share means the same in both, and
+`stare` keeps the value of the list that reads it. The generic parts are
+`src/lib/list.ts` and `src/components/list/`. The institution and supplier pages share one route factory,
 `src/features/entities/route.tsx`. `src/routeTree.gen.ts` (from the dev server or
 `pnpm generate-routes`) and `src/lib/api-schema.gen.ts` (from `pnpm generate-api-types`)
 are generated: never edit them by hand.

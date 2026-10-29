@@ -17,6 +17,15 @@ describe('validateEntitySearch', () => {
     })
   })
 
+  it('keeps a name two lists share for the list that reads it', () => {
+    // A number is a state of a direct purchase; a word, of an EU project or a PNRR
+    // contract. One list's undefined never erases another's value.
+    expect(validateEntitySearch({ stare: 7 }).stare).toBe(7)
+    expect(validateEntitySearch({ stare: 'finalizat' }).stare).toBe('finalizat')
+    expect(validateEntitySearch({ stare: 'sub-30' }).stare).toBe('sub-30')
+    expect(validateEntitySearch({ stare: 'nimic' }).stare).toBeUndefined()
+  })
+
   it('keeps a one-letter search, which only some lists send', () => {
     const search = validateEntitySearch({ lista: 'coeziune', q: 'a' })
     // The EU and PNRR lists leave it out of what they ask (their own list.test.ts).

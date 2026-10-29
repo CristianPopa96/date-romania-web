@@ -52,9 +52,6 @@ export function EntityView({
   const held = contractCount(contracts)
   const eu = euCounts(funds)
   const list = entityList(search, held > 0, euLists(funds))
-  const page = search.pagina ?? 1
-  const onPage = (next: number) =>
-    onSearch({ ...search, pagina: next > 1 ? next : undefined })
   const tab = (value: EntityList, label: string, count: number) => ({
     value,
     label: (
@@ -140,8 +137,8 @@ export function EntityView({
             <EntityPnrr
               cui={cui}
               pnrr={funds.pnrr}
-              page={page}
-              onPage={onPage}
+              search={search}
+              onSearch={onSearch}
             />
           ) : (
             <PurchaseList

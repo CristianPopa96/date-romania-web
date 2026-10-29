@@ -1915,7 +1915,11 @@ test('an institution lists the EU projects and PNRR contracts it is the benefici
   await expect(
     main.getByRole('heading', { name: 'Contracte de finanțare PNRR' }),
   ).toBeVisible()
-  await expect(main.getByText('6,5 mil. lei')).toBeVisible()
+  // Its contracts' value, in the figure and in the list's summary line.
+  await expect(main.getByText('6,5 mil. lei').first()).toBeVisible()
+  await expect(
+    main.getByText('2 contracte · valoare 6,5 mil. lei', { exact: true }),
+  ).toBeVisible()
   // The payments it received, on every measure, with their days; never shared out.
   await expect(main.getByText('2,3 mil. lei')).toBeVisible()
   await expect(main.getByText('3 plăți · 19.12.2025–02.10.2026')).toBeVisible()
@@ -1925,6 +1929,14 @@ test('an institution lists the EU projects and PNRR contracts it is the benefici
   await expect(
     school.getByRole('link', { name: /Renovarea energetică/ }),
   ).toHaveAttribute('href', '/programe/pnrr/contracte/701')
+
+  // A progress range from the address is a chip, and filters the list.
+  await page.goto('/institutii/4981310?lista=pnrr&progres_min=50')
+  await expect(main.getByText('Progres fizic: 50–100 %')).toBeVisible()
+  await expect(
+    main.getByText('un contract · valoare 300.000 lei', { exact: true }),
+  ).toBeVisible()
+  await page.goto('/institutii/4981310')
 
   await main.getByRole('tab', { name: /Proiecte europene/ }).click()
   await expect(page).toHaveURL(/\?lista=coeziune$/)
