@@ -1334,6 +1334,11 @@ export interface components {
              */
             total: number;
             /**
+             * Value
+             * @description Lei, every party's value added up. Won in association, a contract is in the value of each member, so it is counted once per member.
+             */
+            value: number;
+            /**
              * Items
              * @description `rank` is the place in the order asked for, counted from the first page.
              */
@@ -3678,6 +3683,11 @@ export interface components {
              * @description Every party ranked under the filters, beyond the page.
              */
             total: number;
+            /**
+             * Value
+             * @description Lei, every party's value added up.
+             */
+            value: number;
             /**
              * Items
              * @description `rank` is the place in the order asked for, counted from the first page.

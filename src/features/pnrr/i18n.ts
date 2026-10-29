@@ -144,6 +144,7 @@ export const pnrr = {
     `plățile către ${beneficiary} pe ${measure}; e singurul ei contract pe această măsură`,
   paymentsNone: (beneficiary: string, measure: string) =>
     `pentru ${beneficiary} pe ${measure}, în fișierul de plăți`,
+  paymentsFolded: (count: string, sum: string) => `${count} · ${sum}`,
   paymentsShared: (beneficiary: string, measure: string) =>
     `Plăți către ${beneficiary} pe ${measure}`,
   paymentsSharedDetail: (n: number, text: string, days: string) =>

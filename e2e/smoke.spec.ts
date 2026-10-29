@@ -765,6 +765,10 @@ test('winners are ranked by what they won alone or in associations', async ({
   await expect(rankRows(main).first()).toContainText('ALFA CONSTRUCT S.R.L.')
   await expect(rankRows(main).first()).toContainText('210.000 lei')
   await expect(main.getByRole('heading', { name: /Primii 10/ })).toBeVisible()
+  // The largest are tiles of a treemap; one opens its party's page.
+  await main.getByRole('button', { name: /^ALFA CONSTRUCT S\.R\.L\.:/ }).click()
+  await expect(page).toHaveURL(/\/furnizori\/17886786$/)
+  await page.goBack()
 
   await page.goto('/clasamente?clasament=furnizori&castigate=asociere')
   await expect(main.getByText('Câștigat: În asociere')).toBeVisible()
@@ -1814,6 +1818,11 @@ test('payments to a beneficiary with several contracts on a measure belong to no
   await page.goto(`${PNRR}/contracte/702`)
   const main = page.getByRole('main')
   await expect(main.getByText('Nu putem spune').first()).toBeVisible()
+  // The card of the shared payments is folded: its summary says what it holds.
+  const fold = main.locator('details.dr-fold')
+  await expect(fold).not.toHaveAttribute('open')
+  await fold.locator('summary').click()
+  await expect(fold).toHaveAttribute('open')
   await expect(
     main.getByText('pentru toate cele 2 contracte de mai jos', {
       exact: false,
