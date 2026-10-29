@@ -8,15 +8,13 @@ import type { RankingSearch } from '#/features/rankings/urls'
 // Radix Select keeps no item for "no value", so "toate" is an item of its own.
 const ALL = 'toate'
 
-// The filters above a ranking, in one wrapped row: CPV, then EU funds where the ranking
-// is of contracts. Both live in the address.
+// The filters above the largest contracts, in one wrapped row: CPV, then EU funds. Both
+// live in the address. The rankings declare theirs to the list's own bar.
 export function RankingFilters({
   search,
-  contracts,
   onSearch,
 }: {
   search: RankingSearch
-  contracts: boolean
   onSearch: (filters: Pick<RankingSearch, 'cpv' | 'ue'>) => void
 }) {
   const { t } = useI18n()
@@ -66,36 +64,34 @@ export function RankingFilters({
             ))}
           </Select.Content>
         </Select.Root>
-        {contracts ? (
-          <Select.Root
-            size="1"
-            value={eu}
-            onValueChange={(value) =>
-              onSearch({
-                cpv: search.cpv,
-                ue: value === 'da' || value === 'nu' ? value : undefined,
-              })
-            }
-          >
-            <Select.Trigger variant="soft" color="gray" aria-label={labels.eu}>
-              {labels.field(
-                labels.eu,
-                eu === 'da'
-                  ? labels.euYes
-                  : eu === 'nu'
-                    ? labels.euNo
-                    : labels.all,
-              )}
-            </Select.Trigger>
-            <Select.Content position="popper">
-              <Select.Item value={ALL}>{labels.all}</Select.Item>
-              <Select.Item value="da">{labels.euYes}</Select.Item>
-              <Select.Item value="nu">{labels.euNo}</Select.Item>
-            </Select.Content>
-          </Select.Root>
-        ) : null}
+        <Select.Root
+          size="1"
+          value={eu}
+          onValueChange={(value) =>
+            onSearch({
+              cpv: search.cpv,
+              ue: value === 'da' || value === 'nu' ? value : undefined,
+            })
+          }
+        >
+          <Select.Trigger variant="soft" color="gray" aria-label={labels.eu}>
+            {labels.field(
+              labels.eu,
+              eu === 'da'
+                ? labels.euYes
+                : eu === 'nu'
+                  ? labels.euNo
+                  : labels.all,
+            )}
+          </Select.Trigger>
+          <Select.Content position="popper">
+            <Select.Item value={ALL}>{labels.all}</Select.Item>
+            <Select.Item value="da">{labels.euYes}</Select.Item>
+            <Select.Item value="nu">{labels.euNo}</Select.Item>
+          </Select.Content>
+        </Select.Root>
       </Flex>
-      {contracts && search.ue ? (
+      {search.ue ? (
         <Text size="1" color="gray">
           {labels.euNote}
         </Text>

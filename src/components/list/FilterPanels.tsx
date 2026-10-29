@@ -187,9 +187,11 @@ function ChoicePanel({ filter, onDraft }: PanelProps<ChoiceFilter>) {
   const { t, f } = useI18n()
   const [draft, setDraft] = useState(filter.value)
   const [find, setFind] = useState('')
-  // An option that would leave nothing goes last, muted, never hidden.
+  // An option that would leave nothing goes last, muted, never hidden; one not counted
+  // stays where it is.
+  const empty = (count: number | undefined) => count === 0
   const options = [...filter.options]
-    .sort((a, b) => Number(b.count > 0) - Number(a.count > 0))
+    .sort((a, b) => Number(empty(a.count)) - Number(empty(b.count)))
     .filter((option) => !find || plain(option.label).includes(plain(find)))
   const toggle = (value: number) => {
     const chosen = draft.includes(value)
@@ -221,13 +223,15 @@ function ChoicePanel({ filter, onDraft }: PanelProps<ChoiceFilter>) {
                 checked={draft.includes(option.value)}
                 onCheckedChange={() => toggle(option.value)}
               />
-              <Text color={option.count ? undefined : 'gray'}>
+              <Text color={empty(option.count) ? 'gray' : undefined}>
                 {option.label}
               </Text>
             </Flex>
-            <Text size="1" color="gray">
-              {f.count(option.count)}
-            </Text>
+            {option.count === undefined ? null : (
+              <Text size="1" color="gray">
+                {f.count(option.count)}
+              </Text>
+            )}
           </Flex>
         </Text>
       ))}

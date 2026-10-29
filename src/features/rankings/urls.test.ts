@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { rankingQuery } from '#/features/rankings/queries'
 import { rankingFilter, validateRankingSearch } from '#/features/rankings/urls'
 
 describe('validateRankingSearch', () => {
@@ -49,5 +50,63 @@ describe('validateRankingSearch', () => {
       validateRankingSearch({ clasament: 'furnizori', castigate: 'singur' })
         .castigate,
     ).toBeUndefined()
+  })
+
+  it("keeps a ranking's words, order and page, and only on a ranking", () => {
+    expect(
+      validateRankingSearch({
+        clasament: 'institutii',
+        q: 'spital',
+        ordine: 'numar-desc',
+        pe_pagina: 50,
+        pagina: 2,
+      }),
+    ).toEqual({
+      clasament: 'institutii',
+      q: 'spital',
+      ordine: 'numar-desc',
+      pe_pagina: 50,
+      pagina: 2,
+    })
+    // The ranking's own order stays out of the address.
+    expect(
+      validateRankingSearch({ clasament: 'furnizori', ordine: 'valoare-desc' })
+        .ordine,
+    ).toBeUndefined()
+    expect(validateRankingSearch({ q: 'spital', pagina: 2 })).toEqual({})
+  })
+
+  it('keeps who bought and a period only for direct purchases', () => {
+    expect(
+      validateRankingSearch({
+        clasament: 'achizitii',
+        parte: 'institutii',
+        de_la: '2026-10-01',
+      }),
+    ).toEqual({
+      clasament: 'achizitii',
+      parte: 'institutii',
+      de_la: '2026-10-01',
+    })
+    expect(
+      validateRankingSearch({ clasament: 'furnizori', parte: 'institutii' }),
+    ).toEqual({ clasament: 'furnizori' })
+  })
+})
+
+describe('rankingQuery', () => {
+  it('asks for the ranking of the tab, its page and its order', () => {
+    expect(
+      rankingQuery({ clasament: 'achizitii', parte: 'institutii', pagina: 3 }),
+    ).toMatchObject({
+      kind: 'institutions',
+      sort: 'value',
+      order: 'desc',
+      size: 25,
+      page: 3,
+    })
+    expect(
+      rankingQuery({ clasament: 'furnizori', ordine: 'numar-cresc' }),
+    ).toMatchObject({ kind: 'contract-suppliers', sort: 'count', order: 'asc' })
   })
 })

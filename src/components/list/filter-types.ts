@@ -13,7 +13,8 @@ type Base = {
   clear: Patch
 }
 
-export type ChoiceOption = { value: number; label: string; count: number }
+// `count` is left out where the list cannot count each option (a ranking's CPV divisions).
+export type ChoiceOption = { value: number; label: string; count?: number }
 export type LookupOption = {
   value: string
   label: string
