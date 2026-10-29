@@ -45,6 +45,11 @@ describe('the address of a list of PNRR contracts', () => {
     })
   })
 
+  it('never sends a one-letter search, which other lists keep in the address', () => {
+    expect(pnrrFilter(4981310, { q: 'a' }).q).toBeUndefined()
+    expect(pnrrFilter(4981310, { q: 'ab' }).q).toBe('ab')
+  })
+
   it('knows the band of a progress range, or none', () => {
     expect(progressBand({ progres_min: 50, progres_max: 75 })).toBe(2)
     expect(progressBand({ progres_min: 100 })).toBe(4)

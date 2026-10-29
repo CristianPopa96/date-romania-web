@@ -2,6 +2,7 @@ import {
   contractApiSort,
   contractFilter,
   validateContractListSearch,
+  wonOf,
 } from '#/features/contracts/list'
 import type { ContractFilter } from '#/features/contracts/list'
 import type { RankingFilter } from '#/features/rankings'
@@ -44,21 +45,26 @@ export function contractsCsvQuery(
       order: 'desc',
     }
   }
-  // A company's file is one way of winning, as its list is; a buyer's holds both.
-  const won =
-    supplier === undefined || buyer !== undefined
-      ? undefined
-      : search.castig === 'asociere'
-        ? ('association' as const)
-        : ('alone' as const)
-  const filter =
-    buyer !== undefined
-      ? contractFilter('institutions', buyer, search)
-      : contractFilter('suppliers', supplier as number, search, won)
+  // A company's file is one way of winning, as its list is: its link always says how
+  // (`castig`), even with an institution chosen as a filter. A buyer's holds both.
+  if (supplier !== undefined && (buyer === undefined || search.castig)) {
+    return {
+      ...contractFilter('suppliers', supplier, search, wonOf(search, 1)),
+      ...contractApiSort(search),
+    }
+  }
   return {
-    ...filter,
     // A buyer's file filtered by one winner, from its list.
-    supplier: supplier ?? filter.supplier,
+    ...contractFilter('institutions', buyer as number, search),
+    supplier,
     ...contractApiSort(search),
   }
+}
+
+// The file's name: the company's, for a company's list; else the institution's.
+export function contractsCsvName(params: URLSearchParams): string {
+  const cui = params.has('castig')
+    ? params.get('furnizor')
+    : (params.get('institutie') ?? params.get('furnizor'))
+  return cui ? `contracte-${cui}` : 'contracte'
 }

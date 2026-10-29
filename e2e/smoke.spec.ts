@@ -541,10 +541,14 @@ test('a supplier page never adds what was won alone to what was won together', a
     main.getByText('un contract câștigat în asociere · 6,1 mil. lei fără TVA'),
   ).toBeVisible()
   await expect(
-    main.getByText(/valoarea întreagă a fiecărui contract/),
+    main.getByText(/valoarea întreagă a fiecărui contract/).first(),
   ).toBeVisible()
   const together = main.getByRole('row').filter({ hasText: 'Contract 101' })
   await expect(together).toContainText('Asociere · 2 membri')
+  // The total row says it too, as the charts do.
+  await expect(
+    main.getByRole('row').filter({ hasText: 'Total pentru filtrele alese' }),
+  ).toContainText('neîmpărțită între membri')
   await expect(main).not.toContainText('lider')
   await expect(main.getByRole('link', { name: /Exportă CSV/ })).toHaveAttribute(
     'href',

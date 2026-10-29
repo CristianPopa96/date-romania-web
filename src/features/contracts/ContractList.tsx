@@ -57,7 +57,14 @@ export function ContractList<TSearch extends Search>({
   const { data: overview } = useSuspenseQuery(
     contractOverviewQuery(role, cui, search, won),
   )
-  if (!overview) return null
+  // Not answered, or not found: the tab says so, the page stays.
+  if (list === 'failed' || overview === 'failed' || !overview) {
+    return (
+      <Text size="2" color="gray">
+        {t.list.failed}
+      </Text>
+    )
+  }
 
   // A change of filter or order goes back to the first page.
   const apply = (patch: Patch) =>
@@ -134,6 +141,7 @@ export function ContractList<TSearch extends Search>({
       charts={
         <ContractCharts
           role={role}
+          won={won}
           search={search}
           overview={overview}
           onApply={apply}
@@ -149,7 +157,10 @@ export function ContractList<TSearch extends Search>({
           total={
             counted > 0
               ? {
-                  label: t.contractList.total(counted, f.count(counted)),
+                  label:
+                    won === 'association'
+                      ? t.contractList.totalWhole(counted, f.count(counted))
+                      : t.contractList.total(counted, f.count(counted)),
                   value: t.contractList.value(f.lei(found.value)),
                 }
               : null

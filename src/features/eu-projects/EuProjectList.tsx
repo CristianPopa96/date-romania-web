@@ -81,6 +81,7 @@ export function EuProjectList<TSearch extends Search>({
   return (
     <ListView
       title={t.eu.list.title}
+      titleAs="h3"
       search={{
         q,
         what: t.eu.list.searchWhat,

@@ -38,6 +38,11 @@ describe('the address of a list of EU projects', () => {
     expect(programmeCodes(HELD, 'por-2014')).toBeUndefined()
   })
 
+  it('never sends a one-letter search, which other lists keep in the address', () => {
+    expect(euProjectFilter(4491342, { q: 'a' }, undefined).q).toBeUndefined()
+    expect(euProjectFilter(4491342, { q: 'ab' }, undefined).q).toBe('ab')
+  })
+
   it('asks the API for the beneficiary, programmes and statuses', () => {
     expect(
       euProjectFilter(4491342, { stare: 'reziliat', valoare_min: 5 }, ['PEO']),

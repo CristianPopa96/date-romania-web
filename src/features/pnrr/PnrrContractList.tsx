@@ -66,6 +66,7 @@ export function PnrrContractList<TSearch extends Search>({
   return (
     <ListView
       title={l.title}
+      titleAs="h3"
       search={{
         q,
         what: l.searchWhat,
