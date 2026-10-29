@@ -10,21 +10,14 @@ import {
   getEuBeneficiary,
   getEuFunds,
   getEuProject,
-  getEuProjects,
   getEuSeap,
 } from '#/features/eu-projects/api'
-import type { EuProjectFilter, EuSeapOf } from '#/features/eu-projects/api'
+import type { EuSeapOf } from '#/features/eu-projects/api'
 
 export const euFundsQuery = queryOptions({
   queryKey: ['eu-funds'],
   queryFn: () => getEuFunds(),
 })
-
-export const euProjectsQuery = (filter: EuProjectFilter) =>
-  queryOptions({
-    queryKey: ['eu-funds', 'projects', filter],
-    queryFn: () => getEuProjects({ data: filter }),
-  })
 
 export const euProjectQuery = (smis: number) =>
   queryOptions({
@@ -40,11 +33,11 @@ export const euBeneficiaryQuery = (cui: number) =>
 
 // The EU lists of an entity page: 'failed' when the API did not answer, so the
 // institution or company stays on screen with a note instead of an error page.
-// A page of a beneficiary's projects under the filters, the order and the page size of
-// its address, and what the list says about itself. `codes` are the programmes the
-// address names (programmeCodes).
+// A page of a beneficiary's projects (or of every one's, with no CUI) under the filters,
+// the order and the page size of its address, and what the list says about itself. `codes`
+// are the programmes the address names (programmeCodes).
 export const euProjectListQuery = (
-  cui: number,
+  cui: number | undefined,
   search: EuProjectListSearch & { pagina?: number },
   codes: Array<string> | undefined,
 ) => {
@@ -61,7 +54,7 @@ export const euProjectListQuery = (
 }
 
 export const euProjectOverviewQuery = (
-  cui: number,
+  cui: number | undefined,
   search: EuProjectListSearch,
   codes: Array<string> | undefined,
 ) => {

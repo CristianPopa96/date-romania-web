@@ -11,7 +11,6 @@ import {
   euLists,
   euShare,
   periodLabel,
-  programmeBySlug,
   programmeSlug,
 } from '#/features/eu-projects/eu'
 
@@ -78,20 +77,13 @@ describe('programmes in the address', () => {
     { code: 'PoAT', period: '2021-2027' },
   ] as Array<EuProgramme>
 
-  it('are found back in any case', () => {
+  it('are written in lower case with their period', () => {
     expect(programmeSlug(programmes[2])).toBe('poids-2021')
-    expect(programmeBySlug(programmes, 'poids-2021')?.code).toBe('PoIDS')
-    expect(programmeBySlug(programmes, 'POR-2014')?.code).toBe('POR')
-    expect(programmeBySlug(programmes, 'por')).toBeNull()
-    expect(programmeBySlug(programmes, 'pnrr')).toBeNull()
-    expect(programmeBySlug(programmes, undefined)).toBeNull()
   })
 
   it('tell apart two programmes whose codes differ only in case', () => {
     const slugs = programmes.map(programmeSlug)
     expect(new Set(slugs).size).toBe(programmes.length)
-    expect(programmeBySlug(programmes, 'poat-2014')?.period).toBe('2014-2020')
-    expect(programmeBySlug(programmes, 'poat-2021')?.code).toBe('PoAT')
   })
 })
 

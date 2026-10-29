@@ -1,6 +1,7 @@
-// The EU cohesion projects of one beneficiary as a list of the DataTable pattern: what its
-// address holds, and what it asks the API for:
-// /institutii/4491342?lista=coeziune&program=peo-2021&stare=in-implementare.
+// The EU cohesion projects as a list of the DataTable pattern, of one beneficiary or of
+// every one: what its address holds, and what it asks the API for:
+// /institutii/4491342?lista=coeziune&program=peo-2021&stare=in-implementare, or
+// /programe/fonduri-europene?program=por-2014,peo-2021&q=drum.
 
 import { EU_STATUSES } from '#/features/eu-projects/api'
 import type { EuStatus } from '#/features/eu-projects/api'
@@ -114,7 +115,8 @@ export function programmeCodes(
 }
 
 export type EuProjectListFilter = {
-  beneficiary: number
+  // Undefined on the list of every beneficiary.
+  beneficiary?: number
   programme?: Array<string>
   status?: Array<EuStatus>
   q?: string
@@ -123,7 +125,7 @@ export type EuProjectListFilter = {
 }
 
 export function euProjectFilter(
-  cui: number,
+  cui: number | undefined,
   search: EuProjectListSearch,
   codes: Array<string> | undefined,
 ): EuProjectListFilter {

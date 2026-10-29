@@ -29,27 +29,6 @@ export const getEuFunds = createServerFn({ method: 'GET' }).handler(() =>
   getJson<EuFunds>(ROOT),
 )
 
-export type EuProjectFilter = {
-  // A programme code as the API gives it ('POR', 'PoIDS').
-  programme?: string
-  status?: EuStatus
-  q?: string
-  page: number
-}
-
-export const getEuProjects = createServerFn({ method: 'GET' })
-  .inputValidator((data: EuProjectFilter) => data)
-  .handler(async ({ data }): Promise<EuProjectPage> => {
-    const found = await getJson<EuProjectPage>(`${ROOT}/projects`, {
-      programme: data.programme,
-      status: data.status,
-      q: data.q,
-      limit: PAGE_SIZE,
-      offset: (data.page - 1) * PAGE_SIZE,
-    })
-    return found ?? { total: 0, items: [] }
-  })
-
 // Null for a SMIS code not held.
 export const getEuProject = createServerFn({ method: 'GET' })
   .inputValidator((smis: number) => smis)

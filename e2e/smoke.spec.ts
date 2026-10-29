@@ -1668,7 +1668,12 @@ test('the largest PNRR recipients open the page of their kind', async ({
   ).toHaveAttribute('href', '/institutii/4981310')
 })
 
-test('a measure lists its contracts and filters them by status', async ({
+// The rows of a list of PNRR contracts (their numbers), not those of its charts' tables.
+function pnrrRows(main: Locator) {
+  return main.getByRole('row').filter({ hasText: /12\d{3}/ })
+}
+
+test('a measure lists its contracts and filters them by status and county', async ({
   page,
 }) => {
   await page.goto(`${PNRR}/c10.i3`)
@@ -1678,17 +1683,41 @@ test('a measure lists its contracts and filters them by status', async ({
       name: 'Investiția 3. Renovarea energetică a clădirilor publice',
     }),
   ).toBeVisible()
-  const contracts = main.getByRole('table')
-  await expect(contracts.getByRole('row')).toHaveCount(4)
+  await expect(main.getByText(/^3 contracte · valoare /)).toBeVisible()
+  await expect(pnrrRows(main)).toHaveCount(3)
+  // Each row names its beneficiary, the entity held for its CUI.
+  await expect(
+    pnrrRows(main)
+      .filter({ hasText: '12321' })
+      .getByRole('link', { name: 'Comuna Țânțăreni' }),
+  ).toHaveAttribute('href', '/institutii/4981310')
+
   await page.goto(`${PNRR}/c10.i3?stare=finalizat`)
+  await expect(pnrrRows(main)).toHaveCount(1)
   await expect(
-    page.getByRole('main').getByRole('table').getByRole('row'),
-  ).toHaveCount(2)
-  await expect(
-    page
-      .getByRole('main')
-      .getByRole('link', { name: 'Renovare energetică ambulatoriu' }),
+    main.getByRole('link', { name: 'Renovare energetică ambulatoriu' }),
   ).toBeVisible()
+
+  await page.goto(`${PNRR}/c10.i3?judet=gorj`)
+  await expect(main.getByText('Județ: GORJ')).toBeVisible()
+  await expect(pnrrRows(main)).toHaveCount(1)
+})
+
+test("a measure's largest beneficiaries are a chart, and a bar filters the list", async ({
+  page,
+}) => {
+  await page.goto(`${PNRR}/c10.i3`)
+  const main = page.getByRole('main')
+  await expect(
+    main.getByRole('heading', { name: /Cei mai mari beneficiari/ }),
+  ).toBeVisible()
+  await main
+    .getByRole('button', { name: /Comuna Țânțăreni/ })
+    .first()
+    .click()
+  await expect(page).toHaveURL(/\?beneficiar=4981310$/)
+  await expect(main.getByText('Beneficiar: Comuna Țânțăreni')).toBeVisible()
+  await expect(pnrrRows(main)).toHaveCount(1)
 })
 
 test('a county the measure has no contract in is dropped from the address', async ({
@@ -1709,6 +1738,13 @@ test('a measure never names a natural person, and says how many it leaves out', 
     ),
   ).toBeVisible()
   await expect(main.getByText('NUME FICTIV')).toHaveCount(0)
+  // The list counts it too, never naming it.
+  await expect(
+    main.getByText(
+      'plus un contract al unei persoane fizice, pe care nu le afișăm nominal',
+      { exact: false },
+    ),
+  ).toBeVisible()
   await expect(
     main.getByRole('link', { name: 'Împădurire teren comunal' }),
   ).toBeVisible()
@@ -1806,9 +1842,11 @@ test('the EU funds page lists each programme from its own list, never added up',
   await expect(pocu.getByText('Nepublicat')).toBeVisible()
   await expect(pocu.getByText('31.08.2025')).toBeVisible()
   await expect(
-    main.getByText('sumele nu se adună între programe', { exact: false }),
+    main.getByText('din 5 în listele pe care le avem; sumele nu se adună', {
+      exact: false,
+    }),
   ).toBeVisible()
-  await expect(main.getByText('5 proiecte')).toBeVisible()
+  await expect(main.getByText('5 proiecte', { exact: true })).toBeVisible()
 })
 
 test('the EU projects are filtered by programme in the address', async ({
@@ -1816,7 +1854,11 @@ test('the EU projects are filtered by programme in the address', async ({
 }) => {
   await page.goto(`${EU}?program=por-2014`)
   const main = page.getByRole('main')
-  await expect(main.getByText('Un proiect')).toBeVisible()
+  await expect(main.getByText('Program: POR 2014-2020')).toBeVisible()
+  // One programme chosen: its value, at its own list's day.
+  await expect(
+    main.getByText(/^un proiect · valoare .* până la 31\.08\.2025$/),
+  ).toBeVisible()
   const row = main.getByRole('row', { name: /Modernizarea drumului comunal/ })
   await expect(row.getByText('Nume și localitate')).toBeVisible()
   await row
@@ -1825,6 +1867,26 @@ test('the EU projects are filtered by programme in the address', async ({
   await expect(page).toHaveURL(
     /\/programe\/fonduri-europene\/proiecte\/118001$/,
   )
+})
+
+test('a SMIS code typed in the search finds its project', async ({ page }) => {
+  await page.goto(`${EU}?q=118001`)
+  const main = page.getByRole('main')
+  await expect(
+    main.getByText('un proiect', { exact: true }).first(),
+  ).toBeVisible()
+  await expect(
+    main.getByRole('link', { name: 'Modernizarea drumului comunal DC 12' }),
+  ).toBeVisible()
+})
+
+test('a page of a programme list past the end goes to the last one', async ({
+  page,
+}) => {
+  await page.goto(`${EU}?pagina=9`)
+  await expect(page).toHaveURL(/\/programe\/fonduri-europene$/)
+  await page.goto(`${PNRR}/c10.i3?pagina=9`)
+  await expect(page).toHaveURL(/\/programe\/pnrr\/c10\.i3$/)
 })
 
 test('a cohesion project says what was paid up to its list, with no payment day', async ({

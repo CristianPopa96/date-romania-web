@@ -5,7 +5,7 @@ import type { EuProjectListFilter } from '#/features/eu-projects/list'
 import { getJson } from '#/lib/api'
 import type { Schemas } from '#/lib/api'
 
-// The EU projects of one beneficiary as a list with filters: a page of it, and what it
+// The EU projects, of one beneficiary or of all, as a list with filters: a page of it, and what it
 // says about itself under the filters. See api.ts for how the site reaches the API.
 
 const ROOT = '/v1/programmes/eu-funds/projects'
@@ -38,6 +38,7 @@ export const getEuProjectOverview = createServerFn({ method: 'GET' })
   .handler(({ data }) =>
     getJson<EuProjectOverview>(`${ROOT}/overview`, {
       ...data,
-      scope: 'beneficiary',
+      // A beneficiary's list counts all of its projects as the whole.
+      scope: data.beneficiary === undefined ? undefined : 'beneficiary',
     }),
   )

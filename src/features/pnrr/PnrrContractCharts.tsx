@@ -3,6 +3,7 @@ import { Flex } from '@radix-ui/themes'
 import { ChartCard } from '#/components/list/ChartCard'
 import type { Patch } from '#/components/list/filter-types'
 import { RankBars } from '#/components/list/RankBars'
+import type { RankRow } from '#/components/list/RankBars'
 import { StatusBars } from '#/components/list/StatusBars'
 import type { Part } from '#/components/list/StatusBars'
 import type { PnrrContractOverview } from '#/features/pnrr/api-list'
@@ -15,16 +16,19 @@ import {
 import type { PnrrListSearch } from '#/features/pnrr/list'
 import { useI18n } from '#/i18n/context'
 
-// The two charts of a beneficiary's PNRR contracts: the contracts by status, those whose
-// measures differ as a part of their own; and by physical progress. A part or a band
-// clicked becomes a filter.
+// The charts of a list of PNRR contracts: the contracts by status, those whose measures
+// differ as a part of their own; by physical progress; and, on a measure's list, the
+// largest beneficiaries by value. A part, a band or a beneficiary held as an entity clicked
+// becomes a filter.
 export function PnrrContractCharts({
   search,
   overview,
+  beneficiaries,
   onApply,
 }: {
   search: PnrrListSearch
   overview: PnrrContractOverview
+  beneficiaries: boolean
   onApply: (patch: Patch) => void
 }) {
   const { t, f } = useI18n()
@@ -65,6 +69,31 @@ export function PnrrContractCharts({
     on: band === index,
     pick: () => onApply(progressPatch(band === index ? undefined : index)),
   }))
+  const largest: Array<RankRow> = [
+    ...overview.beneficiaries.map((bar, index) => {
+      const cui = bar.entity?.cui
+      const on = cui !== undefined && cui === search.beneficiar
+      return {
+        key: String(cui ?? `name-${index}`),
+        label: bar.entity?.name ?? bar.name ?? t.common.notPublished,
+        value: bar.value,
+        on,
+        pick:
+          cui === undefined
+            ? undefined
+            : () => onApply({ beneficiar: on ? undefined : cui }),
+      }
+    }),
+    ...(overview.others.parties > 0
+      ? [
+          {
+            key: 'others',
+            label: t.list.chart.others(f.count(overview.others.parties)),
+            value: overview.others.value,
+          },
+        ]
+      : []),
+  ]
 
   return (
     <Flex gap="3" wrap="wrap" align="stretch">
@@ -84,6 +113,16 @@ export function PnrrContractCharts({
       >
         <RankBars rows={bands} format={f.count} />
       </ChartCard>
+      {beneficiaries && largest.length ? (
+        <ChartCard
+          title={t.pnrr.list.beneficiariesTitle}
+          unit={t.pnrr.list.beneficiariesUnit}
+          hint={t.list.chart.clickHint}
+          rows={largest.map((row) => [row.label, f.lei(row.value)])}
+        >
+          <RankBars rows={largest} format={f.leiShort} />
+        </ChartCard>
+      ) : null}
     </Flex>
   )
 }

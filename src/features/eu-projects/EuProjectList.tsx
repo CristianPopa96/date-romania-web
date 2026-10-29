@@ -34,16 +34,17 @@ import type { Sort } from '#/lib/list'
 
 type Search = EuProjectListSearch & { pagina?: number }
 
-// The EU cohesion projects of one beneficiary, declared to the list pattern (ListView): its
-// filters, its summary line, two charts and its columns. Programmes are never added: the
-// summary gives a value only when one programme is chosen, with that list's day.
+// The EU cohesion projects of one beneficiary, or with no CUI of every one (the funds
+// page), declared to the list pattern (ListView): its filters, its summary line, two charts
+// and its columns. Programmes are never added: the summary gives a value only when one
+// programme is chosen, with that list's day.
 export function EuProjectList<TSearch extends Search>({
   cui,
   programmes,
   search,
   onSearch,
 }: {
-  cui: number
+  cui?: number
   programmes: ReadonlyArray<HeldProgramme>
   search: TSearch
   onSearch: (search: TSearch) => void
@@ -59,7 +60,8 @@ export function EuProjectList<TSearch extends Search>({
   if (list === 'failed' || overview === 'failed' || !overview) {
     return (
       <Text size="2" color="gray">
-        {t.eu.held.failed}
+        {/* A beneficiary's list, or every project held. */}
+        {cui === undefined ? t.list.failed : t.eu.held.failed}
       </Text>
     )
   }
@@ -81,14 +83,15 @@ export function EuProjectList<TSearch extends Search>({
   return (
     <ListView
       title={t.eu.list.title}
-      titleAs="h3"
+      // Under the entity tabs' own heading, one level below it.
+      titleAs={cui === undefined ? 'h2' : 'h3'}
       search={{
         q,
         what: t.eu.list.searchWhat,
         filters: euProjectFilterDecls({ search, overview, programmes, t, f }),
         onApply: apply,
       }}
-      summary={summaryLine(overview, single, t, f)}
+      summary={summaryLine(overview, single, cui === undefined, t, f)}
       views={
         overview.summary.projects > 0
           ? {
@@ -119,6 +122,7 @@ export function EuProjectList<TSearch extends Search>({
       rows={
         <EuProjectRows
           items={list.items}
+          withBeneficiary={cui === undefined}
           q={q}
           sort={sort}
           onSort={onSort}
@@ -168,10 +172,11 @@ export function EuProjectList<TSearch extends Search>({
 }
 
 // "3 proiecte", with one programme chosen "· valoare 6,2 mil. lei · plătit 6,1 mil. lei
-// până la 31.08.2025"; under it which part of the beneficiary's projects that is.
+// până la 31.08.2025"; under it which part of the beneficiary's (or every) project it is.
 function summaryLine(
   overview: EuProjectOverview,
   single: EuProjectOverview['programmes'][number] | undefined,
+  everyone: boolean,
   t: Messages,
   f: Format,
 ) {
@@ -193,7 +198,7 @@ function summaryLine(
     ),
     detail: (
       <>
-        {t.eu.list.of(f.count(overview.whole))}
+        {(everyone ? t.eu.list.ofAll : t.eu.list.of)(f.count(overview.whole))}
         {overview.other_statuses > 0
           ? ` · ${t.eu.list.otherStatuses(
               overview.other_statuses,

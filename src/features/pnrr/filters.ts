@@ -1,7 +1,8 @@
-// The filters a beneficiary's list of PNRR contracts declares to its FilterBar: Măsură,
-// Stare, Valoare, Progres fizic. A choice panel takes numbers, so a measure or a status is
-// offered by its place in the overview's options, and written back to the address as its
-// code or word; progress is one band at a time.
+// The filters a list of PNRR contracts declares to its FilterBar: a beneficiary's takes
+// Măsură, a measure's Județ and Beneficiar; both Stare, Valoare, Progres fizic. A choice
+// panel takes numbers, so a measure, a county, a beneficiary or a status is offered by its
+// place in the overview's options, and written back to the address as its code, word or
+// CUI; a county, a beneficiary and progress are one at a time.
 
 import type { FilterDecl } from '#/components/list/filter-types'
 import { PNRR_STATUSES } from '#/features/pnrr/api'
@@ -12,8 +13,8 @@ import {
   pnrrStatusesToParam,
   progressBand,
 } from '#/features/pnrr/list'
-import type { PnrrListSearch } from '#/features/pnrr/list'
-import { measureSlug } from '#/features/pnrr/pnrr'
+import type { PnrrListOf, PnrrListSearch } from '#/features/pnrr/list'
+import { countySlug, measureSlug } from '#/features/pnrr/pnrr'
 import type { Messages } from '#/i18n'
 import type { Format } from '#/lib/format'
 import { rangeChip } from '#/lib/list-chips'
@@ -22,24 +23,19 @@ const SMALL = 1_000_000
 const LARGE = 25_000_000
 
 export function pnrrFilterDecls({
+  of,
   search,
   overview,
   t,
   f,
 }: {
+  of: PnrrListOf
   search: PnrrListSearch
   overview: PnrrContractOverview
   t: Messages
   f: Format
 }): Array<FilterDecl> {
   const labels = t.pnrr.list.filters
-  const measures = overview.measures
-  const chosenCodes = search.masura?.split(',') ?? []
-  const chosenMeasures = measures
-    .map((option, index) =>
-      chosenCodes.includes(measureSlug(option.value)) ? index : -1,
-    )
-    .filter((index) => index >= 0)
   const statuses = pnrrStatusesFromParam(search.stare) ?? []
   const band = progressBand(search)
   const chosen = (names: Array<string>) =>
@@ -48,26 +44,12 @@ export function pnrrFilterDecls({
       : names.join(', ')
 
   return [
-    {
-      key: 'masura',
-      kind: 'choice',
-      label: labels.masura,
-      value: chosenMeasures,
-      options: measures.map((option, index) => ({
-        value: index,
-        label: option.value,
-        count: option.count,
-      })),
-      chip: chosenMeasures.length
-        ? chosen(chosenMeasures.map((index) => measures[index].value))
-        : null,
-      clear: { masura: undefined },
-      patch: (next) => ({
-        masura: next.length
-          ? next.map((index) => measureSlug(measures[index].value)).join(',')
-          : undefined,
-      }),
-    },
+    ...('beneficiary' in of
+      ? [measureDecl(search, overview, t, chosen)]
+      : [
+          countyDecl(search, overview, t),
+          beneficiaryDecl(search, overview, t),
+        ]),
     {
       key: 'stare',
       kind: 'choice',
@@ -131,6 +113,105 @@ export function pnrrFilterDecls({
       patch: (next) => progressPatch(next[0]),
     },
   ]
+}
+
+function measureDecl(
+  search: PnrrListSearch,
+  overview: PnrrContractOverview,
+  t: Messages,
+  chosen: (names: Array<string>) => string,
+): FilterDecl {
+  const measures = overview.measures
+  const codes = search.masura?.split(',') ?? []
+  const picked = measures
+    .map((option, index) =>
+      codes.includes(measureSlug(option.value)) ? index : -1,
+    )
+    .filter((index) => index >= 0)
+  return {
+    key: 'masura',
+    kind: 'choice',
+    label: t.pnrr.list.filters.masura,
+    value: picked,
+    options: measures.map((option, index) => ({
+      value: index,
+      label: option.value,
+      count: option.count,
+    })),
+    chip: picked.length
+      ? chosen(picked.map((index) => measures[index].value))
+      : null,
+    clear: { masura: undefined },
+    patch: (next) => ({
+      masura: next.length
+        ? next.map((index) => measureSlug(measures[index].value)).join(',')
+        : undefined,
+    }),
+  }
+}
+
+// The API takes one county: the dashboard's spelling, written without marks in the address.
+function countyDecl(
+  search: PnrrListSearch,
+  overview: PnrrContractOverview,
+  t: Messages,
+): FilterDecl {
+  const counties = overview.counties
+  const picked = counties.findIndex(
+    (option) => countySlug(option.value) === search.judet,
+  )
+  return {
+    key: 'judet',
+    kind: 'choice',
+    single: true,
+    label: t.pnrr.list.filters.judet,
+    value: picked >= 0 ? [picked] : [],
+    options: counties.map((option, index) => ({
+      value: index,
+      label: option.value,
+      count: option.count,
+    })),
+    chip: picked >= 0 ? counties[picked].value : null,
+    clear: { judet: undefined },
+    patch: (next) => ({
+      judet: next.length ? countySlug(counties[next[0]].value) : undefined,
+    }),
+  }
+}
+
+// The largest beneficiaries held as entities are the options; one from an address that is
+// not among them is still shown by its CUI, so it can be cleared.
+function beneficiaryDecl(
+  search: PnrrListSearch,
+  overview: PnrrContractOverview,
+  t: Messages,
+): FilterDecl {
+  const held = overview.beneficiaries.flatMap((bar) =>
+    bar.entity ? [{ ...bar, entity: bar.entity }] : [],
+  )
+  const picked = held.findIndex((bar) => bar.entity.cui === search.beneficiar)
+  return {
+    key: 'beneficiar',
+    kind: 'choice',
+    single: true,
+    label: t.pnrr.list.filters.beneficiar,
+    value: picked >= 0 ? [picked] : [],
+    options: held.map((bar, index) => ({
+      value: index,
+      label: bar.entity.name,
+      count: bar.contracts,
+    })),
+    chip:
+      picked >= 0
+        ? held[picked].entity.name
+        : search.beneficiar !== undefined
+          ? `CUI ${search.beneficiar}`
+          : null,
+    clear: { beneficiar: undefined },
+    patch: (next) => ({
+      beneficiar: next.length ? held[next[0]].entity.cui : undefined,
+    }),
+  }
 }
 
 // The address of one progress band, or of none.

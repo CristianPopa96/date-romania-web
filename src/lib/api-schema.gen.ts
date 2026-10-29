@@ -708,7 +708,8 @@ export interface paths {
         /**
          * Pnrr Contracts Overview
          * @description The contracts under the filters given, in figures: how many and their value, the
-         *     measures and statuses with their counts, and the contracts by value and progress.
+         *     measures, counties and statuses with their counts, the contracts by value and progress,
+         *     and the largest beneficiaries.
          */
         get: operations["pnrr_contracts_overview_v1_programmes_pnrr_contracts_overview_get"];
         put?: never;
@@ -1387,6 +1388,16 @@ export interface components {
             capital_year: number | null;
             /** Uats */
             uats: components["schemas"]["CountyUat"][];
+        };
+        /** CountyOption */
+        CountyOption: {
+            /**
+             * Value
+             * @description The county as the dashboard writes it.
+             */
+            value: string;
+            /** Count */
+            count: number;
         };
         /** CountyRow */
         CountyRow: {
@@ -2337,6 +2348,27 @@ export interface components {
             /** Items */
             items: components["schemas"]["PlaceHit"][];
         };
+        /**
+         * PnrrBeneficiaryBar
+         * @description One of the beneficiaries with the largest value under the filters: never a natural
+         *     person.
+         */
+        PnrrBeneficiaryBar: {
+            /**
+             * Name
+             * @description As the dashboard writes it.
+             */
+            name: string | null;
+            /** @description The entity of its CUI, where it is held. */
+            entity: components["schemas"]["EntityRef"] | null;
+            /** Contracts */
+            contracts: number;
+            /**
+             * Value
+             * @description Lei, every measure of each contract added up.
+             */
+            value: number;
+        };
         /** PnrrContract */
         PnrrContract: {
             /** Id */
@@ -2403,7 +2435,7 @@ export interface components {
             summary: components["schemas"]["PnrrContractSummary"];
             /**
              * Whole
-             * @description Contracts of the same beneficiary, with no other filter.
+             * @description Contracts of the list's own beneficiary or measure (`scope`), with no other filter; with no scope, every contract listed.
              */
             whole: number;
             /**
@@ -2411,6 +2443,11 @@ export interface components {
              * @description Under every filter but the measure.
              */
             measures: components["schemas"]["MeasureOption"][];
+            /**
+             * Counties
+             * @description Under every filter but the county.
+             */
+            counties: components["schemas"]["CountyOption"][];
             /** Statuses */
             statuses: components["schemas"]["PnrrStatusOption"][];
             /**
@@ -2428,6 +2465,13 @@ export interface components {
              * @description Contracts by physical progress, 0 to 1, where their measures agree on it; the last band is 1, finished.
              */
             progress: components["schemas"]["Band"][];
+            /**
+             * Beneficiaries
+             * @description The beneficiaries with the largest value under every filter but the beneficiary, told apart by CUI or by name.
+             */
+            beneficiaries: components["schemas"]["PnrrBeneficiaryBar"][];
+            /** @description The beneficiaries after those, and their value. */
+            others: components["schemas"]["Others"];
             /**
              * Without
              * @description Only when no contract is found: what each filter given would leave out if it alone were removed, in the order of the parameters.
@@ -2461,6 +2505,11 @@ export interface components {
             /** Title */
             title: string | null;
             beneficiary: components["schemas"]["EntityRef"] | null;
+            /**
+             * Beneficiary Name
+             * @description As the dashboard writes it.
+             */
+            beneficiary_name: string | null;
             /** County */
             county: string | null;
             /**
@@ -5056,8 +5105,8 @@ export interface operations {
     pnrr_contracts_overview_v1_programmes_pnrr_contracts_overview_get: {
         parameters: {
             query?: {
-                /** @description The beneficiary whose list this is: `whole` counts all of its. */
-                scope?: "beneficiary" | null;
+                /** @description The beneficiary or the measure whose list this is: `whole` counts all of its. */
+                scope?: ("beneficiary" | "measure") | null;
                 /** @description Measure codes, e.g. 'C10.I3'; any of them. */
                 measure?: string[] | null;
                 /** @description As the dashboard writes it. */

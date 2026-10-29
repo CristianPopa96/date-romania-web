@@ -47,15 +47,9 @@ export const pnrr = {
   naturalPersons: (n: number, text: string) =>
     `Include ${counted(n, text, 'un contract al unei persoane fizice', 'contracte ale unor persoane fizice')}, pe care nu le afișăm nominal.`,
   findTitle: 'Contractele de finanțare',
-  allCounties: 'Toate județele',
-  allStatuses: 'Orice stare',
-  county: 'Județ',
-  searchLabel: 'Caută după titlu sau beneficiar',
-  searchPlaceholder: 'Titlu sau beneficiar',
   contract: 'Contract',
   value: 'Valoare',
   physical: 'Progres fizic',
-  noContracts: 'Niciun contract nu se potrivește.',
   byMeasure: 'diferă pe măsuri',
 
   status: {
@@ -68,9 +62,12 @@ export const pnrr = {
   list: {
     title: 'Contractele',
     searchWhat: 'titlu',
+    searchWhatMeasure: 'titlu, beneficiar',
     filters: {
       q: 'Căutare',
       masura: 'Măsură',
+      judet: 'Județ',
+      beneficiar: 'Beneficiar',
       stare: 'Stare',
       valoare: 'Valoare',
       progres: 'Progres fizic',
@@ -87,6 +84,10 @@ export const pnrr = {
     value: (value: string) => `valoare ${value}`,
     of: (whole: string, edition: string) =>
       `din ${whole} ale beneficiarului · ediția din ${edition} a datelor MIPE`,
+    ofMeasure: (whole: string, edition: string) =>
+      `din ${whole} ale măsurii · ediția din ${edition} a datelor MIPE`,
+    natural: (n: number, text: string) =>
+      `plus ${counted(n, text, 'un contract al unei persoane fizice', 'contracte ale unor persoane fizice')}, pe care nu le afișăm nominal`,
     differ: (n: number, text: string) =>
       `${counted(n, text, 'unul', 'contracte')} cu măsuri în stări diferite`,
     statusTitle: 'Stare',
@@ -94,6 +95,8 @@ export const pnrr = {
     differPart: 'Diferă pe măsuri',
     progressTitle: 'Progres fizic',
     progressUnit: 'contracte, unde măsurile lor dau același progres',
+    beneficiariesTitle: 'Cei mai mari beneficiari',
+    beneficiariesUnit: 'lei, aceleași filtre',
     total: (n: number, text: string) =>
       `Total pentru filtrele alese · ${counted(n, text, 'un contract', 'contracte')}`,
   },

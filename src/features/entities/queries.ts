@@ -83,8 +83,8 @@ export async function loadEntityPage(
     // Paid with no contract held: nothing to list.
     if (euCounts(funds).pnrr > 0) {
       const [contracts] = await Promise.all([
-        client.ensureQueryData(pnrrListQuery(cui, search)),
-        client.ensureQueryData(pnrrOverviewQuery(cui, search)),
+        client.ensureQueryData(pnrrListQuery({ beneficiary: cui }, search)),
+        client.ensureQueryData(pnrrOverviewQuery({ beneficiary: cui }, search)),
       ])
       return {
         page,
