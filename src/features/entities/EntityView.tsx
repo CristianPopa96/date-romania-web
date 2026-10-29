@@ -133,8 +133,8 @@ export function EntityView({
             <EntityCohesion
               cui={cui}
               funds={funds}
-              page={page}
-              onPage={onPage}
+              search={search}
+              onSearch={onSearch}
             />
           ) : list === 'pnrr' && funds && funds !== 'failed' && funds.pnrr ? (
             <EntityPnrr

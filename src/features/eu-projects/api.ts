@@ -32,8 +32,6 @@ export const getEuFunds = createServerFn({ method: 'GET' }).handler(() =>
 export type EuProjectFilter = {
   // A programme code as the API gives it ('POR', 'PoIDS').
   programme?: string
-  // The beneficiary's CUI: its projects, on an institution or supplier page.
-  beneficiary?: number
   status?: EuStatus
   q?: string
   page: number
@@ -44,7 +42,6 @@ export const getEuProjects = createServerFn({ method: 'GET' })
   .handler(async ({ data }): Promise<EuProjectPage> => {
     const found = await getJson<EuProjectPage>(`${ROOT}/projects`, {
       programme: data.programme,
-      beneficiary: data.beneficiary,
       status: data.status,
       q: data.q,
       limit: PAGE_SIZE,

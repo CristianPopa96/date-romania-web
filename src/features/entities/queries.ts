@@ -5,7 +5,9 @@ import {
   euCounts,
   euLists,
   euBeneficiaryQuery,
-  entityEuProjectsQuery,
+  euProjectListQuery,
+  euProjectOverviewQuery,
+  programmeCodes,
 } from '#/features/eu-projects'
 import { getEntityPage } from '#/features/entities/api'
 import type { Role } from '#/lib/api'
@@ -63,7 +65,21 @@ export async function loadEntityPage(
           : pageCount(contracts.total, search.pe_pagina ?? 25),
     }
   } else if (list === 'coeziune') {
-    await client.ensureQueryData(entityEuProjectsQuery(cui, pageNumber))
+    const codes =
+      funds && funds !== 'failed'
+        ? programmeCodes(funds.cohesion, search.program)
+        : undefined
+    const [projects] = await Promise.all([
+      client.ensureQueryData(euProjectListQuery(cui, search, codes)),
+      client.ensureQueryData(euProjectOverviewQuery(cui, search, codes)),
+    ])
+    return {
+      page,
+      last:
+        projects === 'failed'
+          ? null
+          : pageCount(projects.total, search.pe_pagina ?? 25),
+    }
   } else if (list === 'pnrr') {
     // Paid with no contract held: nothing to list.
     if (euCounts(funds).pnrr > 0) {

@@ -1952,9 +1952,22 @@ test('a hospital lists its projects of two programmes, each at its own day', asy
   await expect(
     main.getByRole('row').filter({ hasText: 'PS 2021–2027' }),
   ).toContainText('31.08.2026')
-  await expect(main.getByText('2 proiecte')).toBeVisible()
-  await expect(main.getByText('CUI în listă')).toHaveCount(2)
+  // Two programmes: a count, never a sum across them.
+  await expect(main.getByText('2 proiecte', { exact: true })).toBeVisible()
+  await expect(
+    main.getByRole('row').filter({ hasText: 'CUI în listă' }),
+  ).toHaveCount(2)
   await expect(main.getByText(/legate? de noi după nume/)).toHaveCount(0)
+
+  // One programme chosen: its value and what was paid up to its own list's day.
+  await page.goto('/institutii/4491342?lista=coeziune&program=peo-2021')
+  await expect(main.getByText('Program: PEO 2021-2027')).toBeVisible()
+  await expect(
+    main.getByText(/^un proiect · valoare .* până la 30\.09\.2026$/),
+  ).toBeVisible()
+  await expect(
+    main.getByRole('row').filter({ hasText: 'Total PEO' }),
+  ).toContainText('2.100.000 lei')
 })
 
 test('a company with no EU money has no EU list, even when the address asks', async ({

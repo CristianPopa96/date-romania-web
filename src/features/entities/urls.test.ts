@@ -17,6 +17,12 @@ describe('validateEntitySearch', () => {
     })
   })
 
+  it('keeps a one-letter search, which only some lists send', () => {
+    const search = validateEntitySearch({ lista: 'coeziune', q: 'a' })
+    // The EU and PNRR lists leave it out of what they ask (their own list.test.ts).
+    expect(search.q).toBe('a')
+  })
+
   it('reads a page number written as text', () => {
     expect(validateEntitySearch({ pagina: '12' }).pagina).toBe(12)
   })
