@@ -80,20 +80,17 @@ export function filterParams(filter: RankingFilter) {
   }
 }
 
-// Contracts signed in the period, without framework agreements: those of one buyer or
-// one winner, newest first, or with no entity the largest of all, which the filters of
-// the rankings can narrow.
-export const getContracts = createServerFn({ method: 'GET' })
-  .inputValidator(
-    (data: { role?: Role; cui?: number; page: number } & RankingFilter) => data,
-  )
+// The largest contracts signed in the period, without framework agreements, which the
+// filters of the rankings can narrow. An entity's contracts are a list of their own
+// (api-list.ts).
+export const getLargestContracts = createServerFn({ method: 'GET' })
+  .inputValidator((data: RankingFilter) => data)
   .handler(async ({ data }): Promise<ContractPage> => {
     const found = await getJson<ContractPage>('/v1/award-contracts', {
-      [data.role === 'suppliers' ? 'supplier' : 'buyer']: data.cui,
-      sort: data.cui === undefined ? 'value' : 'newest',
+      sort: 'value',
       ...filterParams(data),
       limit: PAGE_SIZE,
-      offset: (data.page - 1) * PAGE_SIZE,
+      offset: 0,
     })
     return found ?? { total: 0, period: null, items: [] }
   })

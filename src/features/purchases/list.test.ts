@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { messagesFor } from '#/i18n'
 import { formatFor } from '#/lib/format'
-import { periodChip, rangeChip } from '#/features/purchases/filters'
+import { periodChip, rangeChip } from '#/lib/list-chips'
 import {
   PURCHASE_BY_API_PARAM,
   PURCHASE_FILTER_PARAMS,

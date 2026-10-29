@@ -12,7 +12,9 @@ import type { Role } from '#/lib/api'
 import {
   contractCount,
   entityContractsQuery,
-  contractsQuery,
+  contractListQuery,
+  contractOverviewQuery,
+  contractsWon,
 } from '#/features/contracts'
 import { purchaseListQuery, purchaseOverviewQuery } from '#/features/purchases'
 import { entityList } from '#/features/entities/urls'
@@ -48,7 +50,18 @@ export async function loadEntityPage(
   const list = entityList(search, contractCount(totals) > 0, euLists(funds))
   const pageNumber = search.pagina ?? 1
   if (list === 'contracte') {
-    await client.ensureQueryData(contractsQuery(role, cui, pageNumber))
+    const won = contractsWon(totals, search)
+    const [contracts] = await Promise.all([
+      client.ensureQueryData(contractListQuery(role, cui, search, won)),
+      client.ensureQueryData(contractOverviewQuery(role, cui, search, won)),
+    ])
+    return {
+      page,
+      last:
+        contracts === 'failed'
+          ? null
+          : pageCount(contracts.total, search.pe_pagina ?? 25),
+    }
   } else if (list === 'coeziune') {
     await client.ensureQueryData(entityEuProjectsQuery(cui, pageNumber))
   } else if (list === 'pnrr') {

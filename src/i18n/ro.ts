@@ -9,6 +9,7 @@ import { budget } from '#/features/budget/i18n'
 import { counted, plural } from '#/i18n/ro-plural'
 import { list } from '#/i18n/ro-list'
 import { purchaseList } from '#/features/purchases/i18n'
+import { contractList } from '#/features/contracts/i18n'
 import { places } from '#/features/places/i18n'
 import { eu } from '#/features/eu-projects/i18n'
 import { pnrr } from '#/features/pnrr/i18n'
@@ -427,14 +428,9 @@ export const ro = {
   contracts: {
     count: (n: number, text: string) =>
       counted(n, text, 'un contract', 'contracte'),
-    object: 'Obiect',
     contract: 'Contract',
-    supplier: 'Furnizor',
     buyer: 'Cumpărător',
     winner: 'Câștigător',
-    procedure: 'Procedură',
-    won: 'Câștigat',
-    alone: 'singur',
     value: 'Valoare fără TVA',
     date: 'Data semnării',
     rank: 'Loc',
@@ -470,6 +466,7 @@ export const ro = {
 
   list,
   purchaseList,
+  contractList,
 
   notes: {
     period: (days: string) =>

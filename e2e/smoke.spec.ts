@@ -166,8 +166,12 @@ test('an institution page keeps contracts and direct purchases apart', async ({
   await page.goto('/institutii/4981310')
 
   const main = page.getByRole('main')
-  // Two figures, never added. The contract figure says its list is incomplete.
-  await expect(main.getByText('6,3 mil. lei')).toHaveCount(2)
+  // Two figures, never added, and the list's sum. The contract figure says its list is
+  // incomplete.
+  await expect(main.getByText('6,3 mil. lei')).toHaveCount(3)
+  await expect(
+    main.getByText('2 contracte · 6,3 mil. lei fără TVA', { exact: true }),
+  ).toBeVisible()
   await expect(
     main.getByText('2 contracte · semnate 05.10–07.10.2026 · listă incompletă'),
   ).toHaveCount(2)
@@ -195,14 +199,19 @@ test('an institution page keeps contracts and direct purchases apart', async ({
   await expect(
     main.getByRole('tab', { name: /^Contracte \d/ }),
   ).toHaveAttribute('aria-selected', 'true')
-  await expect(main.getByRole('row')).toHaveCount(3)
+  // Its two contracts, newest first, and no framework agreement.
+  await expect(contractRows(main)).toHaveCount(2)
   const together = main.getByRole('row').filter({ hasText: 'Contract 101' })
   await expect(together).toContainText('Asociere · 2 membri')
   await expect(together).toContainText('6.120.000 lei')
-  await expect(together).toContainText('Procedura simplificata')
   await expect(
     together.getByRole('link', { name: 'Contract 101' }),
   ).toHaveAttribute('href', '/contracte/9001')
+  // The winners are ranked by what they won alone; the association is a bar of its own.
+  await expect(main.getByText('Cei mai mari câștigători').first()).toBeVisible()
+  await expect(
+    main.getByText('În asociere · un contract').first(),
+  ).toBeVisible()
   await expect(main.getByRole('link', { name: 'Exportă CSV' })).toHaveAttribute(
     'href',
     '/contracte.csv?institutie=4981310',
@@ -359,6 +368,11 @@ test('the purchases chart their value per day and their largest suppliers', asyn
 })
 
 // The rows of the list of purchases, not those of the charts' tables of figures.
+// The rows of a list of contracts, not those of its charts' hidden tables.
+function contractRows(main: Locator) {
+  return main.getByRole('row').filter({ hasText: /Contract \d{3}/ })
+}
+
 function purchaseRows(main: Locator) {
   return main.getByRole('row').filter({ hasText: /Purchase \d/ })
 }
@@ -504,19 +518,75 @@ test('a supplier page never adds what was won alone to what was won together', a
   await expect(main.getByText('6,3 mil. lei')).toHaveCount(0)
   await expect(main.getByText('Încă necolectat')).toHaveCount(0)
 
+  // Its list holds one way of winning at a time: alone first.
+  await expect(
+    main.getByText('un contract câștigat singur · 210.000 lei fără TVA'),
+  ).toBeVisible()
   const alone = main.getByRole('row').filter({ hasText: 'Contract 103' })
-  await expect(alone).toContainText('singur')
   await expect(alone.getByRole('link', { name: TOWN_HALL })).toHaveAttribute(
     'href',
     '/institutii/4981310',
   )
+  await expect(
+    main.getByRole('row').filter({ hasText: 'Contract 101' }),
+  ).toHaveCount(0)
+  await expect(main.getByRole('link', { name: /Exportă CSV/ })).toHaveAttribute(
+    'href',
+    '/contracte.csv?furnizor=17886786&castig=singur',
+  )
+
+  // Then in association, with the whole value of the contract and every member.
+  await page.goto('/furnizori/17886786?castig=asociere')
+  await expect(
+    main.getByText('un contract câștigat în asociere · 6,1 mil. lei fără TVA'),
+  ).toBeVisible()
+  await expect(
+    main.getByText(/valoarea întreagă a fiecărui contract/).first(),
+  ).toBeVisible()
   const together = main.getByRole('row').filter({ hasText: 'Contract 101' })
   await expect(together).toContainText('Asociere · 2 membri')
+  // The total row says it too, as the charts do.
+  await expect(
+    main.getByRole('row').filter({ hasText: 'Total pentru filtrele alese' }),
+  ).toContainText('neîmpărțită între membri')
   await expect(main).not.toContainText('lider')
-  await expect(main.getByRole('link', { name: 'Exportă CSV' })).toHaveAttribute(
+  await expect(main.getByRole('link', { name: /Exportă CSV/ })).toHaveAttribute(
     'href',
-    '/contracte.csv?furnizor=17886786',
+    '/contracte.csv?furnizor=17886786&castig=asociere',
   )
+})
+
+test('a list of contracts filters, sorts and says which filter emptied it', async ({
+  page,
+}) => {
+  await page.goto('/institutii/4981310?fel=3')
+  const main = page.getByRole('main')
+  await expect(main.getByText('Fel: Contract subsecvent')).toBeVisible()
+  await expect(
+    main.getByText('un contract · 210.000 lei fără TVA', { exact: true }),
+  ).toBeVisible()
+
+  await page.goto('/institutii/4981310?fel=3&valoare_min=1000000')
+  await expect(
+    main.getByText('Nimic nu se potrivește cu filtrele alese.'),
+  ).toBeVisible()
+  await expect(
+    main.getByText('Fără filtrul «Fel» ar fi un contract.'),
+  ).toBeVisible()
+  await main
+    .getByRole('button', { name: 'Scoate filtrul «Fel»' })
+    .last()
+    .click()
+  await expect(page).toHaveURL(/\/institutii\/4981310\?valoare_min=1000000$/)
+  await expect(main.getByRole('link', { name: 'Contract 101' })).toBeVisible()
+
+  // Sorted by value, smallest first, over the whole list.
+  await page.goto('/institutii/4981310')
+  await main.getByRole('button', { name: /Valoare fără TVA/ }).click()
+  await expect(page).toHaveURL(/ordine=valoare-desc$/)
+  await main.getByRole('button', { name: /Valoare fără TVA/ }).click()
+  await expect(page).toHaveURL(/ordine=valoare-cresc$/)
+  await expect(contractRows(main).first()).toContainText('Contract 103')
 })
 
 test('the rankings open on the largest contracts', async ({ page }) => {

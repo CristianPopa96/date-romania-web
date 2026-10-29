@@ -1,3 +1,5 @@
+import { validateContractListSearch } from '#/features/contracts'
+import type { ContractListSearch } from '#/features/contracts'
 import { validatePurchaseListSearch } from '#/features/purchases'
 import type { PurchaseListSearch } from '#/features/purchases'
 import { pageFromParam } from '#/lib/urls'
@@ -15,12 +17,14 @@ export const ENTITY_LISTS = [
 
 export type EntityList = (typeof ENTITY_LISTS)[number]
 
-// The list of direct purchases adds its filters, order and page size
-// (`PurchaseListSearch`).
-export type EntitySearch = PurchaseListSearch & {
-  lista?: EntityList
-  pagina?: number
-}
+// The lists of contracts and of direct purchases add their filters, order and page size
+// (`ContractListSearch`, `PurchaseListSearch`). The names they share mean the same, and a
+// change of tab clears them.
+export type EntitySearch = ContractListSearch &
+  PurchaseListSearch & {
+    lista?: EntityList
+    pagina?: number
+  }
 
 export function validateEntitySearch(
   search: Record<string, unknown>,
@@ -28,6 +32,7 @@ export function validateEntitySearch(
   return {
     lista: ENTITY_LISTS.find((list) => list === search.lista),
     pagina: pageFromParam(search.pagina),
+    ...validateContractListSearch(search),
     ...validatePurchaseListSearch(search),
   }
 }
