@@ -13,7 +13,6 @@ import { messagesFor } from '#/i18n'
 import { useI18n } from '#/i18n/context'
 import { pageTitle } from '#/lib/copy'
 import { correctionsQuery, datasetsQuery } from '#/features/sources/queries'
-import { contractsCsvPath } from '#/features/contracts/urls'
 import { validateSourcesSearch } from '#/features/sources/urls'
 
 // Where the data comes from: the sources we hold, the ones still to come, how the
@@ -94,7 +93,7 @@ function Sources() {
                   </Text>
                   <Button asChild variant="soft" color="gray">
                     {/* A file from the server, not a page of the site. */}
-                    <a href={contractsCsvPath({})} download>
+                    <a href="/contracte.csv?toate=da" download>
                       <DownloadIcon />
                       {t.sources.exportContracts}
                     </a>

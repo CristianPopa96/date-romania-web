@@ -5,6 +5,10 @@ export const purchaseList = {
     institutions: 'obiect, furnizor, cod DA',
     suppliers: 'obiect, instituție, cod DA',
   },
+  searchWhatEvery: 'obiect, furnizor, instituție, cod DA',
+  // The list of every purchase is far longer than a file can hold.
+  fileLimit: (rows: string) =>
+    `fișierul CSV ține cel mult ${rows} de rânduri: alege filtre ca să-l descarci`,
   filters: {
     q: 'Căutare',
     perioada: 'Perioada',
@@ -12,8 +16,10 @@ export const purchaseList = {
     stare: 'Stare',
     tip: 'Tip',
     furnizor: 'Furnizor',
+    firma: 'Firmă',
     institutie: 'Instituție',
     cpv: 'CPV',
+    judet: 'Județ',
   },
   // A state on a chip, after "Stare:".
   stateChip: {

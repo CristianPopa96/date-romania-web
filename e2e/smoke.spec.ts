@@ -247,6 +247,13 @@ test('a town hall shows its budget and the payments to it, each with its period'
   ).toBeVisible()
   await expect(main.getByText(/nu poate fi urmărit/)).toHaveCount(0)
 
+  // The budget is a tab of its own, after the lists (design round 13).
+  await expect(
+    main.getByRole('heading', { name: 'Venituri · 2024' }),
+  ).toHaveCount(0)
+  await main.getByRole('tab', { name: 'Buget' }).click()
+  await expect(page).toHaveURL(/\/institutii\/4981310\?lista=buget$/)
+
   // Revenue in the design's order; the lines add up to the total.
   await expect(
     main.getByRole('heading', { name: 'Venituri · 2024' }),
@@ -589,7 +596,9 @@ test('a list of contracts filters, sorts and says which filter emptied it', asyn
   await expect(contractRows(main).first()).toContainText('Contract 103')
 })
 
-test('the rankings open on the largest contracts', async ({ page }) => {
+test('Clasamente opens on every contract, the largest first', async ({
+  page,
+}) => {
   await page.goto('/')
   await page.getByRole('link', { name: 'Vezi clasamentele' }).click()
 
@@ -600,66 +609,120 @@ test('the rankings open on the largest contracts', async ({ page }) => {
     main.getByText('nu spune nimic despre corectitudinea achizițiilor'),
   ).toBeVisible()
   await expect(
+    main.getByText('Toate contractele publicate, de la cea mai mare valoare.'),
+  ).toBeVisible()
+  await expect(
     main.getByText('Lista contractelor nu e completă.'),
   ).toBeVisible()
-  // Largest first, with the buyer and every winner; the framework agreement is not listed.
-  const first = main.getByRole('row').nth(1)
+  // Largest first, with every winner and the buyer; the framework agreement is not listed.
+  await expect(
+    main.getByRole('columnheader', { name: 'Valoare' }),
+  ).toHaveAttribute('aria-sort', 'descending')
+  const first = contractRows(main).first()
   await expect(first).toContainText('Contract 101')
   await expect(first).toContainText('6.120.000 lei')
   await expect(first).toContainText(TOWN_HALL)
-  await expect(first).toContainText('ALFA CONSTRUCT S.R.L., Beta Birotică SRL')
-  await expect(main.getByRole('row')).toHaveCount(4)
+  await expect(first).toContainText('ALFA CONSTRUCT S.R.L.')
   await expect(main.getByText('Contract 102')).toHaveCount(0)
   await expect(page.getByRole('button', { name: /Cere/ })).toHaveCount(0)
-  // The filters say which ones exist and why the others cannot be chosen yet.
-  await expect(main.getByRole('combobox', { name: 'CPV' })).toHaveText(
-    'CPV: toate',
+  // Each contract is counted once here: the sum is given.
+  await expect(main.getByText(/^\d+ contracte · /)).toBeVisible()
+  await expect(main.getByRole('link', { name: /Exportă CSV/ })).toHaveAttribute(
+    'href',
+    '/contracte.csv?toate=da',
   )
-  await expect(main.getByRole('combobox', { name: 'Fonduri UE' })).toHaveText(
-    'Fonduri UE: toate',
-  )
+  // A row opens its award notice.
   await expect(
-    main.getByText('Anul, județul și tipul instituției nu pot fi alese încă'),
-  ).toBeVisible()
+    first.getByRole('link', { name: /Contract 101/ }),
+  ).toHaveAttribute('href', /^\/contracte\/\d+$/)
 })
 
-test('the filters narrow a ranking and stay in the address', async ({
+test("a company's contracts on the list of every contract are never added both ways", async ({
   page,
 }) => {
-  await page.goto('/clasamente')
+  await page.goto('/clasamente?furnizor=17886786')
   const main = page.getByRole('main')
-  await main.getByRole('combobox', { name: 'CPV' }).click()
-  await page
-    .getByRole('option', { name: '45 · Lucrari de constructii' })
-    .click()
-  await expect(page).toHaveURL(/\/clasamente\?cpv=45$/)
-  await main.getByRole('combobox', { name: 'Fonduri UE' }).click()
-  await page.getByRole('option', { name: 'da' }).click()
-  await expect(page).toHaveURL(/\/clasamente\?cpv=45&ue=da$/)
-
+  await expect(main.getByText(/^Firmă: /)).toBeVisible()
+  // Won alone and in association: how each was won is a column, and there is no sum.
   await expect(
-    main.getByText('Un anunț care nu spune cum e plătit'),
+    main.getByRole('columnheader', { name: 'Câștigat' }),
   ).toBeVisible()
-  await expect(main.getByRole('row')).toHaveCount(3)
-  await expect(main.getByRole('link', { name: 'Exportă CSV' })).toHaveAttribute(
-    'href',
-    '/contracte.csv?cpv=45&ue=da',
+  await expect(
+    main.getByText('singur și în asociere nu se adună', { exact: false }),
+  ).toBeVisible()
+  await expect(main.getByText(/^\d+ contracte · /)).toHaveCount(0)
+  // Nor a chart of their value over time, which would add them.
+  await expect(main.getByRole('heading', { name: /^Valoare pe / })).toHaveCount(
+    0,
   )
+  // One way chosen: the sum comes back.
+  await page.goto('/clasamente?furnizor=17886786&castig=singur')
+  await expect(main.getByText('Câștigat: singur')).toBeVisible()
+  await expect(main.getByText(/ · /).first()).toBeVisible()
+  await expect(main.getByRole('link', { name: /Exportă CSV/ })).toHaveAttribute(
+    'href',
+    '/contracte.csv?toate=da&castig=singur&furnizor=17886786',
+  )
+})
 
-  // Nothing matches: the page says so, with no figure.
+test('the filters narrow the contracts and stay in the address', async ({
+  page,
+}) => {
+  await page.goto('/clasamente?cpv=45&ue=da&judet=gorj')
+  const main = page.getByRole('main')
+  await expect(main.getByText('CPV: 45')).toBeVisible()
+  await expect(main.getByText('Județ: Gorj')).toBeVisible()
+  await expect(contractRows(main)).toHaveCount(2)
+
+  // Nothing matches: the list says so, and offers to remove the filters.
   await page.goto('/clasamente?cpv=30')
-  await expect(
-    main.getByText('Nimic nu se potrivește cu filtrele alese.'),
-  ).toBeVisible()
+  await expect(main.getByText(/Nimic nu se potrivește/)).toBeVisible()
 
-  // The CPV filter goes with the reader to the direct purchases, the EU one does not.
-  // A ranking takes its filters as chips; they stay from one ranking to the next.
+  // The CPV and county filters go with the reader to a ranking, as chips there.
   await page.goto('/clasamente?clasament=furnizori&cpv=45')
   await expect(main.getByText('CPV: 45 · Lucrari de constructii')).toBeVisible()
   await expect(rankRows(main).first()).toContainText('ALFA CONSTRUCT S.R.L.')
-  await main.getByRole('tab', { name: 'Achiziții directe' }).click()
-  await expect(page).toHaveURL(/\/clasamente\?clasament=achizitii&cpv=45$/)
-  await expect(main.getByRole('button', { name: /^Fonduri UE/ })).toHaveCount(0)
+  await main.getByRole('tab', { name: 'Instituții' }).click()
+  await expect(page).toHaveURL(/\/clasamente\?clasament=institutii&cpv=45$/)
+  await page.goto('/clasamente?clasament=furnizori&judet=gorj')
+  await expect(main.getByText('Județ: Gorj')).toBeVisible()
+  await expect(rankRows(main)).toHaveCount(1)
+})
+
+test('every accepted direct purchase is one list, with its count and its sum', async ({
+  page,
+}) => {
+  await page.goto('/clasamente?clasament=achizitii')
+  const main = page.getByRole('main')
+  await expect(
+    main.getByText(
+      'Toate achizițiile directe acceptate, de la cea mai mare valoare.',
+    ),
+  ).toBeVisible()
+  await expect(
+    main.getByRole('columnheader', { name: 'Valoare' }),
+  ).toHaveAttribute('aria-sort', 'descending')
+  // Accepted only: no state column, and a sum.
+  await expect(main.getByRole('columnheader', { name: 'Stare' })).toHaveCount(0)
+  await expect(main.getByText(/^\d+ achiziții acceptate · /)).toBeVisible()
+  await expect(main.getByRole('link', { name: /Exportă CSV/ })).toHaveAttribute(
+    'href',
+    '/achizitii-directe.csv?toate=da',
+  )
+  // A row opens the purchase's page.
+  await expect(
+    purchaseRows(main).first().getByRole('link').first(),
+  ).toHaveAttribute('href', /^\/achizitii-directe\/\d+$/)
+  // By institution.
+  await page.goto('/clasamente?clasament=achizitii&institutie=4981310')
+  await expect(main.getByText(/^Instituție: /)).toBeVisible()
+
+  // The API does not answer (the stub has no answer for this call): the page stays.
+  await page.goto('/clasamente?clasament=achizitii&cpv=99')
+  await expect(
+    main.getByText(/Nu am putut încărca lista/).first(),
+  ).toBeVisible()
+  await expect(main.getByRole('tab', { name: 'Contracte' })).toBeVisible()
 })
 
 // The rows of a ranking (each names its CUI), not those of its chart's table.
@@ -787,11 +850,20 @@ test('winners are ranked by what they won alone or in associations', async ({
   await expect(rankRows(main).nth(1)).toContainText('6.120.000 lei')
 })
 
-test('direct purchases and institutions have rankings of their own', async ({
+test('a ranking of parties is by contracts or by direct purchases, never both', async ({
   page,
 }) => {
-  await page.goto('/clasamente?clasament=achizitii')
+  await page.goto('/clasamente?clasament=furnizori')
   const main = page.getByRole('main')
+  await expect(
+    main.getByRole('heading', {
+      name: 'Furnizori, după contractele câștigate',
+    }),
+  ).toBeVisible()
+  await main.getByRole('radio', { name: 'Achiziții directe' }).click()
+  await expect(page).toHaveURL(
+    /\/clasamente\?clasament=furnizori&bani=achizitii$/,
+  )
   await expect(
     main.getByRole('heading', { name: 'Furnizori, după achizițiile directe' }),
   ).toBeVisible()
@@ -799,11 +871,13 @@ test('direct purchases and institutions have rankings of their own', async ({
   await expect(main.getByText('Lista contractelor nu e completă.')).toHaveCount(
     0,
   )
-  await page.goto('/clasamente?clasament=achizitii&parte=institutii')
+  await page.goto('/clasamente?clasament=institutii&bani=achizitii')
+  await expect(
+    main.getByRole('heading', { name: 'Instituții, după achizițiile directe' }),
+  ).toBeVisible()
   await expect(rankRows(main).first()).toContainText(TOWN_HALL)
 
-  await main.getByRole('tab', { name: 'Instituții' }).click()
-  await expect(page).toHaveURL(/\/clasamente\?clasament=institutii$/)
+  await page.goto('/clasamente?clasament=institutii')
   await expect(rankRows(main).first()).toContainText(TOWN_HALL)
   await expect(rankRows(main).first()).toContainText('6.330.000 lei')
   await expect(rankRows(main).nth(1)).toContainText(
@@ -1124,7 +1198,7 @@ test('the sources page says what is held, what is to come and how it is counted'
   )
   await expect(
     main.getByRole('link', { name: 'Exportă contractele din perioadă (CSV)' }),
-  ).toHaveAttribute('href', '/contracte.csv')
+  ).toHaveAttribute('href', '/contracte.csv?toate=da')
 
   // Collection goes on each morning; the newest days fill in over the next weeks.
   await expect(
@@ -1567,7 +1641,8 @@ test('the localities start from the counties and lead to one commune', async ({
   await expect(
     main.getByRole('heading', { name: 'Localitățile județului' }),
   ).toBeVisible()
-  await main.getByRole('link', { name: 'Comuna Țânțăreni' }).click()
+  // The table of its UATs, after the projects that name the commune too.
+  await main.getByRole('link', { name: 'Comuna Țânțăreni' }).last().click()
   await expect(page).toHaveURL(/\/localitati\/gorj\/comuna-tantareni$/)
 })
 
@@ -1615,12 +1690,13 @@ test('a commune names each figure with its period and never adds them', async ({
     main.getByRole('link', { name: 'Vezi bugetul complet al primăriei' }),
   ).toHaveAttribute('href', '/institutii/4981310')
 
-  // Its projects, with the progress as the town hall typed it.
-  const project = main
-    .getByRole('row')
-    .filter({ hasText: 'Modernizare drumuri' })
-  await expect(project).toContainText('64%')
-  await expect(project).toContainText('Probabil un singur contract')
+  // The projects landing here, of every programme; each opens its own page.
+  await expect(
+    main
+      .getByRole('row')
+      .filter({ hasText: 'Modernizare drumuri' })
+      .getByRole('link', { name: /Modernizare drumuri/ }),
+  ).toHaveAttribute('href', '/proiecte/anghel-saligny/101')
 
   // Its payments are not held; no request button until flow 8.
   await expect(main.getByText('Nu avem plățile primăriei.')).toBeVisible()
@@ -1737,6 +1813,11 @@ test('a measure lists its contracts and filters them by status and county', asyn
 
   await page.goto(`${PNRR}/c10.i3?judet=gorj`)
   await expect(main.getByText('Județ: GORJ')).toBeVisible()
+  await expect(pnrrRows(main)).toHaveCount(1)
+
+  // The kind of beneficiary, in the dashboard's own words (Q65).
+  await page.goto(`${PNRR}/c10.i3?tip_beneficiar=UAT`)
+  await expect(main.getByText('Tip beneficiar: UAT')).toBeVisible()
   await expect(pnrrRows(main)).toHaveCount(1)
 })
 
@@ -2208,27 +2289,43 @@ test('a company lists the projects it was paid through, each saying how', async 
   ).toContainText('câștigător al unui anunț legat')
 })
 
-test("a commune shows its town hall's EU projects and leads to their lists", async ({
+test('a commune lists the projects landing in it, and leads to its town hall’s own', async ({
   page,
 }) => {
   await page.goto('/localitati/gorj/comuna-tantareni')
   const main = page.getByRole('main')
   await expect(
-    main.getByRole('heading', { name: 'Fonduri europene' }),
+    main.getByRole('heading', { name: 'Proiecte în zonă' }),
   ).toBeVisible()
-  await expect(
-    main.getByText(
-      'Un proiect de coeziune, într-un program, legat de noi după nume',
-    ),
-  ).toBeVisible()
-  await expect(
-    main.getByText(
-      '2 contracte PNRR · plăți primite 2,3 mil. lei, 19.12.2025–02.10.2026',
-    ),
-  ).toBeVisible()
-  await main.getByRole('link', { name: 'Vezi lista' }).last().click()
-  await expect(page).toHaveURL(
-    /\/institutii\/4981310\?lista=proiecte&program=pnrr$/,
+  // Every programme's, counted, never added; no county to choose on a place's page.
+  await expect(main.getByText(/^4 proiecte în 3 programe/)).toBeVisible()
+  await expect(projectRows(main)).toHaveCount(4)
+  await expect(main.getByRole('button', { name: /^Județ/ })).toHaveCount(0)
+  await expect(main.getByRole('link', { name: /Exportă CSV/ })).toHaveAttribute(
+    'href',
+    /^\/proiecte\.csv\?loc=\d+$/,
   )
-  await expect(main.getByText('Program: PNRR')).toBeVisible()
+  await expect(main.getByText(/plata Anghel Saligny e pentru/)).toBeVisible()
+  // A page past the end goes to the last one.
+  await page.goto('/localitati/gorj/comuna-tantareni?pagina=9')
+  await expect(page).toHaveURL(/\/localitati\/gorj\/comuna-tantareni$/)
+  await main
+    .getByRole('link', { name: /Proiectele în care .* e beneficiar/ })
+    .click()
+  await expect(page).toHaveURL(/\/institutii\/4981310\?lista=proiecte$/)
+
+  // A county lists the projects of its county.
+  await page.goto('/localitati/gorj')
+  await expect(
+    main.getByRole('heading', { name: 'Proiecte în zonă' }),
+  ).toBeVisible()
+  await expect(main.getByRole('link', { name: /Exportă CSV/ })).toHaveAttribute(
+    'href',
+    '/proiecte.csv?judet=gorj',
+  )
+  // Its own rule; the council is not held, so no link to its projects.
+  await expect(main.getByText(/programul lui numește județul/)).toBeVisible()
+  await expect(
+    main.getByRole('link', { name: /Proiectele în care/ }),
+  ).toHaveCount(0)
 })

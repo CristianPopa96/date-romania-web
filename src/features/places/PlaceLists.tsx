@@ -3,91 +3,12 @@ import { Flex, Heading, Link, Table, Text } from '@radix-ui/themes'
 
 import { DataState } from '#/components/DataState'
 import { EntityLink, roleOfKind } from '#/components/EntityLink'
-import { MatchBadge } from '#/features/programme'
 import { useI18n } from '#/i18n/context'
-import { rich } from '#/i18n/rich'
-import type {
-  CountyUatRow,
-  LocalInstitution,
-  LocalProject,
-} from '#/features/places/api'
+import type { CountyUatRow, LocalInstitution } from '#/features/places/api'
 import { placeLink } from '#/features/places/places'
 
-// The tables of a locality or a county page (ScreenLocality): the town hall's Anghel
-// Saligny projects, the institutions here, a county's UATs.
-
-export function ProjectsTable({ projects }: { projects: Array<LocalProject> }) {
-  const { t, f } = useI18n()
-  const p = t.places
-  return (
-    <Flex direction="column" gap="2">
-      <Heading as="h2" size="5">
-        {p.projects}
-      </Heading>
-      <Text size="2" color="gray">
-        {rich(p.projectsLead, {
-          notCollected: <DataState key="state" kind="notCollected" />,
-        })}
-      </Text>
-      {projects.length === 0 ? (
-        <Text size="2" color="gray">
-          {p.projectsNone}
-        </Text>
-      ) : (
-        <Table.Root variant="surface" size="1">
-          <Table.Header>
-            <Table.Row>
-              <Table.ColumnHeaderCell>{p.project}</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell>{p.builder}</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell>{p.progress}</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell justify="end">
-                {p.paid}
-              </Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell>{p.contract}</Table.ColumnHeaderCell>
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
-            {projects.map((project) => (
-              <Table.Row key={project.id}>
-                <Table.Cell>
-                  <Link asChild>
-                    <RouterLink
-                      to="/proiecte/anghel-saligny/$id"
-                      params={{ id: String(project.id) }}
-                    >
-                      {project.investment ?? String(project.id)}
-                    </RouterLink>
-                  </Link>
-                </Table.Cell>
-                <Table.Cell>
-                  {project.builder ? (
-                    <EntityLink role="suppliers" cui={project.builder.cui}>
-                      {project.builder.name}
-                    </EntityLink>
-                  ) : (
-                    (project.builder_text ?? <DataState kind="notPublished" />)
-                  )}
-                </Table.Cell>
-                <Table.Cell>
-                  {project.progress ?? <DataState kind="notPublished" />}
-                </Table.Cell>
-                <Table.Cell justify="end" style={{ whiteSpace: 'nowrap' }}>
-                  {f.lei(project.paid)}
-                </Table.Cell>
-                <Table.Cell>
-                  <MatchBadge
-                    match={project.match}
-                    label={t.programme.matchOfProject[project.match]}
-                  />
-                </Table.Cell>
-              </Table.Row>
-            ))}
-          </Table.Body>
-        </Table.Root>
-      )}
-    </Flex>
-  )
-}
+// The tables of a locality or a county page (ScreenLocality): the institutions here, a
+// county's UATs.
 
 export function InstitutionsTable({
   institutions,

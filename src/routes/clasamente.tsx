@@ -1,48 +1,70 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { Container, Flex, Heading, Text } from '@radix-ui/themes'
 
-import { Patterns } from '#/features/patterns/Patterns'
-import { RankingFilters } from '#/features/rankings/RankingFilters'
-import { RankingList } from '#/features/rankings/RankingList'
-import { LargestContracts } from '#/features/rankings/Rankings'
+import { IncompleteContracts } from '#/components/Notes'
 import { UrlTabs } from '#/components/UrlTabs'
+import {
+  ContractList,
+  contractListQuery,
+  contractOverviewQuery,
+} from '#/features/contracts'
+import { Patterns } from '#/features/patterns/Patterns'
+import { cpvDivisionsQuery, nearLimitQuery } from '#/features/patterns/queries'
+import {
+  PurchaseList,
+  purchaseListQuery,
+  purchaseOverviewQuery,
+} from '#/features/purchases'
+import { RankingList } from '#/features/rankings/RankingList'
+import { rankingListQuery, rankingTopQuery } from '#/features/rankings/queries'
+import {
+  RANKINGS,
+  isRankingTab,
+  keptAcrossTabs,
+  validateClasamenteSearch,
+} from '#/features/rankings/urls'
+import type { ClasamenteSearch } from '#/features/rankings/urls'
 import { messagesFor } from '#/i18n'
 import { useI18n } from '#/i18n/context'
 import { pageTitle } from '#/lib/copy'
 import { pageCount } from '#/lib/list'
-import {
-  largestContractsQuery,
-  rankingListQuery,
-  rankingTopQuery,
-} from '#/features/rankings/queries'
-import { cpvDivisionsQuery, nearLimitQuery } from '#/features/patterns/queries'
 import { statsQuery } from '#/lib/queries'
-import {
-  RANKINGS,
-  isRankingTab,
-  rankingFilter,
-  validateRankingSearch,
-} from '#/features/rankings/urls'
-import type { RankingSearch } from '#/features/rankings/urls'
 
+// Clasamente (design round 14): the SEAP records and who they are with. "Contracte" and
+// "Achiziții directe" are the lists of every contract and every accepted direct purchase,
+// the largest first; "Furnizori" and "Instituții" rank the parties, by contracts or by
+// direct purchases, never both; "Tipare" holds the patterns.
 export const Route = createFileRoute('/clasamente')({
-  validateSearch: validateRankingSearch,
+  validateSearch: validateClasamenteSearch,
   loaderDeps: ({ search }) => search,
-  // Only the ranking the address asks for is read, and the list behind the filters.
+  // Only the tab the address asks for is read, and the list behind its filters.
   loader: async ({ context: { queryClient }, deps }) => {
-    const filter = rankingFilter(deps)
-    // The rows of the list the tab pages through, when it is one.
-    const ranking = async () => {
-      switch (deps.clasament) {
-        case 'furnizori':
-        case 'institutii':
-        case 'achizitii': {
-          const [, list] = await Promise.all([
-            queryClient.ensureQueryData(statsQuery),
-            queryClient.ensureQueryData(rankingListQuery(deps)),
-            queryClient.ensureQueryData(rankingTopQuery(deps)),
+    // The rows of the list the tab pages through.
+    const rows = async () => {
+      switch (deps.clasament ?? 'contracte') {
+        case 'contracte': {
+          const [list] = await Promise.all([
+            queryClient.ensureQueryData(
+              contractListQuery('institutions', null, deps),
+            ),
+            queryClient.ensureQueryData(
+              contractOverviewQuery('institutions', null, deps),
+            ),
           ])
-          return list === 'failed' || !list ? null : list.total
+          return list === 'failed' ? null : list.total
+        }
+        case 'achizitii': {
+          const [list] = await Promise.all([
+            queryClient.ensureQueryData(
+              purchaseListQuery('institutions', null, deps),
+            ),
+            queryClient.ensureQueryData(
+              purchaseOverviewQuery('institutions', null, deps),
+            ),
+            queryClient.ensureQueryData(statsQuery),
+          ])
+          return list === 'failed' ? null : list.total
         }
         case 'tipare': {
           const pattern = await queryClient.ensureQueryData(
@@ -50,13 +72,18 @@ export const Route = createFileRoute('/clasamente')({
           )
           return pattern === 'failed' || !pattern ? null : pattern.pairs
         }
-        default:
-          await queryClient.ensureQueryData(largestContractsQuery(filter))
-          return null
+        default: {
+          const [, list] = await Promise.all([
+            queryClient.ensureQueryData(statsQuery),
+            queryClient.ensureQueryData(rankingListQuery(deps)),
+            queryClient.ensureQueryData(rankingTopQuery(deps)),
+          ])
+          return list === 'failed' || !list ? null : list.total
+        }
       }
     }
     const [total] = await Promise.all([
-      ranking(),
+      rows(),
       queryClient.ensureQueryData(cpvDivisionsQuery),
     ])
     // A page past the end of the list goes to the last one that has rows.
@@ -81,9 +108,12 @@ function Rankings() {
   const search = Route.useSearch()
   const navigate = Route.useNavigate()
   const tab = search.clasament ?? 'contracte'
-  const filter = rankingFilter(search)
-  const go = (next: RankingSearch) =>
-    void navigate({ search: validateRankingSearch(next), resetScroll: false })
+  const go = (next: ClasamenteSearch) =>
+    void navigate({
+      search: validateClasamenteSearch(next),
+      resetScroll: false,
+    })
+  const records = t.rankings.records
 
   return (
     <Container size="4" px="5" py="7">
@@ -101,11 +131,31 @@ function Rankings() {
             value: name,
             label: t.rankings.tabs[name],
           }))}
-          // The filters stay with the reader from one ranking to the next, where they apply.
+          // The filters go with the reader from one tab to the next, where they apply.
           onChange={(value) =>
-            go({ clasament: value, cpv: search.cpv, ue: search.ue })
+            go({
+              clasament: value === 'contracte' ? undefined : value,
+              ...keptAcrossTabs(search),
+            } as ClasamenteSearch)
           }
         >
+          {tab === 'contracte' ? (
+            <Flex direction="column" gap="3">
+              <Text size="2" color="gray">
+                {records.contracts.lead}
+              </Text>
+              <ContractsPeriod />
+              <ContractList
+                role="institutions"
+                cui={null}
+                search={search}
+                won={undefined}
+                title={records.contracts.title}
+                onSearch={go}
+              />
+            </Flex>
+          ) : null}
+          {tab === 'achizitii' ? <Purchases onSearch={go} /> : null}
           {isRankingTab(tab) ? (
             // A ranking declares its filters to its own bar, as the pattern's list does.
             <RankingList tab={tab} search={search} onSearch={go} />
@@ -116,17 +166,45 @@ function Rankings() {
               onApply={(patch) => go({ ...search, ...patch })}
             />
           ) : null}
-          {tab === 'contracte' ? (
-            <>
-              <RankingFilters
-                search={search}
-                onSearch={(filters) => go({ ...search, ...filters })}
-              />
-              <LargestContracts filter={filter} />
-            </>
-          ) : null}
         </UrlTabs>
       </Flex>
     </Container>
+  )
+}
+
+// The callout every list of contracts carries: the contracts of a period are never complete.
+function ContractsPeriod() {
+  const search = Route.useSearch()
+  const { data } = useSuspenseQuery(
+    contractOverviewQuery('institutions', null, search),
+  )
+  return data && data !== 'failed' ? (
+    <IncompleteContracts period={data.period} />
+  ) : null
+}
+
+function Purchases({
+  onSearch,
+}: {
+  onSearch: (next: ClasamenteSearch) => void
+}) {
+  const { t } = useI18n()
+  const search = Route.useSearch()
+  const { data: stats } = useSuspenseQuery(statsQuery)
+  const records = t.rankings.records
+  return (
+    <Flex direction="column" gap="3">
+      <Text size="2" color="gray">
+        {records.purchases.lead}
+      </Text>
+      <PurchaseList
+        role="institutions"
+        cui={null}
+        search={search}
+        held={stats?.direct_purchases ?? null}
+        title={records.purchases.title}
+        onSearch={onSearch}
+      />
+    </Flex>
   )
 }

@@ -1,8 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 
-import { PAGE_SIZE, getJson } from '#/lib/api'
+import { getJson } from '#/lib/api'
 import type { Role, Source, Schemas, Period } from '#/lib/api'
-import type { RankingFilter } from '#/features/rankings'
 
 // Award notices, their contracts, and one direct purchase: the calls behind the pages of
 // single records. See api.ts for how the site reaches the API.
@@ -70,27 +69,4 @@ export const getEntityContracts = createServerFn({ method: 'GET' })
         awarded: { contracts: found.contracts, value: found.value },
       }
     )
-  })
-
-// The filters of the rankings, as the API names them.
-export function filterParams(filter: RankingFilter) {
-  return {
-    cpv: filter.cpv,
-    eu_funded: filter.eu === undefined ? undefined : String(filter.eu),
-  }
-}
-
-// The largest contracts signed in the period, without framework agreements, which the
-// filters of the rankings can narrow. An entity's contracts are a list of their own
-// (api-list.ts).
-export const getLargestContracts = createServerFn({ method: 'GET' })
-  .inputValidator((data: RankingFilter) => data)
-  .handler(async ({ data }): Promise<ContractPage> => {
-    const found = await getJson<ContractPage>('/v1/award-contracts', {
-      sort: 'value',
-      ...filterParams(data),
-      limit: PAGE_SIZE,
-      offset: 0,
-    })
-    return found ?? { total: 0, period: null, items: [] }
   })

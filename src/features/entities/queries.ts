@@ -47,7 +47,7 @@ export async function loadEntityPage(
   search: EntitySearch,
 ) {
   const scope = entityProjects(role, cui)
-  const [page, totals, , , projects] = await Promise.all([
+  const [page, totals, , budget, projects] = await Promise.all([
     client.ensureQueryData(entityQuery(role, cui)),
     client.ensureQueryData(entityContractsQuery(role, cui)),
     client.ensureQueryData(statsQuery),
@@ -58,7 +58,12 @@ export async function loadEntityPage(
   if (!page || !totals) return null
   // A count not read keeps the tab: its list says it could not be read.
   const hasProjects = projects === 'failed' || projects.total > 0
-  const list = entityList(search, contractCount(totals) > 0, hasProjects)
+  const list = entityList(
+    search,
+    contractCount(totals) > 0,
+    hasProjects,
+    Boolean(budget?.budget),
+  )
   if (list === 'contracte') {
     const won = contractsWon(totals, search)
     const [contracts] = await Promise.all([
@@ -88,12 +93,16 @@ export async function loadEntityPage(
           : pageCount(found.total, search.pe_pagina ?? 25),
     }
   }
+  if (list === 'buget') return { page, last: null }
   const [purchases] = await Promise.all([
     client.ensureQueryData(purchaseListQuery(role, cui, search)),
     client.ensureQueryData(purchaseOverviewQuery(role, cui, search)),
   ])
   return {
     page,
-    last: pageCount(purchases.total, search.pe_pagina ?? 25),
+    last:
+      purchases === 'failed'
+        ? null
+        : pageCount(purchases.total, search.pe_pagina ?? 25),
   }
 }

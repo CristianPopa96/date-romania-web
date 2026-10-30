@@ -37,6 +37,7 @@ export function projectFilterDecls({
   fixedKind,
   held,
   fixedParty = false,
+  fixedArea = false,
   t,
   f,
 }: {
@@ -48,6 +49,8 @@ export function projectFilterDecls({
   held?: ReadonlyArray<HeldProgramme>
   // An entity page: its institution or company is the list's, never a filter.
   fixedParty?: boolean
+  // A place page: its UAT or county is the list's, so the county is no filter.
+  fixedArea?: boolean
   t: Messages
   f: Format
 }): Array<FilterDecl> {
@@ -142,27 +145,34 @@ export function projectFilterDecls({
     }
   }
 
+  // A place page is its UAT's or county's list: no county to choose.
+  const where: Array<FilterDecl> = fixedArea
+    ? []
+    : [
+        {
+          key: 'judet',
+          kind: 'choice',
+          single: true,
+          label: labels.judet,
+          value: countyIndex >= 0 ? [countyIndex] : [],
+          options: counties.map((option, index) => ({
+            value: index,
+            label: option.name,
+            count: option.count,
+          })),
+          chip: countyIndex >= 0 ? counties[countyIndex].name : null,
+          clear: { judet: undefined },
+          patch: (next) => ({
+            judet: next.length
+              ? countySlugOfCode(counties[next[0]].value)
+              : undefined,
+          }),
+        },
+      ]
+
   return [
     ...(fixedKind ? programmes : [program]),
-    {
-      key: 'judet',
-      kind: 'choice',
-      single: true,
-      label: labels.judet,
-      value: countyIndex >= 0 ? [countyIndex] : [],
-      options: counties.map((option, index) => ({
-        value: index,
-        label: option.name,
-        count: option.count,
-      })),
-      chip: countyIndex >= 0 ? counties[countyIndex].name : null,
-      clear: { judet: undefined },
-      patch: (next) => ({
-        judet: next.length
-          ? countySlugOfCode(counties[next[0]].value)
-          : undefined,
-      }),
-    },
+    ...where,
     ...beneficiary,
     {
       key: 'stare',

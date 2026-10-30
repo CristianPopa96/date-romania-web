@@ -7,10 +7,8 @@ export const rankings = {
   title: 'Clasamente',
   intro:
     'Fapte măsurabile, fiecare cu sursa ei. Un loc în clasament arată doar cât s-a contractat, s-a cumpărat sau s-a vândut, nu spune nimic despre corectitudinea achizițiilor.',
-  suppliers: 'Furnizori',
-  institutions: 'Instituții',
   tabs: {
-    contracte: 'Cele mai mari contracte',
+    contracte: 'Contracte',
     furnizori: 'Furnizori',
     achizitii: 'Achiziții directe',
     institutii: 'Instituții',
@@ -21,23 +19,26 @@ export const rankings = {
   // A member's place says what the contracts were worth, not what the member received.
   associationNote:
     'Un contract câștigat în asociere apare la fiecare membru, cu valoarea întreagă.',
-  none: 'Niciun contract semnat în această perioadă nu apare în anunțurile preluate.',
-  noneFiltered: 'Nimic nu se potrivește cu filtrele alese.',
+  euYes: 'da',
+  euNo: 'nu',
 
-  // The filters above the largest contracts. A trigger names its field: "CPV: toate".
-  filters: {
-    label: 'Filtre',
-    field: (name: string, value: string) => `${name}: ${value}`,
-    all: 'toate',
-    cpv: 'CPV',
-    eu: 'Fonduri UE',
-    euYes: 'da',
-    euNo: 'nu',
-    // Only award notices say how they are paid for, and not all of them do.
-    euNote:
-      'Fonduri UE după anunțul de atribuire: „da” dacă un lot e plătit din fonduri europene. Un anunț care nu spune cum e plătit apare doar la „toate”.',
-    missing:
-      'Anul, județul și tipul instituției nu pot fi alese încă: avem o singură perioadă, filtrul după județ nu e construit încă, iar tipul instituției nu îl avem.',
+  // The two lists of records, every contract and every direct purchase, the largest first.
+  records: {
+    contracts: {
+      title: 'Contracte',
+      lead: 'Toate contractele publicate, de la cea mai mare valoare.',
+    },
+    purchases: {
+      title: 'Achiziții directe',
+      lead: 'Toate achizițiile directe acceptate, de la cea mai mare valoare.',
+    },
+  },
+
+  // The switch above a ranking of parties: one kind of money at a time, never added.
+  money: {
+    label: 'Clasament după',
+    contracts: 'Contracte',
+    purchases: 'Achiziții directe',
   },
 
   // A ranking as a list (DataTable): parties, a page at a time, in any column's order.
@@ -52,8 +53,8 @@ export const rankings = {
     filters: {
       q: 'Căutare',
       castigate: 'Câștigat',
-      parte: 'Clasament',
       perioada: 'Perioada',
+      judet: 'Județ',
       cpv: 'CPV',
       ue: 'Fonduri UE',
     },

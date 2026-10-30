@@ -95,6 +95,21 @@ describe('projectsCsvPath', () => {
     ).toBe('/proiecte.csv?judet=gorj&program=pnrr')
     expect(projectsCsvPath({})).toBe('/proiecte.csv')
   })
+
+  it("keeps a place page's UAT or county, whatever the address says", () => {
+    expect(projectsCsvPath({}, { area: { place: 84914 } })).toBe(
+      '/proiecte.csv?loc=84914',
+    )
+    expect(projectsCsvPath({ judet: 'dolj' }, { area: { county: 'GJ' } })).toBe(
+      '/proiecte.csv?judet=gorj',
+    )
+    expect(
+      projectFilter({ judet: 'dolj' }, { area: { place: 84914 } }),
+    ).toMatchObject({ place: 84914 })
+    expect(
+      projectFilter({ judet: 'dolj' }, { area: { county: 'GJ' } }).county,
+    ).toBe('GJ')
+  })
 })
 
 describe('kindParam', () => {

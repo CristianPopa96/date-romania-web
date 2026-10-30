@@ -208,36 +208,6 @@ export const eu = {
     },
   },
 
-  // The EU money of a town hall or county council, in short on its place's page. The two
-  // kinds are never added together, nor two programmes' figures.
-  held: {
-    noPayments: 'nicio plată în fișierul de plăți',
-    failed:
-      'Nu am putut citi acum fondurile europene ale acestui beneficiar. Încearcă din nou mai târziu.',
-    // On a place's page: the town hall's or county council's, with links to its lists.
-    placeTitle: 'Fonduri europene',
-    placeLead: (name: string) =>
-      `Proiectele europene în care ${name} apare ca beneficiar.`,
-    placeCohesion: (n: number, text: string, programmes: number) =>
-      `${counted(n, text, 'Un proiect de coeziune', 'proiecte de coeziune')}, ${programmes === 1 ? 'într-un program' : `în ${programmes} programe`}`,
-    // `all`: every one of them; "legat" then agrees with the project counted before it.
-    placeByName: (n: number, text: string, all: boolean) =>
-      all
-        ? n === 1
-          ? ', legat de noi după nume'
-          : ', toate legate de noi după nume'
-        : `, din care ${n === 1 ? 'unul este legat' : `${text} sunt legate`} de noi după nume`,
-    placePnrr: (n: number, text: string) =>
-      n === 0
-        ? 'Niciun contract PNRR'
-        : counted(n, text, 'Un contract PNRR', 'contracte PNRR'),
-    placeReceived: (sum: string, days: string | null) =>
-      `plăți primite ${sum}${days ? `, ${days}` : ''}`,
-    placeNone:
-      'Niciun proiect european în listele MIPE și în tabloul de bord PNRR pe care le avem.',
-    seeList: 'Vezi lista',
-  },
-
   notPublicTitle: 'Ce nu este public',
   notPublic:
     'Cererile de rambursare, facturile decontate și data fiecărei plăți nu sunt publicate. Lista MIPE dă doar suma plătită până la data ei.',

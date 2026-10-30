@@ -26,6 +26,8 @@ export type PnrrListSearch = {
   // The county without its marks (pnrr.ts) and a beneficiary's CUI: a measure's list only.
   judet?: string
   beneficiar?: number
+  // The kind of beneficiary as the dashboard writes it ('UAT', 'Unitate de învățământ').
+  tip_beneficiar?: string
   stare?: string | number
   valoare_min?: number
   valoare_max?: number
@@ -125,6 +127,11 @@ export function validatePnrrMeasureSearch(
         ? search.judet
         : undefined,
     beneficiar: numberFromParam(search.beneficiar, 10),
+    tip_beneficiar:
+      typeof search.tip_beneficiar === 'string' &&
+      search.tip_beneficiar.trim().length > 0
+        ? search.tip_beneficiar.slice(0, 200)
+        : undefined,
   }
 }
 
@@ -152,6 +159,7 @@ export type PnrrListOf = { measure: string; counties: ReadonlyArray<string> }
 
 export type PnrrListFilter = {
   beneficiary?: number
+  beneficiary_type?: string
   measure?: Array<string>
   county?: string
   status?: Array<PnrrStatus>
@@ -169,6 +177,7 @@ export function pnrrFilter(
 ): PnrrListFilter {
   return {
     beneficiary: search.beneficiar,
+    beneficiary_type: search.tip_beneficiar,
     measure: [of.measure],
     // A county the measure has no contract in is not asked for.
     county: countyBySlug(of.counties, search.judet),
@@ -199,6 +208,7 @@ export const PNRR_FILTER_PARAMS = {
   q: ['q'],
   judet: ['judet'],
   beneficiar: ['beneficiar'],
+  tip_beneficiar: ['tip_beneficiar'],
   stare: ['stare'],
   valoare: ['valoare_min', 'valoare_max'],
   progres: ['progres_min', 'progres_max'],
@@ -209,6 +219,7 @@ export const PNRR_BY_API_PARAM: Record<string, PnrrFilterKey> = {
   q: 'q',
   county: 'judet',
   beneficiary: 'beneficiar',
+  beneficiary_type: 'tip_beneficiar',
   status: 'stare',
   value_min: 'valoare',
   value_max: 'valoare',

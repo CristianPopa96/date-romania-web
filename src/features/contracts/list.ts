@@ -1,8 +1,12 @@
 // The contracts of one institution or supplier as a list of the DataTable pattern: what its
 // address holds, and what it asks the API for. The address is Romanian, the API's
-// parameters English: /institutii/4305857?lista=contracte&fel=3&valoare_min=1000000.
+// parameters English: /institutii/4305857?lista=contracte&fel=3&valoare_min=1000000. The
+// same list of every contract (`cui` null) is the "Contracte" tab of Clasamente:
+// /clasamente?furnizor=17886786&judet=gorj, the largest first.
 
 import type { Role } from '#/lib/api'
+import { countyCodeOfSlug } from '#/lib/counties'
+import { countyParam } from '#/lib/county-filter'
 import {
   choiceFromParam,
   choiceToParam,
@@ -37,6 +41,8 @@ export type ContractListSearch = {
   furnizor?: number
   institutie?: number
   cpv?: string | number
+  // The buyer's county, on the list of every contract.
+  judet?: string
   fel?: string | number
   // EU funds: 'da' or 'nu', as the rankings say it.
   ue?: 'da' | 'nu'
@@ -54,8 +60,10 @@ export const CONTRACT_COLUMNS = {
   institutie: { api: 'buyer', text: true },
 } as const
 
+// `largest`: the list of every contract opens on the largest, an entity's on the newest.
 export function validateContractListSearch(
   search: Record<string, unknown>,
+  largest = false,
 ): ContractListSearch {
   const q =
     typeof search.q === 'string' || typeof search.q === 'number'
@@ -66,6 +74,7 @@ export function validateContractListSearch(
     (CONTRACT_KINDS as ReadonlyArray<number>).includes(kind),
   )
   const sort = sortFromParam(search.ordine, CONTRACT_COLUMNS)
+  const own = defaultSort(largest)
   return {
     q: q ? searchParam(q) : undefined,
     de_la: dayFromParam(search.de_la),
@@ -78,15 +87,16 @@ export function validateContractListSearch(
       cpv !== undefined && String(search.cpv).length >= 2
         ? searchParam(String(search.cpv))
         : undefined,
+    judet: countyParam(search.judet),
     fel: kinds?.length ? choiceToParam(kinds) : undefined,
     ue: search.ue === 'da' || search.ue === 'nu' ? search.ue : undefined,
     castig:
       search.castig === 'singur' || search.castig === 'asociere'
         ? search.castig
         : undefined,
-    // The list's own order (newest first) is left out of the address.
+    // The list's own order is left out of the address.
     ordine:
-      sort && !(sort.column === 'data' && sort.dir === 'desc')
+      sort && !(sort.column === own.column && sort.dir === own.dir)
         ? sortToParam(sort, CONTRACT_COLUMNS)
         : undefined,
     pe_pagina: pageSizeFromParam(search.pe_pagina),
@@ -94,13 +104,15 @@ export function validateContractListSearch(
   }
 }
 
-export function contractSort(search: ContractListSearch): Sort {
-  return (
-    sortFromParam(search.ordine, CONTRACT_COLUMNS) ?? {
-      column: 'data',
-      dir: 'desc',
-    }
-  )
+function defaultSort(largest: boolean): Sort {
+  return { column: largest ? 'valoare' : 'data', dir: 'desc' }
+}
+
+export function contractSort(
+  search: ContractListSearch,
+  largest = false,
+): Sort {
+  return sortFromParam(search.ordine, CONTRACT_COLUMNS) ?? defaultSort(largest)
 }
 
 // How a company's list was won: the address's choice, else alone when it won anything
@@ -122,35 +134,55 @@ export type ContractFilter = {
   value_min?: number
   value_max?: number
   cpv?: string
+  county?: string
   date_from?: string
   date_to?: string
 }
 
-// `won` is the company's way of winning (wonOf); a buyer's list holds both.
+// How the address's "Câștigat" reads, on the list of every contract.
+export function wonOfParam(param: WonParam | undefined): Won | undefined {
+  if (param === undefined) return undefined
+  return param === 'asociere' ? 'association' : 'alone'
+}
+
+// `won` is the company's way of winning (wonOf); a buyer's list holds both. With no CUI,
+// the list of every contract: the company and the institution are the address's filters.
 export function contractFilter(
   role: Role,
-  cui: number,
+  cui: number | null,
   search: ContractListSearch,
   won?: Won,
 ): ContractFilter {
   const party = role === 'institutions' ? search.furnizor : search.institutie
+  const parties =
+    cui === null
+      ? { buyer: search.institutie, supplier: search.furnizor }
+      : {
+          [role === 'institutions' ? 'buyer' : 'supplier']: cui,
+          [role === 'institutions' ? 'supplier' : 'buyer']: party,
+        }
   return {
-    [role === 'institutions' ? 'buyer' : 'supplier']: cui,
-    [role === 'institutions' ? 'supplier' : 'buyer']: party,
+    ...parties,
     q: search.q === undefined ? undefined : String(search.q),
-    won: role === 'suppliers' ? won : undefined,
+    won:
+      cui === null
+        ? wonOfParam(search.castig)
+        : role === 'suppliers'
+          ? won
+          : undefined,
     kind: choiceFromParam(search.fel),
     eu_funded: search.ue === undefined ? undefined : String(search.ue === 'da'),
     value_min: search.valoare_min,
     value_max: search.valoare_max,
     cpv: search.cpv === undefined ? undefined : String(search.cpv),
+    county: countyCodeOfSlug(search.judet),
     date_from: search.de_la,
     date_to: search.pana_la,
   }
 }
 
-export function contractApiSort(search: ContractListSearch) {
-  const sort = contractSort(search)
+export function contractApiSort(search: ContractListSearch, largest = false) {
+  const sort = contractSort(search, largest)
   return {
     sort: CONTRACT_COLUMNS[sort.column as keyof typeof CONTRACT_COLUMNS].api,
     order: sort.dir,
@@ -166,6 +198,7 @@ export const CONTRACT_FILTER_PARAMS = {
   furnizor: ['furnizor'],
   institutie: ['institutie'],
   cpv: ['cpv'],
+  judet: ['judet'],
   fel: ['fel'],
   ue: ['ue'],
 } as const satisfies Record<string, ReadonlyArray<keyof ContractListSearch>>
@@ -180,18 +213,28 @@ export const CONTRACT_BY_API_PARAM: Record<string, ContractFilterKey> = {
   supplier: 'furnizor',
   buyer: 'institutie',
   cpv: 'cpv',
+  county: 'judet',
   kind: 'fel',
   eu_funded: 'ue',
 }
 
 // The address of the list as a file: the CUI, how a company's was won, the filters and the
-// order shown.
+// order shown. The list of every contract keeps its "Câștigat" as it is.
 export function contractFileSearch(
   role: Role,
-  cui: number,
+  cui: number | null,
   search: ContractListSearch,
   won?: Won,
 ): Record<string, string> {
+  if (cui === null) {
+    return {
+      // Not one party's list: its company and institution are filters, its order the
+      // largest first.
+      toate: 'da',
+      ...(search.castig ? { castig: search.castig } : {}),
+      ...fileParams(CONTRACT_FILTER_PARAMS, search),
+    }
+  }
   return {
     [role === 'institutions' ? 'institutie' : 'furnizor']: String(cui),
     ...(role === 'suppliers' && won

@@ -1,5 +1,5 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { Text } from '@radix-ui/themes'
+import { Flex, Heading, Text } from '@radix-ui/themes'
 
 import type { Patch } from '#/components/list/filter-types'
 import { ListEmpty } from '#/components/list/ListEmpty'
@@ -17,6 +17,7 @@ import {
   projectsCsvPath,
 } from '#/features/projects/list'
 import type {
+  ProjectArea,
   ProjectListSearch,
   ProjectParty,
   ProjectScope,
@@ -46,6 +47,7 @@ export function ProjectList<TSearch extends ProjectListSearch>({
   fixed,
   cohesion,
   party,
+  area,
   title,
   titleAs,
 }: {
@@ -60,22 +62,35 @@ export function ProjectList<TSearch extends ProjectListSearch>({
   // An entity page's institution or company: its projects only, and on a company's, how
   // it is tied to each.
   party?: ProjectParty
+  // A place page's UAT or county: the projects landing there.
+  area?: ProjectArea
   title: string
   // h3 under an entity page's own heading for its lists.
   titleAs?: 'h2' | 'h3'
 }) {
   const { t, f } = useI18n()
   const p = t.projects
-  const scope: ProjectScope = { kind: fixed, codes: cohesion?.codes, party }
+  const scope: ProjectScope = {
+    kind: fixed,
+    codes: cohesion?.codes,
+    party,
+    area,
+  }
   const { data: list } = useSuspenseQuery(projectListQuery(search, scope))
   const { data: overview } = useSuspenseQuery(
     projectsOverviewQuery(search, scope),
   )
+  // Not answered: the list keeps its heading and says so; the page stays.
   if (list === 'failed' || overview === 'failed' || !overview) {
     return (
-      <Text size="2" color="gray">
-        {p.failed}
-      </Text>
+      <Flex direction="column" gap="2">
+        <Heading as={titleAs ?? 'h2'} size="4">
+          {title}
+        </Heading>
+        <Text size="2" color="gray">
+          {p.failed}
+        </Text>
+      </Flex>
     )
   }
 
@@ -107,12 +122,19 @@ export function ProjectList<TSearch extends ProjectListSearch>({
           fixedKind: fixed !== undefined,
           held: cohesion?.held,
           fixedParty: party !== undefined,
+          fixedArea: area !== undefined,
           t,
           f,
         }),
         onApply: apply,
       }}
-      summary={summaryLine(overview, fixed, t, f, party !== undefined)}
+      summary={summaryLine(
+        overview,
+        fixed,
+        t,
+        f,
+        party !== undefined || area !== undefined,
+      )}
       views={
         found.projects > 0 && !cohesion
           ? {

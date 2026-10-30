@@ -8,7 +8,7 @@ import {
   REACHES,
 } from '#/features/projects/api'
 import type { ProjectKind, ProjectStatus, Reach } from '#/features/projects/api'
-import { countyCodeOfSlug } from '#/lib/counties'
+import { countyCodeOfSlug, countySlugOfCode } from '#/lib/counties'
 import {
   numberFromParam,
   pageSizeFromParam,
@@ -162,6 +162,8 @@ export type ProjectFilter = {
   // An entity page's: its projects as the beneficiary, or a company's, paid through too.
   company?: number
   county?: string
+  // A place page's UAT, by its SIRUTA code: the projects landing there.
+  place?: number
   beneficiary?: number
   status?: Array<ProjectStatus>
   reach?: Array<Reach>
@@ -174,23 +176,33 @@ export type ProjectFilter = {
 // (`kind`), the EU funds page the cohesion programmes its address names, by code
 // (`codes`, since there `program` holds their slugs), an entity page its institution
 // (`party.beneficiary`) or its company (`party.company`, the projects it was paid through
-// too).
+// too), a place page its UAT (`area.place`, by SIRUTA code) or its county (`area.county`,
+// by code).
 export type ProjectParty = { beneficiary: number } | { company: number }
+export type ProjectArea = { place: number } | { county: string }
 export type ProjectScope = {
   kind?: ProjectKind
   codes?: Array<string>
   party?: ProjectParty
+  area?: ProjectArea
+}
+
+// An institution's own projects, as their beneficiary: its Proiecte tab.
+export function ownProjects(cui: number): ProjectScope {
+  return { party: { beneficiary: cui } }
 }
 
 export function projectFilter(
   search: ProjectListSearch,
   scope: ProjectScope = {},
 ): ProjectFilter {
-  const { kind, codes, party } = scope
+  const { kind, codes, party, area } = scope
   return {
     kind: kind ? [kind] : kindsFromParam(search.program),
     programme: codes,
-    county: countyCodeOfSlug(search.judet),
+    county:
+      area && 'county' in area ? area.county : countyCodeOfSlug(search.judet),
+    place: area && 'place' in area ? area.place : undefined,
     beneficiary:
       party && 'beneficiary' in party ? party.beneficiary : search.beneficiar,
     company: party && 'company' in party ? party.company : undefined,
@@ -207,15 +219,19 @@ export function projectFilter(
 
 // The file of the list, with its filters and order: the site's own address, which the
 // file's route reads as the list's (`/proiecte.csv?program=pnrr&judet=gorj`). The EU
-// funds page's programmes go by code (`cod=POR,PEO`), an entity's company as `firma`.
+// funds page's programmes go by code (`cod=POR,PEO`), an entity's company as `firma`, a
+// place page's UAT as `loc` (its SIRUTA code) and its county as `judet`.
 export function projectsCsvPath(
   search: ProjectListSearch,
   scope: ProjectScope = {},
 ): string {
   const params = new URLSearchParams()
-  const { kind, codes, party } = scope
+  const { kind, codes, party, area } = scope
   const kept = {
     ...search,
+    judet:
+      area && 'county' in area ? countySlugOfCode(area.county) : search.judet,
+    loc: area && 'place' in area ? area.place : undefined,
     program: kind ? kindsToParam([kind]) : search.program,
     cod: codes?.join(','),
     beneficiar:

@@ -37,7 +37,7 @@ export const getContractList = createServerFn({ method: 'GET' })
 // `scope` is the party whose list it is: the figures say what part of it the filters keep.
 export const getContractOverview = createServerFn({ method: 'GET' })
   .inputValidator(
-    (data: { filter: ContractFilter; scope: 'buyer' | 'supplier' }) => data,
+    (data: { filter: ContractFilter; scope?: 'buyer' | 'supplier' }) => data,
   )
   .handler(({ data }) =>
     getJson<ContractOverview>('/v1/award-contracts/overview', {

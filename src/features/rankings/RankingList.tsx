@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
-import { Flex, Text } from '@radix-ui/themes'
+import { Flex, SegmentedControl, Text } from '@radix-ui/themes'
 
 import { ChartCard } from '#/components/list/ChartCard'
 import type { Patch } from '#/components/list/filter-types'
@@ -32,10 +32,10 @@ import { chosenFilters, sortToParam, withoutFilters } from '#/lib/list'
 import type { Sort } from '#/lib/list'
 import { statsQuery } from '#/lib/queries'
 
-// One ranking, declared to the list pattern (ListView): winners or institutions of
-// contracts, or suppliers or institutions of direct purchases, never both kinds of money.
-// Its filters, the count of parties ranked, the ten largest as bars (each opens its page),
-// the places in the order chosen, and the pager. A name searched for keeps its place.
+// One ranking, declared to the list pattern (ListView): companies or institutions, by
+// contracts or by direct purchases (the switch above it), never both kinds of money. Its
+// filters, the count of parties ranked, the ten largest as bars (each opens its page), the
+// places in the order chosen, and the pager. A name searched for keeps its place.
 export function RankingList({
   tab,
   search,
@@ -118,6 +118,30 @@ export function RankingList({
 
   return (
     <Flex direction="column" gap="3">
+      <Flex align="center" gap="3" wrap="wrap">
+        <Text size="2" color="gray">
+          {t.rankings.money.label}
+        </Text>
+        <SegmentedControl.Root
+          size="1"
+          value={search.bani ?? 'contracte'}
+          onValueChange={(value) =>
+            onSearch({
+              ...search,
+              bani: value === 'achizitii' ? 'achizitii' : undefined,
+              ordine: undefined,
+              pagina: undefined,
+            })
+          }
+        >
+          <SegmentedControl.Item value="contracte">
+            {t.rankings.money.contracts}
+          </SegmentedControl.Item>
+          <SegmentedControl.Item value="achizitii">
+            {t.rankings.money.purchases}
+          </SegmentedControl.Item>
+        </SegmentedControl.Root>
+      </Flex>
       {list.contract ? (
         <IncompleteContracts period={list.contract.period} />
       ) : summary ? (

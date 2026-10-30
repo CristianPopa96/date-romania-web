@@ -12,36 +12,42 @@ import type { PurchaseListSearch } from '#/features/purchases/list'
 
 // A page of the direct purchases of an institution or a supplier, under the filters, the
 // order and the page size of its address; and what the list says about itself under the
-// same filters.
+// same filters. 'failed' when the API did not answer: the page stays, with a note.
 export const purchaseListQuery = (
   role: Role,
-  cui: number,
+  cui: number | null,
   search: PurchaseListSearch & { pagina?: number },
 ) => {
   const data = {
     filter: purchaseFilter(role, cui, search),
-    ...purchaseApiSort(search),
+    // The list of every purchase opens on the largest.
+    ...purchaseApiSort(search, cui === null),
     size: search.pe_pagina ?? 25,
     page: search.pagina ?? 1,
   }
   return queryOptions({
     queryKey: ['purchases', 'list', data],
-    queryFn: () => getPurchaseList({ data }),
+    queryFn: () => getPurchaseList({ data }).catch(() => 'failed' as const),
   })
 }
 
 export const purchaseOverviewQuery = (
   role: Role,
-  cui: number,
+  cui: number | null,
   search: PurchaseListSearch,
 ) => {
   const data = {
     filter: purchaseFilter(role, cui, search),
-    scope: role === 'institutions' ? ('buyer' as const) : ('supplier' as const),
+    scope:
+      cui === null
+        ? undefined
+        : role === 'institutions'
+          ? ('buyer' as const)
+          : ('supplier' as const),
   }
   return queryOptions({
     queryKey: ['purchases', 'overview', data],
-    queryFn: () => getPurchaseOverview({ data }),
+    queryFn: () => getPurchaseOverview({ data }).catch(() => 'failed' as const),
   })
 }
 

@@ -7,7 +7,7 @@ import { ListRows } from '#/components/list/ListRows'
 import type { Column } from '#/components/list/ListRows'
 import { Winners } from '#/features/contracts/Winners'
 import type { Contract } from '#/features/contracts/api'
-import { shownValue } from '#/features/contracts/contracts'
+import { isAssociation, shownValue } from '#/features/contracts/contracts'
 import { useI18n } from '#/i18n/context'
 import { rich } from '#/i18n/rich'
 import type { Role } from '#/lib/api'
@@ -16,10 +16,13 @@ import type { Sort } from '#/lib/list'
 
 // The rows of a list of contracts, declared to ListRows: the day signed, the contract (it
 // opens its award notice: a contract has no page of its own), the other party (the
-// winners on an institution's page, the buyer on a company's) and the value. On a phone a
-// card per contract with its value on the right.
+// winners on an institution's page, the buyer on a company's) and the value. The list of
+// every contract (`every`) shows both parties, and with a company chosen how each contract
+// was won ("Câștigat", Q69). On a phone a card per contract with its value on the right.
 export function ContractRows({
   role,
+  every = false,
+  company,
   items,
   q,
   sort,
@@ -27,6 +30,9 @@ export function ContractRows({
   total,
 }: {
   role: Role
+  every?: boolean
+  // The company the list of every contract is filtered by.
+  company?: number
   items: Array<Contract>
   q: string | undefined
   sort: Sort
@@ -34,6 +40,19 @@ export function ContractRows({
   total: { label: string; value: string } | null
 }) {
   const { t } = useI18n()
+  const buyer: Column<Contract> = {
+    key: 'institutie',
+    header: t.contracts.buyer,
+    sort: { column: 'institutie', text: true },
+    cell: (contract) => <Party contract={contract} role="suppliers" />,
+  }
+  const won: Column<Contract> = {
+    key: 'castigat',
+    header: t.contractList.filters.castig,
+    nowrap: true,
+    cell: (contract) =>
+      t.contractList.won[isAssociation(contract) ? 'association' : 'alone'],
+  }
   const columns: Array<Column<Contract>> = [
     {
       key: 'data',
@@ -57,6 +76,8 @@ export function ContractRows({
       },
       cell: (contract) => <Party contract={contract} role={role} />,
     },
+    ...(every ? [buyer] : []),
+    ...(every && company !== undefined ? [won] : []),
     {
       key: 'valoare',
       header: t.contracts.value,
@@ -84,6 +105,11 @@ export function ContractRows({
             <Box mt="1">
               <Party contract={contract} role={role} />
             </Box>
+            {every ? (
+              <Box mt="1">
+                <Party contract={contract} role="suppliers" />
+              </Box>
+            ) : null}
           </Box>
           <Box style={{ whiteSpace: 'nowrap', textAlign: 'right' }}>
             <Value contract={contract} />

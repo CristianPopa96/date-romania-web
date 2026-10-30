@@ -80,6 +80,9 @@ describe('the list of an entity page', () => {
     expect(entityList({ lista: 'proiecte' }, true, true)).toBe('proiecte')
     expect(entityList({ lista: 'proiecte' }, true, false)).toBe('contracte')
     expect(entityList({ lista: 'proiecte' }, false)).toBe('achizitii')
+    // Buget, only for a town hall or a county council, whose budget is held.
+    expect(entityList({ lista: 'buget' }, true, false, true)).toBe('buget')
+    expect(entityList({ lista: 'buget' }, true, true, false)).toBe('contracte')
   })
 
   it('opens an old link to an EU list on the projects, with that programme', () => {

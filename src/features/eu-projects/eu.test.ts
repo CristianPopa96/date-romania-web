@@ -1,13 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
-import type {
-  EuBeneficiary,
-  EuBeneficiaryFunds,
-  EuProgramme,
-} from '#/features/eu-projects/api'
+import type { EuBeneficiary, EuProgramme } from '#/features/eu-projects/api'
 import {
   beneficiaryTie,
-  euCounts,
   euShare,
   periodLabel,
   programmeCodes,
@@ -109,71 +104,4 @@ describe('euShare', () => {
 
 it('writes a programming period with an en dash', () => {
   expect(periodLabel('2014-2020')).toBe('2014–2020')
-})
-
-describe('euCounts', () => {
-  const programme = (code: string, projects: number, byName = 0) => ({
-    code,
-    name: code,
-    period: '2014-2020',
-    projects,
-    total: null,
-    paid: null,
-    cut_off: null,
-    by_name: byName,
-  })
-  const source = {
-    publisher: 'MIPE',
-    record: 'x',
-    url: 'https://mfe.gov.ro',
-    fetched_at: null,
-    document_id: null,
-    sha256: null,
-    parser_version: null,
-    documents: null,
-  }
-  const funds = (patch: Partial<EuBeneficiaryFunds>): EuBeneficiaryFunds => ({
-    entity,
-    cohesion: [],
-    cohesion_source: null,
-    pnrr: null,
-    ...patch,
-  })
-
-  it('counts the projects of every programme, and the PNRR contracts', () => {
-    const held = funds({
-      cohesion: [programme('POR', 3, 1), programme('POIM', 2, 2)],
-      pnrr: {
-        contracts: 4,
-        total: 10,
-        paid: 5,
-        payments: 2,
-        first_day: null,
-        last_day: null,
-        edition: '2026-10-15',
-        source,
-      },
-    })
-    expect(euCounts(held)).toEqual({
-      cohesion: 5,
-      byName: 3,
-      pnrr: 4,
-      pnrrPaid: true,
-    })
-  })
-
-  it('counts nothing without an answer or without projects', () => {
-    expect(euCounts('failed')).toEqual({
-      cohesion: 0,
-      byName: 0,
-      pnrr: 0,
-      pnrrPaid: false,
-    })
-    expect(euCounts(funds({}))).toEqual({
-      cohesion: 0,
-      byName: 0,
-      pnrr: 0,
-      pnrrPaid: false,
-    })
-  })
 })

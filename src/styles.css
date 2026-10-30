@@ -161,6 +161,10 @@ th[aria-sort='ascending'] .dr-sort::after {
   border-radius: 2px;
   background: var(--indigo-6);
 }
+/* "Alți {n}" and the other rows that are no filter: gray, never clickable (Q61). */
+.dr-rank-bar.dr-rest {
+  background: var(--slate-8);
+}
 .dr-rank[aria-pressed='true'] .dr-rank-bar {
   background: var(--indigo-9);
 }

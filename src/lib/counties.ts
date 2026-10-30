@@ -57,6 +57,11 @@ export function plainSlug(name: string): string {
     .replace(/^-|-$/g, '')
 }
 
+// The codes in the order of the names, for a list that offers every county.
+export const COUNTY_CODES = Object.keys(NAMES).sort((a, b) =>
+  NAMES[a].localeCompare(NAMES[b], 'ro'),
+)
+
 export function countyName(code: string): string | undefined {
   return Object.hasOwn(NAMES, code) ? NAMES[code] : undefined
 }

@@ -12,7 +12,8 @@ export type RankRow = {
 
 // The largest counterparts as bars (ChartCard "Clasament"); clicking one asks for it as a
 // filter of the list. Bars are scaled to the largest named row: the rest, added up, can be
-// far larger and would leave the others as slivers, so its bar stops at the full width.
+// far larger and would leave the others as slivers, so its bar stops at the full width,
+// in gray, with its value written: it is no filter (Q61).
 export function RankBars({
   rows,
   format,
@@ -39,7 +40,7 @@ export function RankBars({
               </Text>
             </Flex>
             <Box
-              className="dr-rank-bar"
+              className={row.pick ? 'dr-rank-bar' : 'dr-rank-bar dr-rest'}
               mt="1"
               style={{
                 width: `${Math.min(Math.max((row.value / largest) * 100, 1), 100)}%`,
@@ -63,9 +64,7 @@ export function RankBars({
             {body}
           </button>
         ) : (
-          <Box key={row.key} style={{ opacity: 0.8 }}>
-            {body}
-          </Box>
+          <Box key={row.key}>{body}</Box>
         )
       })}
     </Flex>

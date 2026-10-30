@@ -36,7 +36,7 @@ export const getPurchaseList = createServerFn({ method: 'GET' })
 // `scope` is the party whose list it is: the figures say what part of it the filters keep.
 export const getPurchaseOverview = createServerFn({ method: 'GET' })
   .inputValidator(
-    (data: { filter: PurchaseFilter; scope: 'buyer' | 'supplier' }) => data,
+    (data: { filter: PurchaseFilter; scope?: 'buyer' | 'supplier' }) => data,
   )
   .handler(({ data }) =>
     getJson<PurchaseOverview>('/v1/direct-purchases/overview', {

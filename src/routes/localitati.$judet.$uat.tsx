@@ -3,6 +3,7 @@ import {
   Link as RouterLink,
   createFileRoute,
   notFound,
+  redirect,
 } from '@tanstack/react-router'
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons'
 import {
@@ -18,9 +19,16 @@ import {
 
 import { AmountBars } from '#/features/budget/AmountBars'
 import { EntityLink } from '#/components/EntityLink'
-import { PlaceEuFunds } from '#/features/eu-projects/PlaceEuFunds'
 import { PlaceOverview } from '#/features/places/PlaceOverview'
-import { InstitutionsTable, ProjectsTable } from '#/features/places/PlaceLists'
+import { InstitutionsTable } from '#/features/places/PlaceLists'
+import { PlaceProjects } from '#/features/places/PlaceProjects'
+import {
+  ownProjects,
+  projectListQuery,
+  projectsOverviewQuery,
+  validateProjectListSearch,
+} from '#/features/projects'
+import { pageCount } from '#/lib/list'
 import { WinnersCard } from '#/features/places/WinnersCard'
 import { SourceLine } from '#/components/SourceLine'
 import { messagesFor } from '#/i18n'
@@ -33,22 +41,42 @@ import {
   validateLocalitySearch,
   villageOf,
 } from '#/features/places/places'
-import { euBeneficiaryQuery } from '#/features/eu-projects/queries'
 import { localityQuery } from '#/features/places/queries'
 
 // One UAT (flow 6, ScreenLocality): a commune, town, municipality or Bucharest sector.
 // Every figure names its own period and none is added to another (design round 8).
 export const Route = createFileRoute('/localitati/$judet/$uat')({
-  validateSearch: validateLocalitySearch,
-  loader: async ({ context, params }) => {
+  // The village asked for, and the list of projects landing here: its county is the page's.
+  validateSearch: (search: Record<string, unknown>) => {
+    const { judet: _county, ...projects } = validateProjectListSearch(search)
+    return { ...validateLocalitySearch(search), ...projects }
+  },
+  loaderDeps: ({ search }) => search,
+  loader: async ({ context, params, deps }) => {
     const found = await context.queryClient.ensureQueryData(
       localityQuery(params.judet, params.uat),
     )
     if (!found) throw notFound()
-    if (found.town_hall) {
-      await context.queryClient.ensureQueryData(
-        euBeneficiaryQuery(found.town_hall.cui),
-      )
+    const scope = { area: { place: found.place.siruta } }
+    const [list] = await Promise.all([
+      context.queryClient.ensureQueryData(projectListQuery(deps, scope)),
+      context.queryClient.ensureQueryData(projectsOverviewQuery(deps, scope)),
+      // The town hall's own projects, for the link to them.
+      found.town_hall
+        ? context.queryClient.ensureQueryData(
+            projectListQuery({}, ownProjects(found.town_hall.cui)),
+          )
+        : null,
+    ])
+    // A page past the end of the list goes to the last one that has rows.
+    const last =
+      list === 'failed' ? null : pageCount(list.total, deps.pe_pagina ?? 25)
+    if (last !== null && (deps.pagina ?? 1) > last) {
+      throw redirect({
+        to: '/localitati/$judet/$uat',
+        params,
+        search: { ...deps, pagina: last > 1 ? last : undefined },
+      })
     }
     return { name: found.place.name }
   },
@@ -68,7 +96,9 @@ function LocalityPage() {
   const { t, f } = useI18n()
   const p = t.places
   const { judet, uat } = Route.useParams()
-  const { sat } = Route.useSearch()
+  const search = Route.useSearch()
+  const navigate = Route.useNavigate()
+  const { sat } = search
   const { data: locality } = useSuspenseQuery(localityQuery(judet, uat))
   if (!locality) return null
   const { figures, place } = locality
@@ -137,12 +167,14 @@ function LocalityPage() {
           <WinnersCard winners={figures.top_winners} />
         </Grid>
 
-        <Flex direction="column" gap="5">
-          <ProjectsTable projects={locality.projects} />
-          {locality.town_hall ? (
-            <PlaceEuFunds entity={locality.town_hall} />
-          ) : null}
-        </Flex>
+        <PlaceProjects
+          area={{ place: place.siruta }}
+          own={locality.town_hall}
+          search={search}
+          onSearch={(next) =>
+            void navigate({ search: next, resetScroll: false })
+          }
+        />
 
         <Flex direction="column" gap="2">
           <Heading as="h2" size="5">

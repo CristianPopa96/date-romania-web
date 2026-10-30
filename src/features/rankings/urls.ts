@@ -5,13 +5,20 @@ import {
   sortToParam,
 } from '#/lib/list'
 import type { PageSize, Sort } from '#/lib/list'
+import { countyParam } from '#/lib/county-filter'
 import { pageFromParam, searchParam } from '#/lib/urls'
 import { PATTERN_COLUMNS, contractTypeFromParam } from '#/features/patterns'
+import { validateContractListSearch } from '#/features/contracts'
+import type { ContractListSearch } from '#/features/contracts'
+import { validatePurchaseListSearch } from '#/features/purchases'
+import type { PurchaseListSearch } from '#/features/purchases'
 
-// The rankings page: which ranking, for winners how the contracts were won, and the
-// filters: /clasamente?clasament=furnizori&cpv=45&ue=da. A ranking is a list of the
-// DataTable pattern: words of a name, its order, its page size and page are in the address
-// too: /clasamente?clasament=institutii&q=spital&ordine=numar&pagina=2.
+// The rankings page, Clasamente (design round 14): two lists of SEAP records, "Contracte"
+// (the page's plain address) and "Achiziții directe", whose addresses are their lists'
+// (contracts/list.ts, purchases/list.ts); two rankings of parties, "Furnizori" and
+// "Instituții", each by contracts or, with `bani`, by direct purchases; and "Tipare". A
+// ranking is a list of the DataTable pattern:
+// /clasamente?clasament=institutii&bani=achizitii&judet=gorj&q=spital&ordine=numar&pagina=2.
 export const RANKINGS = [
   'contracte',
   'furnizori',
@@ -22,16 +29,20 @@ export const RANKINGS = [
 
 export type RankingTab = (typeof RANKINGS)[number]
 
+// The address of a ranking of parties, or of Tipare.
 export type RankingSearch = {
   clasament?: RankingTab
+  // A ranking by direct purchases rather than by contracts: one kind of money at a time.
+  bani?: 'achizitii'
   castigate?: 'asociere'
   // The start of a CPV code; the page offers divisions (two digits). A number when it
   // reads as one, like `q` on the search page, so the address is ?cpv=45, not ?cpv="45".
   cpv?: string | number
   // EU funds: only award notices say how they are paid for.
   ue?: 'da' | 'nu'
-  // Direct purchases: who bought (`institutii`) rather than who sold, and their period.
-  parte?: 'institutii'
+  // The county of the party ranked.
+  judet?: string
+  // Direct purchases: their period.
   de_la?: string
   pana_la?: string
   q?: string | number
@@ -52,20 +63,24 @@ export const RANKING_COLUMNS = {
   numar: { api: 'count' },
 } as const
 
-// The tabs that rank contracts, the only ones the EU funds filter applies to.
-export function isContractTab(tab: RankingTab) {
-  return tab === 'contracte' || tab === 'furnizori' || tab === 'institutii'
+// The tabs that rank parties.
+export function isRankingTab(tab: RankingTab) {
+  return tab === 'furnizori' || tab === 'institutii'
 }
 
-// The tabs that are one ranking of parties.
-export function isRankingTab(tab: RankingTab) {
-  return tab === 'furnizori' || tab === 'institutii' || tab === 'achizitii'
+// The tabs that are lists of records, each with its own address.
+export function isRecordTab(tab: RankingTab) {
+  return tab === 'contracte' || tab === 'achizitii'
+}
+
+export function tabOf(search: Record<string, unknown>): RankingTab {
+  return RANKINGS.find((name) => name === search.clasament) ?? 'contracte'
 }
 
 export function validateRankingSearch(
   search: Record<string, unknown>,
 ): RankingSearch {
-  const tab = RANKINGS.find((name) => name === search.clasament) ?? 'contracte'
+  const tab = tabOf(search)
   // A code typed as digits arrives as a number: 45 for "45".
   const cpv =
     typeof search.cpv === 'string' || typeof search.cpv === 'number'
@@ -79,7 +94,7 @@ export function validateRankingSearch(
   const patterns = tab === 'tipare'
   // A list of the page: a ranking, or the pairs of a pattern.
   const list = ranking || patterns
-  const direct = tab === 'achizitii'
+  const direct = ranking && search.bani === 'achizitii'
   const sort = patterns
     ? sortFromParam(search.ordine, PATTERN_COLUMNS)
     : sortFromParam(search.ordine, RANKING_COLUMNS)
@@ -88,18 +103,18 @@ export function validateRankingSearch(
     ? sort?.column === 'achizitii' && sort.dir === 'desc'
     : sort?.column === 'valoare' && sort.dir === 'desc'
   return {
-    // The largest contracts are the page's plain address.
-    clasament: tab === 'contracte' ? undefined : tab,
+    clasament: tab,
+    bani: direct ? 'achizitii' : undefined,
     castigate:
-      tab === 'furnizori' && search.castigate === 'asociere'
+      tab === 'furnizori' && !direct && search.castigate === 'asociere'
         ? 'asociere'
         : undefined,
     cpv: /^\d{2,8}$/.test(cpv) ? searchParam(cpv) : undefined,
     ue:
-      isContractTab(tab) && (search.ue === 'da' || search.ue === 'nu')
+      ranking && !direct && (search.ue === 'da' || search.ue === 'nu')
         ? search.ue
         : undefined,
-    parte: direct && search.parte === 'institutii' ? 'institutii' : undefined,
+    judet: ranking ? countyParam(search.judet) : undefined,
     de_la: direct ? dayFromParam(search.de_la) : undefined,
     pana_la: direct ? dayFromParam(search.pana_la) : undefined,
     // The API reads words of two letters or more, or a CUI.
@@ -113,6 +128,11 @@ export function validateRankingSearch(
     pagina: list ? pageFromParam(search.pagina) : undefined,
     vedere: ranking && search.vedere === 'tabel' ? 'tabel' : undefined,
   }
+}
+
+// The filters that go with the reader from one tab to the next, where they apply.
+export function keptAcrossTabs(search: Record<string, unknown>) {
+  return { cpv: search.cpv, ue: search.ue, judet: search.judet }
 }
 
 export function rankingFilter(search: RankingSearch): RankingFilter {
@@ -136,6 +156,44 @@ export const RANKING_FILTER_PARAMS = {
   q: ['q'],
   cpv: ['cpv'],
   ue: ['ue'],
+  judet: ['judet'],
   perioada: ['de_la', 'pana_la'],
   tip: ['tip'],
 } as const satisfies Record<string, ReadonlyArray<keyof RankingSearch>>
+
+// The address of the whole page: a ranking's, or the list of the tab it opens.
+export type ClasamenteSearch = RankingSearch &
+  ContractListSearch &
+  PurchaseListSearch & { pagina?: number }
+
+// The two lists of records keep their own list's address, the largest first, with only the
+// filters the tab offers: never a filter the reader cannot see.
+export function validateClasamenteSearch(
+  search: Record<string, unknown>,
+): ClasamenteSearch {
+  const tab = tabOf(search)
+  const page = { pagina: pageFromParam(search.pagina) }
+  if (tab === 'contracte') {
+    const list = validateContractListSearch(search, true)
+    return {
+      ...list,
+      fel: undefined,
+      valoare_min: undefined,
+      valoare_max: undefined,
+      ...page,
+    }
+  }
+  if (tab === 'achizitii') {
+    const list = validatePurchaseListSearch(search, true)
+    return {
+      clasament: 'achizitii',
+      ...list,
+      stare: undefined,
+      tip: undefined,
+      valoare_min: undefined,
+      valoare_max: undefined,
+      ...page,
+    }
+  }
+  return validateRankingSearch(search)
+}

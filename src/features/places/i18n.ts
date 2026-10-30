@@ -59,15 +59,12 @@ export const places = {
   noCounty: 'județ necunoscut',
 
   projects: 'Proiecte în zonă',
+  // Under the list: what it holds, what it does not yet, and the town hall's own.
   projectsLead:
-    'Proiectele Anghel Saligny ale primăriei. Proiectele PNDL: {notCollected}',
-  projectsNone:
-    'Primăria nu are proiecte în fișierele programului Anghel Saligny.',
-  project: 'Proiect',
-  builder: 'Constructor',
-  progress: 'Progres, cum îl scrie primăria',
-  paid: 'Plătit',
-  contract: 'Contract SEAP',
+    'Un proiect e aici când plata Anghel Saligny e pentru această localitate sau când ANAF înregistrează beneficiarul aici. Proiectele PNDL: {notCollected}',
+  projectsLeadCounty:
+    'Un proiect e aici când programul lui numește județul. Proiectele PNDL: {notCollected}',
+  ownProjects: (name: string) => `Proiectele în care ${name} e beneficiar`,
 
   payments: 'Plăți ale primăriei',
   paymentsTitle: 'Nu avem plățile primăriei.',

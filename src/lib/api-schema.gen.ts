@@ -217,7 +217,8 @@ export interface paths {
          * Direct Purchases
          * @description Direct purchases under the filters given, by finalization day, value or party.
          *
-         *     As csv, the whole list in the same order; a file needs a buyer or a supplier.
+         *     As csv, the whole list in the same order, up to `CSV_ROWS` rows: a longer list needs
+         *     narrower filters.
          */
         get: operations["direct_purchases_v1_direct_purchases_get"];
         put?: never;
@@ -1168,6 +1169,16 @@ export interface components {
             start: number;
             /** End */
             end: number | null;
+            /** Count */
+            count: number;
+        };
+        /** BeneficiaryTypeOption */
+        BeneficiaryTypeOption: {
+            /**
+             * Value
+             * @description The kind of beneficiary, as the dashboard writes it.
+             */
+            value: string;
             /** Count */
             count: number;
         };
@@ -2550,6 +2561,11 @@ export interface components {
              * @description Under every filter but the county.
              */
             counties: components["schemas"]["CountyOption"][];
+            /**
+             * Beneficiary Types
+             * @description The dashboard's own words for the kind of beneficiary, as written, under every filter but this one.
+             */
+            beneficiary_types: components["schemas"]["BeneficiaryTypeOption"][];
             /** Statuses */
             statuses: components["schemas"]["PnrrStatusOption"][];
             /**
@@ -4432,6 +4448,8 @@ export interface operations {
                 value_min?: number | null;
                 /** @description Lei without VAT, excluded. */
                 value_max?: number | null;
+                /** @description A county's two-letter code ('CJ'; București is 'B'), by where ANAF records the institution or company. */
+                county?: string | null;
                 /** @description Start of a CPV code: 45 for the division of works, 4523 for a narrower class. */
                 cpv?: string | null;
                 /** @description A day in Romanian time, YYYY-MM-DD. */
@@ -4486,6 +4504,8 @@ export interface operations {
                 value_min?: number | null;
                 /** @description Lei without VAT, excluded. */
                 value_max?: number | null;
+                /** @description A county's two-letter code ('CJ'; București is 'B'), by where ANAF records the institution or company. */
+                county?: string | null;
                 /** @description Start of a CPV code: 45 for the division of works, 4523 for a narrower class. */
                 cpv?: string | null;
                 /** @description A day in Romanian time, YYYY-MM-DD. */
@@ -4538,6 +4558,8 @@ export interface operations {
                 value_min?: number | null;
                 /** @description Lei without VAT, excluded. */
                 value_max?: number | null;
+                /** @description A county's two-letter code ('CJ'; București is 'B'), by where ANAF records the institution or company. */
+                county?: string | null;
                 /** @description Start of a CPV code: 45 for the division of works, 4523 for a narrower class. */
                 cpv?: string | null;
                 /** @description A day in Romanian time, YYYY-MM-DD. */
@@ -4595,6 +4617,8 @@ export interface operations {
                 value_min?: number | null;
                 /** @description Lei without VAT, excluded. */
                 value_max?: number | null;
+                /** @description A county's two-letter code ('CJ'; București is 'B'), by where ANAF records the institution or company. */
+                county?: string | null;
                 /** @description Start of a CPV code: 45 for the division of works, 4523 for a narrower class. */
                 cpv?: string | null;
                 /** @description A day in Romanian time, YYYY-MM-DD. */
@@ -4702,6 +4726,8 @@ export interface operations {
                 date_to?: string | null;
                 /** @description Start of a CPV code: 45 for the division of works, 4523 for a narrower class. */
                 cpv?: string | null;
+                /** @description A county's two-letter code ('CJ'; București is 'B'), by where ANAF records the institution or company. */
+                county?: string | null;
                 /** @description The value added up, or how many rows it is added up from. */
                 sort?: "value" | "count";
                 order?: "desc" | "asc";
@@ -4745,6 +4771,8 @@ export interface operations {
                 date_to?: string | null;
                 /** @description Start of a CPV code: 45 for the division of works, 4523 for a narrower class. */
                 cpv?: string | null;
+                /** @description A county's two-letter code ('CJ'; București is 'B'), by where ANAF records the institution or company. */
+                county?: string | null;
                 /** @description The value added up, or how many rows it is added up from. */
                 sort?: "value" | "count";
                 order?: "desc" | "asc";
@@ -4861,6 +4889,8 @@ export interface operations {
                 value_min?: number | null;
                 /** @description Lei, excluded. */
                 value_max?: number | null;
+                /** @description A county's two-letter code ('CJ'; București is 'B'), by where ANAF records the institution or company. */
+                county?: string | null;
                 /** @description Start of a CPV code: 45 for the division of works, 4523 for a narrower class. */
                 cpv?: string | null;
                 /** @description A day in Romanian time, YYYY-MM-DD. */
@@ -4917,6 +4947,8 @@ export interface operations {
                 value_min?: number | null;
                 /** @description Lei, excluded. */
                 value_max?: number | null;
+                /** @description A county's two-letter code ('CJ'; București is 'B'), by where ANAF records the institution or company. */
+                county?: string | null;
                 /** @description Start of a CPV code: 45 for the division of works, 4523 for a narrower class. */
                 cpv?: string | null;
                 /** @description A day in Romanian time, YYYY-MM-DD. */
@@ -4971,6 +5003,8 @@ export interface operations {
                 value_min?: number | null;
                 /** @description Lei, excluded. */
                 value_max?: number | null;
+                /** @description A county's two-letter code ('CJ'; București is 'B'), by where ANAF records the institution or company. */
+                county?: string | null;
                 /** @description Start of a CPV code: 45 for the division of works, 4523 for a narrower class. */
                 cpv?: string | null;
                 /** @description A day in Romanian time, YYYY-MM-DD. */
@@ -5095,6 +5129,8 @@ export interface operations {
                 value_min?: number | null;
                 /** @description Lei, excluded. */
                 value_max?: number | null;
+                /** @description A county's two-letter code ('CJ'; București is 'B'), by where ANAF records the institution or company. */
+                county?: string | null;
                 /** @description Start of a CPV code: 45 for the division of works, 4523 for a narrower class. */
                 cpv?: string | null;
                 /** @description A day in Romanian time, YYYY-MM-DD. */
@@ -5198,6 +5234,8 @@ export interface operations {
                 cpv?: string | null;
                 /** @description true: notices with a lot paid from EU funds; false: notices that say no lot is. A notice whose form does not ask, or not read in detail, is only in the list without this filter. */
                 eu_funded?: boolean | null;
+                /** @description A county's two-letter code ('CJ'; București is 'B'), by where ANAF records the institution or company. */
+                county?: string | null;
                 /** @description The value added up, or how many rows it is added up from. */
                 sort?: "value" | "count";
                 order?: "desc" | "asc";
@@ -5239,6 +5277,8 @@ export interface operations {
                 cpv?: string | null;
                 /** @description true: notices with a lot paid from EU funds; false: notices that say no lot is. A notice whose form does not ask, or not read in detail, is only in the list without this filter. */
                 eu_funded?: boolean | null;
+                /** @description A county's two-letter code ('CJ'; București is 'B'), by where ANAF records the institution or company. */
+                county?: string | null;
                 /** @description The value added up, or how many rows it is added up from. */
                 sort?: "value" | "count";
                 order?: "desc" | "asc";
@@ -5481,6 +5521,8 @@ export interface operations {
                 status?: ("in_progress" | "under_30" | "finished")[] | null;
                 /** @description The beneficiary's CUI. */
                 beneficiary?: number | null;
+                /** @description The kind of beneficiary as written; any of them. */
+                beneficiary_type?: string[] | null;
                 /** @description Words of the title or beneficiary. */
                 q?: string | null;
                 /** @description Lei, included. */
@@ -5534,6 +5576,8 @@ export interface operations {
                 status?: ("in_progress" | "under_30" | "finished")[] | null;
                 /** @description The beneficiary's CUI. */
                 beneficiary?: number | null;
+                /** @description The kind of beneficiary as written; any of them. */
+                beneficiary_type?: string[] | null;
                 /** @description Words of the title or beneficiary. */
                 q?: string | null;
                 /** @description Lei, included. */
@@ -5893,6 +5937,8 @@ export interface operations {
                 county?: string | null;
                 /** @description The beneficiary's CUI. */
                 beneficiary?: number | null;
+                /** @description A UAT's SIRUTA code: the projects landing there, where an Anghel Saligny payment is for or where ANAF records the beneficiary. Bucharest takes its sectors. */
+                place?: number | null;
                 /** @description A company's CUI: the projects it is the beneficiary of, or was paid through as the builder of an Anghel Saligny payment file or as the winner or supplier of a SEAP record that cites the project. Each row says which (`via`). */
                 company?: number | null;
                 /** @description Any of these. */
@@ -5943,6 +5989,8 @@ export interface operations {
                 programme?: string[] | null;
                 /** @description A county's code, as in `counties`. */
                 county?: string | null;
+                /** @description A UAT's SIRUTA code: the projects landing there, where an Anghel Saligny payment is for or where ANAF records the beneficiary. Bucharest takes its sectors. */
+                place?: number | null;
                 /** @description A company's CUI: the projects it is the beneficiary of, or was paid through as the builder of an Anghel Saligny payment file or as the winner or supplier of a SEAP record that cites the project. Each row says which (`via`). */
                 company?: number | null;
                 /** @description Any of these. */
