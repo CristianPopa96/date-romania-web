@@ -8,10 +8,8 @@ import { pageTitle } from '#/lib/copy'
 import { euSeapQuery, euProjectQuery } from '#/features/eu-projects/queries'
 import { idFromPath, validatePageSearch } from '#/lib/urls'
 
-// One EU cohesion project, by its SMIS code.
-export const Route = createFileRoute(
-  '/programe/fonduri-europene/proiecte/$smis',
-)({
+// One EU cohesion project (ScreenProject), by its SMIS code.
+export const Route = createFileRoute('/proiecte/fonduri-europene/$smis')({
   validateSearch: validatePageSearch,
   loaderDeps: ({ search }) => ({ page: search.pagina ?? 1 }),
   loader: async ({ context, params, deps }) => {
@@ -29,7 +27,7 @@ export const Route = createFileRoute(
       const last = pageCount(seap.contracts_total, PAGE_SIZE)
       if (deps.page > last) {
         throw redirect({
-          to: '/programe/fonduri-europene/proiecte/$smis',
+          to: '/proiecte/fonduri-europene/$smis',
           params,
           search: { pagina: last > 1 ? last : undefined },
         })

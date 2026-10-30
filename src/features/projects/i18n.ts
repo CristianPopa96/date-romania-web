@@ -71,9 +71,6 @@ export const projects = {
     n === 1
       ? 'Include un proiect al unei persoane fizice, pe care nu îl afișăm nominal.'
       : `Include ${counted(n, text, 'un proiect', 'proiecte')} ale unor persoane fizice, pe care nu le afișăm nominal.`,
-  // An address of the Anghel Saligny page from before D22, with a filter it no longer has.
-  oldFilters:
-    'Adresa avea un filtru care nu mai există pe această pagină (constructor, contract SEAP, lucrări sau sumă plătită). Lista arată toate proiectele programului.',
   total: (n: number, text: string) =>
     `Valoarea pentru filtrele alese · ${counted(n, text, 'un proiect', 'proiecte')}`,
 
@@ -93,6 +90,8 @@ export const projects = {
   valueColumn: 'Valoare',
   road: 'Drum urmărit',
   national: 'național',
+  someCounties: (first: string, more: number, text: string) =>
+    `${first} și încă ${counted(more, text, 'un județ', 'județe')}`,
   fallbackTitle: 'Proiect fără titlu',
   key: (program: string, key: string) => `${program} · ${key}`,
   smis: (code: string) => `SMIS ${code}`,

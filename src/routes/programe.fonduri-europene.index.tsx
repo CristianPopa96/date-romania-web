@@ -16,7 +16,7 @@ import {
 } from '@radix-ui/themes'
 
 import { DataState } from '#/components/DataState'
-import { EuProjectList } from '#/features/eu-projects/EuProjectList'
+import { ProjectList } from '#/features/projects/ProjectList'
 import { SourceLine } from '#/components/SourceLine'
 import { messagesFor } from '#/i18n'
 import { useI18n } from '#/i18n/context'
@@ -24,27 +24,36 @@ import type { EuFunds } from '#/features/eu-projects/api'
 import { pageTitle } from '#/lib/copy'
 import { pageCount } from '#/lib/list'
 import { periodLabel } from '#/features/eu-projects/eu'
+import { programmeCodes } from '#/features/eu-projects/list'
+import { euFundsQuery } from '#/features/eu-projects/queries'
+import { validateProjectListSearch } from '#/features/projects/list'
+import type { ProjectListSearch } from '#/features/projects/list'
 import {
-  programmeCodes,
-  validateEuProjectListSearch,
-} from '#/features/eu-projects/list'
-import type { EuProjectListSearch } from '#/features/eu-projects/list'
-import {
-  euFundsQuery,
-  euProjectListQuery,
-  euProjectOverviewQuery,
-} from '#/features/eu-projects/queries'
-import { pageFromParam } from '#/lib/urls'
+  projectListQuery,
+  projectsOverviewQuery,
+} from '#/features/projects/queries'
 
-// The EU cohesion programmes held, each from its own list, and their projects as a list of
-// the DataTable pattern: /programe/fonduri-europene?program=por-2014&stare=reziliat&q=drum.
+// The address's programmes, as slugs: 'por-2014,peo-2021'.
+const SLUGS = /^[a-z]{2,10}-\d{4}(,[a-z]{2,10}-\d{4})*$/i
+
+// The list's address, with `program` holding the slugs of cohesion programmes.
+function validateFundsSearch(
+  search: Record<string, unknown>,
+): ProjectListSearch {
+  return {
+    ...validateProjectListSearch({ ...search, program: undefined }),
+    program:
+      typeof search.program === 'string' && SLUGS.test(search.program)
+        ? search.program.toLowerCase()
+        : undefined,
+  }
+}
+
+// The EU cohesion programmes held, each from its own list, an overview (ScreenProgramme,
+// design D22); its list is the list of every project fixed to cohesion, with its
+// programmes as a filter: /programe/fonduri-europene?program=por-2014&stare=reziliat&q=drum.
 export const Route = createFileRoute('/programe/fonduri-europene/')({
-  validateSearch: (
-    search: Record<string, unknown>,
-  ): EuProjectListSearch & { pagina?: number } => ({
-    ...validateEuProjectListSearch(search),
-    pagina: pageFromParam(search.pagina),
-  }),
+  validateSearch: validateFundsSearch,
   loaderDeps: ({ search }) => search,
   loader: async ({ context, deps }) => {
     const funds = await context.queryClient.ensureQueryData(euFundsQuery)
@@ -53,10 +62,10 @@ export const Route = createFileRoute('/programe/fonduri-europene/')({
     const codes = programmeCodes(funds.programmes, deps.program)
     const [list] = await Promise.all([
       context.queryClient.ensureQueryData(
-        euProjectListQuery(undefined, deps, codes),
+        projectListQuery(deps, 'cohesion', codes),
       ),
       context.queryClient.ensureQueryData(
-        euProjectOverviewQuery(undefined, deps, codes),
+        projectsOverviewQuery(deps, 'cohesion', codes),
       ),
     ])
     // A page past the end of the list goes to the last one that has rows.
@@ -96,7 +105,7 @@ function EuFundsView({ funds }: { funds: EuFunds }) {
         <Flex direction="column" gap="2">
           <Text size="2" color="gray">
             <Link asChild color="gray">
-              <RouterLink to="/programe">{e.crumb}</RouterLink>
+              <RouterLink to="/proiecte">{t.projects.crumb}</RouterLink>
             </Link>{' '}
             / {e.name}
           </Text>
@@ -174,11 +183,20 @@ function EuFundsView({ funds }: { funds: EuFunds }) {
           <SourceLine source={funds.source} />
         </Flex>
 
-        <EuProjectList
-          programmes={funds.programmes}
+        <ProjectList
+          title={t.projects.listTitle}
+          fixed="cohesion"
+          cohesion={{
+            held: funds.programmes,
+            codes: programmeCodes(funds.programmes, search.program),
+          }}
           search={search}
+          // The address is cleaned as a link's would be, so the router never rewrites it.
           onSearch={(next) =>
-            void navigate({ search: next, resetScroll: false })
+            void navigate({
+              search: validateFundsSearch(next),
+              resetScroll: false,
+            })
           }
         />
       </Flex>

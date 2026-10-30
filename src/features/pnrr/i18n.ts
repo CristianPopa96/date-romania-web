@@ -116,14 +116,38 @@ export const pnrr = {
   cannotSay: 'Nu putem spune',
   cannotSayDetail: 'plățile numesc beneficiarul și măsura, nu contractul',
   noPayment: 'Nicio plată găsită',
-  progressPhysical: 'Progres fizic',
-  progressFinancial: 'Progres financiar',
   // A ministry the dashboard leaves out is named by what it is.
   reportedBy: (ministry: string | null) =>
     `raportat de ${ministry ?? 'minister'}`,
   reportedByDiffers: (ministry: string | null) =>
     `raportat de ${ministry ?? 'minister'} · poate diferi de plățile numărate de noi`,
   progressByMeasure: 'Progresul raportat, pe măsuri',
+  progressReported: 'Progres raportat',
+  progressByMeasureShort: 'pe măsuri',
+  progressPhysicalShort: (share: string) => `fizic ${share}`,
+  progressFinancialNote: (share: string, ministry: string | null) =>
+    `financiar ${share} · raportat de ${ministry ?? 'minister'}`,
+  // "Drumul banilor" of a contract.
+  roadFunder: 'Finanțator',
+  roadEu: 'Uniunea Europeană',
+  roadFacility: 'Mecanismul de redresare și reziliență',
+  roadMeasure: 'Măsură',
+  andMore: (n: number) => `și încă ${n}`,
+  coordinatedBy: (ministry: string | null) =>
+    ministry ? `coordonată de ${ministry}` : '',
+  roadContract: 'Contract de finanțare',
+  roadNumber: 'nr. {number}',
+  roadPayments: 'Plăți',
+  roadLastPaid: (day: string) => `ultima ${day}`,
+  roadShared: (sum: string) => `${sum} pe măsură`,
+  roadSharedMany: (sum: string, n: number) => `${sum} pe cele ${n} măsuri`,
+  roadSharedManyNote:
+    'mai multe contracte pe fiecare măsură · plățile nu numesc contractul',
+  roadOwnToo: (sum: string) =>
+    `plus ${sum} pe măsurile unde e singurul lui contract`,
+  roadSharedNote: (n: number, text: string) =>
+    `${counted(n, text, 'un contract', 'contracte')} · plățile nu numesc contractul`,
+  roadNoPayment: 'pentru beneficiar pe măsură, în fișierul de plăți',
   progressRow: (physical: string, financial: string) =>
     `fizic ${physical} · financiar ${financial}`,
   number: 'Nr. contract',

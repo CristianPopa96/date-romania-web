@@ -109,10 +109,7 @@ function Title({ row, q }: { row: PnrrContractRow; q: string | undefined }) {
     <>
       <Text as="div" size="2">
         <Link asChild>
-          <RouterLink
-            to="/programe/pnrr/contracte/$id"
-            params={{ id: String(row.id) }}
-          >
+          <RouterLink to="/proiecte/pnrr/$id" params={{ id: String(row.id) }}>
             {row.title
               ? marks(row.title, q).map((part, index) =>
                   part.mark ? (

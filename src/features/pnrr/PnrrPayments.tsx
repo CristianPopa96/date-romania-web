@@ -180,10 +180,7 @@ function SiblingRow({
           (title ?? p.fallbackTitle)
         ) : (
           <Link asChild>
-            <RouterLink
-              to="/programe/pnrr/contracte/$id"
-              params={{ id: String(id) }}
-            >
+            <RouterLink to="/proiecte/pnrr/$id" params={{ id: String(id) }}>
               {title ?? p.fallbackTitle}
             </RouterLink>
           </Link>

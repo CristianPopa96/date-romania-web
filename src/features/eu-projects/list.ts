@@ -125,7 +125,7 @@ export type EuProjectListFilter = {
 }
 
 export function euProjectFilter(
-  cui: number | undefined,
+  cui: number,
   search: EuProjectListSearch,
   codes: Array<string> | undefined,
 ): EuProjectListFilter {

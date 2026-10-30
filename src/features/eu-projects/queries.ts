@@ -37,7 +37,7 @@ export const euBeneficiaryQuery = (cui: number) =>
 // the order and the page size of its address, and what the list says about itself. `codes`
 // are the programmes the address names (programmeCodes).
 export const euProjectListQuery = (
-  cui: number | undefined,
+  cui: number,
   search: EuProjectListSearch & { pagina?: number },
   codes: Array<string> | undefined,
 ) => {
@@ -54,7 +54,7 @@ export const euProjectListQuery = (
 }
 
 export const euProjectOverviewQuery = (
-  cui: number | undefined,
+  cui: number,
   search: EuProjectListSearch,
   codes: Array<string> | undefined,
 ) => {

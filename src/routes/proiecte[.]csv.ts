@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { getFile } from '#/lib/api'
 import {
+  codesFromParam,
   projectApiOrder,
   projectFilter,
   validateProjectListSearch,
@@ -17,7 +18,11 @@ export const Route = createFileRoute('/proiecte.csv')({
         const params = new URL(request.url).searchParams
         const search = validateProjectListSearch(Object.fromEntries(params))
         const file = await getFile('/v1/projects', {
-          ...projectFilter(search),
+          ...projectFilter(
+            search,
+            undefined,
+            codesFromParam(params.get('cod')),
+          ),
           sort: 'value',
           order: projectApiOrder(search),
           format: 'csv',

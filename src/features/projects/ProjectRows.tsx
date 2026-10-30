@@ -83,8 +83,7 @@ export function ProjectRows({
   )
 }
 
-// A project's own page, by its programme. The page of an Anghel Saligny project is under
-// /proiecte; the PNRR and cohesion pages are still under /programe.
+// A project's own page, by its programme: /proiecte/{programme}/{key}.
 export function ProjectLink({
   kind,
   projectKey,
@@ -101,14 +100,11 @@ export function ProjectLink({
         {children}
       </RouterLink>
     ) : kind === 'pnrr' ? (
-      <RouterLink to="/programe/pnrr/contracte/$id" params={{ id }}>
+      <RouterLink to="/proiecte/pnrr/$id" params={{ id }}>
         {children}
       </RouterLink>
     ) : (
-      <RouterLink
-        to="/programe/fonduri-europene/proiecte/$smis"
-        params={{ smis: id }}
-      >
+      <RouterLink to="/proiecte/fonduri-europene/$smis" params={{ smis: id }}>
         {children}
       </RouterLink>
     )
@@ -162,8 +158,17 @@ function Title({ row, q }: { row: ProjectItem; q: string | undefined }) {
 }
 
 function Beneficiary({ row }: { row: ProjectItem }) {
-  const { t } = useI18n()
-  const counties = row.counties.map((county) => county.name).join(', ')
+  const { t, f } = useI18n()
+  // A project over many counties names the first two and counts the rest.
+  const names = row.counties.map((county) => county.name)
+  const counties =
+    names.length > 3
+      ? t.projects.someCounties(
+          names.slice(0, 2).join(', '),
+          names.length - 2,
+          f.count(names.length - 2),
+        )
+      : names.join(', ')
   return (
     <>
       <Text as="div" size="2">

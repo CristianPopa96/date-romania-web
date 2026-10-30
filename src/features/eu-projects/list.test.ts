@@ -46,9 +46,9 @@ describe('the address of a list of EU projects', () => {
     ).toMatchObject({ program: 'poids-2021', stare: 'reziliat' })
   })
 
-  it('asks for every beneficiary on the funds page', () => {
-    expect(euProjectFilter(undefined, { q: 'drum' }, ['POR'])).toMatchObject({
-      beneficiary: undefined,
+  it("asks for one beneficiary's projects of the programmes chosen", () => {
+    expect(euProjectFilter(4491342, { q: 'drum' }, ['POR'])).toMatchObject({
+      beneficiary: 4491342,
       programme: ['POR'],
       q: 'drum',
     })

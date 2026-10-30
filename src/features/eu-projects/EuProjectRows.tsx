@@ -5,10 +5,7 @@ import { ConfidenceBadge } from '#/components/ConfidenceBadge'
 import { DataState } from '#/components/DataState'
 import { ListRows } from '#/components/list/ListRows'
 import type { Column } from '#/components/list/ListRows'
-import {
-  Beneficiary,
-  EuStatusBadge,
-} from '#/features/eu-projects/EuProjectFacts'
+import { EuStatusBadge } from '#/features/eu-projects/EuProjectFacts'
 import type { EuProjectRow } from '#/features/eu-projects/api'
 import { beneficiaryTie } from '#/features/eu-projects/eu'
 import { useI18n } from '#/i18n/context'
@@ -17,17 +14,15 @@ import type { Sort } from '#/lib/list'
 
 // The rows of a list of EU projects, declared to ListRows: the project (it opens its page),
 // its value and what was paid up to its list's day, its status as the list gives it, and
-// how the project was tied to the beneficiary. A list of every beneficiary names each one.
+// how the project was tied to the beneficiary.
 export function EuProjectRows({
   items,
-  withBeneficiary,
   q,
   sort,
   onSort,
   total,
 }: {
   items: Array<EuProjectRow>
-  withBeneficiary: boolean
   q: string | undefined
   sort: Sort
   onSort: (sort: Sort | null) => void
@@ -42,18 +37,6 @@ export function EuProjectRows({
       maxWidth: 380,
       cell: (row) => <Title row={row} q={q} />,
     },
-    ...(withBeneficiary
-      ? [
-          {
-            key: 'beneficiar',
-            header: e.beneficiary,
-            maxWidth: 260,
-            cell: (row: EuProjectRow) => (
-              <Beneficiary beneficiary={row.beneficiary} />
-            ),
-          },
-        ]
-      : []),
     {
       key: 'valoare',
       header: e.value,
@@ -77,16 +60,11 @@ export function EuProjectRows({
         <EuStatusBadge status={row.status} written={row.status_written} />
       ),
     },
-    // A named beneficiary carries its tie; one beneficiary's list gives it a column.
-    ...(withBeneficiary
-      ? []
-      : [
-          {
-            key: 'legatura',
-            header: e.held.tie,
-            cell: (row: EuProjectRow) => <Tie row={row} />,
-          },
-        ]),
+    {
+      key: 'legatura',
+      header: e.held.tie,
+      cell: (row) => <Tie row={row} />,
+    },
   ]
   return (
     <ListRows
@@ -100,13 +78,6 @@ export function EuProjectRows({
         <Flex justify="between" gap="3">
           <Box minWidth="0">
             <Title row={row} q={q} />
-            {withBeneficiary ? (
-              <Text as="div" size="1" mt="1">
-                {row.beneficiary.entity?.name ??
-                  row.beneficiary.name ??
-                  t.common.notPublished}
-              </Text>
-            ) : null}
             <Flex gap="2" mt="1" wrap="wrap">
               <EuStatusBadge status={row.status} written={row.status_written} />
               <Tie row={row} />
@@ -131,7 +102,7 @@ function Title({ row, q }: { row: EuProjectRow; q: string | undefined }) {
       <Text as="div" size="2">
         <Link asChild>
           <RouterLink
-            to="/programe/fonduri-europene/proiecte/$smis"
+            to="/proiecte/fonduri-europene/$smis"
             params={{ smis: String(row.smis) }}
           >
             {row.title

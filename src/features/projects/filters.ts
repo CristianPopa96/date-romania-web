@@ -20,6 +20,7 @@ import {
 } from '#/features/projects/list'
 import type { ProjectListSearch } from '#/features/projects/list'
 import type { Messages } from '#/i18n'
+import { periodLabel, programmeSlug } from '#/features/eu-projects'
 import { countyCodeOfSlug, countySlugOfCode } from '#/lib/counties'
 import type { Format } from '#/lib/format'
 import { rangeChip } from '#/lib/list-chips'
@@ -27,10 +28,14 @@ import { rangeChip } from '#/lib/list-chips'
 const SMALL = 1_000_000
 const LARGE = 25_000_000
 
+// A cohesion programme of the EU funds page, as its list names it.
+export type HeldProgramme = { code: string; period: string }
+
 export function projectFilterDecls({
   search,
   overview,
   fixedKind,
+  held,
   t,
   f,
 }: {
@@ -38,6 +43,8 @@ export function projectFilterDecls({
   overview: ProjectsOverview
   // A programme's own page: its kind is not a filter there.
   fixedKind: boolean
+  // The EU funds page: its programmes are a filter, by slug ('por-2014').
+  held?: ReadonlyArray<HeldProgramme>
   t: Messages
   f: Format
 }): Array<FilterDecl> {
@@ -97,8 +104,43 @@ export function projectFilterDecls({
         ]
       : []
 
+  const programmes: Array<FilterDecl> = held ? [programmeDecl(held)] : []
+
+  function programmeDecl(
+    programmesHeld: ReadonlyArray<HeldProgramme>,
+  ): FilterDecl {
+    const options = overview.programmes.flatMap((option) => {
+      const found = programmesHeld.find((each) => each.code === option.value)
+      return found ? [{ ...option, slug: programmeSlug(found), found }] : []
+    })
+    const slugs = search.program?.split(',') ?? []
+    const value = options
+      .map((option, index) => (slugs.includes(option.slug) ? index : -1))
+      .filter((index) => index >= 0)
+    const name = (index: number) =>
+      `${options[index].found.code} ${periodLabel(options[index].found.period)}`
+    return {
+      key: 'program',
+      kind: 'choice',
+      label: labels.program,
+      value,
+      options: options.map((option, index) => ({
+        value: index,
+        label: name(index),
+        count: option.count,
+      })),
+      chip: value.length ? chosen(value.map(name)) : null,
+      clear: { program: undefined },
+      patch: (next) => ({
+        program: next.length
+          ? next.map((index) => options[index].slug).join(',')
+          : undefined,
+      }),
+    }
+  }
+
   return [
-    ...(fixedKind ? [] : [program]),
+    ...(fixedKind ? programmes : [program]),
     {
       key: 'judet',
       kind: 'choice',

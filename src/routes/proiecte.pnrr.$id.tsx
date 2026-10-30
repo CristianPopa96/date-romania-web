@@ -9,9 +9,9 @@ import { euSeapQuery } from '#/features/eu-projects/queries'
 import { pnrrContractQuery } from '#/features/pnrr/queries'
 import { idFromPath, validatePageSearch } from '#/lib/urls'
 
-// One PNRR financing contract, by MIPE's commitment id (the contract number is not unique).
+// One PNRR financing contract (ScreenProject), by MIPE's commitment id (the contract number is not unique).
 // A natural person's contract has no page: the API answers "not found".
-export const Route = createFileRoute('/programe/pnrr/contracte/$id')({
+export const Route = createFileRoute('/proiecte/pnrr/$id')({
   validateSearch: validatePageSearch,
   loaderDeps: ({ search }) => ({ page: search.pagina ?? 1 }),
   loader: async ({ context, params, deps }) => {
@@ -29,7 +29,7 @@ export const Route = createFileRoute('/programe/pnrr/contracte/$id')({
       const last = pageCount(seap.contracts_total, PAGE_SIZE)
       if (deps.page > last) {
         throw redirect({
-          to: '/programe/pnrr/contracte/$id',
+          to: '/proiecte/pnrr/$id',
           params,
           search: { pagina: last > 1 ? last : undefined },
         })

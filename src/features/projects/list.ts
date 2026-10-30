@@ -155,6 +155,8 @@ export function projectSort(search: ProjectListSearch): Sort {
 
 export type ProjectFilter = {
   kind?: Array<ProjectKind>
+  // Programmes by the API's code: the cohesion programmes of the EU funds page.
+  programme?: Array<string>
   county?: string
   beneficiary?: number
   status?: Array<ProjectStatus>
@@ -165,13 +167,16 @@ export type ProjectFilter = {
 }
 
 // What the API is asked for. A list fixed to one programme (a programme's page) gives
-// its kind whatever the address says.
+// its kind whatever the address says; the EU funds page gives the programmes its address
+// names, by code (`codes`), since there `program` holds their slugs.
 export function projectFilter(
   search: ProjectListSearch,
   fixed?: ProjectKind,
+  codes?: Array<string>,
 ): ProjectFilter {
   return {
     kind: fixed ? [fixed] : kindsFromParam(search.program),
+    programme: codes,
     county: countyCodeOfSlug(search.judet),
     beneficiary: search.beneficiar,
     status: statusesFromParam(search.stare),
@@ -186,15 +191,18 @@ export function projectFilter(
 }
 
 // The file of the list, with its filters and order: the site's own address, which the
-// file's route reads as the list's (`/proiecte.csv?program=pnrr&judet=gorj`).
+// file's route reads as the list's (`/proiecte.csv?program=pnrr&judet=gorj`). The EU
+// funds page's programmes go by code (`cod=POR,PEO`).
 export function projectsCsvPath(
   search: ProjectListSearch,
   fixed?: ProjectKind,
+  codes?: Array<string>,
 ): string {
   const params = new URLSearchParams()
   const kept = {
     ...search,
     program: fixed ? kindsToParam([fixed]) : search.program,
+    cod: codes?.join(','),
     pe_pagina: undefined,
     pagina: undefined,
     vedere: undefined,
@@ -204,6 +212,16 @@ export function projectsCsvPath(
   }
   const query = params.toString()
   return query ? `/proiecte.csv?${query}` : '/proiecte.csv'
+}
+
+// The programme codes of a file's address: 'POR,PoIDS'.
+export function codesFromParam(
+  value: string | null,
+): Array<string> | undefined {
+  if (!value || !/^[A-Za-z]{2,10}(,[A-Za-z]{2,10})*$/.test(value)) {
+    return undefined
+  }
+  return value.split(',')
 }
 
 export function projectApiOrder(search: ProjectListSearch): 'asc' | 'desc' {

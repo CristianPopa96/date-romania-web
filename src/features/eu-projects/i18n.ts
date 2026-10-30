@@ -58,8 +58,6 @@ export const eu = {
       `valoare ${value} · plătit ${paid}${day ? ` până la ${day}` : ''}`,
     of: (whole: string) =>
       `din ${whole} ale beneficiarului; sumele nu se adună între programe, fiecare are data listei lui`,
-    ofAll: (whole: string) =>
-      `din ${whole} în listele pe care le avem; sumele nu se adună între programe, fiecare are data listei lui`,
     otherStatuses: (n: number, text: string) =>
       `${counted(n, text, 'unul', 'proiecte')} cu o stare scrisă altfel în listă`,
     otherStatus: 'Altă stare, scrisă de listă',
@@ -108,6 +106,20 @@ export const eu = {
   type: 'Tip beneficiar',
   place: 'Loc de implementare',
   rate: 'Cofinanțare UE',
+  rateNote: 'partea UE din cheltuielile eligibile',
+  // "Drumul banilor" of a cohesion project.
+  roadFunder: 'Finanțator',
+  roadEu: 'Uniunea Europeană',
+  roadFunds: 'fondurile de coeziune',
+  roadProgramme: 'Program',
+  roadContract: 'Contract de finanțare',
+  roadPayments: 'Plăți',
+  roadPaymentsCount: (n: number, text: string) =>
+    counted(n, text, 'o plată', 'plăți'),
+  roadDated: 'publicate una câte una, cu data lor',
+  roadUntil: (day: string) => `cumulat până la ${day}, fără dată`,
+  roadNoPaid: 'lista nu dă suma plătită',
+  roadNoCutOff: 'cumulat, fără dată · lista nu spune până la ce zi',
   starts: 'Început',
   ends: 'Termen',
 
@@ -124,11 +136,34 @@ export const eu = {
   // cohesion project, `pnrr` a PNRR financing contract.
   seap: {
     // Only what the tie supports: the buyer's text cites the project, nothing proves it paid.
-    title: 'Contracte și achiziții care citează acest proiect',
+    // One heading for every programme (round 13); the line beside it says how they were found.
+    title: 'Contracte și achiziții legate de proiect',
     note: {
-      smis: 'găsite după codul SMIS citat în anunț sau în achiziție',
-      pnrr: 'găsite după numărul contractului de finanțare citat în anunț, la același cumpărător',
+      smis: 'care citează codul SMIS',
+      pnrr: 'care citează numărul contractului de finanțare',
     },
+    // The road's last two steps.
+    hopRecords: 'Achiziții',
+    hopNone: 'Nicio achiziție găsită',
+    hopNoneNote: {
+      smis: 'niciun anunț sau achiziție nu citează codul SMIS',
+      pnrr: 'niciun anunț sau achiziție nu citează numărul contractului',
+    },
+    hopNotices: (n: number, text: string) =>
+      counted(n, text, 'un anunț', 'anunțuri'),
+    hopPurchases: (n: number, text: string) =>
+      counted(n, text, 'o achiziție directă', 'achiziții directe'),
+    hopCited: {
+      smis: 'care citează codul SMIS',
+      pnrr: 'care citează nr. contractului',
+    },
+    probable: 'Probabil',
+    hopCompanies: 'Firme',
+    hopCompaniesNote:
+      'cea mai mare valoare, contracte și achiziții directe adunate; o asociere, cu toată valoarea contractului',
+    hopFailed: 'Nu am putut citi',
+    hopFailedNote: 'anunțurile și achizițiile din SEAP, acum',
+    andMore: (n: number) => `și încă ${n}`,
     none: {
       smis: 'Niciun anunț de atribuire și nicio achiziție directă dintre cele pe care le avem nu citează codul SMIS al proiectului.',
       pnrr: 'Niciun anunț de atribuire și nicio achiziție directă dintre cele pe care le avem nu citează numărul acestui contract de finanțare.',
