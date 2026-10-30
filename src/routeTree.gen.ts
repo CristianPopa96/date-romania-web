@@ -33,9 +33,6 @@ import { Route as ProgramePnrrMasuraRouteImport } from './routes/programe.pnrr.$
 import { Route as ProiecteAnghelSalignyIdRouteImport } from './routes/proiecte.anghel-saligny.$id'
 import { Route as ProiecteFonduriEuropeneSmisRouteImport } from './routes/proiecte.fonduri-europene.$smis'
 import { Route as ProiectePnrrIdRouteImport } from './routes/proiecte.pnrr.$id'
-import { Route as ProgrameAnghelSalignyProiecteIdRouteImport } from './routes/programe.anghel-saligny.proiecte.$id'
-import { Route as ProgrameFonduriEuropeneProiecteSmisRouteImport } from './routes/programe.fonduri-europene.proiecte.$smis'
-import { Route as ProgramePnrrContracteIdRouteImport } from './routes/programe.pnrr.contracte.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -160,23 +157,6 @@ const ProiectePnrrIdRoute = ProiectePnrrIdRouteImport.update({
   path: '/proiecte/pnrr/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProgrameAnghelSalignyProiecteIdRoute =
-  ProgrameAnghelSalignyProiecteIdRouteImport.update({
-    id: '/programe/anghel-saligny/proiecte/$id',
-    path: '/programe/anghel-saligny/proiecte/$id',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProgrameFonduriEuropeneProiecteSmisRoute =
-  ProgrameFonduriEuropeneProiecteSmisRouteImport.update({
-    id: '/programe/fonduri-europene/proiecte/$smis',
-    path: '/programe/fonduri-europene/proiecte/$smis',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProgramePnrrContracteIdRoute = ProgramePnrrContracteIdRouteImport.update({
-  id: '/programe/pnrr/contracte/$id',
-  path: '/programe/pnrr/contracte/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -203,9 +183,6 @@ export interface FileRoutesByFullPath {
   '/programe/anghel-saligny/': typeof ProgrameAnghelSalignyIndexRoute
   '/programe/fonduri-europene/': typeof ProgrameFonduriEuropeneIndexRoute
   '/programe/pnrr/': typeof ProgramePnrrIndexRoute
-  '/programe/anghel-saligny/proiecte/$id': typeof ProgrameAnghelSalignyProiecteIdRoute
-  '/programe/fonduri-europene/proiecte/$smis': typeof ProgrameFonduriEuropeneProiecteSmisRoute
-  '/programe/pnrr/contracte/$id': typeof ProgramePnrrContracteIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -232,9 +209,6 @@ export interface FileRoutesByTo {
   '/programe/anghel-saligny': typeof ProgrameAnghelSalignyIndexRoute
   '/programe/fonduri-europene': typeof ProgrameFonduriEuropeneIndexRoute
   '/programe/pnrr': typeof ProgramePnrrIndexRoute
-  '/programe/anghel-saligny/proiecte/$id': typeof ProgrameAnghelSalignyProiecteIdRoute
-  '/programe/fonduri-europene/proiecte/$smis': typeof ProgrameFonduriEuropeneProiecteSmisRoute
-  '/programe/pnrr/contracte/$id': typeof ProgramePnrrContracteIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -262,9 +236,6 @@ export interface FileRoutesById {
   '/programe/anghel-saligny/': typeof ProgrameAnghelSalignyIndexRoute
   '/programe/fonduri-europene/': typeof ProgrameFonduriEuropeneIndexRoute
   '/programe/pnrr/': typeof ProgramePnrrIndexRoute
-  '/programe/anghel-saligny/proiecte/$id': typeof ProgrameAnghelSalignyProiecteIdRoute
-  '/programe/fonduri-europene/proiecte/$smis': typeof ProgrameFonduriEuropeneProiecteSmisRoute
-  '/programe/pnrr/contracte/$id': typeof ProgramePnrrContracteIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -293,9 +264,6 @@ export interface FileRouteTypes {
     | '/programe/anghel-saligny/'
     | '/programe/fonduri-europene/'
     | '/programe/pnrr/'
-    | '/programe/anghel-saligny/proiecte/$id'
-    | '/programe/fonduri-europene/proiecte/$smis'
-    | '/programe/pnrr/contracte/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -322,9 +290,6 @@ export interface FileRouteTypes {
     | '/programe/anghel-saligny'
     | '/programe/fonduri-europene'
     | '/programe/pnrr'
-    | '/programe/anghel-saligny/proiecte/$id'
-    | '/programe/fonduri-europene/proiecte/$smis'
-    | '/programe/pnrr/contracte/$id'
   id:
     | '__root__'
     | '/'
@@ -351,9 +316,6 @@ export interface FileRouteTypes {
     | '/programe/anghel-saligny/'
     | '/programe/fonduri-europene/'
     | '/programe/pnrr/'
-    | '/programe/anghel-saligny/proiecte/$id'
-    | '/programe/fonduri-europene/proiecte/$smis'
-    | '/programe/pnrr/contracte/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -381,9 +343,6 @@ export interface RootRouteChildren {
   ProgrameAnghelSalignyIndexRoute: typeof ProgrameAnghelSalignyIndexRoute
   ProgrameFonduriEuropeneIndexRoute: typeof ProgrameFonduriEuropeneIndexRoute
   ProgramePnrrIndexRoute: typeof ProgramePnrrIndexRoute
-  ProgrameAnghelSalignyProiecteIdRoute: typeof ProgrameAnghelSalignyProiecteIdRoute
-  ProgrameFonduriEuropeneProiecteSmisRoute: typeof ProgrameFonduriEuropeneProiecteSmisRoute
-  ProgramePnrrContracteIdRoute: typeof ProgramePnrrContracteIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -556,27 +515,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProiectePnrrIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/programe/anghel-saligny/proiecte/$id': {
-      id: '/programe/anghel-saligny/proiecte/$id'
-      path: '/programe/anghel-saligny/proiecte/$id'
-      fullPath: '/programe/anghel-saligny/proiecte/$id'
-      preLoaderRoute: typeof ProgrameAnghelSalignyProiecteIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/programe/fonduri-europene/proiecte/$smis': {
-      id: '/programe/fonduri-europene/proiecte/$smis'
-      path: '/programe/fonduri-europene/proiecte/$smis'
-      fullPath: '/programe/fonduri-europene/proiecte/$smis'
-      preLoaderRoute: typeof ProgrameFonduriEuropeneProiecteSmisRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/programe/pnrr/contracte/$id': {
-      id: '/programe/pnrr/contracte/$id'
-      path: '/programe/pnrr/contracte/$id'
-      fullPath: '/programe/pnrr/contracte/$id'
-      preLoaderRoute: typeof ProgramePnrrContracteIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -605,10 +543,6 @@ const rootRouteChildren: RootRouteChildren = {
   ProgrameAnghelSalignyIndexRoute: ProgrameAnghelSalignyIndexRoute,
   ProgrameFonduriEuropeneIndexRoute: ProgrameFonduriEuropeneIndexRoute,
   ProgramePnrrIndexRoute: ProgramePnrrIndexRoute,
-  ProgrameAnghelSalignyProiecteIdRoute: ProgrameAnghelSalignyProiecteIdRoute,
-  ProgrameFonduriEuropeneProiecteSmisRoute:
-    ProgrameFonduriEuropeneProiecteSmisRoute,
-  ProgramePnrrContracteIdRoute: ProgramePnrrContracteIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

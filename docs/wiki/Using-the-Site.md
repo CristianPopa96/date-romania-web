@@ -342,7 +342,7 @@ or every project of the same builder.
   contract on it, and its contracts, by county, status or words. Contracts of natural
   persons (afforestation grants) are never listed or named; the page says how many there
   are.
-- A contract (`/programe/pnrr/contracte/{id}`): its value, the progress the ministry
+- A contract (`/proiecte/pnrr/{id}`): its value, the progress the ministry
   reports (never worked out from payments), and the payments to its beneficiary on each
   measure. The payments name the beneficiary and the measure, not the contract: they are
   shown as the contract's own only when it is the beneficiary's one contract there;
@@ -370,7 +370,7 @@ programmes and the national programmes of 2021–2027. The regional programmes o
 
 ![An EU project page](images/eu-project.png)
 
-**Project page** (`/programe/fonduri-europene/proiecte/{smis}`): the title, value, the
+**Project page** (`/proiecte/fonduri-europene/{smis}`): the title, value, the
 EU share, "Plătit până la {day}" (what was paid up to the day of the list; the lists give
 no payment days), status, dates, place, partners and the beneficiary with how it was
 tied ("CUI în listă" or "Nume și localitate"). Projects of the Health programme also

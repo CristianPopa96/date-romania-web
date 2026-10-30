@@ -132,31 +132,33 @@ keyed hash for its rate limit.
 
 ## Routes
 
-| File in `src/routes/`                          | Address                                                                       |
-| ---------------------------------------------- | ----------------------------------------------------------------------------- |
-| `index.tsx`                                    | `/`                                                                           |
-| `cautare.tsx`                                  | `/cautare?q=`                                                                 |
-| `institutii.$cui.tsx`                          | `/institutii/{cui}`                                                           |
-| `furnizori.$cui.tsx`                           | `/furnizori/{cui}`                                                            |
-| `contracte.$id.tsx`                            | `/contracte/{id}`                                                             |
-| `achizitii-directe.$id.tsx`                    | `/achizitii-directe/{id}`                                                     |
-| `clasamente.tsx`                               | `/clasamente?clasament=&castigate=&cpv=&ue=`                                  |
-| `programe.index.tsx`                           | `/programe`: the programmes held                                              |
-| `programe.anghel-saligny.index.tsx`            | `/programe/anghel-saligny`                                                    |
-| `programe.anghel-saligny.proiecte.$id.tsx`     | `/programe/anghel-saligny/proiecte/{id}`                                      |
-| `programe.pnrr.index.tsx`                      | `/programe/pnrr?tab=beneficiari`                                              |
-| `programe.pnrr.$masura.tsx`                    | `/programe/pnrr/{masura}?judet=&stare=&q=&pagina=`, e.g. `c10.i3`             |
-| `programe.pnrr.contracte.$id.tsx`              | `/programe/pnrr/contracte/{id_angajament}?pagina=`                            |
-| `programe.fonduri-europene.index.tsx`          | `/programe/fonduri-europene?program=&stare=&q=&pagina=`                       |
-| `programe.fonduri-europene.proiecte.$smis.tsx` | `/programe/fonduri-europene/proiecte/{smis}?pagina=`                          |
-| `localitati.index.tsx`                         | `/localitati`: the 42 counties                                                |
-| `localitati.$judet.index.tsx`                  | `/localitati/{judet}`, e.g. `/localitati/alba`                                |
-| `localitati.$judet.$uat.tsx`                   | `/localitati/{judet}/{uat}?sat=`, e.g. `/localitati/alba/comuna-albac`        |
-| `surse.tsx`                                    | `/surse?fila=&despre=`                                                        |
-| `contracte[.]csv.ts`                           | `/contracte.csv` (`?institutie=` or `?furnizor=` for one CUI)                 |
-| `achizitii-directe[.]csv.ts`                   | `/achizitii-directe.csv?cumparator=` or `?vanzator=`, with the list's filters |
-| `tipare[.]csv.ts`                              | `/tipare.csv`                                                                 |
-| `__root.tsx`                                   | The shell: theme, top bar, footer                                             |
+| File in `src/routes/`                 | Address                                                                       |
+| ------------------------------------- | ----------------------------------------------------------------------------- |
+| `index.tsx`                           | `/`                                                                           |
+| `cautare.tsx`                         | `/cautare?q=`                                                                 |
+| `institutii.$cui.tsx`                 | `/institutii/{cui}`                                                           |
+| `furnizori.$cui.tsx`                  | `/furnizori/{cui}`                                                            |
+| `contracte.$id.tsx`                   | `/contracte/{id}`                                                             |
+| `achizitii-directe.$id.tsx`           | `/achizitii-directe/{id}`                                                     |
+| `clasamente.tsx`                      | `/clasamente?clasament=&castigate=&cpv=&ue=`                                  |
+| `proiecte.index.tsx`                  | `/proiecte?program=&judet=&stare=&drum=&q=&pagina=`: every project            |
+| `proiecte.anghel-saligny.$id.tsx`     | `/proiecte/anghel-saligny/{id}`                                               |
+| `proiecte.pnrr.$id.tsx`               | `/proiecte/pnrr/{id_angajament}?pagina=`                                      |
+| `proiecte.fonduri-europene.$smis.tsx` | `/proiecte/fonduri-europene/{smis}?pagina=`                                   |
+| `programe.index.tsx`                  | `/programe`: the programmes held                                              |
+| `programe.anghel-saligny.index.tsx`   | `/programe/anghel-saligny`                                                    |
+| `programe.pnrr.index.tsx`             | `/programe/pnrr?tab=beneficiari`                                              |
+| `programe.pnrr.$masura.tsx`           | `/programe/pnrr/{masura}?judet=&stare=&q=&pagina=`, e.g. `c10.i3`             |
+| `programe.fonduri-europene.index.tsx` | `/programe/fonduri-europene?program=&stare=&q=&pagina=`                       |
+| `localitati.index.tsx`                | `/localitati`: the 42 counties                                                |
+| `localitati.$judet.index.tsx`         | `/localitati/{judet}`, e.g. `/localitati/alba`                                |
+| `localitati.$judet.$uat.tsx`          | `/localitati/{judet}/{uat}?sat=`, e.g. `/localitati/alba/comuna-albac`        |
+| `surse.tsx`                           | `/surse?fila=&despre=`                                                        |
+| `contracte[.]csv.ts`                  | `/contracte.csv` (`?institutie=` or `?furnizor=` for one CUI)                 |
+| `achizitii-directe[.]csv.ts`          | `/achizitii-directe.csv?cumparator=` or `?vanzator=`, with the list's filters |
+| `tipare[.]csv.ts`                     | `/tipare.csv`                                                                 |
+| `proiecte[.]csv.ts`                   | `/proiecte.csv`, with the list's filters                                      |
+| `__root.tsx`                          | The shell: theme, top bar, footer                                             |
 
 Paging, sorting, tabs and filters are typed search parameters, parsed in each feature's
 `urls.ts` (`?lista=achizitii&pagina=2&ordine=valoare-desc`), so a shared address

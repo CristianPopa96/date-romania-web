@@ -1403,14 +1403,6 @@ test("a programme's page lists its own projects, and nothing else", async ({
   await expect(main.getByRole('button', { name: /^Program$/ })).toHaveCount(0)
   await page.goto(`${PROGRAMME}?q=turceni`)
   await expect(projectRows(main)).toHaveCount(1)
-  // An old link with the finder's builder filter says the list is no longer filtered.
-  await page.goto(`${PROGRAMME}?firma=17886786`)
-  await expect(
-    main.getByText('Adresa avea un filtru care nu mai există', {
-      exact: false,
-    }),
-  ).toBeVisible()
-  await expect(projectRows(main)).toHaveCount(4)
   await page.goto(`${PROGRAMME}?pagina=9`)
   await expect(page).toHaveURL(/\/programe\/anghel-saligny$/)
 })
@@ -1418,9 +1410,7 @@ test("a programme's page lists its own projects, and nothing else", async ({
 test('a project is followed from the ministry to its contract', async ({
   page,
 }) => {
-  // The old address of a project leads to its page under /proiecte.
-  await page.goto(`${PROGRAMME}/proiecte/101`)
-  await expect(page).toHaveURL(/\/proiecte\/anghel-saligny\/101$/)
+  await page.goto('/proiecte/anghel-saligny/101')
   const main = page.getByRole('main')
   await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1)
   await expect(
@@ -1808,9 +1798,7 @@ test('a measure never names a natural person, and says how many it leaves out', 
 test('a PNRR contract alone on its measure has its payments, by day', async ({
   page,
 }) => {
-  // The old address of a contract leads to its page under /proiecte.
-  await page.goto(`${PNRR}/contracte/701`)
-  await expect(page).toHaveURL(/\/proiecte\/pnrr\/701$/)
+  await page.goto('/proiecte/pnrr/701')
   const main = page.getByRole('main')
   await expect(
     main.getByText(/^Proiect · PNRR · C10 · Investiția 3/),
@@ -1845,7 +1833,7 @@ test('a PNRR contract alone on its measure has its payments, by day', async ({
 test('payments to a beneficiary with several contracts on a measure belong to none', async ({
   page,
 }) => {
-  await page.goto(`${PNRR}/contracte/702`)
+  await page.goto(`/proiecte/pnrr/702`)
   const main = page.getByRole('main')
   await expect(main.getByText('Nu putem spune').first()).toBeVisible()
   // The card of the shared payments is folded: its summary says what it holds, and that
@@ -1871,7 +1859,7 @@ test('payments to a beneficiary with several contracts on a measure belong to no
 test('a contract on measures that disagree shows each its own progress', async ({
   page,
 }) => {
-  await page.goto(`${PNRR}/contracte/704`)
+  await page.goto(`/proiecte/pnrr/704`)
   const main = page.getByRole('main')
   await expect(
     main.getByRole('heading', { name: 'Dotări școlare Beta [CNP]' }),
@@ -1884,7 +1872,7 @@ test('a contract on measures that disagree shows each its own progress', async (
 })
 
 test("a natural person's contract has no page", async ({ page }) => {
-  await page.goto(`${PNRR}/contracte/705`)
+  await page.goto(`/proiecte/pnrr/705`)
   await expect(
     page.getByRole('heading', { name: 'Pagina nu există' }),
   ).toBeVisible()
@@ -1955,7 +1943,7 @@ test('a page of a programme list past the end goes to the last one', async ({
 test('a cohesion project says what was paid up to its list, with no payment day', async ({
   page,
 }) => {
-  await page.goto(`${EU}/proiecte/312456`)
+  await page.goto(`/proiecte/fonduri-europene/312456`)
   const main = page.getByRole('main')
   await expect(
     main.getByText(/^Proiect · Programul Educație și Ocupare 2021–2027/),
@@ -1982,7 +1970,7 @@ test('a cohesion project says what was paid up to its list, with no payment day'
 test('a status the list names its own way is shown as written', async ({
   page,
 }) => {
-  await page.goto(`${EU}/proiecte/118002`)
+  await page.goto(`/proiecte/fonduri-europene/118002`)
   const main = page.getByRole('main')
   await expect(main.getByText('etapizat')).toBeVisible()
   await expect(main.getByText('Fără legătură').first()).toBeVisible()
@@ -1992,7 +1980,7 @@ test('a status the list names its own way is shown as written', async ({
 test('a Health project has its payments one by one, apart from the list figure', async ({
   page,
 }) => {
-  await page.goto(`${EU}/proiecte/324809`)
+  await page.goto(`/proiecte/fonduri-europene/324809`)
   const main = page.getByRole('main')
   await expect(main.getByText('Plătit până la 31.08.2026')).toBeVisible()
   await expect(
@@ -2006,7 +1994,7 @@ test('a Health project has its payments one by one, apart from the list figure',
 })
 
 test('an EU project not held has no page', async ({ page }) => {
-  await page.goto(`${EU}/proiecte/999999`)
+  await page.goto(`/proiecte/fonduri-europene/999999`)
   await expect(
     page.getByRole('heading', { name: 'Pagina nu există' }),
   ).toBeVisible()
@@ -2015,7 +2003,7 @@ test('an EU project not held has no page', async ({ page }) => {
 test('a cohesion project lists the SEAP contracts whose notice cites its SMIS code', async ({
   page,
 }) => {
-  await page.goto(`${EU}/proiecte/118001`)
+  await page.goto(`/proiecte/fonduri-europene/118001`)
   const main = page.getByRole('main')
   await expect(
     main.getByRole('heading', {
@@ -2044,7 +2032,7 @@ test('a cohesion project lists the SEAP contracts whose notice cites its SMIS co
 test('a PNRR contract lists the purchases of its beneficiary that cite its number', async ({
   page,
 }) => {
-  await page.goto('/programe/pnrr/contracte/701')
+  await page.goto('/proiecte/pnrr/701')
   const main = page.getByRole('main')
   const table = main.getByRole('table', { name: 'Achizițiile directe' })
   await expect(table.getByRole('link', { name: 'Purchase 3' })).toHaveAttribute(
@@ -2060,7 +2048,7 @@ test('a PNRR contract lists the purchases of its beneficiary that cite its numbe
 })
 
 test('a project no SEAP record cites says so', async ({ page }) => {
-  await page.goto(`${EU}/proiecte/312456`)
+  await page.goto(`/proiecte/fonduri-europene/312456`)
   await expect(
     page
       .getByRole('main')
@@ -2073,7 +2061,7 @@ test('a project no SEAP record cites says so', async ({ page }) => {
 test('a page past the end of the SEAP contracts goes back to the first', async ({
   page,
 }) => {
-  await page.goto(`${EU}/proiecte/118001?pagina=9`)
+  await page.goto(`/proiecte/fonduri-europene/118001?pagina=9`)
   await expect(page).toHaveURL(/\/proiecte\/fonduri-europene\/118001$/)
   await expect(
     page.getByRole('main').getByText('4 contracte din anunțuri de atribuire'),
@@ -2084,7 +2072,7 @@ test('a project page stays up when its SEAP records cannot be read', async ({
   page,
 }) => {
   // The stub has the project, not its SEAP records: the API's call fails.
-  await page.goto(`${EU}/proiecte/118003`)
+  await page.goto(`/proiecte/fonduri-europene/118003`)
   const main = page.getByRole('main')
   await expect(main.getByRole('heading', { level: 1 })).toBeVisible()
   await expect(
