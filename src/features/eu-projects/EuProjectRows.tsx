@@ -131,7 +131,7 @@ function Title({ row, q }: { row: EuProjectRow; q: string | undefined }) {
       <Text as="div" size="2">
         <Link asChild>
           <RouterLink
-            to="/programe/fonduri-europene/proiecte/$smis"
+            to="/proiecte/fonduri-europene/$smis"
             params={{ smis: String(row.smis) }}
           >
             {row.title

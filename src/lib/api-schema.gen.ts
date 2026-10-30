@@ -1939,6 +1939,18 @@ export interface components {
              */
             contracts: components["schemas"]["EuSeapContract"][];
             /**
+             * Notices
+             * @description The award notices tied, still in force.
+             */
+            notices: number;
+            /**
+             * Companies
+             * @description Every company that won a tied contract or sold a tied purchase, told apart by CUI, or by name where SEAP gives none.
+             */
+            companies: number;
+            /** @description The company with the most value across the tied records: contracts counted (never a framework agreement) and accepted purchases. */
+            largest: components["schemas"]["SeapCompany"] | null;
+            /**
              * Purchases
              * @description The accepted direct purchases tied, the newest first, all of them.
              */
@@ -3758,6 +3770,13 @@ export interface components {
             line: "state_subsidies" | "income_tax" | "vat" | "own_revenue" | "eu_funds" | "other_administrations" | "other";
             /** Amount */
             amount: number;
+        };
+        /** SeapCompany */
+        SeapCompany: {
+            /** Name */
+            name: string;
+            /** @description Set when the company has a page. */
+            entity: components["schemas"]["EntityRef"] | null;
         };
         /** SearchResults */
         SearchResults: {

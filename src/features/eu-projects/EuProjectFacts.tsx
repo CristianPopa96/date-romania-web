@@ -1,8 +1,6 @@
 import {
   Badge,
-  Card,
   Code,
-  DataList,
   Flex,
   Table,
   Text,
@@ -18,7 +16,7 @@ import type {
   EuPayment,
   EuProject,
 } from '#/features/eu-projects/api'
-import { beneficiaryTie, periodLabel } from '#/features/eu-projects/eu'
+import { beneficiaryTie } from '#/features/eu-projects/eu'
 
 // A project's status: ours when the list's words say one of the three, else the list's own
 // words in gray ('etapizat', 'nefinalizat'), never guessed into one of ours.
@@ -73,75 +71,6 @@ export function Beneficiary({ beneficiary }: { beneficiary: EuBeneficiary }) {
         help={t.eu.tieHelp[tie.label]}
       />
     </Flex>
-  )
-}
-
-export function Facts({ project }: { project: EuProject }) {
-  const { t, f } = useI18n()
-  const e = t.eu
-  const place = [project.locality, project.county].filter(Boolean).join(', ')
-  const day = (value: string | null) =>
-    value ? f.day(value) : <DataState kind="notPublished" />
-
-  return (
-    <Card size="3">
-      <DataList.Root
-        size="2"
-        orientation={{ initial: 'vertical', sm: 'horizontal' }}
-      >
-        <DataList.Item>
-          <DataList.Label>{e.smisCode}</DataList.Label>
-          <DataList.Value>
-            <Code variant="ghost">{project.smis}</Code>
-          </DataList.Value>
-        </DataList.Item>
-        <DataList.Item>
-          <DataList.Label>{e.beneficiary}</DataList.Label>
-          <DataList.Value>
-            <Beneficiary beneficiary={project.beneficiary} />
-          </DataList.Value>
-        </DataList.Item>
-        <DataList.Item>
-          <DataList.Label>{e.programme}</DataList.Label>
-          <DataList.Value>
-            {project.programme_name} {periodLabel(project.period)}
-          </DataList.Value>
-        </DataList.Item>
-        <DataList.Item>
-          <DataList.Label>{e.state}</DataList.Label>
-          <DataList.Value>
-            <EuStatusBadge
-              status={project.status}
-              written={project.status_written}
-            />
-          </DataList.Value>
-        </DataList.Item>
-        <DataList.Item>
-          <DataList.Label>{e.starts}</DataList.Label>
-          <DataList.Value>{day(project.starts_on)}</DataList.Value>
-        </DataList.Item>
-        <DataList.Item>
-          <DataList.Label>{e.ends}</DataList.Label>
-          <DataList.Value>{day(project.ends_on)}</DataList.Value>
-        </DataList.Item>
-        <DataList.Item>
-          <DataList.Label>{e.place}</DataList.Label>
-          <DataList.Value>
-            {place || <DataState kind="notPublished" />}
-          </DataList.Value>
-        </DataList.Item>
-        <DataList.Item>
-          <DataList.Label>{e.rate}</DataList.Label>
-          <DataList.Value>
-            {project.cofinancing_rate === null ? (
-              <DataState kind="notPublished" />
-            ) : (
-              f.percent(project.cofinancing_rate)
-            )}
-          </DataList.Value>
-        </DataList.Item>
-      </DataList.Root>
-    </Card>
   )
 }
 

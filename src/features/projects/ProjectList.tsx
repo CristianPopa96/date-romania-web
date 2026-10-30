@@ -8,6 +8,7 @@ import { ProjectCharts } from '#/features/projects/ProjectCharts'
 import { ProjectRows } from '#/features/projects/ProjectRows'
 import type { ProjectKind, ProjectsOverview } from '#/features/projects/api'
 import { projectFilterDecls } from '#/features/projects/filters'
+import type { HeldProgramme } from '#/features/projects/filters'
 import {
   PROJECT_BY_API_PARAM,
   PROJECT_COLUMNS,
@@ -39,18 +40,27 @@ export function ProjectList<TSearch extends ProjectListSearch>({
   search,
   onSearch,
   fixed,
+  cohesion,
   title,
 }: {
   search: TSearch
   onSearch: (search: TSearch) => void
   fixed?: ProjectKind
+  // The EU funds page: the programmes it holds, and the codes its address names.
+  cohesion?: {
+    held: ReadonlyArray<HeldProgramme>
+    codes: Array<string> | undefined
+  }
   title: string
 }) {
   const { t, f } = useI18n()
   const p = t.projects
-  const { data: list } = useSuspenseQuery(projectListQuery(search, fixed))
+  const codes = cohesion?.codes
+  const { data: list } = useSuspenseQuery(
+    projectListQuery(search, fixed, codes),
+  )
   const { data: overview } = useSuspenseQuery(
-    projectsOverviewQuery(search, fixed),
+    projectsOverviewQuery(search, fixed, codes),
   )
   if (list === 'failed' || overview === 'failed' || !overview) {
     return (
@@ -69,10 +79,11 @@ export function ProjectList<TSearch extends ProjectListSearch>({
   const q = search.q === undefined ? undefined : String(search.q)
   const back = emptyHint(overview.without, PROJECT_BY_API_PARAM)
   const found = overview.summary
-  // The filters a programme's page keeps whatever the reader removes.
-  const own = fixed ? ['program' as const] : []
+  // The filters a programme's page keeps whatever the reader removes; on the EU funds
+  // page `program` is its programmes, a filter like any other.
+  const own = fixed && !cohesion ? ['program' as const] : []
   const kept = (filters: ProjectListSearch) =>
-    fixed ? { ...filters, program: search.program } : filters
+    own.length ? { ...filters, program: search.program } : filters
 
   return (
     <ListView
@@ -84,6 +95,7 @@ export function ProjectList<TSearch extends ProjectListSearch>({
           search,
           overview,
           fixedKind: fixed !== undefined,
+          held: cohesion?.held,
           t,
           f,
         }),
@@ -91,7 +103,7 @@ export function ProjectList<TSearch extends ProjectListSearch>({
       }}
       summary={summaryLine(overview, fixed, t, f)}
       views={
-        found.projects > 0
+        found.projects > 0 && !cohesion
           ? {
               charts: search.vedere !== 'tabel',
               onCharts: (charts) =>
@@ -101,7 +113,10 @@ export function ProjectList<TSearch extends ProjectListSearch>({
       }
       file={
         found.projects > 0
-          ? { href: projectsCsvPath(search, fixed), rows: found.projects }
+          ? {
+              href: projectsCsvPath(search, fixed, codes),
+              rows: found.projects,
+            }
           : null
       }
       sort={{
@@ -110,13 +125,16 @@ export function ProjectList<TSearch extends ProjectListSearch>({
         isDefault: search.ordine === undefined,
         onSort,
       }}
+      // The EU funds page compares its programmes in the table above it: no chart (Q66).
       charts={
-        <ProjectCharts
-          search={search}
-          overview={overview}
-          fixedKind={fixed !== undefined}
-          onApply={apply}
-        />
+        cohesion ? null : (
+          <ProjectCharts
+            search={search}
+            overview={overview}
+            fixedKind={fixed !== undefined}
+            onApply={apply}
+          />
+        )
       }
       rows={
         <ProjectRows
@@ -208,10 +226,11 @@ function summaryLine(
     ),
     detail: (
       <>
-        {p.of(f.count(overview.whole))}
-        {several ? ` · ${p.noSum}` : null}
+        {/* The whole is every programme's: said on the list of all of them only. */}
+        {fixed ? null : p.of(f.count(overview.whole))}
+        {several ? `${fixed ? '' : ' · '}${p.noSum}` : null}
         {found.natural_persons > 0
-          ? `. ${p.naturalPersons(found.natural_persons, f.count(found.natural_persons))}`
+          ? `${fixed && !several ? '' : '. '}${p.naturalPersons(found.natural_persons, f.count(found.natural_persons))}`
           : null}
       </>
     ),

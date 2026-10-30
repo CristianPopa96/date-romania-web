@@ -93,6 +93,8 @@ export const projects = {
   valueColumn: 'Valoare',
   road: 'Drum urmărit',
   national: 'național',
+  someCounties: (first: string, more: number) =>
+    `${first} și încă ${more} județe`,
   fallbackTitle: 'Proiect fără titlu',
   key: (program: string, key: string) => `${program} · ${key}`,
   smis: (code: string) => `SMIS ${code}`,

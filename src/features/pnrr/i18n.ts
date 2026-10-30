@@ -124,6 +124,27 @@ export const pnrr = {
   reportedByDiffers: (ministry: string | null) =>
     `raportat de ${ministry ?? 'minister'} · poate diferi de plățile numărate de noi`,
   progressByMeasure: 'Progresul raportat, pe măsuri',
+  progressReported: 'Progres raportat',
+  progressByMeasureShort: 'pe măsuri',
+  progressPhysicalShort: (share: string) => `fizic ${share}`,
+  progressFinancialNote: (share: string, ministry: string | null) =>
+    `financiar ${share} · raportat de ${ministry ?? 'minister'}`,
+  // "Drumul banilor" of a contract.
+  roadFunder: 'Finanțator',
+  roadEu: 'Uniunea Europeană',
+  roadFacility: 'Mecanismul de redresare și reziliență',
+  roadMeasure: 'Măsură',
+  andMore: (n: number) => `și încă ${n}`,
+  coordinatedBy: (ministry: string | null) =>
+    ministry ? `coordonat de ${ministry}` : '',
+  roadContract: 'Contract de finanțare',
+  roadNumber: 'nr. {number}',
+  roadPayments: 'Plăți',
+  roadLastPaid: (day: string) => `ultima ${day}`,
+  roadShared: (sum: string) => `${sum} pe măsură`,
+  roadSharedNote: (n: number, text: string) =>
+    `${counted(n, text, 'un contract', 'contracte')} · plățile nu numesc contractul`,
+  roadNoPayment: 'pentru beneficiar pe măsură, în fișierul de plăți',
   progressRow: (physical: string, financial: string) =>
     `fizic ${physical} · financiar ${financial}`,
   number: 'Nr. contract',

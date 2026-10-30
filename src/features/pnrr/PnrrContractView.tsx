@@ -1,30 +1,29 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { Link as RouterLink } from '@tanstack/react-router'
-import { ExclamationTriangleIcon } from '@radix-ui/react-icons'
-import {
-  Callout,
-  Card,
-  Container,
-  Flex,
-  Grid,
-  Heading,
-  Link,
-  Text,
-} from '@radix-ui/themes'
+import { Code, Container, Flex, Link } from '@radix-ui/themes'
 
-import { EuSeapSection } from '#/features/eu-projects'
-import { Facts, ProgressBars } from '#/features/pnrr/PnrrContractFacts'
-import { PnrrPaymentsSection } from '#/features/pnrr/PnrrPayments'
-import { Stat } from '#/features/programme'
+import { DataState } from '#/components/DataState'
+import { EntityLink, roleOfKind } from '#/components/EntityLink'
 import { SourceLine } from '#/components/SourceLine'
+import {
+  FiguresCard,
+  NotPublic,
+  ProjectHeader,
+} from '#/components/project/ProjectFrame'
+import { EuSeapSection, euSeapQuery } from '#/features/eu-projects'
+import { PnrrRoad } from '#/features/pnrr/PnrrRoad'
+import { ProgressBars } from '#/features/pnrr/PnrrContractFacts'
+import { PnrrPaymentsSection } from '#/features/pnrr/PnrrPayments'
+import { PnrrStatusBadge } from '#/features/pnrr/PnrrTables'
 import { useI18n } from '#/i18n/context'
 import type { PnrrContract } from '#/features/pnrr/api'
-import { measureLabel, measureSlug, paidSoFar } from '#/features/pnrr/pnrr'
+import { measureLabel, paidSoFar } from '#/features/pnrr/pnrr'
 import { pnrrContractQuery } from '#/features/pnrr/queries'
 
-// One PNRR financing contract (`ScreenEUProject`, its PNRR kind): what it is worth, the
-// progress the ministry reports, the facts, the payments that can be told to be its, and
-// the SEAP records that cite its number (`page` of their contracts).
+// One PNRR financing contract on the project page of every programme (ScreenProject,
+// design D22): its figures, "Drumul banilor" from the EU to the companies, its payments,
+// the SEAP records that cite its number (`page` of their contracts) and what is not
+// public.
 export function PnrrContractView({
   id,
   page,
@@ -52,109 +51,135 @@ function ContractView({
 }) {
   const { t, f } = useI18n()
   const p = t.pnrr
-  const first = contract.lines.at(0)
+  const pages = t.projects.page
+  const { data: seap } = useSuspenseQuery(
+    euSeapQuery({ kind: 'pnrr', id: contract.id, page }),
+  )
   const measures = contract.lines.map((line) =>
     measureLabel(line.measure, line.measure_name),
   )
-  const ministry = contract.ministry
   const paid = paidSoFar(contract)
   const euShare =
     contract.total && contract.eu !== null ? contract.eu / contract.total : null
+  const place = [contract.locality, contract.county].filter(Boolean).join(', ')
+  const percent = (value: number | null) =>
+    value === null ? t.common.notPublished : f.percent(value)
 
   return (
     <Container size="4" px="5" py="7">
       <Flex direction="column" gap="6">
-        <Flex direction="column" gap="2">
-          <Text size="2" color="gray">
-            {p.crumb} /{' '}
-            <Link asChild color="gray">
-              <RouterLink to="/programe/pnrr">{p.name}</RouterLink>
-            </Link>{' '}
-            /{' '}
-            {first ? (
-              <Link asChild color="gray">
-                <RouterLink
-                  to="/programe/pnrr/$masura"
-                  params={{ masura: measureSlug(first.measure) }}
-                >
-                  {measures[0]}
-                </RouterLink>
-              </Link>
-            ) : null}{' '}
-            /{' '}
-            {contract.number
-              ? p.contractTitle(contract.number)
-              : p.fallbackTitle}
-          </Text>
-          <Text size="1" color="gray" weight="medium">
-            {p.contractEyebrow(measures.join(', '), ministry)}
-          </Text>
-          <Heading size="7">{contract.title ?? p.fallbackTitle}</Heading>
-        </Flex>
+        <ProjectHeader
+          crumbs={
+            <>
+              <Link asChild>
+                <RouterLink to="/proiecte">{t.projects.crumb}</RouterLink>
+              </Link>{' '}
+              /{' '}
+              <Link asChild>
+                <RouterLink to="/programe/pnrr">{p.name}</RouterLink>
+              </Link>{' '}
+              /{' '}
+              {contract.number
+                ? p.contractTitle(contract.number)
+                : p.fallbackTitle}
+            </>
+          }
+          eyebrow={pages.eyebrow(
+            `${p.name} · ${measures.join(', ')}`,
+            place || null,
+          )}
+          title={contract.title ?? p.fallbackTitle}
+        />
 
-        <Grid columns={{ initial: '1', md: '2fr 1fr' }} gap="5" align="start">
-          <Card size="3">
-            <Flex direction="column" gap="4">
-              <Grid columns={{ initial: '1', sm: '3' }} gap="5">
-                <Stat
-                  label={p.total}
-                  value={
-                    contract.total === null
-                      ? t.common.notPublished
-                      : f.leiShort(contract.total)
-                  }
-                  detail={
-                    contract.signed_on
-                      ? [p.signed(f.day(contract.signed_on))]
-                      : []
-                  }
-                />
-                <Stat
-                  label={p.eu}
-                  value={
-                    contract.eu === null
-                      ? t.common.notPublished
-                      : f.leiShort(contract.eu)
-                  }
-                  detail={euShare === null ? [] : [f.percent(euShare)]}
-                />
-                {paid ? (
-                  <Stat
-                    label={p.paidSoFar}
-                    value={paid.count ? f.leiShort(paid.amount) : p.noPayment}
-                    detail={
-                      paid.count
-                        ? [
-                            p.paidSoFarDetail(
-                              paid.count,
-                              f.count(paid.count),
-                              paid.lastDay && f.day(paid.lastDay),
-                            ),
-                          ]
-                        : []
-                    }
-                  />
+        <FiguresCard
+          figures={[
+            {
+              label: p.total,
+              value:
+                contract.total === null ? (
+                  <DataState kind="notPublished" />
                 ) : (
-                  <Stat
-                    label={p.paidOnContract}
-                    value={p.cannotSay}
-                    detail={[p.cannotSayDetail]}
-                  />
-                )}
-              </Grid>
-              <ProgressBars contract={contract} />
-              <SourceLine
-                source={{
-                  ...contract.source,
-                  record:
-                    contract.source.record &&
-                    p.edition(contract.source.record, f.day(contract.edition)),
-                }}
-              />
-            </Flex>
-          </Card>
-          <Facts contract={contract} measures={measures} />
-        </Grid>
+                  f.leiShort(contract.total)
+                ),
+              note: contract.signed_on
+                ? p.signed(f.day(contract.signed_on))
+                : undefined,
+            },
+            {
+              label: p.eu,
+              value:
+                contract.eu === null ? (
+                  <DataState kind="notPublished" />
+                ) : (
+                  f.leiShort(contract.eu)
+                ),
+              note: euShare === null ? undefined : f.percent(euShare),
+            },
+            paid
+              ? {
+                  label: p.paidSoFar,
+                  value: paid.count ? f.leiShort(paid.amount) : p.noPayment,
+                  note: paid.count
+                    ? p.paidSoFarDetail(
+                        paid.count,
+                        f.count(paid.count),
+                        paid.lastDay && f.day(paid.lastDay),
+                      )
+                    : undefined,
+                }
+              : {
+                  label: p.paidOnContract,
+                  value: p.cannotSay,
+                  note: p.cannotSayDetail,
+                },
+            {
+              label: p.progressReported,
+              value: contract.measures_differ
+                ? p.progressByMeasureShort
+                : p.progressPhysicalShort(percent(contract.physical_progress)),
+              note: contract.measures_differ
+                ? p.reportedBy(contract.ministry)
+                : p.progressFinancialNote(
+                    percent(contract.financial_progress),
+                    contract.ministry,
+                  ),
+            },
+          ]}
+          facts={[
+            {
+              label: pages.beneficiary,
+              value: contract.beneficiary ? (
+                <EntityLink
+                  role={roleOfKind(contract.beneficiary.kind)}
+                  cui={contract.beneficiary.cui}
+                >
+                  {contract.beneficiary.name}
+                </EntityLink>
+              ) : (
+                <DataState kind="notPublished" />
+              ),
+            },
+            contract.status
+              ? {
+                  label: pages.status,
+                  value: <PnrrStatusBadge status={contract.status} />,
+                }
+              : null,
+            contract.ends_on
+              ? { label: pages.deadline, value: f.day(contract.ends_on) }
+              : null,
+            contract.number
+              ? {
+                  label: p.number,
+                  value: <Code variant="ghost">{contract.number}</Code>,
+                }
+              : null,
+          ]}
+        />
+        {/* Measures that disagree: each its own progress, as the ministry gives it. */}
+        {contract.measures_differ ? <ProgressBars contract={contract} /> : null}
+
+        <PnrrRoad contract={contract} seap={seap} />
 
         <PnrrPaymentsSection contract={contract} />
 
@@ -164,17 +189,16 @@ function ContractView({
           onPage={onPage}
         />
 
-        <Flex direction="column" gap="3">
-          <Heading as="h2" size="5">
-            {p.notPublicTitle}
-          </Heading>
-          <Callout.Root color="amber" variant="surface">
-            <Callout.Icon>
-              <ExclamationTriangleIcon />
-            </Callout.Icon>
-            <Callout.Text>{p.notPublic}</Callout.Text>
-          </Callout.Root>
-        </Flex>
+        <NotPublic title={pages.notPublicTitle} text={p.notPublic} />
+
+        <SourceLine
+          source={{
+            ...contract.source,
+            record:
+              contract.source.record &&
+              p.edition(contract.source.record, f.day(contract.edition)),
+          }}
+        />
       </Flex>
     </Container>
   )

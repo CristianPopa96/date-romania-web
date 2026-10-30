@@ -108,6 +108,19 @@ export const eu = {
   type: 'Tip beneficiar',
   place: 'Loc de implementare',
   rate: 'Cofinanțare UE',
+  rateNote: 'partea UE din cheltuielile eligibile',
+  // "Drumul banilor" of a cohesion project.
+  roadFunder: 'Finanțator',
+  roadEu: 'Uniunea Europeană',
+  roadFunds: 'fondurile de coeziune',
+  roadProgramme: 'Program',
+  roadContract: 'Contract de finanțare',
+  roadPayments: 'Plăți',
+  roadPaymentsCount: (n: number, text: string) =>
+    counted(n, text, 'o plată', 'plăți'),
+  roadDated: 'publicate una câte una, cu data lor',
+  roadUntil: (day: string) => `cumulat până la ${day}, fără dată`,
+  roadNoPaid: 'lista nu dă suma plătită',
   starts: 'Început',
   ends: 'Termen',
 
@@ -124,11 +137,31 @@ export const eu = {
   // cohesion project, `pnrr` a PNRR financing contract.
   seap: {
     // Only what the tie supports: the buyer's text cites the project, nothing proves it paid.
-    title: 'Contracte și achiziții care citează acest proiect',
+    // One heading for every programme (round 13); the line beside it says how they were found.
+    title: 'Contracte și achiziții legate de proiect',
     note: {
-      smis: 'găsite după codul SMIS citat în anunț sau în achiziție',
-      pnrr: 'găsite după numărul contractului de finanțare citat în anunț, la același cumpărător',
+      smis: 'care citează codul SMIS',
+      pnrr: 'care citează numărul contractului de finanțare',
     },
+    // The road's last two steps.
+    hopRecords: 'Achiziții',
+    hopNone: 'Nicio achiziție găsită',
+    hopNoneNote: {
+      smis: 'niciun anunț sau achiziție nu citează codul SMIS',
+      pnrr: 'niciun anunț sau achiziție nu citează numărul contractului',
+    },
+    hopNotices: (n: number, text: string) =>
+      counted(n, text, 'un anunț', 'anunțuri'),
+    hopPurchases: (n: number, text: string) =>
+      counted(n, text, 'o achiziție directă', 'achiziții directe'),
+    hopCited: {
+      smis: 'care citează codul SMIS',
+      pnrr: 'care citează nr. contractului',
+    },
+    probable: 'Probabil',
+    hopCompanies: 'Firme',
+    hopCompaniesNote: 'câștigători și furnizori',
+    andMore: (n: number) => `și încă ${n}`,
     none: {
       smis: 'Niciun anunț de atribuire și nicio achiziție directă dintre cele pe care le avem nu citează codul SMIS al proiectului.',
       pnrr: 'Niciun anunț de atribuire și nicio achiziție directă dintre cele pe care le avem nu citează numărul acestui contract de finanțare.',

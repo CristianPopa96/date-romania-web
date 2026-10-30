@@ -1808,14 +1808,23 @@ test('a measure never names a natural person, and says how many it leaves out', 
 test('a PNRR contract alone on its measure has its payments, by day', async ({
   page,
 }) => {
+  // The old address of a contract leads to its page under /proiecte.
   await page.goto(`${PNRR}/contracte/701`)
+  await expect(page).toHaveURL(/\/proiecte\/pnrr\/701$/)
   const main = page.getByRole('main')
   await expect(
-    main.getByText(
-      'Contract de finanțare PNRR · C10 · Investiția 3 · coordonat de MDLPA',
-    ),
+    main.getByText(/^Proiect · PNRR · C10 · Investiția 3/),
   ).toBeVisible()
-  await expect(main.getByText('2,3 mil. lei')).toBeVisible()
+  // "Drumul banilor": the EU, the measure, the contract, the beneficiary, its payments,
+  // the purchase that cites the contract's number and who sold it.
+  const road = main.getByRole('list', { name: 'Drumul banilor' })
+  await expect(road.getByRole('listitem')).toHaveCount(7)
+  await expect(road).toContainText('Uniunea Europeană')
+  await expect(road).toContainText('coordonat de MDLPA')
+  await expect(road).toContainText('o achiziție directă')
+  await expect(road).toContainText('Probabil')
+  await expect(road).toContainText('Beta Birotică SRL')
+  await expect(main.getByText('2,3 mil. lei').first()).toBeVisible()
   await expect(main.getByText('3 plăți · ultima 02.10.2026')).toBeVisible()
   await expect(
     main.getByText('e singurul ei contract pe această măsură', {
@@ -1825,11 +1834,11 @@ test('a PNRR contract alone on its measure has its payments, by day', async ({
   await expect(
     main.getByRole('table', { name: 'Plăți' }).getByRole('row'),
   ).toHaveCount(4)
+  await expect(main.getByText('Progres raportat')).toBeVisible()
   await expect(
-    main.getByRole('progressbar', { name: 'Progres fizic' }),
-  ).toBeVisible()
-  await expect(
-    main.getByRole('link', { name: 'Comuna Țânțăreni (Primăria Țânțăreni)' }),
+    main
+      .getByRole('link', { name: 'Comuna Țânțăreni (Primăria Țânțăreni)' })
+      .first(),
   ).toHaveAttribute('href', '/institutii/4981310')
 })
 
@@ -1856,7 +1865,7 @@ test('payments to a beneficiary with several contracts on a measure belong to no
   await expect(main.getByText('nr. 12345 · acest contract')).toBeVisible()
   await expect(
     main.getByRole('link', { name: 'Renovare energetică ambulatoriu' }),
-  ).toHaveAttribute('href', '/programe/pnrr/contracte/703')
+  ).toHaveAttribute('href', '/proiecte/pnrr/703')
 })
 
 test('a contract on measures that disagree shows each its own progress', async ({
@@ -1897,12 +1906,16 @@ test('the EU funds page lists each programme from its own list, never added up',
   // POCU publishes no total value: it is said, never made up.
   await expect(pocu.getByText('Nepublicat')).toBeVisible()
   await expect(pocu.getByText('31.08.2025')).toBeVisible()
+  // Its list is the list of every project, fixed to cohesion, with no chart: the table
+  // above compares the programmes. Several programmes: no value.
   await expect(
-    main.getByText('din 5 în listele pe care le avem; sumele nu se adună', {
-      exact: false,
-    }),
+    main.getByRole('heading', { name: 'Proiectele programului' }),
   ).toBeVisible()
-  await expect(main.getByText('5 proiecte', { exact: true })).toBeVisible()
+  await expect(main.getByText(/^5 proiecte · /)).toBeVisible()
+  await expect(
+    main.getByText(/sumele nu se adună între programe; alege un program/),
+  ).toBeVisible()
+  await expect(main.getByText('Proiecte pe programe')).toHaveCount(0)
 })
 
 test('the EU projects are filtered by programme in the address', async ({
@@ -1910,27 +1923,21 @@ test('the EU projects are filtered by programme in the address', async ({
 }) => {
   await page.goto(`${EU}?program=por-2014`)
   const main = page.getByRole('main')
-  await expect(main.getByText('Program: POR 2014-2020')).toBeVisible()
-  // One programme chosen: its value, at its own list's day.
+  await expect(main.getByText('Program: POR 2014–2020')).toBeVisible()
+  // One programme chosen: its value.
   await expect(
-    main.getByText(/^un proiect · valoare .* până la 31\.08\.2025$/),
+    main.getByText(/^un proiect · .*valoare 6,2 mil\. lei$/),
   ).toBeVisible()
-  const row = main.getByRole('row', { name: /Modernizarea drumului comunal/ })
-  await expect(row.getByText('Nume și localitate')).toBeVisible()
-  await row
+  await main
     .getByRole('link', { name: 'Modernizarea drumului comunal DC 12' })
     .click()
-  await expect(page).toHaveURL(
-    /\/programe\/fonduri-europene\/proiecte\/118001$/,
-  )
+  await expect(page).toHaveURL(/\/proiecte\/fonduri-europene\/118001$/)
 })
 
 test('a SMIS code typed in the search finds its project', async ({ page }) => {
   await page.goto(`${EU}?q=118001`)
   const main = page.getByRole('main')
-  await expect(
-    main.getByText('un proiect', { exact: true }).first(),
-  ).toBeVisible()
+  await expect(main.getByText(/^un proiect · /)).toBeVisible()
   await expect(
     main.getByRole('link', { name: 'Modernizarea drumului comunal DC 12' }),
   ).toBeVisible()
@@ -1951,19 +1958,23 @@ test('a cohesion project says what was paid up to its list, with no payment day'
   await page.goto(`${EU}/proiecte/312456`)
   const main = page.getByRole('main')
   await expect(
-    main.getByText(
-      'Proiect european · Programul Educație și Ocupare 2021–2027',
-    ),
+    main.getByText(/^Proiect · Programul Educație și Ocupare 2021–2027/),
   ).toBeVisible()
   await expect(main.getByText('Plătit până la 30.09.2026')).toBeVisible()
   await expect(
     main.getByText('data listei MIPE · plățile nu au dată'),
   ).toBeVisible()
   await expect(main.getByText('85 %').first()).toBeVisible()
-  await expect(main.getByText('CUI în listă')).toBeVisible()
+  await expect(main.getByText('CUI în listă').first()).toBeVisible()
   await expect(
-    main.getByRole('link', { name: 'SPITALUL JUDETEAN DE URGENTA CLUJ' }),
+    main
+      .getByRole('link', { name: 'SPITALUL JUDETEAN DE URGENTA CLUJ' })
+      .first(),
   ).toHaveAttribute('href', '/institutii/4491342')
+  // Nothing cites the project in SEAP: the road stops at the purchases.
+  const road = main.getByRole('list', { name: 'Drumul banilor' })
+  await expect(road.getByRole('listitem')).toHaveCount(6)
+  await expect(road).toContainText('Nicio achiziție găsită')
   await expect(main.getByText('Asociația Sănătate pentru Toți')).toBeVisible()
   await expect(main.getByRole('table', { name: 'Plăți' })).toHaveCount(0)
 })
@@ -1974,7 +1985,7 @@ test('a status the list names its own way is shown as written', async ({
   await page.goto(`${EU}/proiecte/118002`)
   const main = page.getByRole('main')
   await expect(main.getByText('etapizat')).toBeVisible()
-  await expect(main.getByText('Fără legătură')).toBeVisible()
+  await expect(main.getByText('Fără legătură').first()).toBeVisible()
   await expect(main.getByText('Nepublicat').first()).toBeVisible()
 })
 
@@ -2008,9 +2019,10 @@ test('a cohesion project lists the SEAP contracts whose notice cites its SMIS co
   const main = page.getByRole('main')
   await expect(
     main.getByRole('heading', {
-      name: 'Contracte și achiziții care citează acest proiect',
+      name: 'Contracte și achiziții legate de proiect',
     }),
   ).toBeVisible()
+  await expect(main.getByText('care citează codul SMIS').first()).toBeVisible()
   await expect(
     main.getByText('4 contracte din anunțuri de atribuire'),
   ).toBeVisible()
@@ -2062,7 +2074,7 @@ test('a page past the end of the SEAP contracts goes back to the first', async (
   page,
 }) => {
   await page.goto(`${EU}/proiecte/118001?pagina=9`)
-  await expect(page).toHaveURL(/\/proiecte\/118001$/)
+  await expect(page).toHaveURL(/\/proiecte\/fonduri-europene\/118001$/)
   await expect(
     page.getByRole('main').getByText('4 contracte din anunțuri de atribuire'),
   ).toBeVisible()
@@ -2113,7 +2125,7 @@ test('an institution lists the EU projects and PNRR contracts it is the benefici
   await expect(school).toContainText('6.200.000 lei')
   await expect(
     school.getByRole('link', { name: /Renovarea energetică/ }),
-  ).toHaveAttribute('href', '/programe/pnrr/contracte/701')
+  ).toHaveAttribute('href', '/proiecte/pnrr/701')
 
   // A progress range from the address is a chip, and filters the list.
   await page.goto('/institutii/4981310?lista=pnrr&progres_min=50')
