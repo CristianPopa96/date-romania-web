@@ -79,16 +79,19 @@ describe('projectFilter', () => {
   })
 
   it('keeps a programme page to its programme whatever the address says', () => {
-    expect(projectFilter({ program: 'pnrr' }, 'anghel_saligny').kind).toEqual([
-      'anghel_saligny',
-    ])
+    expect(
+      projectFilter({ program: 'pnrr' }, { kind: 'anghel_saligny' }).kind,
+    ).toEqual(['anghel_saligny'])
   })
 })
 
 describe('projectsCsvPath', () => {
   it('carries the filters and the order, never the page', () => {
     expect(
-      projectsCsvPath({ judet: 'gorj', pagina: 3, vedere: 'tabel' }, 'pnrr'),
+      projectsCsvPath(
+        { judet: 'gorj', pagina: 3, vedere: 'tabel' },
+        { kind: 'pnrr' },
+      ),
     ).toBe('/proiecte.csv?judet=gorj&program=pnrr')
     expect(projectsCsvPath({})).toBe('/proiecte.csv')
   })

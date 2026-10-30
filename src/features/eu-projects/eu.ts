@@ -6,8 +6,6 @@ import type {
   EuBeneficiary,
   EuBeneficiaryFunds,
 } from '#/features/eu-projects/api'
-import type { EuLists } from '#/features/entities'
-
 // How the tie between a project and its beneficiary is marked (the ConfidenceBadge of the
 // design system): 'sure' when the list gives the CUI, 'probable' when we tied it by name.
 // `label` names the evidence: 'cui', 'administration' (the town hall or council of the
@@ -72,12 +70,16 @@ export function euCounts(funds: EuBeneficiaryFunds | null | 'failed') {
   }
 }
 
-// The EU lists an entity page offers: one per kind it has. PNRR counts a payment with no
-// contract too: the money was received, and the page says on what.
-export function euLists(funds: EuBeneficiaryFunds | null | 'failed'): EuLists {
-  const counts = euCounts(funds)
-  return {
-    coeziune: counts.cohesion > 0,
-    pnrr: counts.pnrr > 0 || counts.pnrrPaid,
-  }
+// The programme codes the address names, from the programmes held (a code alone is not
+// enough: POAT and PoAT differ only in case).
+export function programmeCodes(
+  programmes: ReadonlyArray<{ code: string; period: string }>,
+  program: string | undefined,
+): Array<string> | undefined {
+  if (!program) return undefined
+  const slugs = program.split(',')
+  const codes = programmes
+    .filter((each) => slugs.includes(programmeSlug(each)))
+    .map((each) => each.code)
+  return codes.length ? codes : undefined
 }

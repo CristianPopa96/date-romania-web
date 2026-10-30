@@ -907,6 +907,29 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/projects/programmes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Project Programmes
+         * @description A beneficiary's projects by programme, each with its count, its value and what was
+         *     paid as the programme publishes it, at its own day: never added across programmes.
+         *     PNRR payments name the beneficiary and the measure, so their sum is the beneficiary's,
+         *     over every measure, never a contract's.
+         */
+        get: operations["project_programmes_v1_projects_programmes_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/projects": {
         parameters: {
             query?: never;
@@ -2989,6 +3012,46 @@ export interface components {
              */
             paid: number;
         };
+        /** ProgrammeFigures */
+        ProgrammeFigures: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "anghel_saligny" | "pnrr" | "cohesion";
+            /**
+             * Programme
+             * @description 'AS', 'PNRR', or the cohesion programme's code.
+             */
+            programme: string;
+            /** Name */
+            name: string;
+            /** Period */
+            period: string | null;
+            /** Projects */
+            projects: number;
+            /**
+             * Value
+             * @description Lei, the projects' values added up.
+             */
+            value: number | null;
+            /**
+             * Paid
+             * @description Lei, as `paid_as` says; null where not published.
+             */
+            paid: number | null;
+            /**
+             * Paid As
+             * @description files: the Anghel Saligny payment files' sums for these projects; beneficiary: every PNRR payment to the beneficiary, over all its measures; cumulative: the cohesion list's paid figure up to its cut-off.
+             * @enum {string}
+             */
+            paid_as: "files" | "beneficiary" | "cumulative";
+            /**
+             * Day
+             * @description The last payment file's day, the PNRR edition, or the list's cut-off.
+             */
+            day: string | null;
+        };
         /**
          * ProgrammeFile
          * @description One payment file. The files give no payment day; the day in their name stands for it.
@@ -3239,6 +3302,11 @@ export interface components {
              */
             reach: "beneficiary" | "payments" | "purchases" | "companies";
             /**
+             * Via
+             * @description With `company` only: how the company is tied to the project, as its beneficiary, as the builder an Anghel Saligny payment file names, or as the winner of a notice or the supplier of a direct purchase that cites the project (probable).
+             */
+            via: ("beneficiary" | "builder" | "notice" | "purchase") | null;
+            /**
              * Gap
              * @description A step we cannot follow: the payments, when they are on a measure the beneficiary has several contracts on, or not published while a later step is.
              */
@@ -3322,6 +3390,14 @@ export interface components {
             progress: string | null;
             /** Builder Text */
             builder_text: string | null;
+        };
+        /**
+         * ProjectProgrammes
+         * @description A beneficiary's projects by programme: never added across programmes.
+         */
+        ProjectProgrammes: {
+            /** Items */
+            items: components["schemas"]["ProgrammeFigures"][];
         };
         /** ProjectRow */
         ProjectRow: {
@@ -5767,6 +5843,38 @@ export interface operations {
             };
         };
     };
+    project_programmes_v1_projects_programmes_get: {
+        parameters: {
+            query: {
+                /** @description The beneficiary's CUI. */
+                beneficiary: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectProgrammes"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     project_list_v1_projects_get: {
         parameters: {
             query?: {
@@ -5785,6 +5893,8 @@ export interface operations {
                 county?: string | null;
                 /** @description The beneficiary's CUI. */
                 beneficiary?: number | null;
+                /** @description A company's CUI: the projects it is the beneficiary of, or was paid through as the builder of an Anghel Saligny payment file or as the winner or supplier of a SEAP record that cites the project. Each row says which (`via`). */
+                company?: number | null;
                 /** @description Any of these. */
                 status?: ("in_progress" | "finished" | "terminated")[] | null;
                 /** @description Any of these last steps followed. */
@@ -5833,6 +5943,8 @@ export interface operations {
                 programme?: string[] | null;
                 /** @description A county's code, as in `counties`. */
                 county?: string | null;
+                /** @description A company's CUI: the projects it is the beneficiary of, or was paid through as the builder of an Anghel Saligny payment file or as the winner or supplier of a SEAP record that cites the project. Each row says which (`via`). */
+                company?: number | null;
                 /** @description Any of these. */
                 status?: ("in_progress" | "finished" | "terminated")[] | null;
                 /** @description Any of these last steps followed. */

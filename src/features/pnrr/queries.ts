@@ -22,7 +22,7 @@ export const pnrrContractQuery = (id: number) =>
     queryFn: () => getPnrrContract({ data: id }),
   })
 
-// A page of a beneficiary's or a measure's PNRR contracts under the filters, the order and the page size
+// A page of a measure's PNRR contracts under the filters, the order and the page size
 // of its address, and what the list says about itself: 'failed' when the API did not
 // answer, so the page stays on screen with a note instead of an error page.
 export const pnrrListQuery = (
@@ -44,8 +44,7 @@ export const pnrrListQuery = (
 export const pnrrOverviewQuery = (of: PnrrListOf, search: PnrrListSearch) => {
   const data = {
     filter: pnrrFilter(of, search),
-    scope:
-      'beneficiary' in of ? ('beneficiary' as const) : ('measure' as const),
+    scope: 'measure' as const,
   }
   return queryOptions({
     queryKey: ['pnrr', 'overview', data],

@@ -1,7 +1,6 @@
-// The PNRR contracts of one beneficiary, or of one measure, as a list of the DataTable
-// pattern: what its address holds, and what it asks the API for:
-// /institutii/4981310?lista=pnrr&masura=c10.i3&stare=finalizat&progres_min=50&progres_max=75,
-// /programe/pnrr/c10.i3?judet=gorj&beneficiar=4981310.
+// The PNRR contracts of one measure, as a list of the DataTable pattern: what its address
+// holds, and what it asks the API for:
+// /programe/pnrr/c10.i3?judet=gorj&beneficiar=4981310&stare=finalizat&progres_min=50.
 
 import { PNRR_STATUSES } from '#/features/pnrr/api'
 import type { PnrrStatus } from '#/features/pnrr/api'
@@ -147,10 +146,9 @@ export function progressBand(search: PnrrListSearch): number {
   )
 }
 
-// Whose list it is: a beneficiary's, or a measure's with the counties it has contracts in
-// (the address names one without its marks).
-export type PnrrListOf =
-  { beneficiary: number } | { measure: string; counties: ReadonlyArray<string> }
+// Whose list it is: a measure's, with the counties it has contracts in (the address names
+// one without its marks).
+export type PnrrListOf = { measure: string; counties: ReadonlyArray<string> }
 
 export type PnrrListFilter = {
   beneficiary?: number
@@ -169,14 +167,11 @@ export function pnrrFilter(
   of: PnrrListOf,
   search: PnrrListSearch,
 ): PnrrListFilter {
-  const own = 'beneficiary' in of
   return {
-    beneficiary: own ? of.beneficiary : search.beneficiar,
-    measure: own
-      ? search.masura?.split(',').map((code) => code.toUpperCase())
-      : [of.measure],
+    beneficiary: search.beneficiar,
+    measure: [of.measure],
     // A county the measure has no contract in is not asked for.
-    county: own ? undefined : countyBySlug(of.counties, search.judet),
+    county: countyBySlug(of.counties, search.judet),
     status: pnrrStatusesFromParam(search.stare),
     // `q` is shared with lists that keep one letter: the API reads two or more.
     q:
@@ -202,7 +197,6 @@ export function pnrrApiSort(search: PnrrListSearch) {
 
 export const PNRR_FILTER_PARAMS = {
   q: ['q'],
-  masura: ['masura'],
   judet: ['judet'],
   beneficiar: ['beneficiar'],
   stare: ['stare'],
@@ -213,7 +207,6 @@ export type PnrrFilterKey = keyof typeof PNRR_FILTER_PARAMS
 
 export const PNRR_BY_API_PARAM: Record<string, PnrrFilterKey> = {
   q: 'q',
-  measure: 'masura',
   county: 'judet',
   beneficiary: 'beneficiar',
   status: 'stare',

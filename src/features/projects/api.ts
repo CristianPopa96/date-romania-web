@@ -10,6 +10,8 @@ import type { ProjectFilter } from '#/features/projects/list'
 export type ProjectItem = Schemas['ProjectItem']
 export type ProjectList = Schemas['ProjectList']
 export type ProjectsOverview = Schemas['ProjectsOverview']
+export type ProgrammeFigures = Schemas['ProgrammeFigures']
+export type Via = NonNullable<ProjectItem['via']>
 export type ProjectKind = ProjectItem['kind']
 export type ProjectStatus = NonNullable<ProjectItem['status']>
 export type Reach = ProjectItem['reach']
@@ -57,3 +59,14 @@ export const getProjectList = createServerFn({ method: 'GET' })
 export const getProjectsOverview = createServerFn({ method: 'GET' })
   .inputValidator((data: ProjectFilter) => data)
   .handler(({ data }) => getJson<ProjectsOverview>(`${ROOT}/overview`, data))
+
+// A beneficiary's projects by programme; empty when it has none.
+export const getProjectProgrammes = createServerFn({ method: 'GET' })
+  .inputValidator((beneficiary: number) => beneficiary)
+  .handler(async ({ data }): Promise<Array<ProgrammeFigures>> => {
+    const found = await getJson<Schemas['ProjectProgrammes']>(
+      `${ROOT}/programmes`,
+      { beneficiary: data },
+    )
+    return found?.items ?? []
+  })

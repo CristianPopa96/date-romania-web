@@ -61,7 +61,9 @@ export const projects = {
   projects: (n: number, text: string) =>
     counted(n, text, 'un proiect', 'proiecte'),
   inKinds: (n: number, text: string) =>
-    `în ${counted(n, text, 'un program', 'programe')}`,
+    n === 1
+      ? 'într-un program'
+      : `în ${counted(n, text, 'un program', 'programe')}`,
   followed: (text: string) => `${text} urmărite până la firme`,
   noSum:
     'sumele nu se adună între programe; alege un program pentru valoarea lui',
@@ -85,6 +87,42 @@ export const projects = {
   reachNote:
     'SEAP nu are un câmp pentru proiect: o achiziție ajunge la proiect doar când cumpărătorul îl citează.',
 
+  // An entity page's tab.
+  tab: 'Proiecte',
+  tabTitle: 'Proiectele cu bani publici',
+  tabCompanyTitle: 'Proiectele prin care a fost plătită',
+  // How a company is tied to a project, on its page.
+  via: {
+    header: 'Legătura',
+    beneficiary: 'beneficiar',
+    builder: 'constructor în fișierul de plăți',
+    notice: 'câștigător al unui anunț legat',
+    purchase: 'furnizor al unei achiziții legate',
+    help: {
+      beneficiary: 'Programul o numește beneficiarul proiectului.',
+      builder:
+        'Fișierul de plăți al ministerului o numește constructorul, cu CUI-ul ei.',
+      notice:
+        'A câștigat un anunț de atribuire al cărui text citează proiectul. Legătura e făcută de noi, după ce a scris cumpărătorul.',
+      purchase:
+        'A vândut printr-o achiziție directă al cărei text citează proiectul. Legătura e făcută de noi, după ce a scris cumpărătorul.',
+    },
+  },
+  // The table by programme above an entity's list.
+  byProgramme: {
+    title: 'Pe programe, fiecare la data lui',
+    note: 'Fiecare program își publică cifrele la data lui: sumele nu se adună între programe.',
+    programme: 'Program',
+    projects: 'Proiecte',
+    value: 'Valoare',
+    paid: 'Plătit',
+    day: 'La data',
+    paidAs: {
+      files: 'în fișierele MDLPA',
+      beneficiary: 'beneficiarului, pe toate măsurile',
+      cumulative: 'cumulat, fără dată',
+    },
+  },
   project: 'Proiect',
   beneficiary: 'Beneficiar',
   valueColumn: 'Valoare',

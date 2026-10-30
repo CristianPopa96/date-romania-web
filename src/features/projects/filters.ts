@@ -36,6 +36,7 @@ export function projectFilterDecls({
   overview,
   fixedKind,
   held,
+  fixedParty = false,
   t,
   f,
 }: {
@@ -45,6 +46,8 @@ export function projectFilterDecls({
   fixedKind: boolean
   // The EU funds page: its programmes are a filter, by slug ('por-2014').
   held?: ReadonlyArray<HeldProgramme>
+  // An entity page: its institution or company is the list's, never a filter.
+  fixedParty?: boolean
   t: Messages
   f: Format
 }): Array<FilterDecl> {
@@ -83,7 +86,7 @@ export function projectFilterDecls({
     }),
   }
   const beneficiary: Array<FilterDecl> =
-    search.beneficiar !== undefined
+    search.beneficiar !== undefined && !fixedParty
       ? [
           {
             key: 'beneficiar',

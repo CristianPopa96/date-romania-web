@@ -7,13 +7,7 @@ import {
   contractsWon,
   entityContractsQuery,
 } from '#/features/contracts'
-import {
-  EntityCohesion,
-  euCounts,
-  euLists,
-  euBeneficiaryQuery,
-} from '#/features/eu-projects'
-import { EntityPnrr } from '#/features/pnrr'
+import { EntityProjects, projectListQuery } from '#/features/projects'
 import { EntityFigures } from '#/features/entities/EntityFigures'
 import { InstitutionHeader, InstitutionMoney } from '#/features/budget'
 import { PurchaseList } from '#/features/purchases'
@@ -21,14 +15,14 @@ import { UrlTabs } from '#/components/UrlTabs'
 import { useI18n } from '#/i18n/context'
 import { rich } from '#/i18n/rich'
 import type { Role } from '#/lib/api'
-import { entityQuery } from '#/features/entities/queries'
+import { entityProjects, entityQuery } from '#/features/entities/queries'
 import { statsQuery } from '#/lib/queries'
 import { entityList, entityListSearch } from '#/features/entities/urls'
 import type { EntityList, EntitySearch } from '#/features/entities/urls'
 
 // The page of one institution (as a buyer) or one supplier (as a seller): its contracts
-// and its direct purchases, as separate figures and separate lists, and the EU projects
-// and PNRR contracts it is the beneficiary of, a list for each kind it has.
+// and its direct purchases, as separate figures and separate lists, and its projects of
+// every programme in one tab (D22).
 export function EntityView({
   role,
   cui,
@@ -44,20 +38,24 @@ export function EntityView({
   const { data } = useSuspenseQuery(entityQuery(role, cui))
   const { data: contracts } = useSuspenseQuery(entityContractsQuery(role, cui))
   const { data: stats } = useSuspenseQuery(statsQuery)
-  const { data: funds } = useSuspenseQuery(euBeneficiaryQuery(cui))
+  const { data: projects } = useSuspenseQuery(
+    projectListQuery({}, entityProjects(role, cui)),
+  )
   // The route loader answers "not found" before this renders.
   if (!data || !contracts) return null
 
   const summary = data.direct_purchases
   const held = contractCount(contracts)
-  const eu = euCounts(funds)
-  const list = entityList(search, held > 0, euLists(funds))
-  const tab = (value: EntityList, label: string, count: number) => ({
+  // When the count could not be read the tab stays, with no count: its list says why.
+  const projectCount = projects === 'failed' ? null : projects.total
+  const hasProjects = projectCount !== 0
+  const list = entityList(search, held > 0, hasProjects)
+  const tab = (value: EntityList, label: string, count: number | null) => ({
     value,
     label: (
       <Flex gap="2" align="center">
         {label}
-        <Badge color="gray">{f.count(count)}</Badge>
+        {count === null ? null : <Badge color="gray">{f.count(count)}</Badge>}
       </Flex>
     ),
   })
@@ -111,10 +109,9 @@ export function EntityView({
           tabs={[
             tab('contracte', t.entity.tabContracts, held),
             tab('achizitii', t.entity.tabPurchases, summary.purchases),
-            ...(eu.cohesion > 0
-              ? [tab('coeziune', t.eu.held.tabCohesion, eu.cohesion)]
+            ...(hasProjects
+              ? [tab('proiecte', t.projects.tab, projectCount)]
               : []),
-            ...(eu.pnrr > 0 ? [tab('pnrr', t.eu.held.tabPnrr, eu.pnrr)] : []),
           ]}
           onChange={(value) => onSearch(entityListSearch(value, held > 0))}
         >
@@ -126,17 +123,10 @@ export function EntityView({
               won={contractsWon(contracts, search)}
               onSearch={onSearch}
             />
-          ) : list === 'coeziune' && funds && funds !== 'failed' ? (
-            <EntityCohesion
+          ) : list === 'proiecte' ? (
+            <EntityProjects
+              role={role}
               cui={cui}
-              funds={funds}
-              search={search}
-              onSearch={onSearch}
-            />
-          ) : list === 'pnrr' && funds && funds !== 'failed' && funds.pnrr ? (
-            <EntityPnrr
-              cui={cui}
-              pnrr={funds.pnrr}
               search={search}
               onSearch={onSearch}
             />
@@ -150,11 +140,6 @@ export function EntityView({
             />
           )}
         </UrlTabs>
-        {funds === 'failed' ? (
-          <Text size="2" color="gray">
-            {t.eu.held.failed}
-          </Text>
-        ) : null}
       </Flex>
     </Container>
   )

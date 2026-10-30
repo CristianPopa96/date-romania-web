@@ -8,9 +8,9 @@ import type {
 import {
   beneficiaryTie,
   euCounts,
-  euLists,
   euShare,
   periodLabel,
+  programmeCodes,
   programmeSlug,
 } from '#/features/eu-projects/eu'
 
@@ -85,6 +85,17 @@ describe('programmes in the address', () => {
     const slugs = programmes.map(programmeSlug)
     expect(new Set(slugs).size).toBe(programmes.length)
   })
+
+  it('give back the codes of the programmes held, by code and period', () => {
+    expect(programmeCodes(programmes, 'poat-2021')).toEqual(['PoAT'])
+    expect(programmeCodes(programmes, 'poat-2014,por-2014')).toEqual([
+      // In the order the programmes are held.
+      'POR',
+      'POAT',
+    ])
+    expect(programmeCodes(programmes, 'peo-2021')).toBeUndefined()
+    expect(programmeCodes(programmes, undefined)).toBeUndefined()
+  })
 })
 
 describe('euShare', () => {
@@ -100,7 +111,7 @@ it('writes a programming period with an en dash', () => {
   expect(periodLabel('2014-2020')).toBe('2014–2020')
 })
 
-describe('euCounts and euLists', () => {
+describe('euCounts', () => {
   const programme = (code: string, projects: number, byName = 0) => ({
     code,
     name: code,
@@ -149,33 +160,20 @@ describe('euCounts and euLists', () => {
       pnrr: 4,
       pnrrPaid: true,
     })
-    expect(euLists(held)).toEqual({ coeziune: true, pnrr: true })
   })
 
-  it('offers no EU list without an answer or without projects', () => {
-    expect(euLists(null)).toEqual({ coeziune: false, pnrr: false })
-    expect(euLists('failed')).toEqual({ coeziune: false, pnrr: false })
+  it('counts nothing without an answer or without projects', () => {
+    expect(euCounts('failed')).toEqual({
+      cohesion: 0,
+      byName: 0,
+      pnrr: 0,
+      pnrrPaid: false,
+    })
     expect(euCounts(funds({}))).toEqual({
       cohesion: 0,
       byName: 0,
       pnrr: 0,
       pnrrPaid: false,
     })
-  })
-
-  it('offers the PNRR list to a beneficiary paid with no contract held', () => {
-    const paid = funds({
-      pnrr: {
-        contracts: 0,
-        total: null,
-        paid: 40000,
-        payments: 1,
-        first_day: '2026-04-01',
-        last_day: '2026-04-01',
-        edition: '2026-10-15',
-        source,
-      },
-    })
-    expect(euLists(paid)).toEqual({ coeziune: false, pnrr: true })
   })
 })

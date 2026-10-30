@@ -1,8 +1,8 @@
-// The filters a list of PNRR contracts declares to its FilterBar: a beneficiary's takes
-// Măsură, a measure's Județ and Beneficiar; both Stare, Valoare, Progres fizic. A choice
-// panel takes numbers, so a measure, a county, a beneficiary or a status is offered by its
-// place in the overview's options, and written back to the address as its code, word or
-// CUI; a county, a beneficiary and progress are one at a time.
+// The filters a measure's list of PNRR contracts declares to its FilterBar: Județ,
+// Beneficiar, Stare, Valoare, Progres fizic. A choice panel takes numbers, so a county, a
+// beneficiary or a status is offered by its place in the overview's options, and written
+// back to the address as its word or CUI; a county, a beneficiary and progress are one at
+// a time.
 
 import type { FilterDecl } from '#/components/list/filter-types'
 import { PNRR_STATUSES } from '#/features/pnrr/api'
@@ -13,8 +13,8 @@ import {
   pnrrStatusesToParam,
   progressBand,
 } from '#/features/pnrr/list'
-import type { PnrrListOf, PnrrListSearch } from '#/features/pnrr/list'
-import { countySlug, measureSlug } from '#/features/pnrr/pnrr'
+import type { PnrrListSearch } from '#/features/pnrr/list'
+import { countySlug } from '#/features/pnrr/pnrr'
 import type { Messages } from '#/i18n'
 import type { Format } from '#/lib/format'
 import { rangeChip } from '#/lib/list-chips'
@@ -23,13 +23,11 @@ const SMALL = 1_000_000
 const LARGE = 25_000_000
 
 export function pnrrFilterDecls({
-  of,
   search,
   overview,
   t,
   f,
 }: {
-  of: PnrrListOf
   search: PnrrListSearch
   overview: PnrrContractOverview
   t: Messages
@@ -44,12 +42,8 @@ export function pnrrFilterDecls({
       : names.join(', ')
 
   return [
-    ...('beneficiary' in of
-      ? [measureDecl(search, overview, t, chosen)]
-      : [
-          countyDecl(search, overview, t),
-          beneficiaryDecl(search, overview, t),
-        ]),
+    countyDecl(search, overview, t),
+    beneficiaryDecl(search, overview, t),
     {
       key: 'stare',
       kind: 'choice',
@@ -113,41 +107,6 @@ export function pnrrFilterDecls({
       patch: (next) => progressPatch(next[0]),
     },
   ]
-}
-
-function measureDecl(
-  search: PnrrListSearch,
-  overview: PnrrContractOverview,
-  t: Messages,
-  chosen: (names: Array<string>) => string,
-): FilterDecl {
-  const measures = overview.measures
-  const codes = search.masura?.split(',') ?? []
-  const picked = measures
-    .map((option, index) =>
-      codes.includes(measureSlug(option.value)) ? index : -1,
-    )
-    .filter((index) => index >= 0)
-  return {
-    key: 'masura',
-    kind: 'choice',
-    label: t.pnrr.list.filters.masura,
-    value: picked,
-    options: measures.map((option, index) => ({
-      value: index,
-      label: option.value,
-      count: option.count,
-    })),
-    chip: picked.length
-      ? chosen(picked.map((index) => measures[index].value))
-      : null,
-    clear: { masura: undefined },
-    patch: (next) => ({
-      masura: next.length
-        ? next.map((index) => measureSlug(measures[index].value)).join(',')
-        : undefined,
-    }),
-  }
 }
 
 // The API takes one county: the dashboard's spelling, written without marks in the address.

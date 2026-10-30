@@ -26,9 +26,8 @@ import type { Sort } from '#/lib/list'
 
 type Search = PnrrListSearch & { pagina?: number }
 
-// The PNRR contracts of one beneficiary or of one measure, declared to the list pattern
-// (ListView): its filters, its summary line, its charts (a measure's adds the largest
-// beneficiaries) and its columns. All are of one dashboard edition, so their values may be
+// The PNRR contracts of one measure, declared to the list pattern (ListView): its
+// filters, its summary line, its charts (with the largest beneficiaries) and its columns. All are of one dashboard edition, so their values may be
 // added. Natural persons' contracts are counted, never listed.
 export function PnrrContractList<TSearch extends Search>({
   of,
@@ -48,8 +47,7 @@ export function PnrrContractList<TSearch extends Search>({
   if (list === 'failed' || overview === 'failed' || !overview) {
     return (
       <Text size="2" color="gray">
-        {/* A beneficiary's list, or a measure's. */}
-        {'beneficiary' in of ? t.eu.held.failed : t.list.failed}
+        {t.list.failed}
       </Text>
     )
   }
@@ -64,17 +62,15 @@ export function PnrrContractList<TSearch extends Search>({
   const back = emptyHint(overview.without, PNRR_BY_API_PARAM)
   const found = overview.summary
   const l = t.pnrr.list
-  const measure = !('beneficiary' in of)
 
   return (
     <ListView
-      // A beneficiary's list sits under the entity tabs' own heading, one level below it.
-      title={measure ? t.pnrr.findTitle : l.title}
-      titleAs={measure ? 'h2' : 'h3'}
+      title={t.pnrr.findTitle}
+      titleAs="h2"
       search={{
         q,
-        what: measure ? l.searchWhatMeasure : l.searchWhat,
-        filters: pnrrFilterDecls({ of, search, overview, t, f }),
+        what: l.searchWhatMeasure,
+        filters: pnrrFilterDecls({ search, overview, t, f }),
         onApply: apply,
       }}
       summary={{
@@ -88,10 +84,7 @@ export function PnrrContractList<TSearch extends Search>({
         ),
         detail: (
           <>
-            {(measure ? l.ofMeasure : l.of)(
-              f.count(overview.whole),
-              f.day(edition),
-            )}
+            {l.ofMeasure(f.count(overview.whole), f.day(edition))}
             {found.natural_persons > 0
               ? ` · ${l.natural(
                   found.natural_persons,
@@ -130,14 +123,14 @@ export function PnrrContractList<TSearch extends Search>({
         <PnrrContractCharts
           search={search}
           overview={overview}
-          beneficiaries={measure}
+          beneficiaries
           onApply={apply}
         />
       }
       rows={
         <PnrrContractRows
           items={list.items}
-          withBeneficiary={measure}
+          withBeneficiary
           q={q}
           sort={sort}
           onSort={onSort}

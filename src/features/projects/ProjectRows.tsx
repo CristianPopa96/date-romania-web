@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { Link as RouterLink } from '@tanstack/react-router'
 import { Box, Flex, Link, Text } from '@radix-ui/themes'
 
+import { ConfidenceBadge } from '#/components/ConfidenceBadge'
 import { DataState } from '#/components/DataState'
 import { EntityLink } from '#/components/EntityLink'
 import { ListRows } from '#/components/list/ListRows'
@@ -17,12 +18,15 @@ import type { Sort } from '#/lib/list'
 // programme gives it, and how far its road is followed.
 export function ProjectRows({
   items,
+  showVia = false,
   q,
   sort,
   onSort,
   total,
 }: {
   items: Array<ProjectItem>
+  // A company's list: how it is tied to each project.
+  showVia?: boolean
   q: string | undefined
   sort: Sort
   onSort: (sort: Sort | null) => void
@@ -56,6 +60,15 @@ export function ProjectRows({
       header: p.road,
       cell: (row) => <RoadMeter project={row} />,
     },
+    ...(showVia
+      ? [
+          {
+            key: 'legatura',
+            header: p.via.header,
+            cell: (row: ProjectItem) => <ViaBadge via={row.via} />,
+          },
+        ]
+      : []),
   ]
   return (
     <ListRows
@@ -77,6 +90,7 @@ export function ProjectRows({
           </Flex>
           <Beneficiary row={row} />
           <RoadMeter project={row} />
+          {showVia ? <ViaBadge via={row.via} /> : null}
         </Flex>
       )}
     />
@@ -198,5 +212,20 @@ function Money({ value }: { value: number | null }) {
     <DataState kind="notPublished" />
   ) : (
     <>{f.lei(value)}</>
+  )
+}
+
+// How a company is tied to a project. The payment file names the builder and the list its
+// beneficiary (published); a notice or purchase is tied to the project by its buyer's text
+// (probable).
+function ViaBadge({ via }: { via: ProjectItem['via'] }) {
+  const { t } = useI18n()
+  if (!via) return null
+  return (
+    <ConfidenceBadge
+      level={via === 'notice' || via === 'purchase' ? 'probable' : 'sure'}
+      label={t.projects.via[via]}
+      help={t.projects.via.help[via]}
+    />
   )
 }
