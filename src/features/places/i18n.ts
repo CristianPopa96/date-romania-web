@@ -61,13 +61,10 @@ export const places = {
   projects: 'Proiecte în zonă',
   // Under the list: what it holds, what it does not yet, and the town hall's own.
   projectsLead:
-    'Un proiect e aici când plata Anghel Saligny e pentru această localitate sau când ANAF își înregistrează beneficiarul aici. Proiectele PNDL: {notCollected}',
+    'Un proiect e aici când plata Anghel Saligny e pentru această localitate sau când ANAF înregistrează beneficiarul aici. Proiectele PNDL: {notCollected}',
+  projectsLeadCounty:
+    'Un proiect e aici când programul lui numește județul. Proiectele PNDL: {notCollected}',
   ownProjects: (name: string) => `Proiectele în care ${name} e beneficiar`,
-  project: 'Proiect',
-  builder: 'Constructor',
-  progress: 'Progres, cum îl scrie primăria',
-  paid: 'Plătit',
-  contract: 'Contract SEAP',
 
   payments: 'Plăți ale primăriei',
   paymentsTitle: 'Nu avem plățile primăriei.',

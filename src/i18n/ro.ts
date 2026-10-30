@@ -436,7 +436,6 @@ export const ro = {
     winner: 'Câștigător',
     value: 'Valoare fără TVA',
     date: 'Data semnării',
-    rank: 'Loc',
     none: (range: string) =>
       `Niciun contract semnat în perioada ${range} nu apare în anunțurile de atribuire preluate.`,
     export: 'Exportă CSV',

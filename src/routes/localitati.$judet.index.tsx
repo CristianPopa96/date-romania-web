@@ -3,6 +3,7 @@ import {
   Link as RouterLink,
   createFileRoute,
   notFound,
+  redirect,
 } from '@tanstack/react-router'
 import { Container, Flex, Grid, Heading, Link, Text } from '@radix-ui/themes'
 
@@ -10,10 +11,12 @@ import { EntityLink } from '#/components/EntityLink'
 import { PlaceOverview } from '#/features/places/PlaceOverview'
 import { PlaceProjects } from '#/features/places/PlaceProjects'
 import {
+  ownProjects,
   projectListQuery,
   projectsOverviewQuery,
   validateProjectListSearch,
 } from '#/features/projects'
+import { pageCount } from '#/lib/list'
 import { countyCodeOfSlug } from '#/lib/counties'
 import { UatsTable } from '#/features/places/PlaceLists'
 import { WinnersCard } from '#/features/places/WinnersCard'
@@ -37,10 +40,26 @@ export const Route = createFileRoute('/localitati/$judet/')({
     )
     if (!county) throw notFound()
     const scope = { area: areaOf(params.judet) }
-    await Promise.all([
+    const [list] = await Promise.all([
       context.queryClient.ensureQueryData(projectListQuery(deps, scope)),
       context.queryClient.ensureQueryData(projectsOverviewQuery(deps, scope)),
+      // The council's own projects, for the link to them.
+      county.council
+        ? context.queryClient.ensureQueryData(
+            projectListQuery({}, ownProjects(county.council.cui)),
+          )
+        : null,
     ])
+    // A page past the end of the list goes to the last one that has rows.
+    const last =
+      list === 'failed' ? null : pageCount(list.total, deps.pe_pagina ?? 25)
+    if (last !== null && (deps.pagina ?? 1) > last) {
+      throw redirect({
+        to: '/localitati/$judet',
+        params,
+        search: { ...deps, pagina: last > 1 ? last : undefined },
+      })
+    }
     return { name: county.place.name }
   },
   head: ({ loaderData, match }) => ({

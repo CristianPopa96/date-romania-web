@@ -651,6 +651,10 @@ test("a company's contracts on the list of every contract are never added both w
     main.getByText('singur și în asociere nu se adună', { exact: false }),
   ).toBeVisible()
   await expect(main.getByText(/^\d+ contracte · /)).toHaveCount(0)
+  // Nor a chart of their value over time, which would add them.
+  await expect(main.getByRole('heading', { name: /^Valoare pe / })).toHaveCount(
+    0,
+  )
   // One way chosen: the sum comes back.
   await page.goto('/clasamente?furnizor=17886786&castig=singur')
   await expect(main.getByText('Câștigat: singur')).toBeVisible()
@@ -712,6 +716,13 @@ test('every accepted direct purchase is one list, with its count and its sum', a
   // By institution.
   await page.goto('/clasamente?clasament=achizitii&institutie=4981310')
   await expect(main.getByText(/^Instituție: /)).toBeVisible()
+
+  // The API does not answer (the stub has no answer for this call): the page stays.
+  await page.goto('/clasamente?clasament=achizitii&cpv=99')
+  await expect(
+    main.getByText(/Nu am putut încărca lista/).first(),
+  ).toBeVisible()
+  await expect(main.getByRole('tab', { name: 'Contracte' })).toBeVisible()
 })
 
 // The rows of a ranking (each names its CUI), not those of its chart's table.
@@ -2294,6 +2305,10 @@ test('a commune lists the projects landing in it, and leads to its town hall’s
     'href',
     /^\/proiecte\.csv\?loc=\d+$/,
   )
+  await expect(main.getByText(/plata Anghel Saligny e pentru/)).toBeVisible()
+  // A page past the end goes to the last one.
+  await page.goto('/localitati/gorj/comuna-tantareni?pagina=9')
+  await expect(page).toHaveURL(/\/localitati\/gorj\/comuna-tantareni$/)
   await main
     .getByRole('link', { name: /Proiectele în care .* e beneficiar/ })
     .click()
@@ -2308,4 +2323,9 @@ test('a commune lists the projects landing in it, and leads to its town hall’s
     'href',
     '/proiecte.csv?judet=gorj',
   )
+  // Its own rule; the council is not held, so no link to its projects.
+  await expect(main.getByText(/programul lui numește județul/)).toBeVisible()
+  await expect(
+    main.getByRole('link', { name: /Proiectele în care/ }),
+  ).toHaveCount(0)
 })

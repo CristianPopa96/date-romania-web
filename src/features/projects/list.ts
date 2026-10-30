@@ -187,6 +187,11 @@ export type ProjectScope = {
   area?: ProjectArea
 }
 
+// An institution's own projects, as their beneficiary: its Proiecte tab.
+export function ownProjects(cui: number): ProjectScope {
+  return { party: { beneficiary: cui } }
+}
+
 export function projectFilter(
   search: ProjectListSearch,
   scope: ProjectScope = {},

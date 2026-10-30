@@ -3,6 +3,7 @@ import {
   Link as RouterLink,
   createFileRoute,
   notFound,
+  redirect,
 } from '@tanstack/react-router'
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons'
 import {
@@ -22,10 +23,12 @@ import { PlaceOverview } from '#/features/places/PlaceOverview'
 import { InstitutionsTable } from '#/features/places/PlaceLists'
 import { PlaceProjects } from '#/features/places/PlaceProjects'
 import {
+  ownProjects,
   projectListQuery,
   projectsOverviewQuery,
   validateProjectListSearch,
 } from '#/features/projects'
+import { pageCount } from '#/lib/list'
 import { WinnersCard } from '#/features/places/WinnersCard'
 import { SourceLine } from '#/components/SourceLine'
 import { messagesFor } from '#/i18n'
@@ -55,10 +58,26 @@ export const Route = createFileRoute('/localitati/$judet/$uat')({
     )
     if (!found) throw notFound()
     const scope = { area: { place: found.place.siruta } }
-    await Promise.all([
+    const [list] = await Promise.all([
       context.queryClient.ensureQueryData(projectListQuery(deps, scope)),
       context.queryClient.ensureQueryData(projectsOverviewQuery(deps, scope)),
+      // The town hall's own projects, for the link to them.
+      found.town_hall
+        ? context.queryClient.ensureQueryData(
+            projectListQuery({}, ownProjects(found.town_hall.cui)),
+          )
+        : null,
     ])
+    // A page past the end of the list goes to the last one that has rows.
+    const last =
+      list === 'failed' ? null : pageCount(list.total, deps.pe_pagina ?? 25)
+    if (last !== null && (deps.pagina ?? 1) > last) {
+      throw redirect({
+        to: '/localitati/$judet/$uat',
+        params,
+        search: { ...deps, pagina: last > 1 ? last : undefined },
+      })
+    }
     return { name: found.place.name }
   },
   head: ({ loaderData, match }) => ({

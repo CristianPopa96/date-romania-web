@@ -12,7 +12,7 @@ import type { PurchaseListSearch } from '#/features/purchases/list'
 
 // A page of the direct purchases of an institution or a supplier, under the filters, the
 // order and the page size of its address; and what the list says about itself under the
-// same filters.
+// same filters. 'failed' when the API did not answer: the page stays, with a note.
 export const purchaseListQuery = (
   role: Role,
   cui: number | null,
@@ -27,7 +27,7 @@ export const purchaseListQuery = (
   }
   return queryOptions({
     queryKey: ['purchases', 'list', data],
-    queryFn: () => getPurchaseList({ data }),
+    queryFn: () => getPurchaseList({ data }).catch(() => 'failed' as const),
   })
 }
 
@@ -47,7 +47,7 @@ export const purchaseOverviewQuery = (
   }
   return queryOptions({
     queryKey: ['purchases', 'overview', data],
-    queryFn: () => getPurchaseOverview({ data }),
+    queryFn: () => getPurchaseOverview({ data }).catch(() => 'failed' as const),
   })
 }
 

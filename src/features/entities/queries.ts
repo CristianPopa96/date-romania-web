@@ -93,12 +93,16 @@ export async function loadEntityPage(
           : pageCount(found.total, search.pe_pagina ?? 25),
     }
   }
+  if (list === 'buget') return { page, last: null }
   const [purchases] = await Promise.all([
     client.ensureQueryData(purchaseListQuery(role, cui, search)),
     client.ensureQueryData(purchaseOverviewQuery(role, cui, search)),
   ])
   return {
     page,
-    last: pageCount(purchases.total, search.pe_pagina ?? 25),
+    last:
+      purchases === 'failed'
+        ? null
+        : pageCount(purchases.total, search.pe_pagina ?? 25),
   }
 }

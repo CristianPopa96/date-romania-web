@@ -1,5 +1,5 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { Text } from '@radix-ui/themes'
+import { Flex, Heading, Text } from '@radix-ui/themes'
 
 import type { Patch } from '#/components/list/filter-types'
 import { ListEmpty } from '#/components/list/ListEmpty'
@@ -80,11 +80,17 @@ export function ProjectList<TSearch extends ProjectListSearch>({
   const { data: overview } = useSuspenseQuery(
     projectsOverviewQuery(search, scope),
   )
+  // Not answered: the list keeps its heading and says so; the page stays.
   if (list === 'failed' || overview === 'failed' || !overview) {
     return (
-      <Text size="2" color="gray">
-        {p.failed}
-      </Text>
+      <Flex direction="column" gap="2">
+        <Heading as={titleAs ?? 'h2'} size="4">
+          {title}
+        </Heading>
+        <Text size="2" color="gray">
+          {p.failed}
+        </Text>
+      </Flex>
     )
   }
 

@@ -43,12 +43,6 @@ export const programme = {
     probable: 'Probabil un singur contract',
     possible: 'Posibil un singur contract',
   },
-  matchOfProject: {
-    one: 'Probabil un singur contract',
-    several: 'Mai multe contracte posibile',
-    none: 'Niciun contract găsit',
-    unnamed: 'Constructor numit doar cu numele',
-  },
 
   // How the payments were tied.
   howTitle: 'Cum s-au legat plățile',

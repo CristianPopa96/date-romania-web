@@ -1,8 +1,9 @@
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { Link as RouterLink } from '@tanstack/react-router'
 import { Flex, Link, Text } from '@radix-ui/themes'
 
 import { DataState } from '#/components/DataState'
-import { ProjectList } from '#/features/projects'
+import { ProjectList, ownProjects, projectListQuery } from '#/features/projects'
 import type { ProjectArea, ProjectListSearch } from '#/features/projects'
 import { useI18n } from '#/i18n/context'
 import { rich } from '#/i18n/rich'
@@ -34,24 +35,32 @@ export function PlaceProjects<TSearch extends ProjectListSearch>({
         onSearch={onSearch}
       />
       <Text size="2" color="gray">
-        {rich(p.projectsLead, {
+        {rich('county' in area ? p.projectsLeadCounty : p.projectsLead, {
           notCollected: <DataState key="state" kind="notCollected" />,
         })}
-        {own ? (
-          <>
-            {' '}
-            <Link asChild>
-              <RouterLink
-                to="/institutii/$cui"
-                params={{ cui: String(own.cui) }}
-                search={{ lista: 'proiecte' }}
-              >
-                {p.ownProjects(own.name)}
-              </RouterLink>
-            </Link>
-          </>
-        ) : null}
+        {own ? <OwnLink own={own} /> : null}
       </Text>
     </Flex>
+  )
+}
+
+// The town hall's or council's own projects, when it has any.
+function OwnLink({ own }: { own: EntityRef }) {
+  const { t } = useI18n()
+  const { data } = useSuspenseQuery(projectListQuery({}, ownProjects(own.cui)))
+  if (data === 'failed' || data.total === 0) return null
+  return (
+    <>
+      {' '}
+      <Link asChild>
+        <RouterLink
+          to="/institutii/$cui"
+          params={{ cui: String(own.cui) }}
+          search={{ lista: 'proiecte' }}
+        >
+          {t.places.ownProjects(own.name)}
+        </RouterLink>
+      </Link>
+    </>
   )
 }

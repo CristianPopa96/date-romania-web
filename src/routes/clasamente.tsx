@@ -64,7 +64,7 @@ export const Route = createFileRoute('/clasamente')({
             ),
             queryClient.ensureQueryData(statsQuery),
           ])
-          return list.total
+          return list === 'failed' ? null : list.total
         }
         case 'tipare': {
           const pattern = await queryClient.ensureQueryData(

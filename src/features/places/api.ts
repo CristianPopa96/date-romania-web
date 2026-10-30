@@ -19,8 +19,6 @@ export type PlaceFigures = Schemas['PlaceFigures']
 
 export type TopWinner = Schemas['TopWinner']
 
-export type LocalProject = Schemas['LocalProject']
-
 export type LocalInstitution = Schemas['LocalInstitution']
 
 export type PlaceHit = Schemas['PlaceHit']

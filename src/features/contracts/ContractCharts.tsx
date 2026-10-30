@@ -17,12 +17,15 @@ import { fillSteps, isOpen, monthOf } from '#/lib/list'
 // member.
 export function ContractCharts({
   role,
+  both = false,
   won,
   search,
   overview,
   onApply,
 }: {
   role: Role
+  // A company's contracts won alone and in association: never added, so no time chart.
+  both?: boolean
   won: Won | undefined
   search: ContractListSearch
   overview: ContractOverview
@@ -89,39 +92,41 @@ export function ContractCharts({
 
   return (
     <Flex gap="3" wrap="wrap" align="stretch">
-      <ChartCard
-        title={t.contractList.timeTitle[step]}
-        unit={
-          won === 'association'
-            ? t.contractList.wholeUnit
-            : t.contractList.timeUnit
-        }
-        hint={t.list.chart.clickHint}
-        note={
-          open
-            ? step === 'month'
-              ? t.list.chart.openMonth
-              : t.list.chart.openDay
-            : null
-        }
-        rows={points.map((point) => [name(point.start), f.lei(point.value)])}
-      >
-        <TimeBars
-          points={points}
-          step={step}
-          lastHeld={lastHeld}
-          chosen={chosen}
-          onPick={(start) => {
-            const { from, to } = span(start)
-            // The bar chosen again gives the list back its period.
-            onApply(
-              start === chosen
-                ? { de_la: undefined, pana_la: undefined }
-                : { de_la: from, pana_la: to },
-            )
-          }}
-        />
-      </ChartCard>
+      {both ? null : (
+        <ChartCard
+          title={t.contractList.timeTitle[step]}
+          unit={
+            won === 'association'
+              ? t.contractList.wholeUnit
+              : t.contractList.timeUnit
+          }
+          hint={t.list.chart.clickHint}
+          note={
+            open
+              ? step === 'month'
+                ? t.list.chart.openMonth
+                : t.list.chart.openDay
+              : null
+          }
+          rows={points.map((point) => [name(point.start), f.lei(point.value)])}
+        >
+          <TimeBars
+            points={points}
+            step={step}
+            lastHeld={lastHeld}
+            chosen={chosen}
+            onPick={(start) => {
+              const { from, to } = span(start)
+              // The bar chosen again gives the list back its period.
+              onApply(
+                start === chosen
+                  ? { de_la: undefined, pana_la: undefined }
+                  : { de_la: from, pana_la: to },
+              )
+            }}
+          />
+        </ChartCard>
+      )}
       {rows.length ? (
         <ChartCard
           title={t.contractList.partiesTitle[overview.party]}

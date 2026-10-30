@@ -1,4 +1,5 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
+import { Text } from '@radix-ui/themes'
 
 import type { Patch } from '#/components/list/filter-types'
 import { ListEmpty } from '#/components/list/ListEmpty'
@@ -59,6 +60,14 @@ export function PurchaseList<TSearch extends Search>({
   const { data: overview } = useSuspenseQuery(
     purchaseOverviewQuery(role, cui, search),
   )
+  // Not answered: the list says so, the page stays.
+  if (list === 'failed' || overview === 'failed') {
+    return (
+      <Text size="2" color="gray">
+        {t.list.failed}
+      </Text>
+    )
+  }
   if (!overview) return null
 
   // A change of filter or order goes back to the first page.

@@ -153,6 +153,7 @@ export function ContractList<TSearch extends Search>({
       charts={
         <ContractCharts
           role={role}
+          both={both}
           won={won}
           search={search}
           overview={overview}
