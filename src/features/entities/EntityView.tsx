@@ -46,14 +46,16 @@ export function EntityView({
 
   const summary = data.direct_purchases
   const held = contractCount(contracts)
-  const projectCount = projects === 'failed' ? 0 : projects.total
-  const list = entityList(search, held > 0, projectCount > 0)
-  const tab = (value: EntityList, label: string, count: number) => ({
+  // When the count could not be read the tab stays, with no count: its list says why.
+  const projectCount = projects === 'failed' ? null : projects.total
+  const hasProjects = projectCount !== 0
+  const list = entityList(search, held > 0, hasProjects)
+  const tab = (value: EntityList, label: string, count: number | null) => ({
     value,
     label: (
       <Flex gap="2" align="center">
         {label}
-        <Badge color="gray">{f.count(count)}</Badge>
+        {count === null ? null : <Badge color="gray">{f.count(count)}</Badge>}
       </Flex>
     ),
   })
@@ -107,7 +109,7 @@ export function EntityView({
           tabs={[
             tab('contracte', t.entity.tabContracts, held),
             tab('achizitii', t.entity.tabPurchases, summary.purchases),
-            ...(projectCount > 0
+            ...(hasProjects
               ? [tab('proiecte', t.projects.tab, projectCount)]
               : []),
           ]}

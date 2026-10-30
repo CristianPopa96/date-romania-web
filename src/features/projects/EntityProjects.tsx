@@ -1,5 +1,5 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { Flex, Table, Text } from '@radix-ui/themes'
+import { Flex, Heading, Table, Text } from '@radix-ui/themes'
 
 import { DataState } from '#/components/DataState'
 import { ProjectList } from '#/features/projects/ProjectList'
@@ -10,10 +10,11 @@ import { periodLabel } from '#/features/eu-projects'
 import { useI18n } from '#/i18n/context'
 import type { Role } from '#/lib/api'
 
-// The "Proiecte" tab of an entity page (ScreenInstitution, ScreenSupplier; design D22):
-// the projects of every programme it is the beneficiary of, by programme above the list,
-// each at its own day and never added together. On a company's page the list also holds
-// the projects it was paid through, each saying how.
+// The "Proiecte" tab of an entity page (ScreenInstitution, ScreenSupplier; design D22).
+// An institution's: the projects of every programme it is the beneficiary of, by programme
+// above the list, each at its own day and never added together. A company's: the projects
+// it was paid through, each saying how; no table, since what a programme paid its
+// beneficiary is not what the company was paid.
 export function EntityProjects<TSearch extends ProjectListSearch>({
   role,
   cui,
@@ -27,12 +28,9 @@ export function EntityProjects<TSearch extends ProjectListSearch>({
 }) {
   const { t } = useI18n()
   const p = t.projects
-  const { data: programmes } = useSuspenseQuery(projectProgrammesQuery(cui))
   return (
     <Flex direction="column" gap="5">
-      {programmes !== 'failed' && programmes.length ? (
-        <ByProgramme programmes={programmes} />
-      ) : null}
+      {role === 'institutions' ? <ByProgramme cui={cui} /> : null}
       <ProjectList
         title={role === 'suppliers' ? p.tabCompanyTitle : p.tabTitle}
         titleAs="h3"
@@ -46,13 +44,18 @@ export function EntityProjects<TSearch extends ProjectListSearch>({
 
 // One row per programme: its projects, their value, what was paid as the programme
 // publishes it, and its day. No total row.
-function ByProgramme({ programmes }: { programmes: Array<ProgrammeFigures> }) {
+function ByProgramme({ cui }: { cui: number }) {
   const { t, f } = useI18n()
   const b = t.projects.byProgramme
+  const { data: programmes } = useSuspenseQuery(projectProgrammesQuery(cui))
+  if (programmes === 'failed' || !programmes.length) return null
   const money = (value: number | null) =>
     value === null ? <DataState kind="notPublished" /> : f.lei(value)
   return (
     <Flex direction="column" gap="2">
+      <Heading as="h3" size="3">
+        {b.title}
+      </Heading>
       <Table.Root variant="surface" size="1">
         <Table.Header>
           <Table.Row>
@@ -70,7 +73,7 @@ function ByProgramme({ programmes }: { programmes: Array<ProgrammeFigures> }) {
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {programmes.map((each) => (
+          {programmes.map((each: ProgrammeFigures) => (
             <Table.Row key={each.programme}>
               <Table.RowHeaderCell>
                 {each.period

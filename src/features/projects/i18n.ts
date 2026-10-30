@@ -110,7 +110,7 @@ export const projects = {
   },
   // The table by programme above an entity's list.
   byProgramme: {
-    title: 'Pe programe',
+    title: 'Pe programe, fiecare la data lui',
     note: 'Fiecare program își publică cifrele la data lui: sumele nu se adună între programe.',
     programme: 'Program',
     projects: 'Proiecte',

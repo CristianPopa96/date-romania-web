@@ -2112,6 +2112,11 @@ test('an institution lists its projects of every programme in one tab', async ({
     main.getByRole('heading', { name: 'Proiectele cu bani publici' }),
   ).toBeVisible()
   // By programme, each paid as it publishes it and at its own day; no total row.
+  await expect(
+    main.getByRole('heading', {
+      name: 'Pe programe, fiecare la data lui',
+    }),
+  ).toBeVisible()
   // The table by programme comes first, above the list.
   const pnrr = main.getByRole('row').filter({ hasText: /^PNRR/ }).first()
   await expect(pnrr).toContainText('6.500.000 lei')

@@ -56,8 +56,9 @@ export async function loadEntityPage(
     client.ensureQueryData(projectListQuery({}, scope)),
   ])
   if (!page || !totals) return null
-  const held = projects === 'failed' ? 0 : projects.total
-  const list = entityList(search, contractCount(totals) > 0, held > 0)
+  // A count not read keeps the tab: its list says it could not be read.
+  const hasProjects = projects === 'failed' || projects.total > 0
+  const list = entityList(search, contractCount(totals) > 0, hasProjects)
   if (list === 'contracte') {
     const won = contractsWon(totals, search)
     const [contracts] = await Promise.all([
@@ -75,7 +76,9 @@ export async function loadEntityPage(
     const [found] = await Promise.all([
       client.ensureQueryData(projectListQuery(search, scope)),
       client.ensureQueryData(projectsOverviewQuery(search, scope)),
-      client.ensureQueryData(projectProgrammesQuery(cui)),
+      role === 'institutions'
+        ? client.ensureQueryData(projectProgrammesQuery(cui))
+        : null,
     ])
     return {
       page,

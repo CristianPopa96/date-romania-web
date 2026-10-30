@@ -60,12 +60,9 @@ export const pnrr = {
 
   // A beneficiary's contracts in the list pattern (DataTable).
   list: {
-    title: 'Contractele',
-    searchWhat: 'titlu',
     searchWhatMeasure: 'titlu, beneficiar',
     filters: {
       q: 'Căutare',
-      masura: 'Măsură',
       judet: 'Județ',
       beneficiar: 'Beneficiar',
       stare: 'Stare',
@@ -82,8 +79,6 @@ export const pnrr = {
     contracts: (n: number, text: string) =>
       counted(n, text, 'un contract', 'contracte'),
     value: (value: string) => `valoare ${value}`,
-    of: (whole: string, edition: string) =>
-      `din ${whole} ale beneficiarului · ediția din ${edition} a datelor MIPE`,
     ofMeasure: (whole: string, edition: string) =>
       `din ${whole} ale măsurii · ediția din ${edition} a datelor MIPE`,
     natural: (n: number, text: string) =>

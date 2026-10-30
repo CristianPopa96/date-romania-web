@@ -29,19 +29,16 @@ describe('the address of a list of PNRR contracts', () => {
     expect(validatePnrrListSearch({ stare: 'reziliat' }).stare).toBeUndefined()
   })
 
+  const measure = { measure: 'C10.I3', counties: ['GORJ'] }
+
   it('asks the API in fractions and its own measure codes', () => {
     expect(
-      pnrrFilter(
-        { beneficiary: 4981310 },
-        {
-          masura: 'c10.i3',
-          stare: 'finalizat',
-          progres_min: 50,
-          progres_max: 75,
-        },
-      ),
+      pnrrFilter(measure, {
+        stare: 'finalizat',
+        progres_min: 50,
+        progres_max: 75,
+      }),
     ).toMatchObject({
-      beneficiary: 4981310,
       measure: ['C10.I3'],
       status: ['finished'],
       progress_min: 0.5,
@@ -50,8 +47,8 @@ describe('the address of a list of PNRR contracts', () => {
   })
 
   it('never sends a one-letter search, which other lists keep in the address', () => {
-    expect(pnrrFilter({ beneficiary: 4981310 }, { q: 'a' }).q).toBeUndefined()
-    expect(pnrrFilter({ beneficiary: 4981310 }, { q: 'ab' }).q).toBe('ab')
+    expect(pnrrFilter(measure, { q: 'a' }).q).toBeUndefined()
+    expect(pnrrFilter(measure, { q: 'ab' }).q).toBe('ab')
   })
 
   it('knows the band of a progress range, or none', () => {

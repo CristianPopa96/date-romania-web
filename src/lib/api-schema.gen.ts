@@ -5885,8 +5885,6 @@ export interface operations {
                 offset?: number;
                 /** @description csv gives the whole list as a file. */
                 format?: "json" | "csv";
-                /** @description A company's CUI: the projects it is the beneficiary of, or was paid through as the builder of an Anghel Saligny payment file or as the winner or supplier of a SEAP record that cites the project. Each row says which (`via`). */
-                company?: number | null;
                 /** @description Any of these kinds of programme. */
                 kind?: ("anghel_saligny" | "pnrr" | "cohesion")[] | null;
                 /** @description Any of these programmes: 'AS', 'PNRR', or a cohesion code 'POR'. */
@@ -5895,6 +5893,8 @@ export interface operations {
                 county?: string | null;
                 /** @description The beneficiary's CUI. */
                 beneficiary?: number | null;
+                /** @description A company's CUI: the projects it is the beneficiary of, or was paid through as the builder of an Anghel Saligny payment file or as the winner or supplier of a SEAP record that cites the project. Each row says which (`via`). */
+                company?: number | null;
                 /** @description Any of these. */
                 status?: ("in_progress" | "finished" | "terminated")[] | null;
                 /** @description Any of these last steps followed. */
