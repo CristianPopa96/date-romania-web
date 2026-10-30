@@ -1,7 +1,7 @@
 # Features and roadmap
 
 The site is planned as ten user flows, built in releases. This page is the state as of
-28.10.2026.
+30.10.2026.
 
 ## Built
 
@@ -22,6 +22,10 @@ The site is planned as ten user flows, built in releases. This page is the state
 | 4       | See the SEAP contracts and direct purchases that cite an EU project or a PNRR contract                                                    |
 | 4       | See the EU projects and PNRR money of an institution, a company, a town hall or a county council                                          |
 | 4       | Filter, sort and chart the direct purchases of an institution or a company, and download them as filtered                                 |
+| 4       | Every list (contracts, purchases, projects, rankings) filtered, sorted and charted the same way, and downloaded as filtered               |
+| 4       | Browse every project of every programme in one list, each with how far its money is followed, and open each project's page                |
+| 4       | See every project of an institution, of a company (with how it was paid through it) and of a commune or county                            |
+| 4       | Browse every contract and every accepted direct purchase, and rank companies and institutions by either, filtered by county               |
 
 ## The data behind it
 
@@ -57,16 +61,15 @@ is collected each morning (as of 20.10.2026).
 
 Also waiting:
 
-- The same filters, column sorting and charts on the other lists (contracts, rankings,
-  the programme and project finders), and a new search page with suggestions.
+- A new search page with suggestions, that also finds projects.
 - The EU projects of the regional programmes of 2021–2027 (left out for now).
-- On a place's page, the EU projects of every institution and company located there,
-  not only the town hall's.
+- Placing a national beneficiary's projects where the work is, rather than where the
+  beneficiary is registered.
 
 - The items bought in each direct purchase, with payment and delivery conditions, below
   100,000 lei (shown as "Încă necolectat"). Accepted purchases of 100,000 lei or more
   are collected, newest first, since October 2026.
-- Filters by year, county and institution type in the rankings.
+- Filters by year and institution type in the rankings, and a ranking as a spreadsheet.
 - More patterns: supplier inactive at ANAF or newly founded, public money as most of a
   company's turnover, single-offer procedures (the number of offers is not published by
   SEAP).

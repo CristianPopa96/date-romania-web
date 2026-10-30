@@ -134,6 +134,8 @@ line, charts, sortable columns and the pager. What differs:
 
 ### Projects of an institution or a company
 
+![The projects tab of an institution](images/institution-projects.png)
+
 "Proiecte" holds the projects of every programme in one list.
 
 - **An institution's**: every project it is the beneficiary of. Above the list, a table
@@ -260,13 +262,13 @@ of its own: searching it opens its UAT, with the line "Localitatea X face parte 
 
 "Clasamente" holds the SEAP records and who they are with, in five tabs:
 
-| Tab                 | What it holds                                                                                                                       |
-| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| "Contracte"         | Every contract signed in the period, the largest first. A row opens its award notice                                                |
+| Tab                 | What it holds                                                                                                                           |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| "Contracte"         | Every contract signed in the period, the largest first. A row opens its award notice                                                    |
 | "Furnizori"         | Companies ranked by contracts won (alone, "Singur", or in association, "În asociere") or, with the switch, by accepted direct purchases |
-| "Achiziții directe" | Every accepted direct purchase, the largest first. A row opens the purchase                                                         |
-| "Instituții"        | Institutions ranked by contracts awarded or, with the switch, by accepted direct purchases                                          |
-| "Tipare"            | Patterns worth asking documents about (see below)                                                                                   |
+| "Achiziții directe" | Every accepted direct purchase, the largest first. A row opens the purchase                                                             |
+| "Instituții"        | Institutions ranked by contracts awarded or, with the switch, by accepted direct purchases                                              |
+| "Tipare"            | Patterns worth asking documents about (see below)                                                                                       |
 
 **The two lists** work like every list on the site (search, filters, summary line,
 charts, sortable columns, a CSV file):
@@ -301,6 +303,8 @@ page says how many there are. Patterns that the data cannot give yet are listed 
 reason.
 
 ## Projects
+
+![Every project of every programme](images/projects.png)
 
 `/proiecte` lists every project of every programme followed: Anghel Saligny projects,
 PNRR financing contracts and EU cohesion projects.

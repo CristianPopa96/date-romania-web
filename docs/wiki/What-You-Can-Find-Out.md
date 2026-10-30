@@ -14,15 +14,12 @@ Open "Localități", pick your county, then your commune or town (or just type i
 the search box). The page shows the town hall's 2024 budget: how much came from the
 state, from local taxes, from EU funds and so on, and how much was spent on investments.
 
-**"Did my commune get money from the Anghel Saligny programme? For what?"**
-The same page lists the payments the ministry made to the town hall and the projects
-behind them (a road, a water network, a sewage system), with how far each project has
-progressed.
-
-**"Does my town hall have EU-funded projects?"**
-The same page, under "Proiecte în zonă", says how many EU cohesion projects and PNRR
-contracts the town hall has and how much PNRR money it received, with a link to each
-list.
+**"Which projects are paid for in my commune? From which programme?"**
+The same page, under "Proiecte în zonă", lists every project landing there: Anghel
+Saligny projects (a road, a water network, a sewage system), PNRR financing contracts and
+EU cohesion projects, of the town hall and of every other beneficiary located there. Each
+row shows how far its money is followed, and opens the project's page. A link under the
+list opens the town hall's own projects. The county page does the same for the county.
 
 **"Who wins the contracts in my area? Are they local companies?"**
 The commune page lists the companies that won contracts from the institutions there,
@@ -51,10 +48,10 @@ The box "Cele două capete ale banilor" puts its budget, its contracts and the p
 we can name side by side, each with its own period. They are never subtracted from each
 other, because they cover different times.
 
-**"Which EU projects does this institution run?"**
-Its page has a "Proiecte europene" tab for its cohesion projects and a "Contracte PNRR"
-tab for its recovery plan contracts, with what was paid. Where a project was matched to
-the institution by its name only, the page says so.
+**"Which projects does this institution run?"**
+Its page has a "Proiecte" tab with its projects of every programme, and above them a
+table by programme with what was paid, each figure at its own day. A town hall's or
+county council's page also has a "Buget" tab with its 2024 budget.
 
 ## About a company
 
@@ -63,31 +60,40 @@ Search its name or tax ID (CUI). Its page shows the contracts it won alone, thos
 together with other companies, and what it sold through direct purchases, with every
 institution it sold to.
 
-**"Does this company build Anghel Saligny projects?"**
-If it does, the programme section lists its projects, and each project shows the chain
-from the ministry to the company.
+**"Which projects was this company paid through?"**
+Its "Proiecte" tab lists them, each saying how: named as the builder in the Anghel
+Saligny payment files, or winner of a contract or seller of a purchase whose text cites
+the project. Each project's page shows the chain from the funder to the company.
 
 ## About the big picture
 
-**"Who are the largest suppliers of the state? Which contracts are the biggest?"**
-Open "Clasamente" (rankings). You can narrow it to one kind of purchase, for example
-construction works, or to EU-funded contracts only.
+**"Which contracts are the biggest? Who are the largest suppliers of the state?"**
+Open "Clasamente". It opens on every contract, the largest first; "Achiziții directe"
+holds every accepted direct purchase the same way. "Furnizori" and "Instituții" rank the
+companies and institutions, by contracts or by direct purchases. You can narrow any of
+them to a county, to one kind of purchase (for example construction works), or to
+EU-funded contracts only.
 
 **"Is there anything unusual worth asking about?"**
 The "Tipare" (patterns) tab lists pairs of institution and company with repeated
 purchases just under the legal limit for buying without an auction. This is not proof
 of wrongdoing, but a good place to ask for documents.
 
+**"Which projects does the state pay for, and how far can the money be followed?"**
+Open "Proiecte": every project of every programme in one list, by programme, county,
+status or value, each showing how far its money is followed.
+
 **"Where did the Anghel Saligny money go, county by county?"**
-Open "Programe", then Anghel Saligny. You see what was paid by county and can look up
+From "Proiecte", open Anghel Saligny. You see what was paid by county and can look up
 any project.
 
 **"What has the recovery plan (PNRR) paid for, and to whom?"**
-Open "Programe", then PNRR: its measures, the largest recipients, and every financing
+From "Proiecte", open PNRR: its measures, the largest recipients, and every financing
 contract with its progress and payments.
 
 **"Which companies got contracts under this EU project?"**
-Open the project (search the EU funds page by its title or SMIS code). "Contracte și
+Open the project (search "Proiecte" by its title, SMIS code or financing contract
+number). "Contracte și
 achiziții care citează acest proiect" lists the SEAP contracts and purchases whose text
 cites the project, with their suppliers. The list may be incomplete, because buyers do
 not always write the project code.
