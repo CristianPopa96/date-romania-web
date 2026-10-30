@@ -81,7 +81,7 @@ Romanian words and acronyms you meet on the site, with what they mean here.
 | **Corecturi**                              | Corrections                                                                 |
 | **Raportează o eroare**                    | Report an error                                                             |
 | **Drumul banilor**                         | "The road of the money", the chain on a programme project page              |
-| **Proiecte europene · Contracte PNRR**     | The EU tabs of an institution or company page                               |
+| **Proiecte**                               | Projects of every programme; a tab of an institution or company page        |
 | **Plătit până la …**                       | Paid up to the day of the programme's list (no payment days are given)      |
 | **CUI în listă · Nume și localitate**      | How a project was tied to its beneficiary: tax ID given, or matched by name |
 | **Legat de noi după nume**                 | "Tied by us by name": matched by name, so only probable                     |
