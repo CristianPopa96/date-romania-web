@@ -10,12 +10,7 @@ import type { EuSeapLinks } from '#/features/eu-projects'
 import { useI18n } from '#/i18n/context'
 import { rich } from '#/i18n/rich'
 import type { PnrrContract } from '#/features/pnrr/api'
-import {
-  measureLabel,
-  measureSlug,
-  paidSoFar,
-  paymentsCase,
-} from '#/features/pnrr/pnrr'
+import { measureLabel, measureSlug, paymentsCase } from '#/features/pnrr/pnrr'
 
 // "Drumul banilor" of a PNRR contract: the EU → the measure (with the ministry that runs
 // it) → the financing contract → the beneficiary → its payments → the SEAP records that
@@ -112,30 +107,50 @@ export function PnrrRoad({
     ...seapHops(seap, 'pnrr', by, t, f),
   ]
 
+  // The payments, measure by measure: on a measure where the contract is the
+  // beneficiary's only one they are its own; where it has several, they name the measure,
+  // not the contract, and the step cannot be followed. Neither is ever added to the other.
   function paymentsHop(): TraceHop {
-    const paid = paidSoFar(contract)
-    if (paid && paid.count) {
-      return {
-        role: p.roadPayments,
-        name: p.paymentsCount(paid.count, f.count(paid.count)),
-        figure: f.leiShort(paid.amount),
-        note: paid.lastDay ? p.roadLastPaid(f.day(paid.lastDay)) : undefined,
-        link: by('published'),
-      }
-    }
+    const own = contract.payments.filter((each) => paymentsCase(each) === 'own')
     const shared = contract.payments.filter(
       (each) => paymentsCase(each) === 'several',
     )
+    const ownCount = own.reduce((n, each) => n + each.count, 0)
+    const ownSum = own.reduce((sum, each) => sum + each.paid, 0)
     if (shared.length) {
       const sum = shared.reduce((total, each) => total + each.paid, 0)
-      const contracts = Math.max(...shared.map((each) => each.contracts))
+      const ownToo = ownCount ? ` · ${p.roadOwnToo(f.leiShort(ownSum))}` : ''
       return {
         role: p.roadPayments,
         name: p.cannotSay,
-        figure: p.roadShared(f.leiShort(sum)),
-        note: p.roadSharedNote(contracts, f.count(contracts)),
+        figure:
+          shared.length === 1
+            ? p.roadShared(f.leiShort(sum))
+            : p.roadSharedMany(f.leiShort(sum), shared.length),
+        note:
+          (shared.length === 1
+            ? p.roadSharedNote(
+                shared[0].contracts,
+                f.count(shared[0].contracts),
+              )
+            : p.roadSharedManyNote) + ownToo,
         link: by('unknown'),
         missing: 'step',
+      }
+    }
+    if (ownCount) {
+      const days = own
+        .map((each) => each.last_day)
+        .filter((day): day is string => !!day)
+        .sort()
+      return {
+        role: p.roadPayments,
+        name: p.paymentsCount(ownCount, f.count(ownCount)),
+        figure: f.leiShort(ownSum),
+        note: days.length
+          ? p.roadLastPaid(f.day(days[days.length - 1]))
+          : undefined,
+        link: by('published'),
       }
     }
     return {

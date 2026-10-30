@@ -298,7 +298,7 @@ function CohesionRoad({
             name: f.leiShort(project.paid),
             note: project.cut_off
               ? e.roadUntil(f.day(project.cut_off))
-              : e.paidUntilDetail,
+              : e.roadNoCutOff,
             link: by('published'),
           }
         : {

@@ -1,22 +1,8 @@
-import {
-  Badge,
-  Code,
-  Flex,
-  Table,
-  Text,
-  VisuallyHidden,
-} from '@radix-ui/themes'
+import { Badge, Table, Text, VisuallyHidden } from '@radix-ui/themes'
 
-import { ConfidenceBadge } from '#/components/ConfidenceBadge'
 import { DataState } from '#/components/DataState'
-import { EntityLink, roleOfKind } from '#/components/EntityLink'
 import { useI18n } from '#/i18n/context'
-import type {
-  EuBeneficiary,
-  EuPayment,
-  EuProject,
-} from '#/features/eu-projects/api'
-import { beneficiaryTie } from '#/features/eu-projects/eu'
+import type { EuPayment, EuProject } from '#/features/eu-projects/api'
 
 // A project's status: ours when the list's words say one of the three, else the list's own
 // words in gray ('etapizat', 'nefinalizat'), never guessed into one of ours.
@@ -43,34 +29,6 @@ export function EuStatusBadge({
     </Badge>
   ) : (
     <DataState kind="notPublished" />
-  )
-}
-
-// The beneficiary as the list names it, the institution or company it is tied to, and how.
-export function Beneficiary({ beneficiary }: { beneficiary: EuBeneficiary }) {
-  const { t } = useI18n()
-  const tie = beneficiaryTie(beneficiary)
-  const { entity } = beneficiary
-  return (
-    <Flex direction="column" gap="1" align="start">
-      {entity ? (
-        <Text>
-          <EntityLink role={roleOfKind(entity.kind)} cui={entity.cui}>
-            {entity.name}
-          </EntityLink>{' '}
-          <Code variant="ghost" color="gray">
-            CUI {entity.cui}
-          </Code>
-        </Text>
-      ) : (
-        <Text>{beneficiary.name ?? t.common.notPublished}</Text>
-      )}
-      <ConfidenceBadge
-        level={tie.level}
-        label={t.eu.tie[tie.label]}
-        help={t.eu.tieHelp[tie.label]}
-      />
-    </Flex>
   )
 }
 

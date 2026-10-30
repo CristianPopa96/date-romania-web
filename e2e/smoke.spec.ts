@@ -1808,10 +1808,12 @@ test('a PNRR contract alone on its measure has its payments, by day', async ({
   const road = main.getByRole('list', { name: 'Drumul banilor' })
   await expect(road.getByRole('listitem')).toHaveCount(7)
   await expect(road).toContainText('Uniunea Europeană')
-  await expect(road).toContainText('coordonat de MDLPA')
+  await expect(road).toContainText('coordonată de MDLPA')
   await expect(road).toContainText('o achiziție directă')
   await expect(road).toContainText('Probabil')
   await expect(road).toContainText('Beta Birotică SRL')
+  // Why that company: the most value, contracts and direct purchases added together.
+  await expect(road).toContainText('cea mai mare valoare')
   await expect(main.getByText('2,3 mil. lei').first()).toBeVisible()
   await expect(main.getByText('3 plăți · ultima 02.10.2026')).toBeVisible()
   await expect(
@@ -1836,6 +1838,10 @@ test('payments to a beneficiary with several contracts on a measure belong to no
   await page.goto(`/proiecte/pnrr/702`)
   const main = page.getByRole('main')
   await expect(main.getByText('Nu putem spune').first()).toBeVisible()
+  // On the road: a step we cannot follow, the measure's sum labelled as the measure's.
+  const road = main.getByRole('list', { name: 'Drumul banilor' })
+  await expect(road).toContainText('pe măsură')
+  await expect(road).toContainText('2 contracte · plățile nu numesc contractul')
   // The card of the shared payments is folded: its summary says what it holds, and that
   // the sum is the measure's.
   await expect(
@@ -2084,6 +2090,10 @@ test('a project page stays up when its SEAP records cannot be read', async ({
     ),
   ).toBeVisible()
   await expect(main.getByText('Ce nu este public')).toBeVisible()
+  // The road says it could not read SEAP, never that nothing cites the project.
+  const road = main.getByRole('list', { name: 'Drumul banilor' })
+  await expect(road).toContainText('Nu am putut citi')
+  await expect(road).not.toContainText('Nicio achiziție găsită')
 })
 
 test('an institution lists the EU projects and PNRR contracts it is the beneficiary of', async ({

@@ -7,7 +7,9 @@ import type { useI18n } from '#/i18n/context'
 // The last two steps of an EU project's road ("Drumul banilor"): the SEAP records whose
 // text cites it, and the companies that won or sold them. The tie into the records is
 // ours, from the buyer's text, so it is never more than probable; the companies are
-// published with their records. Nothing cited: the road stops at the records.
+// published with their records. Nothing cited: the road stops at the records. SEAP not
+// read: a step we cannot follow, never "nothing cites it". No answer at all (no such
+// endpoint): no SEAP steps.
 export function seapHops(
   seap: EuSeapLinks | null | 'failed',
   kind: EuSeapOf['kind'],
@@ -16,9 +18,20 @@ export function seapHops(
   f: ReturnType<typeof useI18n>['f'],
 ): Array<TraceHop> {
   const s = t.eu.seap
-  const records =
-    seap && seap !== 'failed' ? seap.notices + seap.purchases.length : 0
-  if (!seap || seap === 'failed' || records === 0) {
+  if (seap === null) return []
+  if (seap === 'failed') {
+    return [
+      {
+        role: s.hopRecords,
+        name: s.hopFailed,
+        note: s.hopFailedNote,
+        link: by('unknown'),
+        missing: 'step',
+      },
+    ]
+  }
+  const records = seap.notices + seap.purchases.length
+  if (records === 0) {
     return [
       {
         role: s.hopRecords,
@@ -71,6 +84,7 @@ export function seapHops(
           {others > 0 ? ` ${s.andMore(others)}` : null}
         </>
       ),
+      // Why this one: the most value, contracts and direct purchases added together.
       note: s.hopCompaniesNote,
       link: by('published'),
     })

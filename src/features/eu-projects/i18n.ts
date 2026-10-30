@@ -58,8 +58,6 @@ export const eu = {
       `valoare ${value} · plătit ${paid}${day ? ` până la ${day}` : ''}`,
     of: (whole: string) =>
       `din ${whole} ale beneficiarului; sumele nu se adună între programe, fiecare are data listei lui`,
-    ofAll: (whole: string) =>
-      `din ${whole} în listele pe care le avem; sumele nu se adună între programe, fiecare are data listei lui`,
     otherStatuses: (n: number, text: string) =>
       `${counted(n, text, 'unul', 'proiecte')} cu o stare scrisă altfel în listă`,
     otherStatus: 'Altă stare, scrisă de listă',
@@ -121,6 +119,7 @@ export const eu = {
   roadDated: 'publicate una câte una, cu data lor',
   roadUntil: (day: string) => `cumulat până la ${day}, fără dată`,
   roadNoPaid: 'lista nu dă suma plătită',
+  roadNoCutOff: 'cumulat, fără dată · lista nu spune până la ce zi',
   starts: 'Început',
   ends: 'Termen',
 
@@ -160,7 +159,10 @@ export const eu = {
     },
     probable: 'Probabil',
     hopCompanies: 'Firme',
-    hopCompaniesNote: 'câștigători și furnizori',
+    hopCompaniesNote:
+      'cea mai mare valoare, contracte și achiziții directe adunate; o asociere, cu toată valoarea contractului',
+    hopFailed: 'Nu am putut citi',
+    hopFailedNote: 'anunțurile și achizițiile din SEAP, acum',
     andMore: (n: number) => `și încă ${n}`,
     none: {
       smis: 'Niciun anunț de atribuire și nicio achiziție directă dintre cele pe care le avem nu citează codul SMIS al proiectului.',

@@ -12,7 +12,7 @@ import {
 } from '#/components/project/ProjectFrame'
 import { EuSeapSection, euSeapQuery } from '#/features/eu-projects'
 import { PnrrRoad } from '#/features/pnrr/PnrrRoad'
-import { ProgressBars } from '#/features/pnrr/PnrrContractFacts'
+import { ProgressByMeasure } from '#/features/pnrr/PnrrContractFacts'
 import { PnrrPaymentsSection } from '#/features/pnrr/PnrrPayments'
 import { PnrrStatusBadge } from '#/features/pnrr/PnrrTables'
 import { useI18n } from '#/i18n/context'
@@ -177,7 +177,9 @@ function ContractView({
           ]}
         />
         {/* Measures that disagree: each its own progress, as the ministry gives it. */}
-        {contract.measures_differ ? <ProgressBars contract={contract} /> : null}
+        {contract.measures_differ ? (
+          <ProgressByMeasure contract={contract} />
+        ) : null}
 
         <PnrrRoad contract={contract} seap={seap} />
 
