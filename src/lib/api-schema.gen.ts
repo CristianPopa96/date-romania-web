@@ -1943,14 +1943,14 @@ export interface components {
         EuSeapContract: {
             /**
              * Cited
-             * @description What SEAP's text cites, as written: '341497', '12321/26.08.2024'.
+             * @description What SEAP's text cites, as written: '341497', '12321/26.08.2024'; for pnrr-measure+buyer, the contract's measure it fits ('C10.I3'), or 'PNRR' when the buyer's only PNRR contract is tied with no measure cited.
              */
             cited: string;
             /**
              * Method
              * @enum {string}
              */
-            method: "smis-in-text" | "financing-number+buyer";
+            method: "smis-in-text" | "financing-number+buyer" | "pnrr-measure+buyer";
             /**
              * Confidence
              * @description Always probable: the buyer's own text.
@@ -1994,14 +1994,14 @@ export interface components {
         EuSeapPurchase: {
             /**
              * Cited
-             * @description What SEAP's text cites, as written: '341497', '12321/26.08.2024'.
+             * @description What SEAP's text cites, as written: '341497', '12321/26.08.2024'; for pnrr-measure+buyer, the contract's measure it fits ('C10.I3'), or 'PNRR' when the buyer's only PNRR contract is tied with no measure cited.
              */
             cited: string;
             /**
              * Method
              * @enum {string}
              */
-            method: "smis-in-text" | "financing-number+buyer";
+            method: "smis-in-text" | "financing-number+buyer" | "pnrr-measure+buyer";
             /**
              * Confidence
              * @description Always probable: the buyer's own text.

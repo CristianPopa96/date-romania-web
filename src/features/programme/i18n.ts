@@ -20,7 +20,7 @@ export const programme = {
   tied: 'Legat, probabil, de un singur contract SEAP',
   tiedDetail: (ofCount: string) => `din sumă · ${ofCount} din plăți`,
   tiedOf: (n: number, text: string) =>
-    `din ${counted(n, text, 'o plată care numește', 'plăți care numesc')} constructorul cu CUI`,
+    `din ${counted(n, text, 'o plată al cărei', 'plăți al căror')} constructor are CUI`,
   tiedSeveral: (n: number, text: string) =>
     `${counted(n, text, 'o plată are', 'plăți au')} mai multe contracte posibile și nu ${n === 1 ? 'e numărată' : 'sunt numărate'} aici`,
 
@@ -46,7 +46,7 @@ export const programme = {
 
   // How the payments were tied.
   howTitle: 'Cum s-au legat plățile',
-  how: 'O plată e legată de un contract de lucrări când același constructor, după CUI, l-a câștigat în SEAP de la o instituție cu numele primăriei. Nicio legătură nu este sigură: fișierul de plăți nu numește contractul. O numim probabilă când SEAP arată că instituția e din județul proiectului sau când nicio altă instituție nu poartă acel nume.',
+  how: 'O plată e legată de un contract de lucrări când același constructor, după CUI, l-a câștigat în SEAP de la o instituție cu numele primăriei. Nicio legătură nu este sigură: fișierul de plăți nu numește contractul. O numim probabilă când SEAP arată că instituția e din județul proiectului sau când nicio altă instituție nu poartă acel nume. O plată dintr-un fișier fără CUI ia CUI-ul pe care o plată mai nouă a aceluiași proiect îl dă aceleiași firme.',
   howSearched: (from: string, to: string) =>
     `Am căutat în contractele publicate în SEAP între ${from} și ${to}.`,
   howPossible: (n: number, text: string) =>
@@ -68,9 +68,9 @@ export const programme = {
   ],
   whyUnnamedTitle: 'De ce unele plăți nu pot fi legate.',
   whyUnnamed: (day: string) =>
-    `Fișierele de plăți publicate înainte de ${day} dau doar numele constructorului, fără CUI. După nume nu legăm o plată de un contract. Într-un proiect, o astfel de plată stă lângă plățile care numesc aceeași firmă cu CUI.`,
+    `Fișierele de plăți publicate înainte de ${day} dau doar numele constructorului, fără CUI. Când o plată mai nouă a aceluiași proiect numește aceeași firmă cu CUI, folosim acel CUI. Altfel, după nume nu legăm o plată de un contract.`,
   whyUnnamedOlder:
-    'Fișierele de plăți mai vechi dau doar numele constructorului, fără CUI. După nume nu legăm o plată de un contract. Într-un proiect, o astfel de plată stă lângă plățile care numesc aceeași firmă cu CUI.',
+    'Fișierele de plăți mai vechi dau doar numele constructorului, fără CUI. Când o plată mai nouă a aceluiași proiect numește aceeași firmă cu CUI, folosim acel CUI. Altfel, după nume nu legăm o plată de un contract.',
   whyUnnamedAll:
     'Fișierele de plăți preluate dau doar numele constructorului, fără CUI. După nume nu legăm o plată de un contract.',
   filesTitle: 'Fișierele de plăți',
@@ -170,6 +170,13 @@ export const programme = {
       'Legătură probabilă: același constructor, după CUI; nicio altă instituție din SEAP nu poartă numele primăriei.',
     'builder-cui+town-hall-name':
       'Legătură posibilă: același constructor, după CUI; mai multe instituții din SEAP poartă numele primăriei.',
+    // A payment from an older file, with no tax ID of its own.
+    'builder-cui-of-project+town-hall-name+county':
+      'Legătură probabilă: același constructor, după CUI-ul pe care o plată mai nouă a proiectului îl dă aceluiași nume de firmă; instituția are numele primăriei și e din același județ.',
+    'builder-cui-of-project+only-town-hall-of-that-name':
+      'Legătură probabilă: același constructor, după CUI-ul pe care o plată mai nouă a proiectului îl dă aceluiași nume de firmă; nicio altă instituție din SEAP nu poartă numele primăriei.',
+    'builder-cui-of-project+town-hall-name':
+      'Legătură posibilă: același constructor, după CUI-ul pe care o plată mai nouă a proiectului îl dă aceluiași nume de firmă; mai multe instituții din SEAP poartă numele primăriei.',
   } as Record<string, string | undefined>,
   confidence: {
     probable: 'Legătură probabilă.',
