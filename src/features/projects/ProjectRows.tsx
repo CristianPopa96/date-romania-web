@@ -158,12 +158,16 @@ function Title({ row, q }: { row: ProjectItem; q: string | undefined }) {
 }
 
 function Beneficiary({ row }: { row: ProjectItem }) {
-  const { t } = useI18n()
+  const { t, f } = useI18n()
   // A project over many counties names the first two and counts the rest.
   const names = row.counties.map((county) => county.name)
   const counties =
     names.length > 3
-      ? t.projects.someCounties(names.slice(0, 2).join(', '), names.length - 2)
+      ? t.projects.someCounties(
+          names.slice(0, 2).join(', '),
+          names.length - 2,
+          f.count(names.length - 2),
+        )
       : names.join(', ')
   return (
     <>
