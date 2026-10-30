@@ -2,25 +2,19 @@ import { queryOptions } from '@tanstack/react-query'
 
 import { getRankingList } from '#/features/rankings/api'
 import type { RankingKind, RankingQuery } from '#/features/rankings/api'
-import { getLargestContracts } from '#/features/contracts'
 import {
   RANKING_COLUMNS,
   rankingFilter,
   rankingSort,
 } from '#/features/rankings/urls'
-import type { RankingFilter, RankingSearch } from '#/features/rankings/urls'
+import type { RankingSearch } from '#/features/rankings/urls'
+import { countyCodeOfSlug } from '#/lib/counties'
 
-export const largestContractsQuery = (filter: RankingFilter) =>
-  queryOptions({
-    queryKey: ['contracts', 'largest', filter],
-    queryFn: () => getLargestContracts({ data: filter }),
-  })
-
-// Which ranking a tab of the address shows.
+// Which ranking a tab of the address shows: by contracts, or by direct purchases.
 export function rankingKind(search: RankingSearch): RankingKind {
-  if (search.clasament === 'furnizori') return 'contract-suppliers'
-  if (search.clasament === 'institutii') return 'contract-institutions'
-  return search.parte === 'institutii' ? 'institutions' : 'suppliers'
+  const buyers = search.clasament === 'institutii'
+  if (search.bani === 'achizitii') return buyers ? 'institutions' : 'suppliers'
+  return buyers ? 'contract-institutions' : 'contract-suppliers'
 }
 
 // What the API is asked for a ranking's page, under the address's filters and order.
@@ -30,6 +24,7 @@ export function rankingQuery(search: RankingSearch): RankingQuery {
     kind: rankingKind(search),
     won: search.castigate === 'asociere' ? 'association' : 'alone',
     ...rankingFilter(search),
+    county: countyCodeOfSlug(search.judet),
     date_from: search.de_la,
     date_to: search.pana_la,
     q: search.q === undefined ? undefined : String(search.q),

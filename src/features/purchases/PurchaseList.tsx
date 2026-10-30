@@ -11,6 +11,7 @@ import {
   PURCHASE_BY_API_PARAM,
   PURCHASE_COLUMNS,
   PURCHASE_FILTER_PARAMS,
+  FILE_ROWS,
   purchaseFileSearch,
   purchaseSort,
 } from '#/features/purchases/list'
@@ -35,18 +36,22 @@ import type { Sort } from '#/lib/list'
 type Search = PurchaseListSearch & { pagina?: number }
 
 // The direct purchases of one institution or supplier, declared to the list pattern
-// (ListView): its filters, its summary line, two charts, its columns and its file.
+// (ListView): its filters, its summary line, two charts, its columns and its file. With no
+// CUI, the list of every accepted purchase, the largest first (Clasamente, "Achiziții
+// directe"): its count and its sum, since every row is one purchase with one value.
 export function PurchaseList<TSearch extends Search>({
   role,
   cui,
   search,
   held,
+  title,
   onSearch,
 }: {
   role: Role
-  cui: number
+  cui: number | null
   search: TSearch
   held: Summary | null
+  title?: string
   onSearch: (search: TSearch) => void
 }) {
   const { t, f } = useI18n()
@@ -59,21 +64,24 @@ export function PurchaseList<TSearch extends Search>({
   // A change of filter or order goes back to the first page.
   const apply = (patch: Patch) =>
     onSearch({ ...search, ...patch, pagina: undefined })
-  const sort = purchaseSort(search)
+  const every = cui === null
+  const sort = purchaseSort(search, every)
   const onSort = (next: Sort | null) =>
     apply({ ordine: next ? sortToParam(next, PURCHASE_COLUMNS) : undefined })
   const found = overview.summary
-  const acceptedOnly = String(search.stare) === String(ACCEPTED)
+  const acceptedOnly = every || String(search.stare) === String(ACCEPTED)
   const q = search.q === undefined ? undefined : String(search.q)
   const party = role === 'institutions' ? 'furnizor' : 'institutie'
   const back = emptyHint(overview.without, PURCHASE_BY_API_PARAM)
 
   return (
     <ListView
-      title={t.entity.tabPurchases}
+      title={title ?? t.entity.tabPurchases}
       search={{
         q,
-        what: t.purchaseList.searchWhat[role],
+        what: every
+          ? t.purchaseList.searchWhatEvery
+          : t.purchaseList.searchWhat[role],
         filters: purchaseFilterDecls({
           role,
           cui,
@@ -89,7 +97,14 @@ export function PurchaseList<TSearch extends Search>({
         }),
         onApply: apply,
       }}
-      summary={summaryLine(overview, acceptedOnly, t, f)}
+      summary={summaryLine(
+        overview,
+        acceptedOnly,
+        every,
+        list.total > FILE_ROWS,
+        t,
+        f,
+      )}
       views={
         found.accepted > 0
           ? {
@@ -99,12 +114,17 @@ export function PurchaseList<TSearch extends Search>({
             }
           : null
       }
-      file={{
-        href: `/achizitii-directe.csv?${new URLSearchParams(
-          purchaseFileSearch(role, cui, search),
-        ).toString()}`,
-        rows: list.total,
-      }}
+      // A file holds at most FILE_ROWS rows: a longer list says so in its summary.
+      file={
+        list.total > FILE_ROWS
+          ? null
+          : {
+              href: `/achizitii-directe.csv?${new URLSearchParams(
+                purchaseFileSearch(role, cui, search),
+              ).toString()}`,
+              rows: list.total,
+            }
+      }
       sort={{
         value: sort,
         columns: [
@@ -117,6 +137,9 @@ export function PurchaseList<TSearch extends Search>({
                 ? t.common.supplier
                 : t.common.institution,
           },
+          ...(every
+            ? [{ column: 'institutie', label: t.common.institution }]
+            : []),
         ],
         isDefault: search.ordine === undefined,
         onSort,
@@ -132,6 +155,7 @@ export function PurchaseList<TSearch extends Search>({
       rows={
         <PurchaseRows
           role={role}
+          every={every}
           items={list.items}
           q={q}
           sort={sort}
@@ -197,6 +221,8 @@ function totalRow(overview: PurchaseOverview, t: Messages, f: Format) {
 function summaryLine(
   overview: PurchaseOverview,
   acceptedOnly: boolean,
+  every: boolean,
+  noFile: boolean,
   t: Messages,
   f: Format,
 ) {
@@ -225,10 +251,15 @@ function summaryLine(
     ),
     detail: (
       <>
-        {t.purchaseList.of(
-          f.count(overview.whole),
-          days ? t.period.range(days.from, days.to) : null,
-        )}
+        {/* The list of every purchase is accepted ones only: its whole is no measure. */}
+        {every
+          ? days
+            ? t.period.range(days.from, days.to)
+            : null
+          : t.purchaseList.of(
+              f.count(overview.whole),
+              days ? t.period.range(days.from, days.to) : null,
+            )}
         {found.above_limit > 0
           ? ` · ${t.purchaseList.aboveLimit(
               found.above_limit,
@@ -236,6 +267,7 @@ function summaryLine(
               f.lei(found.above_limit_value),
             )}`
           : null}
+        {noFile ? ` · ${t.purchaseList.fileLimit(f.count(FILE_ROWS))}` : null}
       </>
     ),
   }

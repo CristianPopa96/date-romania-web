@@ -2,10 +2,7 @@
 // named in an address, and what share of a project the EU pays. Kept here so it can be
 // tested.
 
-import type {
-  EuBeneficiary,
-  EuBeneficiaryFunds,
-} from '#/features/eu-projects/api'
+import type { EuBeneficiary } from '#/features/eu-projects/api'
 // How the tie between a project and its beneficiary is marked (the ConfidenceBadge of the
 // design system): 'sure' when the list gives the CUI, 'probable' when we tied it by name.
 // `label` names the evidence: 'cui', 'administration' (the town hall or council of the
@@ -52,22 +49,6 @@ export function euShare(
 // '2021-2027' as the site writes a span of years, with an en dash.
 export function periodLabel(period: string): string {
   return period.replace('-', '–')
-}
-
-// What an entity holds of EU money, as its page counts it: its cohesion projects (every
-// programme's, a count only) and how many of them we tied by name, its PNRR contracts,
-// and whether it was paid from PNRR (it can be, on a measure with no contract held).
-// Nothing when the answer is missing.
-export function euCounts(funds: EuBeneficiaryFunds | null | 'failed') {
-  if (!funds || funds === 'failed') {
-    return { cohesion: 0, byName: 0, pnrr: 0, pnrrPaid: false }
-  }
-  return {
-    cohesion: funds.cohesion.reduce((n, row) => n + row.projects, 0),
-    byName: funds.cohesion.reduce((n, row) => n + row.by_name, 0),
-    pnrr: funds.pnrr?.contracts ?? 0,
-    pnrrPaid: (funds.pnrr?.payments ?? 0) > 0,
-  }
 }
 
 // The programme codes the address names, from the programmes held (a code alone is not

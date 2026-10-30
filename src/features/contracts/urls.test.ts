@@ -1,10 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  contractsCsvName,
-  contractsCsvPath,
-  contractsCsvQuery,
-} from '#/features/contracts/urls'
+import { contractsCsvName, contractsCsvQuery } from '#/features/contracts/urls'
 
 describe('the address of a CSV file', () => {
   const read = (query: string) => contractsCsvQuery(new URLSearchParams(query))
@@ -62,18 +58,31 @@ describe('the address of a CSV file', () => {
     expect(read('furnizor=1;drop')).toBeNull()
   })
 
-  it('carries the filters of the rankings for the whole period', () => {
-    expect(contractsCsvPath({})).toBe('/contracte.csv')
-    expect(contractsCsvPath({ cpv: '45', eu: true })).toBe(
-      '/contracte.csv?cpv=45&ue=da',
+  it('asks for every contract with its filters, the largest first', () => {
+    // From the "Contracte" tab of Clasamente: the company and the institution are filters.
+    expect(
+      read('toate=da&furnizor=17886786&castig=singur&judet=gorj&cpv=45&ue=da'),
+    ).toEqual(
+      expect.objectContaining({
+        supplier: 17886786,
+        buyer: undefined,
+        won: 'alone',
+        county: 'GJ',
+        cpv: '45',
+        eu_funded: 'true',
+        sort: 'value',
+        order: 'desc',
+      }),
     )
-    expect(read('cpv=45&ue=da')).toEqual({
-      cpv: '45',
-      eu_funded: 'true',
-      sort: 'value',
-      order: 'desc',
-    })
-    expect(read('cpv=4x')).toBeNull()
-    expect(read('ue=poate')).toBeNull()
+    expect(read('toate=da&furnizor=17886786')).toEqual(
+      expect.objectContaining({ won: undefined }),
+    )
+    expect(contractsCsvName(new URLSearchParams('toate=da&furnizor=1'))).toBe(
+      'contracte',
+    )
+    // No party at all is the same list.
+    expect(read('cpv=45')).toEqual(
+      expect.objectContaining({ cpv: '45', sort: 'value' }),
+    )
   })
 })

@@ -17,9 +17,11 @@ import type { Sort } from '#/lib/list'
 // The rows of a list of direct purchases, declared to ListRows: the columns of the table
 // (day, purchase, the other party, state, value) and on a phone a card per purchase with
 // its value on the right. `total` is the row under the table, given only when every row is
-// one kind of money.
+// one kind of money. The list of every accepted purchase (`every`) shows both parties and
+// no state: every row is accepted.
 export function PurchaseRows({
   role,
+  every = false,
   items,
   q,
   sort,
@@ -27,6 +29,7 @@ export function PurchaseRows({
   total,
 }: {
   role: Role
+  every?: boolean
   items: Array<Purchase>
   q: string | undefined
   sort: Sort
@@ -59,11 +62,20 @@ export function PurchaseRows({
       },
       cell: (purchase) => <Party purchase={purchase} other={other} />,
     },
-    {
-      key: 'stare',
-      header: t.purchases.state,
-      cell: (purchase) => <State purchase={purchase} />,
-    },
+    every
+      ? {
+          key: 'institutie',
+          header: t.common.institution,
+          sort: { column: 'institutie', text: true },
+          cell: (purchase) => (
+            <Party purchase={purchase} other="institutions" />
+          ),
+        }
+      : {
+          key: 'stare',
+          header: t.purchases.state,
+          cell: (purchase) => <State purchase={purchase} />,
+        },
     {
       key: 'valoare',
       header: t.purchases.value,
@@ -90,7 +102,13 @@ export function PurchaseRows({
               <Party purchase={purchase} other={other} />
             </Text>
             <Box mt="1">
-              <State purchase={purchase} />
+              {every ? (
+                <Text size="1" color="gray">
+                  <Party purchase={purchase} other="institutions" />
+                </Text>
+              ) : (
+                <State purchase={purchase} />
+              )}
             </Box>
           </Box>
           <Box style={{ whiteSpace: 'nowrap', textAlign: 'right' }}>

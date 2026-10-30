@@ -1,9 +1,14 @@
 // The direct purchases of one institution or supplier as a list of the DataTable pattern:
 // what its address holds, and what it asks the API for. The address is Romanian, the API's
-// parameters English: /institutii/4305857?lista=achizitii&stare=7&valoare_min=50000.
+// parameters English: /institutii/4305857?lista=achizitii&stare=7&valoare_min=50000. The
+// list of every accepted purchase (`cui` null) is the "Achiziții directe" tab of
+// Clasamente: /clasamente?clasament=achizitii&institutie=4981310&judet=gorj, the largest
+// first.
 
 import { ACCEPTED } from '#/lib/api'
 import type { Role } from '#/lib/api'
+import { countyCodeOfSlug } from '#/lib/counties'
+import { countyParam } from '#/lib/county-filter'
 import { searchParam } from '#/lib/urls'
 import {
   choiceFromParam,
@@ -32,6 +37,8 @@ export type PurchaseListSearch = {
   furnizor?: number
   institutie?: number
   cpv?: string | number
+  // The buyer's county, on the list of every purchase.
+  judet?: string
   ordine?: string
   pe_pagina?: PageSize
   vedere?: 'tabel'
@@ -52,8 +59,13 @@ export function partyOf(role: Role) {
     : ({ param: 'institutie', api: 'buyer' } as const)
 }
 
+// The most rows a file holds (the API's `CSV_ROWS`): the whole country is far more.
+export const FILE_ROWS = 100_000
+
+// `largest`: the list of every purchase opens on the largest, an entity's on the newest.
 export function validatePurchaseListSearch(
   search: Record<string, unknown>,
+  largest = false,
 ): PurchaseListSearch {
   const q =
     typeof search.q === 'string' || typeof search.q === 'number'
@@ -66,6 +78,7 @@ export function validatePurchaseListSearch(
   // "Cele mai mari acceptate", the switch this list had before its columns sorted, wrote
   // ?ordine=valoare: such a link keeps showing the largest accepted purchases.
   const legacy = search.ordine === 'valoare' && stare === undefined
+  const own = defaultSort(largest)
   return {
     q: q ? searchParam(q) : undefined,
     de_la: dayFromParam(search.de_la),
@@ -81,9 +94,10 @@ export function validatePurchaseListSearch(
       cpv !== undefined && String(search.cpv).length >= 2
         ? searchParam(String(search.cpv))
         : undefined,
-    // The list's own order (newest first) is left out of the address.
+    judet: countyParam(search.judet),
+    // The list's own order is left out of the address.
     ordine:
-      sort && !(sort.column === 'data' && sort.dir === 'desc')
+      sort && !(sort.column === own.column && sort.dir === own.dir)
         ? sortToParam(sort, PURCHASE_COLUMNS)
         : undefined,
     pe_pagina: pageSizeFromParam(search.pe_pagina),
@@ -91,13 +105,15 @@ export function validatePurchaseListSearch(
   }
 }
 
-export function purchaseSort(search: PurchaseListSearch): Sort {
-  return (
-    sortFromParam(search.ordine, PURCHASE_COLUMNS) ?? {
-      column: 'data',
-      dir: 'desc',
-    }
-  )
+function defaultSort(largest: boolean): Sort {
+  return { column: largest ? 'valoare' : 'data', dir: 'desc' }
+}
+
+export function purchaseSort(
+  search: PurchaseListSearch,
+  largest = false,
+): Sort {
+  return sortFromParam(search.ordine, PURCHASE_COLUMNS) ?? defaultSort(largest)
 }
 
 // What the API is asked, for the list, its figures and its file.
@@ -110,32 +126,42 @@ export type PurchaseFilter = {
   value_min?: number
   value_max?: number
   cpv?: string
+  county?: string
   date_from?: string
   date_to?: string
 }
 
+// With no CUI, the list of every accepted purchase: the money spent, each row one value.
+// Its company and institution are the address's filters.
 export function purchaseFilter(
   role: Role,
-  cui: number,
+  cui: number | null,
   search: PurchaseListSearch,
 ): PurchaseFilter {
   const party = role === 'institutions' ? search.furnizor : search.institutie
+  const parties =
+    cui === null
+      ? { buyer: search.institutie, supplier: search.furnizor }
+      : {
+          [role === 'institutions' ? 'buyer' : 'supplier']: cui,
+          [partyOf(role).api]: party,
+        }
   return {
-    [role === 'institutions' ? 'buyer' : 'supplier']: cui,
-    [partyOf(role).api]: party,
+    ...parties,
     q: search.q === undefined ? undefined : String(search.q),
-    state: choiceFromParam(search.stare),
+    state: cui === null ? [ACCEPTED] : choiceFromParam(search.stare),
     contract_type: choiceFromParam(search.tip),
     value_min: search.valoare_min,
     value_max: search.valoare_max,
     cpv: search.cpv === undefined ? undefined : String(search.cpv),
+    county: countyCodeOfSlug(search.judet),
     date_from: search.de_la,
     date_to: search.pana_la,
   }
 }
 
-export function purchaseApiSort(search: PurchaseListSearch) {
-  const sort = purchaseSort(search)
+export function purchaseApiSort(search: PurchaseListSearch, largest = false) {
+  const sort = purchaseSort(search, largest)
   return {
     sort: PURCHASE_COLUMNS[sort.column as keyof typeof PURCHASE_COLUMNS].api,
     order: sort.dir,
@@ -152,6 +178,7 @@ export const PURCHASE_FILTER_PARAMS = {
   furnizor: ['furnizor'],
   institutie: ['institutie'],
   cpv: ['cpv'],
+  judet: ['judet'],
 } as const satisfies Record<string, ReadonlyArray<keyof PurchaseListSearch>>
 export type PurchaseFilterKey = keyof typeof PURCHASE_FILTER_PARAMS
 
@@ -168,14 +195,19 @@ export const PURCHASE_BY_API_PARAM: Record<string, PurchaseFilterKey> = {
   supplier: 'furnizor',
   buyer: 'institutie',
   cpv: 'cpv',
+  county: 'judet',
 }
 
 // The address of the list as a file, with every filter and the order shown.
 export function purchaseFileSearch(
   role: Role,
-  cui: number,
+  cui: number | null,
   search: PurchaseListSearch,
 ): Record<string, string> {
+  // Not one party's list: its company and institution are filters.
+  if (cui === null) {
+    return { toate: 'da', ...fileParams(PURCHASE_FILTER_PARAMS, search) }
+  }
   return {
     [role === 'institutions' ? 'cumparator' : 'vanzator']: String(cui),
     ...fileParams(PURCHASE_FILTER_PARAMS, search),

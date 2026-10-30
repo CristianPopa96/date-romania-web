@@ -7,10 +7,15 @@ import type { PurchaseListSearch } from '#/features/purchases'
 import { pageFromParam } from '#/lib/urls'
 
 // Search params shared by the institution and the supplier page.
-// `lista` picks one of the lists: contracts, direct purchases, and the projects of every
-// programme (D22). Left out, the page opens on its contracts when it has any, else on its
-// direct purchases.
-export const ENTITY_LISTS = ['contracte', 'achizitii', 'proiecte'] as const
+// `lista` picks one of the tabs: contracts, direct purchases, the projects of every
+// programme (D22) and, for a town hall or a county council, its budget. Left out, the page
+// opens on its contracts when it has any, else on its direct purchases.
+export const ENTITY_LISTS = [
+  'contracte',
+  'achizitii',
+  'proiecte',
+  'buget',
+] as const
 
 // The two lists the projects tab replaced, and the programme each opens it on.
 const OLD_LISTS: Record<string, string | undefined> = {
@@ -52,15 +57,18 @@ export function validateEntitySearch(
 
 // The list an entity page shows. Contracts come first, but most institutions and
 // companies have none signed in the period, and an empty list is a poor way in.
-// The projects tab is there only when the entity has projects: an address asking for it
-// otherwise opens the default.
+// The projects tab is there only when the entity has projects, the budget tab only when its
+// budget is held: an address asking for one otherwise opens the default.
 export function entityList(
   search: EntitySearch,
   hasContracts: boolean,
   hasProjects = false,
+  hasBudget = false,
 ): EntityList {
   const asked = search.lista
-  if (asked && (asked !== 'proiecte' || hasProjects)) return asked
+  const there =
+    asked === 'proiecte' ? hasProjects : asked === 'buget' ? hasBudget : true
+  if (asked && there) return asked
   return hasContracts ? 'contracte' : 'achizitii'
 }
 

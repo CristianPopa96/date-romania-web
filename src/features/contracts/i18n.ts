@@ -9,12 +9,18 @@ export const contractList = {
     institutions: 'obiect, câștigător, nr. anunț',
     suppliers: 'obiect, instituție, nr. anunț',
   },
+  searchWhatEvery: 'obiect, câștigător, instituție, nr. anunț',
+  // A company chosen on the list of every contract, with no "Câștigat": both ways.
+  noSumBoth:
+    'singur și în asociere nu se adună; alege „Câștigat” pentru valoarea lor',
   filters: {
     q: 'Căutare',
     perioada: 'Perioada',
     valoare: 'Valoare',
     furnizor: 'Câștigător',
+    firma: 'Firmă',
     institutie: 'Instituție',
+    judet: 'Județ',
     cpv: 'CPV',
     fel: 'Fel',
     ue: 'Fonduri UE',

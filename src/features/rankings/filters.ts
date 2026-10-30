@@ -1,15 +1,15 @@
-// The filters a ranking declares to its FilterBar: Câștigat (winners) or Clasament (direct
-// purchases: who sold, who bought), Perioada (direct purchases), CPV and, for contracts,
-// Fonduri UE. A ranking cannot count each option, so its choices carry no counts. A
-// choice panel takes numbers: an option is offered by its place, and written back to the
-// address as its word or code.
+// The filters a ranking declares to its FilterBar: Câștigat (winners of contracts),
+// Perioada (direct purchases), Județ (of the party ranked), CPV and, for contracts, Fonduri
+// UE. A ranking cannot count each option, so its choices carry no counts. A choice panel
+// takes numbers: an option is offered by its place, and written back to the address as its
+// word or code.
 
 import type { FilterDecl } from '#/components/list/filter-types'
 import { cpvDivisionLabel } from '#/features/patterns'
 import type { CpvDivision } from '#/features/patterns'
-import { isContractTab } from '#/features/rankings/urls'
 import type { RankingSearch, RankingTab } from '#/features/rankings/urls'
 import type { Messages } from '#/i18n'
+import { countyFilter } from '#/lib/county-filter'
 import type { Format } from '#/lib/format'
 import { periodChip } from '#/lib/list-chips'
 
@@ -40,8 +40,9 @@ export function rankingFilterDecls({
       : [...divisions, { code, name: null }]
   const cpv = options.findIndex((division) => division.code === code)
   const decls: Array<FilterDecl> = []
+  const direct = search.bani === 'achizitii'
 
-  if (tab === 'furnizori') {
+  if (tab === 'furnizori' && !direct) {
     const together = search.castigate === 'asociere'
     decls.push({
       key: 'castigate',
@@ -60,36 +61,19 @@ export function rankingFilterDecls({
       patch: (next) => ({ castigate: next[0] === 1 ? 'asociere' : undefined }),
     })
   }
-  if (tab === 'achizitii') {
-    const buyers = search.parte === 'institutii'
-    decls.push(
-      {
-        key: 'parte',
-        kind: 'choice',
-        single: true,
-        label: labels.parte,
-        value: buyers ? [1] : [0],
-        options: [
-          { value: 0, label: t.rankings.suppliers },
-          { value: 1, label: t.rankings.institutions },
-        ],
-        chip: buyers ? t.rankings.institutions : null,
-        clear: { parte: undefined },
-        patch: (next) => ({ parte: next[0] === 1 ? 'institutii' : undefined }),
-      },
-      {
-        key: 'perioada',
-        kind: 'period',
-        label: labels.perioada,
-        value: { from: search.de_la, to: search.pana_la },
-        held,
-        chip: periodChip({ from: search.de_la, to: search.pana_la }, t, f),
-        clear: { de_la: undefined, pana_la: undefined },
-        patch: (next) => ({ de_la: next.from, pana_la: next.to }),
-      },
-    )
+  if (direct) {
+    decls.push({
+      key: 'perioada',
+      kind: 'period',
+      label: labels.perioada,
+      value: { from: search.de_la, to: search.pana_la },
+      held,
+      chip: periodChip({ from: search.de_la, to: search.pana_la }, t, f),
+      clear: { de_la: undefined, pana_la: undefined },
+      patch: (next) => ({ de_la: next.from, pana_la: next.to }),
+    })
   }
-  decls.push({
+  decls.push(countyFilter(search.judet, labels.judet), {
     key: 'cpv',
     kind: 'choice',
     single: true,
@@ -105,7 +89,7 @@ export function rankingFilterDecls({
       cpv: next.length ? options[next[0]].code : undefined,
     }),
   })
-  if (isContractTab(tab)) {
+  if (!direct) {
     const eu = EU.findIndex((value) => value === search.ue)
     decls.push({
       key: 'ue',
@@ -114,10 +98,10 @@ export function rankingFilterDecls({
       label: labels.ue,
       value: eu >= 0 ? [eu] : [],
       options: [
-        { value: 0, label: t.rankings.filters.euYes },
-        { value: 1, label: t.rankings.filters.euNo },
+        { value: 0, label: t.rankings.euYes },
+        { value: 1, label: t.rankings.euNo },
       ],
-      chip: eu >= 0 ? t.rankings.filters[eu === 0 ? 'euYes' : 'euNo'] : null,
+      chip: eu >= 0 ? t.rankings[eu === 0 ? 'euYes' : 'euNo'] : null,
       clear: { ue: undefined },
       patch: (next) => ({ ue: next.length ? EU[next[0]] : undefined }),
     })

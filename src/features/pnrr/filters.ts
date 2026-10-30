@@ -44,6 +44,7 @@ export function pnrrFilterDecls({
   return [
     countyDecl(search, overview, t),
     beneficiaryDecl(search, overview, t),
+    typeDecl(search, overview, t),
     {
       key: 'stare',
       kind: 'choice',
@@ -169,6 +170,36 @@ function beneficiaryDecl(
     clear: { beneficiar: undefined },
     patch: (next) => ({
       beneficiar: next.length ? held[next[0]].entity.cui : undefined,
+    }),
+  }
+}
+
+// The kind of beneficiary, in the dashboard's own words, as written, with counts (Q65). One
+// from an address that is not among them is still shown, so it can be cleared.
+function typeDecl(
+  search: PnrrListSearch,
+  overview: PnrrContractOverview,
+  t: Messages,
+): FilterDecl {
+  const types = overview.beneficiary_types
+  const picked = types.findIndex(
+    (option) => option.value === search.tip_beneficiar,
+  )
+  return {
+    key: 'tip_beneficiar',
+    kind: 'choice',
+    single: true,
+    label: t.pnrr.list.filters.tip_beneficiar,
+    value: picked >= 0 ? [picked] : [],
+    options: types.map((option, index) => ({
+      value: index,
+      label: option.value,
+      count: option.count,
+    })),
+    chip: search.tip_beneficiar ?? null,
+    clear: { tip_beneficiar: undefined },
+    patch: (next) => ({
+      tip_beneficiar: next.length ? types[next[0]].value : undefined,
     }),
   }
 }

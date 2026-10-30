@@ -2,6 +2,5 @@
 export { EuSeapSection } from './EuSeapSection'
 export { seapHops } from './SeapHops'
 export type { EuSeapLinks } from './api'
-export type { EuBeneficiaryPnrr } from './api'
-export { euCounts, periodLabel, programmeCodes, programmeSlug } from './eu'
-export { euBeneficiaryQuery, euSeapQuery } from './queries'
+export { periodLabel, programmeCodes, programmeSlug } from './eu'
+export { euSeapQuery } from './queries'

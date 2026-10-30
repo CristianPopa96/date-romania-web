@@ -1,4 +1,4 @@
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { Badge, Code, Container, Flex, Heading, Text } from '@radix-ui/themes'
 
 import {
@@ -9,7 +9,12 @@ import {
 } from '#/features/contracts'
 import { EntityProjects, projectListQuery } from '#/features/projects'
 import { EntityFigures } from '#/features/entities/EntityFigures'
-import { InstitutionHeader, InstitutionMoney } from '#/features/budget'
+import {
+  BudgetTab,
+  InstitutionHeader,
+  InstitutionMoney,
+  budgetQuery,
+} from '#/features/budget'
 import { PurchaseList } from '#/features/purchases'
 import { UrlTabs } from '#/components/UrlTabs'
 import { useI18n } from '#/i18n/context'
@@ -49,7 +54,14 @@ export function EntityView({
   // When the count could not be read the tab stays, with no count: its list says why.
   const projectCount = projects === 'failed' ? null : projects.total
   const hasProjects = projectCount !== 0
-  const list = entityList(search, held > 0, hasProjects)
+  // Only a town hall's or a county council's budget is held: the others have no tab.
+  // Read in the loader for an institution, so it is in the cache already.
+  const { data: budget } = useQuery({
+    ...budgetQuery(cui),
+    enabled: role === 'institutions',
+  })
+  const hasBudget = role === 'institutions' && Boolean(budget?.budget)
+  const list = entityList(search, held > 0, hasProjects, hasBudget)
   const tab = (value: EntityList, label: string, count: number | null) => ({
     value,
     label: (
@@ -112,6 +124,7 @@ export function EntityView({
             ...(hasProjects
               ? [tab('proiecte', t.projects.tab, projectCount)]
               : []),
+            ...(hasBudget ? [tab('buget', t.budget.title, null)] : []),
           ]}
           onChange={(value) => onSearch(entityListSearch(value, held > 0))}
         >
@@ -123,6 +136,8 @@ export function EntityView({
               won={contractsWon(contracts, search)}
               onSearch={onSearch}
             />
+          ) : list === 'buget' ? (
+            <BudgetTab cui={cui} />
           ) : list === 'proiecte' ? (
             <EntityProjects
               role={role}

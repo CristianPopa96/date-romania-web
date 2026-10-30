@@ -36,18 +36,22 @@ type Search = ContractListSearch & { pagina?: number }
 
 // The contracts of one institution or company, declared to the list pattern (ListView):
 // its filters, its summary line, two charts, its columns and its file. A company's list is
-// one way of winning at a time (`won`), never the two added.
+// one way of winning at a time (`won`), never the two added. With no CUI, the list of every
+// contract, the largest first (Clasamente, "Contracte"): with a company chosen it holds
+// both ways of winning, and a sum only once one is chosen (Q69).
 export function ContractList<TSearch extends Search>({
   role,
   cui,
   search,
   won,
+  title,
   onSearch,
 }: {
   role: Role
-  cui: number
+  cui: number | null
   search: TSearch
   won: Won | undefined
+  title?: string
   onSearch: (search: TSearch) => void
 }) {
   const { t, f } = useI18n()
@@ -69,7 +73,8 @@ export function ContractList<TSearch extends Search>({
   // A change of filter or order goes back to the first page.
   const apply = (patch: Patch) =>
     onSearch({ ...search, ...patch, pagina: undefined })
-  const sort = contractSort(search)
+  const every = cui === null
+  const sort = contractSort(search, every)
   const onSort = (next: Sort | null) =>
     apply({ ordine: next ? sortToParam(next, CONTRACT_COLUMNS) : undefined })
   const found = overview.summary
@@ -81,14 +86,18 @@ export function ContractList<TSearch extends Search>({
     overview.period.last_day ?? null,
   )
   const range = days ? t.period.range(days.from, days.to) : null
-  const counted = found.contracts - found.without_value
+  // A company's contracts won alone and in association are never added up.
+  const both = every && search.furnizor !== undefined && !search.castig
+  const counted = both ? 0 : found.contracts - found.without_value
 
   return (
     <ListView
-      title={t.entity.tabContracts}
+      title={title ?? t.entity.tabContracts}
       search={{
         q,
-        what: t.contractList.searchWhat[role],
+        what: every
+          ? t.contractList.searchWhatEvery
+          : t.contractList.searchWhat[role],
         filters: contractFilterDecls({
           role,
           cui,
@@ -108,7 +117,7 @@ export function ContractList<TSearch extends Search>({
         }),
         onApply: apply,
       }}
-      summary={summaryLine(overview, won, range, t, f)}
+      summary={summaryLine(overview, won, range, both, t, f)}
       views={
         found.contracts > 0
           ? {
@@ -134,6 +143,9 @@ export function ContractList<TSearch extends Search>({
             label:
               role === 'institutions' ? t.contracts.winner : t.contracts.buyer,
           },
+          ...(every
+            ? [{ column: 'institutie', label: t.contracts.buyer }]
+            : []),
         ],
         isDefault: search.ordine === undefined,
         onSort,
@@ -150,6 +162,8 @@ export function ContractList<TSearch extends Search>({
       rows={
         <ContractRows
           role={role}
+          every={every}
+          company={every ? search.furnizor : undefined}
           items={list.items}
           q={q}
           sort={sort}
@@ -213,11 +227,13 @@ export function ContractList<TSearch extends Search>({
 }
 
 // "2 contracte · 6,33 mil. lei fără TVA" (or "câștigate singur" for a company), and under
-// it which part of the whole that is, over which days, and what the sum leaves out.
+// it which part of the whole that is, over which days, and what the sum leaves out. `both`:
+// a company's contracts won alone and in association, never added: no sum.
 function summaryLine(
   overview: ContractOverview,
   won: Won | undefined,
   range: string | null,
+  both: boolean,
   t: Messages,
   f: Format,
 ) {
@@ -229,7 +245,7 @@ function summaryLine(
         {won
           ? t.contractList.wonContracts(found.contracts, count, won)
           : t.contractList.contracts(found.contracts, count)}
-        {found.contracts > 0
+        {found.contracts > 0 && !both
           ? ` · ${t.contractList.value(f.leiShort(found.value))}`
           : null}
       </>
@@ -244,6 +260,7 @@ function summaryLine(
             )}`
           : null}
         {won === 'association' ? ` · ${t.contractList.wholeValue}` : null}
+        {both ? ` · ${t.contractList.noSumBoth}` : null}
       </>
     ),
   }

@@ -65,6 +65,7 @@ export const pnrr = {
       q: 'Căutare',
       judet: 'Județ',
       beneficiar: 'Beneficiar',
+      tip_beneficiar: 'Tip beneficiar',
       stare: 'Stare',
       valoare: 'Valoare',
       progres: 'Progres fizic',

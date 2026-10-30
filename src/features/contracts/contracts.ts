@@ -1,6 +1,5 @@
 // Reading a notice and its contracts: the small decisions the pages share, kept out of
 // the components so they can be tested.
-import type { Source } from '#/lib/api'
 import { wonOf } from '#/features/contracts/list'
 import type { ContractListSearch, Won } from '#/features/contracts/list'
 import type {
@@ -82,25 +81,4 @@ export function contractCount(totals: EntityContracts) {
   return totals.role === 'institutions'
     ? totals.awarded.contracts
     : totals.alone.contracts + totals.association.contracts
-}
-
-// The source of a list of contracts read from many notices: the publisher they share,
-// and the last time any of them was fetched. Each row links to its own notice.
-export function listSource(contracts: Array<Contract>): Source | null {
-  if (contracts.length === 0) return null
-  const fetched = contracts
-    .map((contract) => contract.source.fetched_at)
-    .filter((at) => at !== null)
-    .sort()
-  return {
-    publisher: contracts[0].source.publisher,
-    record: null,
-    url: null,
-    fetched_at: fetched.at(-1) ?? null,
-    document_id: null,
-    sha256: null,
-    parser_version: null,
-    documents: new Set(contracts.map((contract) => contract.source.document_id))
-      .size,
-  }
 }

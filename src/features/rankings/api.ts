@@ -2,7 +2,6 @@ import { createServerFn } from '@tanstack/react-start'
 
 import { getJson } from '#/lib/api'
 import type { Schemas } from '#/lib/api'
-import { filterParams } from '#/features/contracts'
 
 // The rankings: parties by the value of their contracts or direct purchases, a page at a
 // time, in any column's order. See api.ts of the site for how it reaches the API.
@@ -28,6 +27,8 @@ export type RankingQuery = {
   won?: Won
   cpv?: string
   eu?: boolean
+  // The county's code, of the party ranked.
+  county?: string
   // Direct purchases only.
   date_from?: string
   date_to?: string
@@ -69,7 +70,6 @@ export const getRankingList = createServerFn({ method: 'GET' })
       limit: data.size,
       offset: (data.page - 1) * data.size,
     }
-    const filter = { cpv: data.cpv, eu: data.eu }
     if (
       data.kind === 'contract-suppliers' ||
       data.kind === 'contract-institutions'
@@ -81,7 +81,9 @@ export const getRankingList = createServerFn({ method: 'GET' })
             data.kind === 'contract-suppliers'
               ? (data.won ?? 'alone')
               : undefined,
-          ...filterParams(filter),
+          cpv: data.cpv,
+          eu_funded: data.eu === undefined ? undefined : String(data.eu),
+          county: data.county,
           ...page,
         },
       )
@@ -99,6 +101,7 @@ export const getRankingList = createServerFn({ method: 'GET' })
       date_from: data.date_from,
       date_to: data.date_to,
       cpv: data.cpv,
+      county: data.county,
       ...page,
     })
     return (

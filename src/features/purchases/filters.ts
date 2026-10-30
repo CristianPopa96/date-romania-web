@@ -1,6 +1,7 @@
 // The filters the list of direct purchases declares to its FilterBar, from what the API
-// accepts: Perioada, Valoare, Stare, Tip, the other party, CPV. Each says its chip once
-// chosen, and the change of address its panel asks for.
+// accepts: Perioada, Valoare, Stare, Tip, the other party, CPV. The list of every accepted
+// purchase (`cui` null) takes Firmă, Instituție, Județ, CPV and Perioada (design round 14).
+// Each says its chip once chosen, and the change of address its panel asks for.
 
 import type { FilterDecl } from '#/components/list/filter-types'
 import type { Messages } from '#/i18n'
@@ -10,6 +11,7 @@ import {
   getPurchaseCpvCodes,
   getPurchaseParties,
 } from '#/features/purchases/api'
+import { countyFilter } from '#/lib/county-filter'
 import type { Format } from '#/lib/format'
 import { choiceFromParam, choiceToParam } from '#/lib/list'
 import { periodChip, rangeChip } from '#/lib/list-chips'
@@ -31,7 +33,7 @@ export function purchaseFilterDecls({
   f,
 }: {
   role: Role
-  cui: number
+  cui: number | null
   search: PurchaseListSearch
   overview: PurchaseOverview
   items: Array<Purchase>
@@ -40,7 +42,6 @@ export function purchaseFilterDecls({
   f: Format
 }): Array<FilterDecl> {
   const labels = t.purchaseList.filters
-  const party = partyOf(role)
   const filter = purchaseFilter(role, cui, search)
   const chosenMany = (values: Array<string>) =>
     values.length > 2
@@ -49,9 +50,35 @@ export function purchaseFilterDecls({
   const states = choiceFromParam(search.stare) ?? []
   const types = choiceFromParam(search.tip) ?? []
   const period: Period = { from: search.de_la, to: search.pana_la }
-  const partyCui = search[party.param]
+  // A party filter: the supplier ("Firmă" on the list of every purchase), or the buyer.
+  const party = (param: 'furnizor' | 'institutie'): FilterDecl => {
+    const chosen = search[param]
+    const side = param === 'furnizor' ? 'supplier' : 'buyer'
+    return {
+      key: param,
+      kind: 'entity',
+      label:
+        cui === null && param === 'furnizor' ? labels.firma : labels[param],
+      value: chosen === undefined ? undefined : String(chosen),
+      chip:
+        chosen === undefined ? null : partyName(chosen, side, items, overview),
+      clear: { [param]: undefined },
+      lookup: async (find) =>
+        (await getPurchaseParties({ data: { filter, side, find } })).map(
+          (option) => ({
+            value: String(option.cui),
+            label: option.name,
+            sub: `CUI ${option.cui}`,
+            count: option.count,
+          }),
+        ),
+      patch: (next) => ({
+        [param]: next === undefined ? undefined : Number(next),
+      }),
+    }
+  }
 
-  return [
+  const decls: Array<FilterDecl> = [
     {
       key: 'perioada',
       kind: 'period',
@@ -120,29 +147,6 @@ export function purchaseFilterDecls({
       patch: (next) => ({ tip: choiceToParam(next) }),
     },
     {
-      key: party.param,
-      kind: 'entity',
-      label: labels[party.param],
-      value: partyCui === undefined ? undefined : String(partyCui),
-      chip:
-        partyCui === undefined
-          ? null
-          : partyName(partyCui, role, items, overview),
-      clear: { [party.param]: undefined },
-      lookup: async (find) =>
-        (
-          await getPurchaseParties({ data: { filter, side: party.api, find } })
-        ).map((option) => ({
-          value: String(option.cui),
-          label: option.name,
-          sub: `CUI ${option.cui}`,
-          count: option.count,
-        })),
-      patch: (next) => ({
-        [party.param]: next === undefined ? undefined : Number(next),
-      }),
-    },
-    {
       key: 'cpv',
       kind: 'code',
       label: labels.cpv,
@@ -162,16 +166,27 @@ export function purchaseFilterDecls({
       patch: (next) => ({ cpv: next }),
     },
   ]
+  const [periodDecl, value, state, type, cpv] = decls
+  // The list of every accepted purchase: both parties are filters; its state is fixed.
+  if (cui === null) {
+    return [
+      party('furnizor'),
+      party('institutie'),
+      countyFilter(search.judet, labels.judet),
+      cpv,
+      periodDecl,
+    ]
+  }
+  return [periodDecl, value, state, type, party(partyOf(role).param), cpv]
 }
 
 // The name of the party chosen, from the rows shown or the chart; its CUI if neither has it.
 function partyName(
   cui: number,
-  role: Role,
+  side: 'supplier' | 'buyer',
   items: Array<Purchase>,
   overview: PurchaseOverview,
 ) {
-  const side = role === 'institutions' ? 'supplier' : 'buyer'
   const fromRows = items.find((item) => item[side]?.cui === cui)?.[side]?.name
   const fromChart = overview.parties.find((each) => each.cui === cui)?.name
   return fromRows ?? fromChart ?? `CUI ${cui}`

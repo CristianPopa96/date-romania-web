@@ -7,29 +7,40 @@ import {
 import { Container, Flex, Grid, Heading, Link, Text } from '@radix-ui/themes'
 
 import { EntityLink } from '#/components/EntityLink'
-import { PlaceEuFunds } from '#/features/eu-projects/PlaceEuFunds'
 import { PlaceOverview } from '#/features/places/PlaceOverview'
+import { PlaceProjects } from '#/features/places/PlaceProjects'
+import {
+  projectListQuery,
+  projectsOverviewQuery,
+  validateProjectListSearch,
+} from '#/features/projects'
+import { countyCodeOfSlug } from '#/lib/counties'
 import { UatsTable } from '#/features/places/PlaceLists'
 import { WinnersCard } from '#/features/places/WinnersCard'
 import { messagesFor } from '#/i18n'
 import { useI18n } from '#/i18n/context'
 import { pageTitle } from '#/lib/copy'
 import { countyQuery } from '#/features/places/queries'
-import { euBeneficiaryQuery } from '#/features/eu-projects/queries'
 
 // A county (flow 6): the figures of its UATs and its council, each with its period, and
 // a table of its UATs to go on to (design round 8).
 export const Route = createFileRoute('/localitati/$judet/')({
-  loader: async ({ context, params }) => {
+  // The list of projects landing in the county: its county is the page's.
+  validateSearch: (search: Record<string, unknown>) => {
+    const { judet: _county, ...projects } = validateProjectListSearch(search)
+    return projects
+  },
+  loaderDeps: ({ search }) => search,
+  loader: async ({ context, params, deps }) => {
     const county = await context.queryClient.ensureQueryData(
       countyQuery(params.judet),
     )
     if (!county) throw notFound()
-    if (county.council) {
-      await context.queryClient.ensureQueryData(
-        euBeneficiaryQuery(county.council.cui),
-      )
-    }
+    const scope = { area: areaOf(params.judet) }
+    await Promise.all([
+      context.queryClient.ensureQueryData(projectListQuery(deps, scope)),
+      context.queryClient.ensureQueryData(projectsOverviewQuery(deps, scope)),
+    ])
     return { name: county.place.name }
   },
   head: ({ loaderData, match }) => ({
@@ -44,10 +55,17 @@ export const Route = createFileRoute('/localitati/$judet/')({
   component: CountyPage,
 })
 
+// The projects of a county are those its programme names it for (`/v1/projects?county=`).
+function areaOf(judet: string) {
+  return { county: countyCodeOfSlug(judet) ?? '' }
+}
+
 function CountyPage() {
   const { t, f } = useI18n()
   const p = t.places
   const { judet } = Route.useParams()
+  const search = Route.useSearch()
+  const navigate = Route.useNavigate()
   const { data: county } = useSuspenseQuery(countyQuery(judet))
   if (!county) return null
   const { figures } = county
@@ -99,7 +117,14 @@ function CountyPage() {
           <WinnersCard winners={figures.top_winners} />
         </Grid>
 
-        {county.council ? <PlaceEuFunds entity={county.council} /> : null}
+        <PlaceProjects
+          area={areaOf(judet)}
+          own={county.council}
+          search={search}
+          onSearch={(next) =>
+            void navigate({ search: next, resetScroll: false })
+          }
+        />
 
         <UatsTable
           uats={county.uats}

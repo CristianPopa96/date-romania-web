@@ -63,23 +63,3 @@ export const getEuSeap = createServerFn({ method: 'GET' })
       return 'failed'
     }
   })
-
-// The EU money of one beneficiary, of both kinds, never added together: its cohesion
-// projects by programme and its PNRR contracts and payments.
-export type EuBeneficiaryFunds = Schemas['EuBeneficiaryFunds']
-export type EuBeneficiaryPnrr = Schemas['EuBeneficiaryPnrr']
-
-// The entity is found before this is asked: null when the API has no such endpoint (a
-// site deployed before its API) and 'failed' when it did not answer, so the page stays up
-// without the EU money and never says there is none.
-export const getEuBeneficiary = createServerFn({ method: 'GET' })
-  .inputValidator((cui: number) => cui)
-  .handler(async ({ data }): Promise<EuBeneficiaryFunds | null | 'failed'> => {
-    try {
-      return await getJson<EuBeneficiaryFunds>(
-        `/v1/programmes/eu-beneficiaries/${data}`,
-      )
-    } catch {
-      return 'failed'
-    }
-  })

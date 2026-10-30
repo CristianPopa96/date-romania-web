@@ -94,7 +94,15 @@ export function InstitutionMoney({
   return (
     <>
       <GapPanel awarded={awarded} period={period} ends={gapEnds(data)} />
-      <BudgetSection answer={data} />
+      {/* Its budget is not held: said here, once. A held one is the "Buget" tab. */}
+      {data?.budget ? null : <BudgetSection answer={data} />}
     </>
   )
+}
+
+// The "Buget" tab of a town hall or a county council, the only institutions whose budget
+// is held (design round 13: after "Proiecte").
+export function BudgetTab({ cui }: { cui: number }) {
+  const { data } = useSuspenseQuery(budgetQuery(cui))
+  return <BudgetSection answer={data} />
 }

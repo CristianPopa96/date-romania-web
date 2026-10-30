@@ -36,13 +36,14 @@ export const entityContractsQuery = (role: Role, cui: number) =>
 // filters. `won` is how a company's list was won (wonOf); a buyer's holds both.
 export const contractListQuery = (
   role: Role,
-  cui: number,
+  cui: number | null,
   search: ContractListSearch & { pagina?: number },
   won?: Won,
 ) => {
   const data = {
     filter: contractFilter(role, cui, search, won),
-    ...contractApiSort(search),
+    // The list of every contract opens on the largest.
+    ...contractApiSort(search, cui === null),
     size: search.pe_pagina ?? 25,
     page: search.pagina ?? 1,
   }
@@ -55,13 +56,18 @@ export const contractListQuery = (
 
 export const contractOverviewQuery = (
   role: Role,
-  cui: number,
+  cui: number | null,
   search: ContractListSearch,
   won?: Won,
 ) => {
   const data = {
     filter: contractFilter(role, cui, search, won),
-    scope: role === 'institutions' ? ('buyer' as const) : ('supplier' as const),
+    scope:
+      cui === null
+        ? undefined
+        : role === 'institutions'
+          ? ('buyer' as const)
+          : ('supplier' as const),
   }
   return queryOptions({
     queryKey: ['contracts', 'overview', data],

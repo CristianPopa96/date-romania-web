@@ -17,6 +17,7 @@ import {
   projectsCsvPath,
 } from '#/features/projects/list'
 import type {
+  ProjectArea,
   ProjectListSearch,
   ProjectParty,
   ProjectScope,
@@ -46,6 +47,7 @@ export function ProjectList<TSearch extends ProjectListSearch>({
   fixed,
   cohesion,
   party,
+  area,
   title,
   titleAs,
 }: {
@@ -60,13 +62,20 @@ export function ProjectList<TSearch extends ProjectListSearch>({
   // An entity page's institution or company: its projects only, and on a company's, how
   // it is tied to each.
   party?: ProjectParty
+  // A place page's UAT or county: the projects landing there.
+  area?: ProjectArea
   title: string
   // h3 under an entity page's own heading for its lists.
   titleAs?: 'h2' | 'h3'
 }) {
   const { t, f } = useI18n()
   const p = t.projects
-  const scope: ProjectScope = { kind: fixed, codes: cohesion?.codes, party }
+  const scope: ProjectScope = {
+    kind: fixed,
+    codes: cohesion?.codes,
+    party,
+    area,
+  }
   const { data: list } = useSuspenseQuery(projectListQuery(search, scope))
   const { data: overview } = useSuspenseQuery(
     projectsOverviewQuery(search, scope),
@@ -107,12 +116,19 @@ export function ProjectList<TSearch extends ProjectListSearch>({
           fixedKind: fixed !== undefined,
           held: cohesion?.held,
           fixedParty: party !== undefined,
+          fixedArea: area !== undefined,
           t,
           f,
         }),
         onApply: apply,
       }}
-      summary={summaryLine(overview, fixed, t, f, party !== undefined)}
+      summary={summaryLine(
+        overview,
+        fixed,
+        t,
+        f,
+        party !== undefined || area !== undefined,
+      )}
       views={
         found.projects > 0 && !cohesion
           ? {
