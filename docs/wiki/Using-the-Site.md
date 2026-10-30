@@ -13,11 +13,16 @@ Every name of an institution or company is a link to its page, so you can keep
 following the money from any page. The top bar on every page holds the sections that
 exist today and a search field:
 
+- **"Proiecte"**: every project of every programme followed (the EU recovery plan, PNRR;
+  the EU cohesion funds; the Anghel Saligny investment programme), and each programme's
+  own page.
+- **"Clasamente"**: every contract, every accepted direct purchase, the companies and
+  institutions ranked, and the patterns.
 - **"Localități"**: every county, town and commune.
-- **"Clasamente"**: rankings of the largest contracts, companies and institutions.
-- **"Programe"**: the programmes followed: the EU recovery plan (PNRR), the EU cohesion
-  funds and the Anghel Saligny investment programme.
 - **"Surse"**: where the data comes from, how it is counted, and corrections.
+
+The page of a notice, a direct purchase, an institution or a company belongs to no
+section: you reach it from search, a list, a ranking or another record.
 
 ## Home
 
@@ -60,25 +65,23 @@ The page of a public body as a **buyer** (a town hall, a hospital, a ministry…
    last the Anghel Saligny payments to it. The three cover different periods, so each
    box names its own, no bars are drawn and no difference is computed: the note under
    them opens "Perioadele diferă: …". A box not held is marked "Încă necolectat".
-3. **"Buget"**: for a town hall or a county council, "Venituri · 2024" (revenue in seven
-   lines that add up to the total: state subsidies, income tax shares, VAT shares, own
-   revenue, EU funds, subsidies from other administrations, other) and "Cheltuieli ·
-   2024" (capital spending, then spending by chapter: transport, education…), both
-   executed to 31.12.2024, from the Ministry of Development. The Anghel Saligny payments
-   to it are a card of their own, never added to the subsidies, with a link to its
-   projects. Any other institution (a school, a hospital, a ministry) shows "Încă
-   necolectat": the Finance Ministry publishes its budget, but it cannot be collected
-   yet.
-4. **Figures**: "Contracte atribuite" (contracts awarded, signed in the period held) and
+   Any institution but a town hall or a county council then says its budget is "Încă
+   necolectat": the Finance Ministry publishes it, but it cannot be collected yet.
+3. **Figures**: "Contracte atribuite" (contracts awarded, signed in the period held) and
    "Achiziții directe acceptate" (accepted direct purchases). The two are never added
    together.
-5. **Tabs**:
+4. **Tabs**:
    - "Contracte": the contracts it awarded, with winner, value and signing date, and a
      CSV export.
    - "Achiziții directe": every direct purchase, as a list you can filter, sort and
      chart (see below).
-   - "Proiecte europene" and "Contracte PNRR", when it is the beneficiary of EU money
-     (see below).
+   - "Proiecte {n}", when it is the beneficiary of projects of any programme (see below).
+   - "Buget", for a town hall or a county council: "Venituri · 2024" (revenue in seven
+     lines that add up to the total: state subsidies, income tax shares, VAT shares, own
+     revenue, EU funds, subsidies from other administrations, other) and "Cheltuieli ·
+     2024" (capital spending, then spending by chapter: transport, education…), both
+     executed to 31.12.2024, from the Ministry of Development. The Anghel Saligny
+     payments to it are a card of their own, never added to the subsidies.
 
 The page opens on the tab that has something to show. The link in your browser keeps
 the tab, page and order you chose, so you can share exactly what you see.
@@ -118,8 +121,8 @@ back, and how many, with a button that removes it. Every choice is kept in the l
 
 ### The other lists of an institution or a company
 
-The tabs "Contracte", "Proiecte europene" and "Contracte PNRR" work the same way: a
-search, filters, a summary line, charts, sortable columns and the pager. What differs:
+The tabs "Contracte" and "Proiecte" work the same way: a search, filters, a summary
+line, charts, sortable columns and the pager. What differs:
 
 - **Contracte**: filters by period (the day signed), value, the other party, CPV, "Fel"
   (an ordinary or a subsequent contract) and "Fonduri UE". A company's list is either the
@@ -127,34 +130,31 @@ search, filters, a summary line, charts, sortable columns and the pager. What di
   opens on what it won alone, and "Câștigat" switches. On an institution's page the
   chart ranks the winners by what they won alone; the contracts won by associations are
   a bar of their own, never given to one member.
-- **Proiecte europene**: filters by programme, status and value. Each programme's figures
-  are of its own list's day, so they are never added: the summary gives a value only
-  when one programme is chosen. The charts show the value per programme, side by side,
-  and the projects by status.
-- **Contracte PNRR**: filters by measure, status, value and physical progress. A
-  contract's status and progress are those all its measures agree on; one whose measures
-  differ is counted apart. The charts show the contracts by status and by progress.
+- **Proiecte**: see below.
 
-### EU money of an institution or a company
+### Projects of an institution or a company
 
-![The EU projects tab of an institution](images/institution-eu.png)
+![The projects tab of an institution](images/institution-projects.png)
 
-An institution or a company that receives EU money has one tab for each kind it has.
-The two kinds are never added together.
+"Proiecte" holds the projects of every programme in one list.
 
-- **"Proiecte europene"**: its cohesion projects. First comes a table by programme with
-  the number of projects, their value, what was paid and the day of the programme's
-  list. It has no total row, because each programme's list describes a different day.
-  Then come the projects one by one, largest first. The "Legătură" column says how the
-  project was tied to this institution or company: "CUI în listă" when the list gives
-  its tax ID, or "Nume și localitate" when the list gives only a name and Date România
-  matched it. When some projects were matched by name, a line above the table says how
-  many, and the programme table says it for each programme ("din care unul după nume").
-- **"Contracte PNRR"**: the value of its PNRR financing contracts, and the PNRR payments
-  it received with the first and last day. A payment names the beneficiary and a
-  measure, never the contract, so the payments are never split among its contracts.
-  Then comes the list of contracts. A beneficiary that was paid on a measure where it
-  has no contract still has the tab, with the payments and a line saying so.
+- **An institution's**: every project it is the beneficiary of. Above the list, a table
+  by programme ("Pe programe, fiecare la data lui") gives the number of projects, their
+  value, what was paid and the day of that figure. What was paid is named the way each
+  programme publishes it: "în fișierele MDLPA" (Anghel Saligny), "beneficiarului, pe
+  toate măsurile" (PNRR: a payment names the beneficiary and a measure, never the
+  contract), "cumulat, fără dată" (cohesion). It has no total row, because each
+  programme's figure is of its own day. A programme whose list gives no paid figure for
+  one of its projects shows "Nepublicat", never a partial sum.
+- **The list** counts across programmes and gives a value only once one programme is
+  chosen with the "Program" chip. Each row opens the project's page, and "Drum urmărit"
+  shows how far its money is followed (see [Projects](#projects)).
+- **A company's**: the projects it was paid through. A "Legătura" column says how:
+  "beneficiar", "constructor în fișierul de plăți" (named by the Anghel Saligny payment
+  file), "câștigător al unui anunț legat" or "furnizor al unei achiziții legate" (a SEAP
+  record whose text cites the project). The last two are "Probabil": the tie is made by
+  us from what the buyer wrote. A company has no table by programme: what a programme
+  paid its beneficiary is not what the company was paid.
 
 ## Company page
 
@@ -166,8 +166,8 @@ The same layout, flipped: a company as a **seller**.
   of an association, at the full value of the contract) and "Achiziții directe
   acceptate". They sit side by side and are never added, because a contract won in an
   association would otherwise be counted once per member.
-- Tabs: its contracts, and the institutions it sold to directly, with every sale. A
-  company that receives EU money has the same two EU tabs as an institution.
+- Tabs: its contracts, the institutions it sold to directly with every sale, and
+  "Proiecte" when it was paid through a project (see above).
 
 ## Award notice page
 
@@ -223,11 +223,10 @@ municipalities, Bucharest sectors) and people. A county opens its page.
 
 ![A county page](images/county.png)
 
-**A county.** The same figures as a locality,
-added up over its UATs and its county council, the county council's EU money in short,
-then a table of every UAT with its
-population, capital spending in 2024 (the year of the UATs' budgets, the council's left
-out) and contracts signed in the period held.
+**A county.** The same figures as a locality, added up over its UATs and its county
+council; "Proiecte în zonă", the projects whose programme names the county; then a table
+of every UAT with its population, capital spending in 2024 (the year of the UATs'
+budgets, the council's left out) and contracts signed in the period held.
 
 ![A commune page](images/commune.png)
 
@@ -242,13 +241,12 @@ out) and contracts signed in the period held.
    with members in several counties is counted apart).
 3. The town hall's budget (its largest revenue lines, and a link to the whole budget on
    its page), and who gets the contracts, each supplier with its county.
-4. "Proiecte în zonă": the town hall's Anghel Saligny projects, with the progress as the
-   town hall types it and whether a SEAP contract was found. Under them, "Fonduri
-   europene": the town hall's EU money in two lines ("2 contracte PNRR · plăți primite
-   2,3 mil. lei, 19.12.2025–02.10.2026"), each with a link to the full list on the town
-   hall's page. Projects matched to the town hall by name are counted as such. Only the
-   town hall's own projects are shown here, not those of every company or institution
-   located in the place.
+4. "Proiecte în zonă": every project landing here, of every beneficiary and programme,
+   as the list of projects (see [Projects](#projects)) fixed to the place. A project
+   lands here when its Anghel Saligny payment is for this place, or when ANAF records
+   its beneficiary here; a ministry's projects therefore land where it is registered.
+   Under the list, a link opens the town hall's own projects on its page, when it has
+   any.
 5. "Plăți ale primăriei": we do not hold whom the town hall paid; its payments can be
    asked for under Law 544/2001.
 6. "Instituții din localitate": every institution located here, with its contracts and,
@@ -262,20 +260,35 @@ of its own: searching it opens its UAT, with the line "Localitatea X face parte 
 
 ![The rankings](images/rankings.png)
 
-Five tabs, each a measurable fact with its source:
+"Clasamente" holds the SEAP records and who they are with, in five tabs:
 
-| Tab                       | What it ranks                                                                                               |
-| ------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| "Cele mai mari contracte" | The largest contracts signed in the period                                                                  |
-| "Furnizori"               | Companies by value of contracts won; switch between won alone ("Singur") and in association ("În asociere") |
-| "Achiziții directe"       | Suppliers and institutions by accepted direct purchases, kept apart from contracts                          |
-| "Instituții"              | Institutions by value of contracts awarded                                                                  |
-| "Tipare"                  | Patterns worth asking documents about (see below)                                                           |
+| Tab                 | What it holds                                                                                                                           |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| "Contracte"         | Every contract signed in the period, the largest first. A row opens its award notice                                                    |
+| "Furnizori"         | Companies ranked by contracts won (alone, "Singur", or in association, "În asociere") or, with the switch, by accepted direct purchases |
+| "Achiziții directe" | Every accepted direct purchase, the largest first. A row opens the purchase                                                             |
+| "Instituții"        | Institutions ranked by contracts awarded or, with the switch, by accepted direct purchases                                              |
+| "Tipare"            | Patterns worth asking documents about (see below)                                                                                       |
 
-Filters: **CPV** (the category of what was bought, by its first two digits, for example
-45 for construction works) on every tab, and **Fonduri UE** (EU funds: yes or no) on the
-contract tabs. A note says which filters cannot be offered yet (year, county,
-institution type) and why.
+**The two lists** work like every list on the site (search, filters, summary line,
+charts, sortable columns, a CSV file):
+
+- "Contracte" filters by "Firmă" (the winner, alone or in association), "Instituție"
+  (the buyer), "Câștigat", "Județ" (where ANAF records the buyer), "CPV", "Fonduri UE"
+  and the period. With a company chosen, the list holds what it won alone and in
+  association, a "Câștigat" column says which, and no sum is given until one way is
+  chosen: the two are never added.
+- "Achiziții directe" filters by "Firmă", "Instituție", "Județ", "CPV" and the period. It
+  holds accepted purchases only, so it gives their count and their sum; those published
+  above their legal limit are named apart. A file holds at most 100,000 purchases: the
+  whole country is far more, so choose filters first.
+
+**The rankings** of companies and institutions show one kind of money at a time: the
+switch above the list ("Clasament după: Contracte | Achiziții directe") changes the
+ranking, its title and the order line, never adding the two. Their filters: "Județ" (of
+the company or institution ranked), "CPV" (the category of what was bought, by its first
+two digits, for example 45 for construction works), "Fonduri UE" on contracts, and the
+period on direct purchases. The ten largest are drawn as tiles; one opens its page.
 
 ![The patterns tab](images/patterns.png)
 
@@ -289,10 +302,34 @@ value close to the ceiling does not prove a purchase was split. Services of Anne
 page says how many there are. Patterns that the data cannot give yet are listed with the
 reason.
 
+## Projects
+
+![Every project of every programme](images/projects.png)
+
+`/proiecte` lists every project of every programme followed: Anghel Saligny projects,
+PNRR financing contracts and EU cohesion projects.
+
+- Filters: "Program", "Județ", "Stare", "Valoare" and "Drum urmărit", and a search by
+  words, SMIS code or financing contract number.
+- The summary counts projects and how many are followed to the companies. Programmes are
+  never added: a value appears only once one programme is chosen.
+- Two charts count projects, never sums: "Proiecte pe programe", and "Cât de departe
+  urmărim drumul".
+- **"Drum urmărit"** on every row: how far the project's money is followed, "până la
+  beneficiar", "până la plăți", "până la achiziții" or "până la firme", with an amber
+  stop where the payments cannot be followed. It is a reading aid, not a score.
+
+**A project's page** (`/proiecte/{programme}/{id}`) has the same frame for every
+programme: the programme's own figures, each with its day, then **"Drumul banilor"**,
+the chain from the funder to the firms, then the payments in the shape the programme
+publishes them, the contracts and purchases tied to the project, what is not public, and
+the sources. A step we cannot follow is drawn dashed, with its reason. The programme
+sections below say what each programme adds.
+
 ## Programmes
 
-"Programe" lists the three programmes followed, each with its own page: the PNRR, the
-EU cohesion funds and Anghel Saligny.
+"Proiecte" also leads to the three programmes' own pages: the PNRR, the EU cohesion
+funds and Anghel Saligny.
 
 ### Anghel Saligny
 
@@ -305,8 +342,8 @@ for roads, water, sewage and gas works.
   halls and county councils paid, and the share of the money that could be tied,
   probably, to one SEAP contract.
 - "Cum s-au legat plățile": how a payment is tied to a contract, in plain words.
-- "Urmărește un proiect": a finder with a county select, a match-state filter and a
-  search on the town hall or the works.
+- Its projects: the list of every project (see [Projects](#projects)) fixed to Anghel
+  Saligny.
 - The list of payment files held, with how many name the builder's CUI.
 
 ![An Anghel Saligny project page](images/project.png)
@@ -324,8 +361,8 @@ are listed below. A project has one of four states:
 | "Niciun contract găsit"            | The chain stops at the builder; likely reasons are listed            |
 | "Constructor numit doar cu numele" | The file gives only the builder's name, no CUI, so no search is made |
 
-From a project you can open the builder's page, the town hall's page, the SEAP notice,
-or every project of the same builder.
+From a project you can open the builder's page, the town hall's page and the SEAP
+notice; the builder's page lists every project it was paid through.
 
 ### PNRR
 
@@ -339,7 +376,8 @@ or every project of the same builder.
   "Cei mai mari beneficiari": the largest final recipients, which an EU rule asks every
   country to publish.
 - A measure (`/programe/pnrr/c10.i3`): its money, what went to beneficiaries with no
-  contract on it, and its contracts, by county, status or words. Contracts of natural
+  contract on it, and its contracts, by county, beneficiary, "Tip beneficiar" (the kind
+  of beneficiary, in the dashboard's own words), status, value, progress or words. Contracts of natural
   persons (afforestation grants) are never listed or named; the page says how many there
   are.
 - A contract (`/proiecte/pnrr/{id}`): its value, the progress the ministry
@@ -365,8 +403,10 @@ programmes and the national programmes of 2021–2027. The regional programmes o
 - "Programele": one row per programme with its projects, value, paid so far and the day
   its list describes. Each programme has its own list and its own day, so the programmes
   are never added together.
-- "Proiectele": a finder by programme, by status ("În implementare", "Finalizat",
-  "Reziliat"), or by words in the title, the beneficiary's name or the SMIS code.
+- "Proiectele": the list of every project fixed to the cohesion programmes, by
+  programme, status ("În implementare", "Finalizat", "Reziliat") or words in the title,
+  the beneficiary's name or the SMIS code. It has no chart: the table above already
+  compares the programmes.
 
 ![An EU project page](images/eu-project.png)
 
@@ -410,10 +450,12 @@ an hour.
 
 ## Downloads
 
-Every list of contracts has a download button that gives a CSV file (it opens in Excel
-or any spreadsheet program): all contracts of the period from "Surse", or one
-institution's or one company's contracts from its page. The purchases behind the "just
-under the ceiling" pattern download from the "Tipare" tab.
+Every list has a download button that gives a CSV file (it opens in Excel or any
+spreadsheet program), with the filters and the order shown: every contract (from "Surse"
+or "Clasamente"), an institution's or a company's contracts and direct purchases, the
+lists of projects (a company's says how it is tied to each), and the purchases behind
+the "just under the ceiling" pattern from "Tipare". A file of direct purchases holds at
+most 100,000 rows.
 
 Each row keeps its source and the day it was read. The data is free to reuse under CC BY
 4.0, naming Date România and the original source.

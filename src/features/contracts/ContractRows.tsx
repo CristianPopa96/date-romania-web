@@ -44,7 +44,7 @@ export function ContractRows({
     key: 'institutie',
     header: t.contracts.buyer,
     sort: { column: 'institutie', text: true },
-    cell: (contract) => <Party contract={contract} role="suppliers" />,
+    cell: (contract) => <Buyer contract={contract} />,
   }
   const won: Column<Contract> = {
     key: 'castigat',
@@ -107,7 +107,7 @@ export function ContractRows({
             </Box>
             {every ? (
               <Box mt="1">
-                <Party contract={contract} role="suppliers" />
+                <Buyer contract={contract} />
               </Box>
             ) : null}
           </Box>
@@ -185,19 +185,24 @@ function Party({ contract, role }: { contract: Contract; role: Role }) {
   if (role === 'institutions') return <Winners winners={contract.winners} />
   return (
     <>
-      {contract.buyer ? (
-        <EntityLink role="institutions" cui={contract.buyer.cui}>
-          {contract.buyer.name}
-        </EntityLink>
-      ) : (
-        (contract.buyer_text ?? <DataState kind="notPublished" />)
-      )}
+      <Buyer contract={contract} />
       {contract.winners.length > 1 ? (
         <Box mt="1">
           <Winners winners={contract.winners} />
         </Box>
       ) : null}
     </>
+  )
+}
+
+// The buyer alone: on the list of every contract, the winners have their own column.
+function Buyer({ contract }: { contract: Contract }) {
+  return contract.buyer ? (
+    <EntityLink role="institutions" cui={contract.buyer.cui}>
+      {contract.buyer.name}
+    </EntityLink>
+  ) : (
+    <>{contract.buyer_text ?? <DataState kind="notPublished" />}</>
   )
 }
 
