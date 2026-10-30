@@ -7,6 +7,8 @@ import type { Patch } from '#/components/list/filter-types'
 import { ListEmpty } from '#/components/list/ListEmpty'
 import { ListView } from '#/components/list/ListView'
 import { RankBars } from '#/components/list/RankBars'
+import { TreeMap } from '#/components/list/TreeMap'
+import type { TreeTile } from '#/components/list/TreeMap'
 import { IncompleteContracts, PeriodNote } from '#/components/Notes'
 import { SourceLine } from '#/components/SourceLine'
 import { cpvDivisionsQuery } from '#/features/patterns'
@@ -80,6 +82,38 @@ export function RankingList({
       ? { first: summary.first_day, last: summary.last_day }
       : null
   const bars = top === 'failed' || !top ? [] : top.items
+  // The ten largest, and the rest added up as one tile. Won in association, a contract
+  // is in the value of each of its members, so the rest would count it again: left out.
+  const association = search.castigate === 'asociere'
+  const rest =
+    top === 'failed' || !top || association
+      ? null
+      : {
+          parties: top.total - bars.length,
+          value: top.value - bars.reduce((sum, row) => sum + row.value, 0),
+        }
+  const tiles: Array<TreeTile> = [
+    ...bars.map((row) => ({
+      key: String(row.cui),
+      label: row.name,
+      value: row.value,
+      detail: countText(row.count),
+      pick: () =>
+        void navigate({
+          to: role === 'institutions' ? '/institutii/$cui' : '/furnizori/$cui',
+          params: { cui: String(row.cui) },
+        }),
+    })),
+    ...(rest && rest.parties > 0 && rest.value > 0
+      ? [
+          {
+            key: 'rest',
+            label: l.rest(role, rest.parties, f.count(rest.parties)),
+            value: rest.value,
+          },
+        ]
+      : []),
+  ]
   const source = sourceOf(list)
 
   return (
@@ -137,30 +171,32 @@ export function RankingList({
           onSort,
         }}
         charts={
-          <ChartCard
-            title={l.topTitle}
-            unit={l.topUnit}
-            hint={l.topHint}
-            rows={bars.map((row) => [row.name, f.lei(row.value)])}
-          >
-            <RankBars
-              rows={bars.map((row) => ({
-                key: String(row.cui),
-                label: row.name,
-                value: row.value,
-                detail: countText(row.count),
-                pick: () =>
-                  void navigate({
-                    to:
-                      role === 'institutions'
-                        ? '/institutii/$cui'
-                        : '/furnizori/$cui',
-                    params: { cui: String(row.cui) },
-                  }),
-              }))}
-              format={f.leiShort}
-            />
-          </ChartCard>
+          // In a row, as every list's charts: a card's size is its width there.
+          <Flex gap="3" wrap="wrap" align="stretch">
+            <ChartCard
+              title={
+                association
+                  ? l.topTitleAssociation
+                  : q
+                    ? l.topTitleSearch
+                    : l.topTitle
+              }
+              unit={l.topUnit}
+              hint={association ? l.topHintBars : l.topHint}
+              rows={tiles.map((tile) => [tile.label, f.lei(tile.value)])}
+            >
+              {/* Won in association, a contract is in each member's value: two tiles could
+                  be the same money, so they are bars, never parts of one whole. */}
+              {association ? (
+                <RankBars
+                  rows={tiles.map((tile) => ({ ...tile, on: false }))}
+                  format={f.leiShort}
+                />
+              ) : (
+                <TreeMap tiles={tiles} format={f.leiShort} />
+              )}
+            </ChartCard>
+          </Flex>
         }
         rows={
           <RankingRows

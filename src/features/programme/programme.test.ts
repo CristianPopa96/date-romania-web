@@ -3,11 +3,8 @@ import { describe, expect, it } from 'vitest'
 import type { TraceBuilder, TraceContract } from '#/features/programme/api'
 import {
   chainEnd,
-  countyKey,
   countySlug,
   isAssociation,
-  isMatchParam,
-  matchParam,
   partnerNames,
   progressShare,
   tiedShare,
@@ -51,19 +48,9 @@ function builder(more: Partial<TraceBuilder> = {}): TraceBuilder {
 }
 
 describe('counties in an address', () => {
-  it('writes a county without capitals and spaces, and reads it back', () => {
+  it('writes a county without capitals and spaces', () => {
     expect(countySlug('BISTRITA NASAUD')).toBe('bistrita-nasaud')
-    expect(countyKey('bistrita-nasaud')).toBe('BISTRITA NASAUD')
-    expect(countyKey(countySlug('GORJ'))).toBe('GORJ')
-  })
-})
-
-describe('matchParam', () => {
-  it('names every match state the way the address does', () => {
-    expect(matchParam('one')).toBe('un-contract')
-    expect(matchParam('several')).toBe('mai-multe')
-    expect(matchParam('none')).toBe('niciunul')
-    expect(matchParam('unnamed')).toBe('fara-cui')
+    expect(countySlug('GORJ')).toBe('gorj')
   })
 })
 
@@ -147,15 +134,6 @@ describe('chainEnd', () => {
     expect(
       chainEnd(builder({ cui: null, match: 'unnamed', contracts: [] })),
     ).toEqual({ kind: 'unnamed' })
-  })
-})
-
-describe('isMatchParam', () => {
-  it('takes the four names and nothing an object happens to have', () => {
-    expect(isMatchParam('mai-multe')).toBe(true)
-    expect(isMatchParam('toString')).toBe(false)
-    expect(isMatchParam('constructor')).toBe(false)
-    expect(isMatchParam(undefined)).toBe(false)
   })
 })
 

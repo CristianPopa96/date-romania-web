@@ -14,6 +14,7 @@ import { Route as AchizitiiDirecteDotcsvRouteImport } from './routes/achizitii-d
 import { Route as CautareRouteImport } from './routes/cautare'
 import { Route as ClasamenteRouteImport } from './routes/clasamente'
 import { Route as ContracteDotcsvRouteImport } from './routes/contracte[.]csv'
+import { Route as ProiecteDotcsvRouteImport } from './routes/proiecte[.]csv'
 import { Route as SurseRouteImport } from './routes/surse'
 import { Route as TipareDotcsvRouteImport } from './routes/tipare[.]csv'
 import { Route as AchizitiiDirecteIdRouteImport } from './routes/achizitii-directe.$id'
@@ -22,12 +23,14 @@ import { Route as FurnizoriCuiRouteImport } from './routes/furnizori.$cui'
 import { Route as InstitutiiCuiRouteImport } from './routes/institutii.$cui'
 import { Route as LocalitatiIndexRouteImport } from './routes/localitati.index'
 import { Route as ProgrameIndexRouteImport } from './routes/programe.index'
+import { Route as ProiecteIndexRouteImport } from './routes/proiecte.index'
 import { Route as LocalitatiJudetIndexRouteImport } from './routes/localitati.$judet.index'
 import { Route as LocalitatiJudetUatRouteImport } from './routes/localitati.$judet.$uat'
 import { Route as ProgrameAnghelSalignyIndexRouteImport } from './routes/programe.anghel-saligny.index'
 import { Route as ProgrameFonduriEuropeneIndexRouteImport } from './routes/programe.fonduri-europene.index'
 import { Route as ProgramePnrrIndexRouteImport } from './routes/programe.pnrr.index'
 import { Route as ProgramePnrrMasuraRouteImport } from './routes/programe.pnrr.$masura'
+import { Route as ProiecteAnghelSalignyIdRouteImport } from './routes/proiecte.anghel-saligny.$id'
 import { Route as ProgrameAnghelSalignyProiecteIdRouteImport } from './routes/programe.anghel-saligny.proiecte.$id'
 import { Route as ProgrameFonduriEuropeneProiecteSmisRouteImport } from './routes/programe.fonduri-europene.proiecte.$smis'
 import { Route as ProgramePnrrContracteIdRouteImport } from './routes/programe.pnrr.contracte.$id'
@@ -55,6 +58,11 @@ const ClasamenteRoute = ClasamenteRouteImport.update({
 const ContracteDotcsvRoute = ContracteDotcsvRouteImport.update({
   id: '/contracte.csv',
   path: '/contracte.csv',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProiecteDotcsvRoute = ProiecteDotcsvRouteImport.update({
+  id: '/proiecte.csv',
+  path: '/proiecte.csv',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SurseRoute = SurseRouteImport.update({
@@ -97,6 +105,11 @@ const ProgrameIndexRoute = ProgrameIndexRouteImport.update({
   path: '/programe/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProiecteIndexRoute = ProiecteIndexRouteImport.update({
+  id: '/proiecte/',
+  path: '/proiecte/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LocalitatiJudetIndexRoute = LocalitatiJudetIndexRouteImport.update({
   id: '/localitati/$judet/',
   path: '/localitati/$judet/',
@@ -129,6 +142,11 @@ const ProgramePnrrMasuraRoute = ProgramePnrrMasuraRouteImport.update({
   path: '/programe/pnrr/$masura',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProiecteAnghelSalignyIdRoute = ProiecteAnghelSalignyIdRouteImport.update({
+  id: '/proiecte/anghel-saligny/$id',
+  path: '/proiecte/anghel-saligny/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProgrameAnghelSalignyProiecteIdRoute =
   ProgrameAnghelSalignyProiecteIdRouteImport.update({
     id: '/programe/anghel-saligny/proiecte/$id',
@@ -153,6 +171,7 @@ export interface FileRoutesByFullPath {
   '/cautare': typeof CautareRoute
   '/clasamente': typeof ClasamenteRoute
   '/contracte.csv': typeof ContracteDotcsvRoute
+  '/proiecte.csv': typeof ProiecteDotcsvRoute
   '/surse': typeof SurseRoute
   '/tipare.csv': typeof TipareDotcsvRoute
   '/achizitii-directe/$id': typeof AchizitiiDirecteIdRoute
@@ -161,8 +180,10 @@ export interface FileRoutesByFullPath {
   '/institutii/$cui': typeof InstitutiiCuiRoute
   '/localitati/': typeof LocalitatiIndexRoute
   '/programe/': typeof ProgrameIndexRoute
+  '/proiecte/': typeof ProiecteIndexRoute
   '/localitati/$judet/$uat': typeof LocalitatiJudetUatRoute
   '/programe/pnrr/$masura': typeof ProgramePnrrMasuraRoute
+  '/proiecte/anghel-saligny/$id': typeof ProiecteAnghelSalignyIdRoute
   '/localitati/$judet/': typeof LocalitatiJudetIndexRoute
   '/programe/anghel-saligny/': typeof ProgrameAnghelSalignyIndexRoute
   '/programe/fonduri-europene/': typeof ProgrameFonduriEuropeneIndexRoute
@@ -177,6 +198,7 @@ export interface FileRoutesByTo {
   '/cautare': typeof CautareRoute
   '/clasamente': typeof ClasamenteRoute
   '/contracte.csv': typeof ContracteDotcsvRoute
+  '/proiecte.csv': typeof ProiecteDotcsvRoute
   '/surse': typeof SurseRoute
   '/tipare.csv': typeof TipareDotcsvRoute
   '/achizitii-directe/$id': typeof AchizitiiDirecteIdRoute
@@ -185,8 +207,10 @@ export interface FileRoutesByTo {
   '/institutii/$cui': typeof InstitutiiCuiRoute
   '/localitati': typeof LocalitatiIndexRoute
   '/programe': typeof ProgrameIndexRoute
+  '/proiecte': typeof ProiecteIndexRoute
   '/localitati/$judet/$uat': typeof LocalitatiJudetUatRoute
   '/programe/pnrr/$masura': typeof ProgramePnrrMasuraRoute
+  '/proiecte/anghel-saligny/$id': typeof ProiecteAnghelSalignyIdRoute
   '/localitati/$judet': typeof LocalitatiJudetIndexRoute
   '/programe/anghel-saligny': typeof ProgrameAnghelSalignyIndexRoute
   '/programe/fonduri-europene': typeof ProgrameFonduriEuropeneIndexRoute
@@ -202,6 +226,7 @@ export interface FileRoutesById {
   '/cautare': typeof CautareRoute
   '/clasamente': typeof ClasamenteRoute
   '/contracte.csv': typeof ContracteDotcsvRoute
+  '/proiecte.csv': typeof ProiecteDotcsvRoute
   '/surse': typeof SurseRoute
   '/tipare.csv': typeof TipareDotcsvRoute
   '/achizitii-directe/$id': typeof AchizitiiDirecteIdRoute
@@ -210,8 +235,10 @@ export interface FileRoutesById {
   '/institutii/$cui': typeof InstitutiiCuiRoute
   '/localitati/': typeof LocalitatiIndexRoute
   '/programe/': typeof ProgrameIndexRoute
+  '/proiecte/': typeof ProiecteIndexRoute
   '/localitati/$judet/$uat': typeof LocalitatiJudetUatRoute
   '/programe/pnrr/$masura': typeof ProgramePnrrMasuraRoute
+  '/proiecte/anghel-saligny/$id': typeof ProiecteAnghelSalignyIdRoute
   '/localitati/$judet/': typeof LocalitatiJudetIndexRoute
   '/programe/anghel-saligny/': typeof ProgrameAnghelSalignyIndexRoute
   '/programe/fonduri-europene/': typeof ProgrameFonduriEuropeneIndexRoute
@@ -228,6 +255,7 @@ export interface FileRouteTypes {
     | '/cautare'
     | '/clasamente'
     | '/contracte.csv'
+    | '/proiecte.csv'
     | '/surse'
     | '/tipare.csv'
     | '/achizitii-directe/$id'
@@ -236,8 +264,10 @@ export interface FileRouteTypes {
     | '/institutii/$cui'
     | '/localitati/'
     | '/programe/'
+    | '/proiecte/'
     | '/localitati/$judet/$uat'
     | '/programe/pnrr/$masura'
+    | '/proiecte/anghel-saligny/$id'
     | '/localitati/$judet/'
     | '/programe/anghel-saligny/'
     | '/programe/fonduri-europene/'
@@ -252,6 +282,7 @@ export interface FileRouteTypes {
     | '/cautare'
     | '/clasamente'
     | '/contracte.csv'
+    | '/proiecte.csv'
     | '/surse'
     | '/tipare.csv'
     | '/achizitii-directe/$id'
@@ -260,8 +291,10 @@ export interface FileRouteTypes {
     | '/institutii/$cui'
     | '/localitati'
     | '/programe'
+    | '/proiecte'
     | '/localitati/$judet/$uat'
     | '/programe/pnrr/$masura'
+    | '/proiecte/anghel-saligny/$id'
     | '/localitati/$judet'
     | '/programe/anghel-saligny'
     | '/programe/fonduri-europene'
@@ -276,6 +309,7 @@ export interface FileRouteTypes {
     | '/cautare'
     | '/clasamente'
     | '/contracte.csv'
+    | '/proiecte.csv'
     | '/surse'
     | '/tipare.csv'
     | '/achizitii-directe/$id'
@@ -284,8 +318,10 @@ export interface FileRouteTypes {
     | '/institutii/$cui'
     | '/localitati/'
     | '/programe/'
+    | '/proiecte/'
     | '/localitati/$judet/$uat'
     | '/programe/pnrr/$masura'
+    | '/proiecte/anghel-saligny/$id'
     | '/localitati/$judet/'
     | '/programe/anghel-saligny/'
     | '/programe/fonduri-europene/'
@@ -301,6 +337,7 @@ export interface RootRouteChildren {
   CautareRoute: typeof CautareRoute
   ClasamenteRoute: typeof ClasamenteRoute
   ContracteDotcsvRoute: typeof ContracteDotcsvRoute
+  ProiecteDotcsvRoute: typeof ProiecteDotcsvRoute
   SurseRoute: typeof SurseRoute
   TipareDotcsvRoute: typeof TipareDotcsvRoute
   AchizitiiDirecteIdRoute: typeof AchizitiiDirecteIdRoute
@@ -309,8 +346,10 @@ export interface RootRouteChildren {
   InstitutiiCuiRoute: typeof InstitutiiCuiRoute
   LocalitatiIndexRoute: typeof LocalitatiIndexRoute
   ProgrameIndexRoute: typeof ProgrameIndexRoute
+  ProiecteIndexRoute: typeof ProiecteIndexRoute
   LocalitatiJudetUatRoute: typeof LocalitatiJudetUatRoute
   ProgramePnrrMasuraRoute: typeof ProgramePnrrMasuraRoute
+  ProiecteAnghelSalignyIdRoute: typeof ProiecteAnghelSalignyIdRoute
   LocalitatiJudetIndexRoute: typeof LocalitatiJudetIndexRoute
   ProgrameAnghelSalignyIndexRoute: typeof ProgrameAnghelSalignyIndexRoute
   ProgrameFonduriEuropeneIndexRoute: typeof ProgrameFonduriEuropeneIndexRoute
@@ -355,6 +394,13 @@ declare module '@tanstack/react-router' {
       path: '/contracte.csv'
       fullPath: '/contracte.csv'
       preLoaderRoute: typeof ContracteDotcsvRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/proiecte.csv': {
+      id: '/proiecte.csv'
+      path: '/proiecte.csv'
+      fullPath: '/proiecte.csv'
+      preLoaderRoute: typeof ProiecteDotcsvRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/surse': {
@@ -413,6 +459,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProgrameIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/proiecte/': {
+      id: '/proiecte/'
+      path: '/proiecte'
+      fullPath: '/proiecte/'
+      preLoaderRoute: typeof ProiecteIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/localitati/$judet/': {
       id: '/localitati/$judet/'
       path: '/localitati/$judet'
@@ -455,6 +508,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProgramePnrrMasuraRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/proiecte/anghel-saligny/$id': {
+      id: '/proiecte/anghel-saligny/$id'
+      path: '/proiecte/anghel-saligny/$id'
+      fullPath: '/proiecte/anghel-saligny/$id'
+      preLoaderRoute: typeof ProiecteAnghelSalignyIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/programe/anghel-saligny/proiecte/$id': {
       id: '/programe/anghel-saligny/proiecte/$id'
       path: '/programe/anghel-saligny/proiecte/$id'
@@ -485,6 +545,7 @@ const rootRouteChildren: RootRouteChildren = {
   CautareRoute: CautareRoute,
   ClasamenteRoute: ClasamenteRoute,
   ContracteDotcsvRoute: ContracteDotcsvRoute,
+  ProiecteDotcsvRoute: ProiecteDotcsvRoute,
   SurseRoute: SurseRoute,
   TipareDotcsvRoute: TipareDotcsvRoute,
   AchizitiiDirecteIdRoute: AchizitiiDirecteIdRoute,
@@ -493,8 +554,10 @@ const rootRouteChildren: RootRouteChildren = {
   InstitutiiCuiRoute: InstitutiiCuiRoute,
   LocalitatiIndexRoute: LocalitatiIndexRoute,
   ProgrameIndexRoute: ProgrameIndexRoute,
+  ProiecteIndexRoute: ProiecteIndexRoute,
   LocalitatiJudetUatRoute: LocalitatiJudetUatRoute,
   ProgramePnrrMasuraRoute: ProgramePnrrMasuraRoute,
+  ProiecteAnghelSalignyIdRoute: ProiecteAnghelSalignyIdRoute,
   LocalitatiJudetIndexRoute: LocalitatiJudetIndexRoute,
   ProgrameAnghelSalignyIndexRoute: ProgrameAnghelSalignyIndexRoute,
   ProgrameFonduriEuropeneIndexRoute: ProgrameFonduriEuropeneIndexRoute,

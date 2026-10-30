@@ -51,6 +51,8 @@ export type RankedParty = {
 
 export type RankedList = {
   total: number
+  // Every party's value added up, beyond the page.
+  value: number
   items: Array<RankedParty>
   // Contracts: the days the contracts were signed in; purchases: the days asked for.
   contract: ContractRanking | null
@@ -86,6 +88,7 @@ export const getRankingList = createServerFn({ method: 'GET' })
       return (
         found && {
           total: found.total,
+          value: found.value,
           items: found.items.map((row) => ({ ...row, count: row.contracts })),
           contract: found,
           direct: null,
@@ -101,6 +104,7 @@ export const getRankingList = createServerFn({ method: 'GET' })
     return (
       found && {
         total: found.total,
+        value: found.value,
         items: found.items.map((row) => ({ ...row, count: row.accepted })),
         contract: null,
         direct: found,

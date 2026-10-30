@@ -1,35 +1,55 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { createFileRoute, redirect } from '@tanstack/react-router'
-import { Container, Flex, Heading, Text } from '@radix-ui/themes'
+import {
+  Link as RouterLink,
+  createFileRoute,
+  redirect,
+} from '@tanstack/react-router'
+import { InfoCircledIcon } from '@radix-ui/react-icons'
+import { Callout, Container, Flex, Heading, Link, Text } from '@radix-ui/themes'
 
 import { Unavailable } from '#/components/Notes'
 import { ProgrammeFigures } from '#/features/programme/ProgrammeFigures'
 import { ProgrammeMatch } from '#/features/programme/ProgrammeMatch'
-import { ProjectList } from '#/features/programme/ProjectList'
+import { ProjectList } from '#/features/projects/ProjectList'
 import { messagesFor } from '#/i18n'
 import { useI18n } from '#/i18n/context'
 import { pageTitle } from '#/lib/copy'
 import { pageCount } from '#/lib/list'
-import { validateProjectListSearch } from '#/features/programme/list'
+import { validateProjectListSearch } from '#/features/projects/list'
+import type { ProjectListSearch } from '#/features/projects/list'
+import { programmeQuery } from '#/features/programme/queries'
 import {
-  programmeQuery,
   projectListQuery,
-  projectOverviewQuery,
-} from '#/features/programme/queries'
+  projectsOverviewQuery,
+} from '#/features/projects/queries'
 
-// The Anghel Saligny programme: what the ministry paid, its projects as a list of the
-// DataTable pattern, and how its payments were tied to SEAP contracts.
+// The Anghel Saligny programme, an overview (ScreenProgramme, design D22): what the
+// ministry paid and how its payments were tied to SEAP contracts. Its list is the list of
+// every project (ScreenProjects) fixed to the programme.
+// The filters of the page's own finder, before D22: an old link that carries one is told
+// that the list now shows every project, rather than looking filtered when it is not.
+const OLD_FILTERS = ['firma', 'legatura', 'lucrari', 'platit_min', 'platit_max']
+
 export const Route = createFileRoute('/programe/anghel-saligny/')({
-  validateSearch: validateProjectListSearch,
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): ProjectListSearch & { vechi?: 'filtre' } => ({
+    ...validateProjectListSearch(search),
+    vechi:
+      search.vechi === 'filtre' ||
+      OLD_FILTERS.some((key) => search[key] !== undefined)
+        ? 'filtre'
+        : undefined,
+  }),
   loaderDeps: ({ search }) => search,
   loader: async ({ context, deps }) => {
-    const programme = await context.queryClient.ensureQueryData(programmeQuery)
-    // The kinds of works the address may name come with the programme.
-    const categories = programme?.categories ?? []
-    const [list] = await Promise.all([
-      context.queryClient.ensureQueryData(projectListQuery(deps, categories)),
+    const [, list] = await Promise.all([
+      context.queryClient.ensureQueryData(programmeQuery),
       context.queryClient.ensureQueryData(
-        projectOverviewQuery(deps, categories),
+        projectListQuery(deps, 'anghel_saligny'),
+      ),
+      context.queryClient.ensureQueryData(
+        projectsOverviewQuery(deps, 'anghel_saligny'),
       ),
     ])
     // A page past the end of the list goes to the last one that has rows.
@@ -63,7 +83,10 @@ function ProgrammePage() {
       <Flex direction="column" gap="6">
         <Flex direction="column" gap="2">
           <Text size="2" color="gray">
-            {p.crumb} / {p.name}
+            <Link asChild>
+              <RouterLink to="/proiecte">{t.projects.crumb}</RouterLink>
+            </Link>{' '}
+            / {p.name}
           </Text>
           <Text size="1" color="gray" weight="medium">
             {p.eyebrow}
@@ -79,8 +102,17 @@ function ProgrammePage() {
         ) : (
           <>
             <ProgrammeFigures programme={programme} />
+            {search.vechi ? (
+              <Callout.Root color="amber" variant="surface" size="1">
+                <Callout.Icon>
+                  <InfoCircledIcon />
+                </Callout.Icon>
+                <Callout.Text>{t.projects.oldFilters}</Callout.Text>
+              </Callout.Root>
+            ) : null}
             <ProjectList
-              categories={programme.categories}
+              title={t.projects.listTitle}
+              fixed="anghel_saligny"
               search={search}
               // Choosing keeps the reader at the list, not back at the top. The address
               // is cleaned as a link's would be, so the router never rewrites it.

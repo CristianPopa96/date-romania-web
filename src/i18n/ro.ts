@@ -14,6 +14,7 @@ import { places } from '#/features/places/i18n'
 import { eu } from '#/features/eu-projects/i18n'
 import { pnrr } from '#/features/pnrr/i18n'
 import { programme } from '#/features/programme/i18n'
+import { projects } from '#/features/projects/i18n'
 import { rankings } from '#/features/rankings/i18n'
 
 export const ro = {
@@ -56,6 +57,7 @@ export const ro = {
 
   nav: {
     label: 'Secțiuni',
+    projects: 'Proiecte',
     programmes: 'Programe',
     places: 'Localități',
     rankings: 'Clasamente',
@@ -63,6 +65,7 @@ export const ro = {
   },
 
   programme,
+  projects,
 
   pnrr,
 

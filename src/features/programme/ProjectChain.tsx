@@ -1,34 +1,33 @@
 import { Link as RouterLink } from '@tanstack/react-router'
-import { Code, Flex, Link, Text } from '@radix-ui/themes'
+import { Code, Link } from '@radix-ui/themes'
 
+import { ConfidenceBadge } from '#/components/ConfidenceBadge'
 import { DataState } from '#/components/DataState'
 import { EntityLink } from '#/components/EntityLink'
-import { TraceChain, TraceLegend } from '#/features/programme/TraceChain'
-import type { TraceHop, TraceLink } from '#/features/programme/TraceChain'
+import type { TraceHop, TraceLink } from '#/components/TraceChain'
+import { MoneyRoad } from '#/components/project/ProjectFrame'
 import { useI18n } from '#/i18n/context'
 import { rich } from '#/i18n/rich'
 import type { Project, TraceBuilder } from '#/features/programme/api'
-import {
-  chainEnd,
-  progressShare,
-  weakest,
-} from '#/features/programme/programme'
+import { chainEnd, paymentFiles, weakest } from '#/features/programme/programme'
 
-// The money of one project, hop by hop, for one of its builders: ministry, town hall,
-// project, builder, and the SEAP contract when one was found. The first links are
-// published together in a payment file; the one to the contract is ours, and never sure.
+// "Drumul banilor" of an Anghel Saligny project: MDLPA (funder and programme in one hop)
+// → financing contract → town hall → payments → the builder named in the payment file →
+// the SEAP contract found from the builder → subcontractors, never published. The first
+// links are published together in a payment file; the one to the contract is ours, and
+// never sure. Several builders: the hop names the one with the most payments and counts
+// the rest; the tables under the chain list them all.
 export function ProjectChain({
   project,
-  builder,
   searched,
 }: {
   project: Project
-  builder: TraceBuilder
   // The two ends of the period whose contracts were searched.
   searched: { from: string; to: string } | null
 }) {
   const { t, f } = useI18n()
   const p = t.programme
+  const page = t.projects.page
   const isCounty = /^jude[tț]ul/i.test(project.town_hall)
   const cui = (value: number) =>
     rich(t.common.cui, {
@@ -38,27 +37,43 @@ export function ProjectChain({
         </Code>
       ),
     })
-  const share = progressShare(project.progress)
-  // What each line of this chain means, in the words of the legend under it.
-  const labels: Record<TraceLink, string> = {
+  const legend: Record<TraceLink, string> = {
     published: p.linkPublished,
-    probable: p.linkProbable,
-    possible: p.linkPossible,
-    gap: p.linkNone,
+    probable: page.legend.probable,
+    possible: page.legend.possible,
+    unknown: page.legend.unknown,
+    gap: page.legend.gap,
   }
-  const by = (kind: TraceLink) => ({ kind, label: labels[kind] })
+  const by = (kind: TraceLink) => ({ kind, label: legend[kind] })
+  const builders = [...project.builders].sort((a, b) => b.payments - a.payments)
+  const first = builders.at(0)
+  const files = paymentFiles(project.items)
+  const filesSpan = f.span(files.first, files.last)
 
   const hops: Array<TraceHop> = [
     {
-      role: p.ministry,
-      name: p.ministryName,
-      note: p.matchAmount(
-        p.payments(builder.payments, f.count(builder.payments)),
-        f.leiShort(builder.amount),
-      ),
+      role: p.funderProgramme,
+      name: p.funderName,
+      note: p.funderNote,
     },
     {
-      role: isCounty ? p.countyCouncil : p.townHall,
+      role: p.financingContract,
+      name: project.ministry_contract_no ? (
+        p.financingNo(project.ministry_contract_no)
+      ) : (
+        <DataState kind="notPublished" />
+      ),
+      figure:
+        project.total_value !== null
+          ? f.leiShort(project.total_value)
+          : undefined,
+      note: project.ministry_contract_date
+        ? p.signedOn(f.day(project.ministry_contract_date))
+        : undefined,
+      link: by('published'),
+    },
+    {
+      role: page.beneficiary,
       name: project.town_hall_entity ? (
         <EntityLink role="institutions" cui={project.town_hall_entity.cui}>
           {isCounty ? project.county_name : project.town_hall}
@@ -74,40 +89,63 @@ export function ProjectChain({
       link: by('published'),
     },
     {
-      role: p.project,
-      name: p.projectHop(String(project.id)),
-      note:
-        share !== null
-          ? p.progress(f.percent(share, 2))
-          : project.progress
-            ? p.progressAsWritten(project.progress)
-            : undefined,
+      role: p.paymentsHop,
+      name: p.payments(project.payments, f.count(project.payments)),
+      figure: f.leiShort(project.paid),
+      note: filesSpan
+        ? p.inFiles(
+            files.count,
+            f.count(files.count),
+            `${filesSpan.from}–${filesSpan.to}`,
+          )
+        : undefined,
       link: by('published'),
     },
-    {
-      role: p.builder,
-      name:
-        builder.name === null ? (
-          <DataState kind="notPublished" />
-        ) : builder.entity && builder.cui ? (
-          <EntityLink role="suppliers" cui={builder.cui}>
-            {builder.name}
-          </EntityLink>
-        ) : (
-          builder.name
-        ),
-      note: builder.cui ? cui(builder.cui) : p.noTaxId,
-      link: by('published'),
-    },
+    builderHop(),
     ...contractHops(),
   ]
 
+  function builderHop(): TraceHop {
+    const others = builders.length - 1
+    return {
+      role: p.companiesHop,
+      name:
+        !first || first.name === null ? (
+          <DataState kind="notPublished" />
+        ) : (
+          <>
+            {first.entity && first.cui ? (
+              <EntityLink role="suppliers" cui={first.cui}>
+                {first.name}
+              </EntityLink>
+            ) : (
+              first.name
+            )}
+            {others > 0 ? ` ${p.andMore(others)}` : null}
+          </>
+        ),
+      note: first?.cui
+        ? rich(p.namedInFile, {
+            cui: (
+              <Code key="cui" variant="ghost">
+                {first.cui}
+              </Code>
+            ),
+          })
+        : p.noTaxId,
+      link: by('published'),
+    }
+  }
+
   function contractHops(): Array<TraceHop> {
-    const end = chainEnd(builder)
-    if (end.kind === 'none' || end.kind === 'unnamed') {
+    // The builder whose payments reach a contract, if one does.
+    const builder: TraceBuilder | undefined =
+      builders.find((each) => each.contracts.length > 0) ?? first
+    const end = builder ? chainEnd(builder) : { kind: 'unnamed' as const }
+    if (!builder || end.kind === 'none' || end.kind === 'unnamed') {
       return [
         {
-          role: p.contractHop,
+          role: p.purchasesHop,
           name: end.kind === 'none' ? p.noneHop : p.unnamedHop,
           note:
             end.kind === 'unnamed'
@@ -120,7 +158,14 @@ export function ProjectChain({
         },
       ]
     }
-    const tie = by(weakest(builder.contracts) ?? 'probable')
+    const level = weakest(builder.contracts) ?? 'probable'
+    const badge = (
+      <ConfidenceBadge
+        level={level === 'possible' ? 'none' : 'probable'}
+        label={p.confidenceShort[level]}
+        help={p.confidence[level]}
+      />
+    )
     const subcontractors: TraceHop = {
       role: p.subcontractors,
       name: <DataState kind="notPublished" />,
@@ -133,10 +178,11 @@ export function ProjectChain({
       const notices = new Set(builder.contracts.map((each) => each.notice_no))
       return [
         {
-          role: p.contractHop,
+          role: p.purchasesHop,
           name: p.severalHop(notices.size, f.count(notices.size)),
           note: p.severalNote,
-          link: tie,
+          badge,
+          link: by(level),
         },
         subcontractors,
       ]
@@ -150,7 +196,7 @@ export function ProjectChain({
       )
     return [
       {
-        role: p.contractHop,
+        role: p.purchasesHop,
         name:
           contract.notice_id !== null ? (
             <Link asChild>
@@ -164,51 +210,36 @@ export function ProjectChain({
           ) : (
             number
           ),
+        figure:
+          contract.value_ron === null
+            ? undefined
+            : contract.is_framework
+              ? // A ceiling is not compared with what the project costs.
+                p.ceiling(f.leiShort(contract.value_ron))
+              : f.leiShort(contract.value_ron),
         note:
           end.kind === 'notice'
             ? p.contractsOfNotice(
                 builder.contracts.length,
                 f.count(builder.contracts.length),
               )
-            : contract.value_ron === null
-              ? undefined
-              : contract.is_framework
-                ? // A ceiling is not compared with what the project costs.
-                  p.ceiling(f.leiShort(contract.value_ron))
-                : contract.ratio !== null
-                  ? p.contractValue(
-                      f.leiShort(contract.value_ron),
-                      f.percent(contract.ratio),
-                    )
-                  : f.leiShort(contract.value_ron),
-        link: tie,
+            : contract.ratio !== null && !contract.is_framework
+              ? p.ofProjectValue(f.percent(contract.ratio))
+              : undefined,
+        badge,
+        link: by(level),
       },
       subcontractors,
     ]
   }
 
-  const drawn = new Set(hops.map((hop) => hop.link?.kind))
   return (
-    <Flex direction="column" gap="3">
-      <TraceChain hops={hops} label={p.chainOf(builder.name ?? p.builder)} />
-      <TraceLegend
-        title={p.links}
-        items={(['published', 'probable', 'possible', 'gap'] as const)
-          .filter((kind) => drawn.has(kind))
-          .map(by)}
-      />
-      {builder.cui ? (
-        <Text size="1">
-          <Link asChild>
-            <RouterLink
-              to="/programe/anghel-saligny"
-              search={{ firma: builder.cui }}
-            >
-              {p.otherProjects}
-            </RouterLink>
-          </Link>
-        </Text>
-      ) : null}
-    </Flex>
+    <MoneyRoad
+      title={page.roadTitle}
+      lead={page.roadLead}
+      hops={hops}
+      label={page.roadTitle}
+      legend={legend}
+    />
   )
 }

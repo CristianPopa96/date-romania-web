@@ -1,4 +1,5 @@
 import { Link as RouterLink } from '@tanstack/react-router'
+import { ChevronDownIcon } from '@radix-ui/react-icons'
 import {
   Card,
   Code,
@@ -84,55 +85,75 @@ function MeasurePayments({
     )
   }
   const days = f.span(payments.first_day, payments.last_day)
+  // Folded by default: the summary says what it holds, and a measure with hundreds of
+  // payments does not push the rest of the page away. A details element opens without
+  // any script.
   return (
-    <Card size="3">
-      <Flex direction="column" gap="4">
-        <Stat
-          label={`${p.paidOnContract} · ${measure}`}
-          value={p.cannotSay}
-          detail={[p.cannotSayDetail]}
-        />
-        <Flex justify="between" align="baseline" gap="3" wrap="wrap">
-          <Heading as="h3" size="4">
-            {p.paymentsShared(beneficiary, measure)}
-          </Heading>
-          <Text size="1" color="gray">
-            {p.paymentsSharedDetail(
-              payments.contracts,
-              f.count(payments.contracts),
-              days ? t.period.range(days.from, days.to) : '',
-            )}
-          </Text>
-        </Flex>
-        <Stat
-          label={p.paymentsCount(payments.count, f.count(payments.count))}
-          value={f.leiShort(payments.paid)}
-          detail={[]}
-        />
-        <Table.Root variant="surface" size="1">
-          <Table.Header>
-            <Table.Row>
-              <Table.ColumnHeaderCell>{p.others}</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell justify="end">
-                {p.value}
-              </Table.ColumnHeaderCell>
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
-            <SiblingRow
-              id={contract.id}
-              title={contract.title}
-              number={contract.number}
-              total={contract.total}
-              current
+    <Card size="3" asChild>
+      <details className="dr-fold">
+        <summary>
+          <Flex justify="between" align="center" gap="4" wrap="wrap">
+            <Stat
+              label={`${p.paidOnContract} · ${measure}`}
+              value={p.cannotSay}
+              detail={[p.cannotSayDetail]}
             />
-            {payments.others.map((other) => (
-              <SiblingRow key={other.id} {...other} />
-            ))}
-          </Table.Body>
-        </Table.Root>
-        <PaymentsTable payments={payments} />
-      </Flex>
+            <Flex align="center" gap="2">
+              <Text size="2" color="gray">
+                {p.paymentsFolded(
+                  p.paymentsCount(payments.count, f.count(payments.count)),
+                  f.leiShort(payments.paid),
+                  payments.contracts,
+                  f.count(payments.contracts),
+                )}
+              </Text>
+              <ChevronDownIcon className="dr-fold-mark" aria-hidden />
+            </Flex>
+          </Flex>
+        </summary>
+        <Flex direction="column" gap="4" mt="4">
+          <Flex justify="between" align="baseline" gap="3" wrap="wrap">
+            <Heading as="h3" size="4">
+              {p.paymentsShared(beneficiary, measure)}
+            </Heading>
+            <Text size="1" color="gray">
+              {p.paymentsSharedDetail(
+                payments.contracts,
+                f.count(payments.contracts),
+                days ? t.period.range(days.from, days.to) : '',
+              )}
+            </Text>
+          </Flex>
+          <Stat
+            label={p.paymentsCount(payments.count, f.count(payments.count))}
+            value={f.leiShort(payments.paid)}
+            detail={[]}
+          />
+          <Table.Root variant="surface" size="1">
+            <Table.Header>
+              <Table.Row>
+                <Table.ColumnHeaderCell>{p.others}</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell justify="end">
+                  {p.value}
+                </Table.ColumnHeaderCell>
+              </Table.Row>
+            </Table.Header>
+            <Table.Body>
+              <SiblingRow
+                id={contract.id}
+                title={contract.title}
+                number={contract.number}
+                total={contract.total}
+                current
+              />
+              {payments.others.map((other) => (
+                <SiblingRow key={other.id} {...other} />
+              ))}
+            </Table.Body>
+          </Table.Root>
+          <PaymentsTable payments={payments} />
+        </Flex>
+      </details>
     </Card>
   )
 }
@@ -182,8 +203,10 @@ function SiblingRow({
 function PaymentsTable({ payments }: { payments: PnrrPayments }) {
   const { t, f } = useI18n()
   const p = t.pnrr
+  // A fixed height that scrolls inside itself, its header kept in view: a measure can
+  // hold hundreds of payments.
   return (
-    <Table.Root variant="surface" size="1">
+    <Table.Root variant="surface" size="1" className="dr-scroll-table">
       {/* Radix puts props on its wrapper, not the table: a caption names it. */}
       <VisuallyHidden asChild>
         <caption>{p.paymentsTitle}</caption>

@@ -1,6 +1,6 @@
 // The Romanian text of the rankings page. Part of `ro` (see ro.ts for the rules).
 
-import { counted } from '#/i18n/ro-plural'
+import { counted, plural } from '#/i18n/ro-plural'
 import type { Role } from '#/lib/api'
 
 export const rankings = {
@@ -78,9 +78,25 @@ export const rankings = {
           ? 'locul după numărul de contracte semnate în perioada pe care o avem'
           : 'locul după numărul de achiziții directe acceptate',
     },
-    topTitle: 'Primii 10',
+    topTitle: 'Primii 10 și ceilalți',
+    topTitleSearch: 'Primii 10 și ceilalți, din cei găsiți',
+    topTitleAssociation: 'Primii 10',
+    topHintBars: 'clic pe o bară deschide pagina',
     topUnit: 'lei, aceleași filtre',
-    topHint: 'clic pe o bară deschide pagina',
+    topHint: 'clic pe o casetă deschide pagina',
+    // The tile of every party after the ten largest, added up.
+    rest: (role: Role, n: number, text: string) =>
+      role === 'suppliers'
+        ? plural(n, {
+            one: 'Încă un furnizor',
+            few: `Alți ${text} furnizori`,
+            other: `Alți ${text} de furnizori`,
+          })
+        : plural(n, {
+            one: 'Încă o instituție',
+            few: `Alte ${text} instituții`,
+            other: `Alte ${text} de instituții`,
+          }),
   },
 
   // The patterns tab. A pattern is a fact worth asking documents for, never an accusation.

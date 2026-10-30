@@ -907,6 +907,48 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/projects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Project List
+         * @description Every project of every programme under the filters, the largest first. Sorting
+         *     across programmes orders them; it never adds their values.
+         */
+        get: operations["project_list_v1_projects_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/projects/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Projects Overview
+         * @description The projects under the filters in figures: how many, how many are followed to the
+         *     companies, the natural persons' left out, and each choice's options with their counts.
+         */
+        get: operations["projects_overview_v1_projects_overview_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/places": {
         parameters: {
             query?: never;
@@ -1292,6 +1334,11 @@ export interface components {
              */
             total: number;
             /**
+             * Value
+             * @description Lei, every party's value added up. Won in association, a contract is in the value of each member, so it is counted once per member.
+             */
+            value: number;
+            /**
              * Items
              * @description `rank` is the place in the order asked for, counted from the first page.
              */
@@ -1398,6 +1445,16 @@ export interface components {
             value: string;
             /** Count */
             count: number;
+        };
+        /** CountyRef */
+        CountyRef: {
+            /**
+             * Code
+             * @description The two-letter code: 'CJ', 'B'.
+             */
+            code: string;
+            /** Name */
+            name: string;
         };
         /** CountyRow */
         CountyRow: {
@@ -1784,7 +1841,7 @@ export interface components {
              * Programmes
              * @description Under every filter but the programme: the options of that filter, and each programme's value and amount paid, most projects first.
              */
-            programmes: components["schemas"]["ProgrammeOption"][];
+            programmes: components["schemas"]["date_romania__api__schemas__eu_project_list__ProgrammeOption"][];
             /** Statuses */
             statuses: components["schemas"]["StatusOption"][];
             /**
@@ -1943,6 +2000,16 @@ export interface components {
             value: number;
             period: components["schemas"]["Period"];
             source: components["schemas"]["Source"];
+        };
+        /** KindOption */
+        KindOption: {
+            /**
+             * Value
+             * @enum {string}
+             */
+            value: "anghel_saligny" | "pnrr" | "cohesion";
+            /** Count */
+            count: number;
         };
         /**
          * LocalBudgetOut
@@ -2979,31 +3046,6 @@ export interface components {
             unnamed: components["schemas"]["MatchCount"];
         };
         /**
-         * ProgrammeOption
-         * @description One programme of the list under the other filters, with its own figures.
-         */
-        ProgrammeOption: {
-            /**
-             * Value
-             * @description The programme's code, e.g. 'POR'.
-             */
-            value: string;
-            /** Count */
-            count: number;
-            /**
-             * Total
-             * @description Lei; never add it to another programme's.
-             */
-            total: number | null;
-            /** Paid */
-            paid: number | null;
-            /**
-             * Cut Off
-             * @description The day its list counts `paid` up to.
-             */
-            cut_off: string | null;
-        };
-        /**
          * ProgrammePayments
          * @description The Anghel Saligny payments to this town hall or county council, from the
          *     ministry's files. Never added to the budget's state subsidies: the periods differ,
@@ -3083,6 +3125,11 @@ export interface components {
             /** Poim */
             poim: boolean | null;
             /**
+             * State
+             * @description The project's state as the latest payment file writes it: 'Finalizată'.
+             */
+            state: string | null;
+            /**
              * Progress
              * @description From the latest payment that gives one.
              */
@@ -3102,6 +3149,95 @@ export interface components {
             confidence: ("probable" | "possible") | null;
             source: components["schemas"]["Source"];
             contracts_source: components["schemas"]["Source"];
+        };
+        /** ProjectCountyOption */
+        ProjectCountyOption: {
+            /**
+             * Value
+             * @description The county's code, as in `county`.
+             */
+            value: string;
+            /** Name */
+            name: string;
+            /** Count */
+            count: number;
+        };
+        /** ProjectItem */
+        ProjectItem: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "anghel_saligny" | "pnrr" | "cohesion";
+            /**
+             * Key
+             * @description The programme's own key: the ministry's project id (Anghel Saligny), the commitment id (PNRR, `id_angajament`), the SMIS code (cohesion).
+             */
+            key: number;
+            /**
+             * Programme
+             * @description 'AS', 'PNRR', or the cohesion programme's code.
+             */
+            programme: string;
+            /** Programme Name */
+            programme_name: string;
+            /**
+             * Period
+             * @description A cohesion programme's period: '2014-2020'.
+             */
+            period: string | null;
+            /** Title */
+            title: string | null;
+            /**
+             * Number
+             * @description The financing contract's number, where given.
+             */
+            number: string | null;
+            /**
+             * Beneficiary Name
+             * @description As the programme writes it.
+             */
+            beneficiary_name: string | null;
+            /** @description The beneficiary's entity, where tied. */
+            beneficiary: components["schemas"]["EntityRef"] | null;
+            /**
+             * Counties
+             * @description None for a national project.
+             */
+            counties: components["schemas"]["CountyRef"][];
+            /**
+             * Value
+             * @description Lei, as the programme gives it.
+             */
+            value: number | null;
+            /**
+             * Status
+             * @description Ours, where the programme's words map.
+             */
+            status: ("in_progress" | "finished" | "terminated") | null;
+            /**
+             * Status Written
+             * @description As the programme writes it.
+             */
+            status_written: string | null;
+            /**
+             * Reach
+             * @description The last step of the money's road followed.
+             * @enum {string}
+             */
+            reach: "beneficiary" | "payments" | "purchases" | "companies";
+            /**
+             * Gap
+             * @description A step we cannot follow: the payments, when they are on a measure the beneficiary has several contracts on, or not published while a later step is.
+             */
+            gap: "payments" | null;
+        };
+        /** ProjectList */
+        ProjectList: {
+            /** Total */
+            total: number;
+            /** Items */
+            items: components["schemas"]["ProjectItem"][];
         };
         /**
          * ProjectOverview
@@ -3215,6 +3351,16 @@ export interface components {
              */
             match: "one" | "several" | "none" | "unnamed";
         };
+        /** ProjectStatusOption */
+        ProjectStatusOption: {
+            /**
+             * Value
+             * @enum {string}
+             */
+            value: "in_progress" | "finished" | "terminated";
+            /** Count */
+            count: number;
+        };
         /** ProjectSummary */
         ProjectSummary: {
             /** Projects */
@@ -3226,6 +3372,72 @@ export interface components {
              * @description Lei, every payment held for these projects.
              */
             paid: number;
+        };
+        /**
+         * ProjectsOverview
+         * @description The projects under the filters chosen, in figures; each option counted under every
+         *     filter but its own.
+         */
+        ProjectsOverview: {
+            summary: components["schemas"]["ProjectsSummary"];
+            /**
+             * Whole
+             * @description Every project held, natural persons' left out.
+             */
+            whole: number;
+            /** @description The beneficiary filtered by. */
+            beneficiary: components["schemas"]["EntityRef"] | null;
+            /** Kinds */
+            kinds: components["schemas"]["KindOption"][];
+            /** Programmes */
+            programmes: components["schemas"]["date_romania__api__schemas__projects__ProgrammeOption"][];
+            /** Counties */
+            counties: components["schemas"]["ProjectCountyOption"][];
+            /** Statuses */
+            statuses: components["schemas"]["ProjectStatusOption"][];
+            /**
+             * Reaches
+             * @description How far the road is followed.
+             */
+            reaches: components["schemas"]["ReachOption"][];
+            /**
+             * Bands
+             * @description Projects by value, in lei.
+             */
+            bands: components["schemas"]["Band"][];
+            /**
+             * Without
+             * @description Only when no project is found: what each filter given would leave out if it alone were removed, in the order of the parameters.
+             */
+            without: components["schemas"]["Without"][];
+            /**
+             * Sources
+             * @description One per programme's source.
+             */
+            sources: components["schemas"]["Source"][];
+        };
+        /** ProjectsSummary */
+        ProjectsSummary: {
+            /**
+             * Projects
+             * @description Natural persons' projects left out.
+             */
+            projects: number;
+            /**
+             * Companies
+             * @description Of them, followed to the companies that delivered.
+             */
+            companies: number;
+            /**
+             * Natural Persons
+             * @description Projects of natural persons under the filters, never listed by name.
+             */
+            natural_persons: number;
+            /**
+             * Value
+             * @description Lei: only when a programme is chosen and every project filtered is of that one programme (cohesion is several, each at its own cut-off), since programmes are never added together.
+             */
+            value: number | null;
         };
         /** Purchase */
         Purchase: {
@@ -3472,6 +3684,11 @@ export interface components {
              */
             total: number;
             /**
+             * Value
+             * @description Lei, every party's value added up.
+             */
+            value: number;
+            /**
              * Items
              * @description `rank` is the place in the order asked for, counted from the first page.
              */
@@ -3495,6 +3712,16 @@ export interface components {
             value: number;
             /** Rank */
             rank: number;
+        };
+        /** ReachOption */
+        ReachOption: {
+            /**
+             * Value
+             * @enum {string}
+             */
+            value: "beneficiary" | "payments" | "purchases" | "companies";
+            /** Count */
+            count: number;
         };
         /**
          * ReportIn
@@ -3844,6 +4071,50 @@ export interface components {
              * @description The kind of works as the ministry writes it.
              */
             value: string;
+            /** Count */
+            count: number;
+        };
+        /**
+         * ProgrammeOption
+         * @description One programme of the list under the other filters, with its own figures.
+         */
+        date_romania__api__schemas__eu_project_list__ProgrammeOption: {
+            /**
+             * Value
+             * @description The programme's code, e.g. 'POR'.
+             */
+            value: string;
+            /** Count */
+            count: number;
+            /**
+             * Total
+             * @description Lei; never add it to another programme's.
+             */
+            total: number | null;
+            /** Paid */
+            paid: number | null;
+            /**
+             * Cut Off
+             * @description The day its list counts `paid` up to.
+             */
+            cut_off: string | null;
+        };
+        /** ProgrammeOption */
+        date_romania__api__schemas__projects__ProgrammeOption: {
+            /**
+             * Value
+             * @description As in `programme`.
+             */
+            value: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "anghel_saligny" | "pnrr" | "cohesion";
+            /** Name */
+            name: string;
+            /** Period */
+            period: string | null;
             /** Count */
             count: number;
         };
@@ -5464,6 +5735,109 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["EuBeneficiaryFunds"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    project_list_v1_projects_get: {
+        parameters: {
+            query?: {
+                /** @description The project's value. */
+                sort?: "value";
+                order?: "desc" | "asc";
+                limit?: number;
+                offset?: number;
+                /** @description csv gives the whole list as a file. */
+                format?: "json" | "csv";
+                /** @description Any of these kinds of programme. */
+                kind?: ("anghel_saligny" | "pnrr" | "cohesion")[] | null;
+                /** @description Any of these programmes: 'AS', 'PNRR', or a cohesion code 'POR'. */
+                programme?: string[] | null;
+                /** @description A county's code, as in `counties`. */
+                county?: string | null;
+                /** @description The beneficiary's CUI. */
+                beneficiary?: number | null;
+                /** @description Any of these. */
+                status?: ("in_progress" | "finished" | "terminated")[] | null;
+                /** @description Any of these last steps followed. */
+                reach?: ("beneficiary" | "payments" | "purchases" | "companies")[] | null;
+                /** @description Words of the title or the beneficiary's name, a SMIS code or a financing contract number. */
+                q?: string | null;
+                /** @description Lei, included. */
+                value_min?: number | null;
+                /** @description Lei, excluded. */
+                value_max?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectList"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    projects_overview_v1_projects_overview_get: {
+        parameters: {
+            query?: {
+                /** @description The beneficiary's CUI. */
+                beneficiary?: number | null;
+                /** @description Any of these kinds of programme. */
+                kind?: ("anghel_saligny" | "pnrr" | "cohesion")[] | null;
+                /** @description Any of these programmes: 'AS', 'PNRR', or a cohesion code 'POR'. */
+                programme?: string[] | null;
+                /** @description A county's code, as in `counties`. */
+                county?: string | null;
+                /** @description Any of these. */
+                status?: ("in_progress" | "finished" | "terminated")[] | null;
+                /** @description Any of these last steps followed. */
+                reach?: ("beneficiary" | "payments" | "purchases" | "companies")[] | null;
+                /** @description Words of the title or the beneficiary's name, a SMIS code or a financing contract number. */
+                q?: string | null;
+                /** @description Lei, included. */
+                value_min?: number | null;
+                /** @description Lei, excluded. */
+                value_max?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectsOverview"];
                 };
             };
             /** @description Validation Error */

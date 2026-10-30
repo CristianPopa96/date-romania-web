@@ -164,6 +164,70 @@ th[aria-sort='ascending'] .dr-sort::after {
 .dr-rank[aria-pressed='true'] .dr-rank-bar {
   background: var(--indigo-9);
 }
+/* A card that folds (details): the summary is its handle, the chevron turns when open. */
+.dr-fold > summary {
+  list-style: none;
+  cursor: pointer;
+}
+.dr-fold > summary::-webkit-details-marker {
+  display: none;
+}
+.dr-fold > summary:focus-visible {
+  outline: 2px solid var(--focus-8);
+  outline-offset: 4px;
+  border-radius: var(--radius-2);
+}
+.dr-fold-mark {
+  transition: transform 120ms;
+}
+.dr-fold[open] .dr-fold-mark {
+  transform: rotate(180deg);
+}
+/* A long table (the payments of a measure): a fixed height that scrolls inside itself,
+   with its header kept in view. */
+/* Radix scrolls a table inside its own scroll area: the height goes on that, so the
+   sticky header sticks to the box that scrolls. */
+.dr-scroll-table .rt-ScrollAreaViewport {
+  max-height: 320px;
+}
+/* The table clips itself for its rounded corners, which would keep its header from
+   sticking. */
+.dr-scroll-table .rt-TableRootTable {
+  overflow: visible;
+}
+.dr-scroll-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--color-panel-solid);
+}
+/* A tile of a treemap (TreeMap): a party opens its page; the rest, gray, opens nothing. */
+.dr-tile {
+  all: unset;
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 3px 8px;
+  overflow: hidden;
+  border-radius: var(--radius-2);
+  background: var(--indigo-5);
+  color: var(--slate-12);
+  cursor: pointer;
+}
+.dr-tile:hover,
+.dr-tile:focus-visible {
+  background: var(--indigo-7);
+}
+.dr-tile:focus-visible {
+  outline: 2px solid var(--focus-8);
+  outline-offset: -2px;
+}
+.dr-tile-rest,
+.dr-tile-rest:hover {
+  background: var(--slate-8);
+  cursor: default;
+}
 .dr-mark {
   background: var(--amber-3);
   color: inherit;

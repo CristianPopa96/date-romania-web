@@ -52,7 +52,7 @@ export function ProjectsTable({ projects }: { projects: Array<LocalProject> }) {
                 <Table.Cell>
                   <Link asChild>
                     <RouterLink
-                      to="/programe/anghel-saligny/proiecte/$id"
+                      to="/proiecte/anghel-saligny/$id"
                       params={{ id: String(project.id) }}
                     >
                       {project.investment ?? String(project.id)}

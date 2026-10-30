@@ -3,7 +3,6 @@
 
 import type {
   Confidence,
-  Match,
   MatchCounts,
   TraceBuilder,
   TraceContract,
@@ -12,29 +11,6 @@ import type {
 // A county in an address: "bistrita-nasaud" for the API's "BISTRITA NASAUD".
 export function countySlug(key: string) {
   return key.toLowerCase().replace(/ /g, '-')
-}
-
-export function countyKey(slug: string) {
-  return slug.toUpperCase().replace(/-/g, ' ')
-}
-
-// The match states as addresses name them: /programe/anghel-saligny?legatura=mai-multe.
-export const MATCH_PARAMS = {
-  'un-contract': 'one',
-  'mai-multe': 'several',
-  niciunul: 'none',
-  'fara-cui': 'unnamed',
-} as const satisfies Record<string, Match>
-export type MatchParam = keyof typeof MATCH_PARAMS
-
-// True for a name the address may carry. `in` would also say yes to "toString".
-export function isMatchParam(value: unknown): value is MatchParam {
-  return typeof value === 'string' && Object.hasOwn(MATCH_PARAMS, value)
-}
-
-export function matchParam(match: Match) {
-  const names = Object.keys(MATCH_PARAMS) as Array<MatchParam>
-  return names.find((name) => MATCH_PARAMS[name] === match)
 }
 
 // How much was tied, probably, to the contracts of one award notice, out of what could
@@ -111,4 +87,23 @@ export function chainEnd(builder: TraceBuilder): ChainEnd {
     }
   }
   return { kind: builder.match }
+}
+
+// The payment files a project's payments come from: how many, and the first and last
+// file's day. The files give no payment day, only the day of the file.
+export function paymentFiles(
+  payments: ReadonlyArray<{ published_on: string | null }>,
+): { count: number; first: string | null; last: string | null } {
+  const days = [
+    ...new Set(
+      payments
+        .map((payment) => payment.published_on)
+        .filter((day): day is string => day !== null),
+    ),
+  ].sort()
+  return {
+    count: days.length,
+    first: days.at(0) ?? null,
+    last: days.at(-1) ?? null,
+  }
 }

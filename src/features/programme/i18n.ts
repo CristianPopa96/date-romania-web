@@ -27,43 +27,8 @@ export const programme = {
   tiedPossible: (n: number, text: string) =>
     `${counted(n, text, 'o plată are', 'plăți au')} un contract legat doar posibil și nu ${n === 1 ? 'e numărată' : 'sunt numărate'} aici`,
 
-  // Finding a project: the list of the projects.
-  findTitle: 'Urmărește un proiect',
-  list: {
-    searchWhat: 'primăria sau lucrarea',
-    filters: {
-      q: 'Căutare',
-      firma: 'Constructor',
-      judet: 'Județ',
-      legatura: 'Contract SEAP',
-      lucrari: 'Lucrări',
-      platit: 'Plătit',
-    },
-    paidPresets: {
-      small: 'Sub 1.000.000 lei',
-      middle: '1.000.000–5.000.000 lei',
-      large: '5.000.000 lei sau mai mult',
-    },
-    value: 'Valoare proiect',
-    projects: (n: number, text: string) =>
-      counted(n, text, 'un proiect', 'proiecte'),
-    paid: (amount: string, n: number, text: string) =>
-      `plătit ${amount} în ${counted(n, text, 'o plată', 'plăți')}`,
-    of: (whole: string) =>
-      `din ${whole} ale programului, din fișierele de plăți ale ministerului`,
-    paidAllBuilders:
-      'Plătit înseamnă tot ce s-a plătit pentru aceste proiecte, și către alți constructori.',
-    total: (n: number, text: string) =>
-      `Plătit pentru filtrele alese · ${counted(n, text, 'un proiect', 'proiecte')}`,
-    countiesTitle: 'Plătit pe județe',
-    countiesUnit: 'lei, aceleași filtre',
-    matchTitle: 'Contract SEAP găsit',
-    matchUnit: 'proiecte, aceleași filtre',
-  },
   project: 'Proiectul',
   townHall: 'Primăria',
-  paidColumn: 'Plătit',
-  contract: 'Contract SEAP',
   countyOf: (name: string) => `județul ${name}`,
 
   // Whether a contract was found, in a list and on a project.
@@ -122,6 +87,21 @@ export const programme = {
 
   // One project.
   projectTitle: (id: string) => `Proiectul ${id}`,
+  figureTotal: 'Valoare totală',
+  figureState: 'De la bugetul de stat',
+  figurePaid: 'Plătit în fișierele MDLPA',
+  figureProgress: 'Progres raportat',
+  financingOn: (day: string) => `contract de finanțare ${day}`,
+  progressBy: 'de primărie, în fișierul de plăți MDLPA',
+  linkedHow: 'găsite după constructorul din fișierul de plăți',
+  notPublic:
+    'Situațiile de lucrări, procesele-verbale de recepție și subcontractorii nu sunt publicate.',
+  paymentsHeading: 'Plăți',
+  filesOnly: 'fișierele MDLPA nu dau ziua plății, doar ziua fișierului',
+  fileColumn: 'Fișierul MDLPA',
+  namedBuilder: 'Constructorul numit',
+  paymentsInFiles: (payments: string, n: number, text: string) =>
+    `${payments} în ${counted(n, text, 'un fișier', 'fișiere')}`,
   fallbackTitle: 'Proiect Anghel Saligny',
   ministryContract: (number: string, day: string) =>
     `Contract de finanțare MDLPA ${number} din ${day}`,
@@ -130,7 +110,25 @@ export const programme = {
   alsoEu: 'finanțat și din fonduri europene (POIM)',
   estimatedEnd: (day: string) => `termen estimat ${day}`,
 
-  // The chain, hop by hop.
+  // The chain, hop by hop ("Drumul banilor" of ScreenProject).
+  funderProgramme: 'Finanțator · program',
+  funderName: 'MDLPA · Anghel Saligny',
+  funderNote: 'bugetul de stat',
+  financingContract: 'Contract de finanțare',
+  financingNo: (number: string) => `nr. ${number}`,
+  signedOn: (day: string) => `semnat ${day}`,
+  paymentsHop: 'Plăți',
+  inFiles: (n: number, text: string, span: string) =>
+    `în ${counted(n, text, 'un fișier', 'fișiere')}, ${span}`,
+  companiesHop: 'Firme',
+  andMore: (n: number) => `și încă ${n}`,
+  namedInFile: 'numită în fișierul de plăți · CUI {cui}',
+  purchasesHop: 'Achiziții',
+  ofProjectValue: (share: string) => `${share} din valoarea proiectului`,
+  confidenceShort: {
+    probable: 'Probabil',
+    possible: 'Posibil',
+  },
   chainTitle: 'Drumul banilor',
   ministry: 'Ministerul',
   ministryName: 'MDLPA',
