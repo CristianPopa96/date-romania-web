@@ -31,10 +31,10 @@ export const Route = createFileRoute('/programe/anghel-saligny/')({
     const [, list] = await Promise.all([
       context.queryClient.ensureQueryData(programmeQuery),
       context.queryClient.ensureQueryData(
-        projectListQuery(deps, 'anghel_saligny'),
+        projectListQuery(deps, { kind: 'anghel_saligny' }),
       ),
       context.queryClient.ensureQueryData(
-        projectsOverviewQuery(deps, 'anghel_saligny'),
+        projectsOverviewQuery(deps, { kind: 'anghel_saligny' }),
       ),
     ])
     // A page past the end of the list goes to the last one that has rows.

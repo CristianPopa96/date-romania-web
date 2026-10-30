@@ -23,8 +23,7 @@ import { useI18n } from '#/i18n/context'
 import type { EuFunds } from '#/features/eu-projects/api'
 import { pageTitle } from '#/lib/copy'
 import { pageCount } from '#/lib/list'
-import { periodLabel } from '#/features/eu-projects/eu'
-import { programmeCodes } from '#/features/eu-projects/list'
+import { periodLabel, programmeCodes } from '#/features/eu-projects/eu'
 import { euFundsQuery } from '#/features/eu-projects/queries'
 import { validateProjectListSearch } from '#/features/projects/list'
 import type { ProjectListSearch } from '#/features/projects/list'
@@ -62,10 +61,10 @@ export const Route = createFileRoute('/programe/fonduri-europene/')({
     const codes = programmeCodes(funds.programmes, deps.program)
     const [list] = await Promise.all([
       context.queryClient.ensureQueryData(
-        projectListQuery(deps, 'cohesion', codes),
+        projectListQuery(deps, { kind: 'cohesion', codes }),
       ),
       context.queryClient.ensureQueryData(
-        projectsOverviewQuery(deps, 'cohesion', codes),
+        projectsOverviewQuery(deps, { kind: 'cohesion', codes }),
       ),
     ])
     // A page past the end of the list goes to the last one that has rows.

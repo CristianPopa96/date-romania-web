@@ -1,23 +1,22 @@
 import { validateContractListSearch } from '#/features/contracts'
 import type { ContractListSearch } from '#/features/contracts'
-import { validateEuProjectListSearch } from '#/features/eu-projects'
-import type { EuProjectListSearch } from '#/features/eu-projects'
-import { validatePnrrListSearch } from '#/features/pnrr'
-import type { PnrrListSearch } from '#/features/pnrr'
+import { validateProjectListSearch } from '#/features/projects'
+import type { ProjectListSearch } from '#/features/projects'
 import { validatePurchaseListSearch } from '#/features/purchases'
 import type { PurchaseListSearch } from '#/features/purchases'
 import { pageFromParam } from '#/lib/urls'
 
 // Search params shared by the institution and the supplier page.
-// `lista` picks one of the lists: contracts, direct purchases, and the EU projects and
-// PNRR contracts it is the beneficiary of. Left out, the page opens on its contracts when
-// it has any, else on its direct purchases.
-export const ENTITY_LISTS = [
-  'contracte',
-  'achizitii',
-  'coeziune',
-  'pnrr',
-] as const
+// `lista` picks one of the lists: contracts, direct purchases, and the projects of every
+// programme (D22). Left out, the page opens on its contracts when it has any, else on its
+// direct purchases.
+export const ENTITY_LISTS = ['contracte', 'achizitii', 'proiecte'] as const
+
+// The two lists the projects tab replaced, and the programme each opens it on.
+const OLD_LISTS: Record<string, string | undefined> = {
+  coeziune: 'fonduri-europene',
+  pnrr: 'pnrr',
+}
 
 export type EntityList = (typeof ENTITY_LISTS)[number]
 
@@ -26,8 +25,7 @@ export type EntityList = (typeof ENTITY_LISTS)[number]
 // change of tab clears them.
 export type EntitySearch = ContractListSearch &
   PurchaseListSearch &
-  EuProjectListSearch &
-  PnrrListSearch & {
+  ProjectListSearch & {
     lista?: EntityList
     pagina?: number
   }
@@ -35,6 +33,12 @@ export type EntitySearch = ContractListSearch &
 export function validateEntitySearch(
   search: Record<string, unknown>,
 ): EntitySearch {
+  // An old link to the EU lists opens the projects tab with that programme chosen.
+  const old =
+    typeof search.lista === 'string' && Object.hasOwn(OLD_LISTS, search.lista)
+      ? OLD_LISTS[search.lista]
+      : undefined
+  if (old) search = { ...search, lista: 'proiecte', program: old }
   return {
     lista: ENTITY_LISTS.find((list) => list === search.lista),
     pagina: pageFromParam(search.pagina),
@@ -42,25 +46,21 @@ export function validateEntitySearch(
     // list's undefined never erases another's.
     ...defined(validateContractListSearch(search)),
     ...defined(validatePurchaseListSearch(search)),
-    ...defined(validateEuProjectListSearch(search)),
-    ...defined(validatePnrrListSearch(search)),
+    ...defined(validateProjectListSearch(search)),
   }
 }
 
 // The list an entity page shows. Contracts come first, but most institutions and
 // companies have none signed in the period, and an empty list is a poor way in.
-// The EU lists an entity has: an address asking for one it has not opens the default.
-export type EuLists = { coeziune: boolean; pnrr: boolean }
-
+// The projects tab is there only when the entity has projects: an address asking for it
+// otherwise opens the default.
 export function entityList(
   search: EntitySearch,
   hasContracts: boolean,
-  eu: EuLists = { coeziune: false, pnrr: false },
+  hasProjects = false,
 ): EntityList {
   const asked = search.lista
-  if (asked && (asked === 'contracte' || asked === 'achizitii' || eu[asked])) {
-    return asked
-  }
+  if (asked && (asked !== 'proiecte' || hasProjects)) return asked
   return hasContracts ? 'contracte' : 'achizitii'
 }
 

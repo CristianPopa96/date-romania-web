@@ -16,7 +16,11 @@ import {
   projectSort,
   projectsCsvPath,
 } from '#/features/projects/list'
-import type { ProjectListSearch } from '#/features/projects/list'
+import type {
+  ProjectListSearch,
+  ProjectParty,
+  ProjectScope,
+} from '#/features/projects/list'
 import {
   projectListQuery,
   projectsOverviewQuery,
@@ -41,7 +45,9 @@ export function ProjectList<TSearch extends ProjectListSearch>({
   onSearch,
   fixed,
   cohesion,
+  party,
   title,
+  titleAs,
 }: {
   search: TSearch
   onSearch: (search: TSearch) => void
@@ -51,16 +57,19 @@ export function ProjectList<TSearch extends ProjectListSearch>({
     held: ReadonlyArray<HeldProgramme>
     codes: Array<string> | undefined
   }
+  // An entity page's institution or company: its projects only, and on a company's, how
+  // it is tied to each.
+  party?: ProjectParty
   title: string
+  // h3 under an entity page's own heading for its lists.
+  titleAs?: 'h2' | 'h3'
 }) {
   const { t, f } = useI18n()
   const p = t.projects
-  const codes = cohesion?.codes
-  const { data: list } = useSuspenseQuery(
-    projectListQuery(search, fixed, codes),
-  )
+  const scope: ProjectScope = { kind: fixed, codes: cohesion?.codes, party }
+  const { data: list } = useSuspenseQuery(projectListQuery(search, scope))
   const { data: overview } = useSuspenseQuery(
-    projectsOverviewQuery(search, fixed, codes),
+    projectsOverviewQuery(search, scope),
   )
   if (list === 'failed' || overview === 'failed' || !overview) {
     return (
@@ -88,6 +97,7 @@ export function ProjectList<TSearch extends ProjectListSearch>({
   return (
     <ListView
       title={title}
+      titleAs={titleAs}
       search={{
         q,
         what: p.searchWhat,
@@ -96,12 +106,13 @@ export function ProjectList<TSearch extends ProjectListSearch>({
           overview,
           fixedKind: fixed !== undefined,
           held: cohesion?.held,
+          fixedParty: party !== undefined,
           t,
           f,
         }),
         onApply: apply,
       }}
-      summary={summaryLine(overview, fixed, t, f)}
+      summary={summaryLine(overview, fixed, t, f, party !== undefined)}
       views={
         found.projects > 0 && !cohesion
           ? {
@@ -114,7 +125,7 @@ export function ProjectList<TSearch extends ProjectListSearch>({
       file={
         found.projects > 0
           ? {
-              href: projectsCsvPath(search, fixed, codes),
+              href: projectsCsvPath(search, scope),
               rows: found.projects,
             }
           : null
@@ -139,6 +150,7 @@ export function ProjectList<TSearch extends ProjectListSearch>({
       rows={
         <ProjectRows
           items={list.items}
+          showVia={party !== undefined && 'company' in party}
           q={q}
           sort={sort}
           onSort={onSort}
@@ -204,6 +216,8 @@ function summaryLine(
   fixed: ProjectKind | undefined,
   t: Messages,
   f: Format,
+  // An entity's list: the whole of every project is not its whole.
+  own = false,
 ) {
   const p = t.projects
   const found = overview.summary
@@ -211,6 +225,7 @@ function summaryLine(
   // More than one programme has rows: cohesion alone is several, each list at its day.
   const several =
     overview.programmes.filter((each) => each.count > 0).length > 1
+  const whole = !fixed && !own
   return {
     headline: (
       <>
@@ -227,10 +242,10 @@ function summaryLine(
     detail: (
       <>
         {/* The whole is every programme's: said on the list of all of them only. */}
-        {fixed ? null : p.of(f.count(overview.whole))}
-        {several ? `${fixed ? '' : ' · '}${p.noSum}` : null}
+        {whole ? p.of(f.count(overview.whole)) : null}
+        {several ? `${whole ? ' · ' : ''}${p.noSum}` : null}
         {found.natural_persons > 0
-          ? `${fixed && !several ? '' : '. '}${p.naturalPersons(found.natural_persons, f.count(found.natural_persons))}`
+          ? `${whole || several ? '. ' : ''}${p.naturalPersons(found.natural_persons, f.count(found.natural_persons))}`
           : null}
       </>
     ),

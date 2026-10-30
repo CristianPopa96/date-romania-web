@@ -59,7 +59,7 @@ export function PlaceEuFunds({ entity }: { entity: EntityRef }) {
                   <RouterLink
                     to="/institutii/$cui"
                     params={{ cui: String(entity.cui) }}
-                    search={{ lista: 'coeziune' }}
+                    search={{ lista: 'proiecte', program: 'fonduri-europene' }}
                   >
                     {e.seeList}
                   </RouterLink>
@@ -83,7 +83,7 @@ export function PlaceEuFunds({ entity }: { entity: EntityRef }) {
                   <RouterLink
                     to="/institutii/$cui"
                     params={{ cui: String(entity.cui) }}
-                    search={{ lista: 'pnrr' }}
+                    search={{ lista: 'proiecte', program: 'pnrr' }}
                   >
                     {e.seeList}
                   </RouterLink>

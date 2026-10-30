@@ -18,17 +18,16 @@ describe('validateEntitySearch', () => {
   })
 
   it('keeps a name two lists share for the list that reads it', () => {
-    // A number is a state of a direct purchase; a word, of an EU project or a PNRR
-    // contract. One list's undefined never erases another's value.
+    // A number is a state of a direct purchase; a word, of a project. One list's
+    // undefined never erases another's value.
     expect(validateEntitySearch({ stare: 7 }).stare).toBe(7)
     expect(validateEntitySearch({ stare: 'finalizat' }).stare).toBe('finalizat')
-    expect(validateEntitySearch({ stare: 'sub-30' }).stare).toBe('sub-30')
     expect(validateEntitySearch({ stare: 'nimic' }).stare).toBeUndefined()
   })
 
   it('keeps a one-letter search, which only some lists send', () => {
-    const search = validateEntitySearch({ lista: 'coeziune', q: 'a' })
-    // The EU and PNRR lists leave it out of what they ask (their own list.test.ts).
+    const search = validateEntitySearch({ lista: 'proiecte', q: 'a' })
+    // The projects list leaves it out of what it asks (its own list.test.ts).
     expect(search.q).toBe('a')
   })
 
@@ -77,14 +76,21 @@ describe('the list of an entity page', () => {
     expect(entityList({ lista: 'contracte' }, false)).toBe('contracte')
   })
 
-  it('shows an EU list only when the entity has that kind', () => {
-    const both = { coeziune: true, pnrr: true }
-    expect(validateEntitySearch({ lista: 'pnrr' }).lista).toBe('pnrr')
-    expect(entityList({ lista: 'coeziune' }, true, both)).toBe('coeziune')
-    expect(entityList({ lista: 'pnrr' }, false, both)).toBe('pnrr')
-    const none = { coeziune: false, pnrr: false }
-    expect(entityList({ lista: 'pnrr' }, true, none)).toBe('contracte')
-    expect(entityList({ lista: 'coeziune' }, false)).toBe('achizitii')
+  it('shows the projects only when the entity has some', () => {
+    expect(entityList({ lista: 'proiecte' }, true, true)).toBe('proiecte')
+    expect(entityList({ lista: 'proiecte' }, true, false)).toBe('contracte')
+    expect(entityList({ lista: 'proiecte' }, false)).toBe('achizitii')
+  })
+
+  it('opens an old link to an EU list on the projects, with that programme', () => {
+    expect(validateEntitySearch({ lista: 'coeziune' })).toMatchObject({
+      lista: 'proiecte',
+      program: 'fonduri-europene',
+    })
+    expect(validateEntitySearch({ lista: 'pnrr' })).toMatchObject({
+      lista: 'proiecte',
+      program: 'pnrr',
+    })
   })
 
   it('leaves the default list out of the address', () => {
