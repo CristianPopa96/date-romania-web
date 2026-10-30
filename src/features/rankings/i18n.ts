@@ -79,6 +79,9 @@ export const rankings = {
           : 'locul după numărul de achiziții directe acceptate',
     },
     topTitle: 'Primii 10 și ceilalți',
+    topTitleSearch: 'Primii 10 și ceilalți, din cei găsiți',
+    topTitleAssociation: 'Primii 10',
+    topHintBars: 'clic pe o bară deschide pagina',
     topUnit: 'lei, aceleași filtre',
     topHint: 'clic pe o casetă deschide pagina',
     // The tile of every party after the ten largest, added up.

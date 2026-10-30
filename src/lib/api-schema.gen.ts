@@ -3435,7 +3435,7 @@ export interface components {
             natural_persons: number;
             /**
              * Value
-             * @description Lei: only when one kind of programme is chosen, since programmes are never added together.
+             * @description Lei: only when a programme is chosen and every project filtered is of that one programme (cohesion is several, each at its own cut-off), since programmes are never added together.
              */
             value: number | null;
         };

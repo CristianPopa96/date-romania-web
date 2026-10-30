@@ -6,6 +6,7 @@ import { ChartCard } from '#/components/list/ChartCard'
 import type { Patch } from '#/components/list/filter-types'
 import { ListEmpty } from '#/components/list/ListEmpty'
 import { ListView } from '#/components/list/ListView'
+import { RankBars } from '#/components/list/RankBars'
 import { TreeMap } from '#/components/list/TreeMap'
 import type { TreeTile } from '#/components/list/TreeMap'
 import { IncompleteContracts, PeriodNote } from '#/components/Notes'
@@ -83,8 +84,9 @@ export function RankingList({
   const bars = top === 'failed' || !top ? [] : top.items
   // The ten largest, and the rest added up as one tile. Won in association, a contract
   // is in the value of each of its members, so the rest would count it again: left out.
+  const association = search.castigate === 'asociere'
   const rest =
-    top === 'failed' || !top || search.castigate === 'asociere'
+    top === 'failed' || !top || association
       ? null
       : {
           parties: top.total - bars.length,
@@ -172,12 +174,27 @@ export function RankingList({
           // In a row, as every list's charts: a card's size is its width there.
           <Flex gap="3" wrap="wrap" align="stretch">
             <ChartCard
-              title={l.topTitle}
+              title={
+                association
+                  ? l.topTitleAssociation
+                  : q
+                    ? l.topTitleSearch
+                    : l.topTitle
+              }
               unit={l.topUnit}
-              hint={l.topHint}
+              hint={association ? l.topHintBars : l.topHint}
               rows={tiles.map((tile) => [tile.label, f.lei(tile.value)])}
             >
-              <TreeMap tiles={tiles} format={f.leiShort} />
+              {/* Won in association, a contract is in each member's value: two tiles could
+                  be the same money, so they are bars, never parts of one whole. */}
+              {association ? (
+                <RankBars
+                  rows={tiles.map((tile) => ({ ...tile, on: false }))}
+                  format={f.leiShort}
+                />
+              ) : (
+                <TreeMap tiles={tiles} format={f.leiShort} />
+              )}
             </ChartCard>
           </Flex>
         }

@@ -12,7 +12,6 @@ import {
   PROJECT_BY_API_PARAM,
   PROJECT_COLUMNS,
   PROJECT_FILTER_PARAMS,
-  kindsFromParam,
   projectSort,
   projectsCsvPath,
 } from '#/features/projects/list'
@@ -90,7 +89,7 @@ export function ProjectList<TSearch extends ProjectListSearch>({
         }),
         onApply: apply,
       }}
-      summary={summaryLine(overview, fixed, search, t, f)}
+      summary={summaryLine(overview, fixed, t, f)}
       views={
         found.projects > 0
           ? {
@@ -185,14 +184,15 @@ export function ProjectList<TSearch extends ProjectListSearch>({
 function summaryLine(
   overview: ProjectsOverview,
   fixed: ProjectKind | undefined,
-  search: ProjectListSearch,
   t: Messages,
   f: Format,
 ) {
   const p = t.projects
   const found = overview.summary
   const kinds = overview.kinds.filter((each) => each.count > 0).length
-  const several = !fixed && (kindsFromParam(search.program)?.length ?? 0) !== 1
+  // More than one programme has rows: cohesion alone is several, each list at its day.
+  const several =
+    overview.programmes.filter((each) => each.count > 0).length > 1
   return {
     headline: (
       <>

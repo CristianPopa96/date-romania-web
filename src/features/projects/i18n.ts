@@ -68,7 +68,12 @@ export const projects = {
   value: (amount: string) => `valoare ${amount}`,
   of: (whole: string) => `din ${whole} de proiecte, din toate programele`,
   naturalPersons: (n: number, text: string) =>
-    `Include ${counted(n, text, 'un contract al unei persoane fizice', 'contracte ale unor persoane fizice')}, pe care nu le afișăm nominal.`,
+    n === 1
+      ? 'Include un proiect al unei persoane fizice, pe care nu îl afișăm nominal.'
+      : `Include ${counted(n, text, 'un proiect', 'proiecte')} ale unor persoane fizice, pe care nu le afișăm nominal.`,
+  // An address of the Anghel Saligny page from before D22, with a filter it no longer has.
+  oldFilters:
+    'Adresa avea un filtru care nu mai există pe această pagină (constructor, contract SEAP, lucrări sau sumă plătită). Lista arată toate proiectele programului.',
   total: (n: number, text: string) =>
     `Valoarea pentru filtrele alese · ${counted(n, text, 'un proiect', 'proiecte')}`,
 

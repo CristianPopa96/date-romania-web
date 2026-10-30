@@ -772,6 +772,11 @@ test('winners are ranked by what they won alone or in associations', async ({
 
   await page.goto('/clasamente?clasament=furnizori&castigate=asociere')
   await expect(main.getByText('Câștigat: În asociere')).toBeVisible()
+  // A contract is in each member's value: bars, never parts of one whole.
+  await expect(
+    main.getByRole('heading', { name: /^Primii 10 · / }),
+  ).toBeVisible()
+  await expect(main.locator('.dr-tile')).toHaveCount(0)
   await expect(
     main.getByText(
       'Un contract câștigat în asociere apare la fiecare membru, cu valoarea întreagă.',
@@ -1331,7 +1336,7 @@ test('every project of every programme is one list, never added up', async ({
   // A natural person's project is counted, never listed by name.
   await expect(
     main.getByText(
-      'Include un contract al unei persoane fizice, pe care nu le afișăm nominal.',
+      'Include un proiect al unei persoane fizice, pe care nu îl afișăm nominal.',
       { exact: false },
     ),
   ).toBeVisible()
@@ -1348,6 +1353,14 @@ test('every project of every programme is one list, never added up', async ({
   await expect(main.getByText('Program: Anghel Saligny')).toBeVisible()
   await expect(projectRows(main)).toHaveCount(4)
   await expect(main.getByText(/valoare 67,5 mil\. lei$/)).toBeVisible()
+
+  // Cohesion is several programmes, each list at its own day: still no value.
+  await page.goto('/proiecte?program=fonduri-europene')
+  await expect(projectRows(main)).toHaveCount(5)
+  await expect(main.getByText(/valoare .* lei$/)).toHaveCount(0)
+  await expect(
+    main.getByText('sumele nu se adună între programe', { exact: false }),
+  ).toBeVisible()
 
   await page.goto('/proiecte?judet=gorj')
   await expect(main.getByText('Județ: Gorj')).toBeVisible()
@@ -1390,6 +1403,14 @@ test("a programme's page lists its own projects, and nothing else", async ({
   await expect(main.getByRole('button', { name: /^Program$/ })).toHaveCount(0)
   await page.goto(`${PROGRAMME}?q=turceni`)
   await expect(projectRows(main)).toHaveCount(1)
+  // An old link with the finder's builder filter says the list is no longer filtered.
+  await page.goto(`${PROGRAMME}?firma=17886786`)
+  await expect(
+    main.getByText('Adresa avea un filtru care nu mai există', {
+      exact: false,
+    }),
+  ).toBeVisible()
+  await expect(projectRows(main)).toHaveCount(4)
   await page.goto(`${PROGRAMME}?pagina=9`)
   await expect(page).toHaveURL(/\/programe\/anghel-saligny$/)
 })
@@ -1818,7 +1839,11 @@ test('payments to a beneficiary with several contracts on a measure belong to no
   await page.goto(`${PNRR}/contracte/702`)
   const main = page.getByRole('main')
   await expect(main.getByText('Nu putem spune').first()).toBeVisible()
-  // The card of the shared payments is folded: its summary says what it holds.
+  // The card of the shared payments is folded: its summary says what it holds, and that
+  // the sum is the measure's.
+  await expect(
+    main.getByText('pe măsură, pentru 2 contracte', { exact: false }),
+  ).toBeVisible()
   const fold = main.locator('details.dr-fold')
   await expect(fold).not.toHaveAttribute('open')
   await fold.locator('summary').click()

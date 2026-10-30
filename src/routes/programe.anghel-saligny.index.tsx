@@ -4,7 +4,8 @@ import {
   createFileRoute,
   redirect,
 } from '@tanstack/react-router'
-import { Container, Flex, Heading, Link, Text } from '@radix-ui/themes'
+import { InfoCircledIcon } from '@radix-ui/react-icons'
+import { Callout, Container, Flex, Heading, Link, Text } from '@radix-ui/themes'
 
 import { Unavailable } from '#/components/Notes'
 import { ProgrammeFigures } from '#/features/programme/ProgrammeFigures'
@@ -15,6 +16,7 @@ import { useI18n } from '#/i18n/context'
 import { pageTitle } from '#/lib/copy'
 import { pageCount } from '#/lib/list'
 import { validateProjectListSearch } from '#/features/projects/list'
+import type { ProjectListSearch } from '#/features/projects/list'
 import { programmeQuery } from '#/features/programme/queries'
 import {
   projectListQuery,
@@ -24,8 +26,21 @@ import {
 // The Anghel Saligny programme, an overview (ScreenProgramme, design D22): what the
 // ministry paid and how its payments were tied to SEAP contracts. Its list is the list of
 // every project (ScreenProjects) fixed to the programme.
+// The filters of the page's own finder, before D22: an old link that carries one is told
+// that the list now shows every project, rather than looking filtered when it is not.
+const OLD_FILTERS = ['firma', 'legatura', 'lucrari', 'platit_min', 'platit_max']
+
 export const Route = createFileRoute('/programe/anghel-saligny/')({
-  validateSearch: validateProjectListSearch,
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): ProjectListSearch & { vechi?: 'filtre' } => ({
+    ...validateProjectListSearch(search),
+    vechi:
+      search.vechi === 'filtre' ||
+      OLD_FILTERS.some((key) => search[key] !== undefined)
+        ? 'filtre'
+        : undefined,
+  }),
   loaderDeps: ({ search }) => search,
   loader: async ({ context, deps }) => {
     const [, list] = await Promise.all([
@@ -87,6 +102,14 @@ function ProgrammePage() {
         ) : (
           <>
             <ProgrammeFigures programme={programme} />
+            {search.vechi ? (
+              <Callout.Root color="amber" variant="surface" size="1">
+                <Callout.Icon>
+                  <InfoCircledIcon />
+                </Callout.Icon>
+                <Callout.Text>{t.projects.oldFilters}</Callout.Text>
+              </Callout.Root>
+            ) : null}
             <ProjectList
               title={t.projects.listTitle}
               fixed="anghel_saligny"

@@ -103,6 +103,8 @@ function MeasurePayments({
                 {p.paymentsFolded(
                   p.paymentsCount(payments.count, f.count(payments.count)),
                   f.leiShort(payments.paid),
+                  payments.contracts,
+                  f.count(payments.contracts),
                 )}
               </Text>
               <ChevronDownIcon className="dr-fold-mark" aria-hidden />
