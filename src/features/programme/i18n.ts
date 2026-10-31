@@ -117,6 +117,9 @@ export const programme = {
   companiesHop: 'Firme',
   andMore: (n: number) => `și încă ${n}`,
   namedInFile: 'numită în fișierul de plăți · CUI {cui}',
+  // A builder the payment files name without a tax ID, found by its name.
+  namedInRegister:
+    'numită în fișierul de plăți fără CUI · CUI {cui} din Registrul Comerțului, după nume',
   purchasesHop: 'Achiziții',
   ofProjectValue: (share: string) => `${share} din valoarea proiectului`,
   confidenceShort: {
@@ -143,7 +146,8 @@ export const programme = {
   noneHop: 'Niciun contract găsit',
   noneNote: (from: string, to: string) => `căutat în SEAP, ${from}–${to}`,
   unnamedHop: 'Nu putem căuta',
-  unnamedNote: 'constructorul nu are CUI în fișier',
+  unnamedNote:
+    'constructorul nu are CUI în fișier, iar numele lui nu duce la o singură firmă din Registrul Comerțului',
   subcontractors: 'Subcontractori',
   subcontractorsNote: 'SEAP nu îi publică',
   ceiling: (value: string) => `acord-cadru · plafon ${value}`,
@@ -177,6 +181,13 @@ export const programme = {
       'Legătură probabilă: același constructor, după CUI-ul pe care o plată mai nouă a proiectului îl dă aceluiași nume de firmă; nicio altă instituție din SEAP nu poartă numele primăriei.',
     'builder-cui-of-project+town-hall-name':
       'Legătură posibilă: același constructor, după CUI-ul pe care o plată mai nouă a proiectului îl dă aceluiași nume de firmă; mai multe instituții din SEAP poartă numele primăriei.',
+    // A builder named without a tax ID, found in the trade register by its name.
+    'builder-name-in-register+town-hall-name+county':
+      'Legătură probabilă: constructorul e găsit după nume, singura firmă cu acest nume din Registrul Comerțului; instituția are numele primăriei și e din același județ.',
+    'builder-name-in-register+only-town-hall-of-that-name':
+      'Legătură probabilă: constructorul e găsit după nume, singura firmă cu acest nume din Registrul Comerțului; nicio altă instituție din SEAP nu poartă numele primăriei.',
+    'builder-name-in-register+town-hall-name':
+      'Legătură posibilă: constructorul e găsit după nume, singura firmă cu acest nume din Registrul Comerțului; mai multe instituții din SEAP poartă numele primăriei.',
   } as Record<string, string | undefined>,
   confidence: {
     probable: 'Legătură probabilă.',
