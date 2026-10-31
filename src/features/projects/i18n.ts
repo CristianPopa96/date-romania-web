@@ -121,6 +121,7 @@ export const projects = {
       files: 'în fișierele MDLPA',
       beneficiary: 'beneficiarului, pe toate măsurile',
       cumulative: 'cumulat, fără dată',
+      validated: 'plăți validate, pe harta MIPE',
     },
   },
   project: 'Proiect',

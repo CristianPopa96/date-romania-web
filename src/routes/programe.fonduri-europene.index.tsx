@@ -157,6 +157,11 @@ function EuFundsView({ funds }: { funds: EuFunds }) {
                     </Table.Cell>
                     <Table.Cell justify="end">
                       {money(programme.paid)}
+                      {programme.paid_as === 'validated' && (
+                        <Text as="div" size="1" color="gray">
+                          {e.paidValidated}
+                        </Text>
+                      )}
                     </Table.Cell>
                     <Table.Cell>
                       {programme.cut_off ? (
