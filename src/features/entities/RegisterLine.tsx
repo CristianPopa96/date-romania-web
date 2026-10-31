@@ -17,7 +17,7 @@ export function RegisterLine({ register }: { register: Register }) {
     register.registered_on
       ? e.registeredOn(f.day(register.registered_on))
       : null,
-    e.state(register.states.join(', ')),
+    register.states.length ? e.state(register.states.join(', ')) : null,
     register.since ? e.stateSince(f.day(register.since)) : null,
   ].filter(Boolean)
   return (
