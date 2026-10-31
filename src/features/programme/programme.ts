@@ -14,8 +14,9 @@ export function countySlug(key: string) {
 }
 
 // How much was tied, probably, to the contracts of one award notice, out of what could
-// be tied at all. Only payments that name the builder by tax ID can be tied, so the share
-// is of those, never of every payment: the older files give names only. Left out of what
+// be tied at all. Only payments whose builder has a tax ID can be tied (their own, or the
+// one a newer payment of the project gives the same name), so the share is of those,
+// never of every payment: the older files give names only. Left out of what
 // counts as tied, and counted apart:
 //   several   payments with several possible notices: we do not know which one is paid
 //   possible  payments tied to one notice by a link that is only possible

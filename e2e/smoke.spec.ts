@@ -1341,20 +1341,21 @@ test('the programme page adds up the payment files and says how much was tied', 
     main.getByText('Plătit, în fișierele din 18.05–27.08.2026'),
   ).toBeVisible()
   await expect(main.getByText('7,2 mil. lei').first()).toBeVisible()
-  // Of the four payments that name the builder by tax ID, two found one contract. The
-  // one with two possible contracts is not counted as tied, and the figure says so.
+  // Of the five payments whose builder has a tax ID, three found one contract: the
+  // oldest of project 101 takes the tax ID of the project's newer payments. The one with
+  // two possible contracts is not counted as tied, and the figure says so.
   await expect(
     main.getByText('Legat, probabil, de un singur contract SEAP'),
   ).toBeVisible()
-  await expect(main.getByText('70 %', { exact: true })).toBeVisible()
-  await expect(main.getByText('din sumă · 50 % din plăți')).toBeVisible()
+  await expect(main.getByText('81 %', { exact: true })).toBeVisible()
+  await expect(main.getByText('din sumă · 60 % din plăți')).toBeVisible()
   await expect(
     main.getByText(
       'o plată are mai multe contracte posibile și nu e numărată aici',
     ),
   ).toBeVisible()
   await expect(
-    main.getByText('din 4 plăți care numesc constructorul cu CUI'),
+    main.getByText('din 5 plăți al căror constructor are CUI'),
   ).toBeVisible()
   // The figure rests on both sources, and both are named under it.
   await expect(

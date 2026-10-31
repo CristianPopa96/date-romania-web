@@ -155,7 +155,7 @@ export const eu = {
       counted(n, text, 'o achiziție directă', 'achiziții directe'),
     hopCited: {
       smis: 'care citează codul SMIS',
-      pnrr: 'care citează nr. contractului',
+      pnrr: 'care citează contractul sau măsura lui',
     },
     probable: 'Probabil',
     hopCompanies: 'Firme',
@@ -184,27 +184,39 @@ export const eu = {
     supplier: 'Furnizor',
     value: 'Valoare fără TVA',
     link: 'Legătură',
-    // By the kind of project, then of record: a direct purchase is not a notice.
+    // By how the record was tied, then by the record: a direct purchase is not a notice.
     badge: {
-      smis: { notice: 'SMIS în anunț', purchase: 'SMIS în achiziție' },
-      pnrr: {
+      'smis-in-text': {
+        notice: 'SMIS în anunț',
+        purchase: 'SMIS în achiziție',
+      },
+      'financing-number+buyer': {
         notice: 'Nr. finanțare în anunț',
         purchase: 'Nr. finanțare în achiziție',
+      },
+      'pnrr-measure+buyer': {
+        notice: 'PNRR în anunț',
+        purchase: 'PNRR în achiziție',
       },
     },
     failed:
       'Nu am putut citi acum contractele și achizițiile din SEAP. Încearcă din nou mai târziu.',
     help: {
-      smis: (cited: string) =>
+      'smis-in-text': (cited: string) =>
         `Legat de noi: codul SMIS ${cited} apare în textul scris de cumpărător în SEAP. SEAP nu are un câmp pentru proiect și nu verifică ce scrie cumpărătorul.`,
-      pnrr: (cited: string) =>
+      'financing-number+buyer': (cited: string) =>
         `Legat de noi: numărul „${cited}” apare în textul scris de cumpărător în SEAP și este numărul unui contract de finanțare PNRR al aceluiași cumpărător. SEAP nu verifică ce scrie cumpărătorul.`,
+      // 'PNRR' when the text names no measure and the buyer has a single PNRR contract.
+      'pnrr-measure+buyer': (cited: string) =>
+        cited === 'PNRR'
+          ? 'Legat de noi: textul scris de cumpărător în SEAP pomenește PNRR, iar acesta e singurul contract de finanțare PNRR al cumpărătorului. SEAP nu verifică ce scrie cumpărătorul.'
+          : `Legat de noi: textul scris de cumpărător în SEAP pomenește PNRR și măsura acestui contract (${cited}), iar cumpărătorul nu are alt contract de finanțare PNRR pe ea. SEAP nu verifică ce scrie cumpărătorul.`,
     },
     // A partner of the project buys for it too.
     boughtBy: (name: string) => `cumpărat de ${name}`,
     incomplete: {
       smis: 'Lista poate fi incompletă. Codul SMIS apare în SEAP doar când autoritatea l-a scris în anunț; nu e un câmp obligatoriu. Citim doar anunțurile și achizițiile din perioada pe care o avem.',
-      pnrr: 'Lista poate fi incompletă. Numărul contractului de finanțare apare în anunț doar când autoritatea l-a scris acolo; nu e un câmp obligatoriu în SEAP. Citim doar anunțurile și achizițiile din perioada pe care o avem.',
+      pnrr: 'Lista poate fi incompletă. Numărul contractului de finanțare sau măsura PNRR apar în anunț doar când autoritatea le-a scris acolo; nu sunt câmpuri obligatorii în SEAP. Citim doar anunțurile și achizițiile din perioada pe care o avem.',
     },
   },
 

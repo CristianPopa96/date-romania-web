@@ -48,8 +48,8 @@ export function seapHops(
       ? s.hopPurchases(seap.purchases.length, f.count(seap.purchases.length))
       : null,
   ].filter((part) => part !== null)
-  // What the buyer's text cites, as written, for the badge's words.
-  const cited = seap.contracts.at(0)?.cited ?? seap.purchases.at(0)?.cited ?? ''
+  // How the first record was tied and what its text cites, for the badge's words.
+  const first = seap.contracts.at(0) ?? seap.purchases.at(0)
   const hops: Array<TraceHop> = [
     {
       role: s.hopRecords,
@@ -59,7 +59,7 @@ export function seapHops(
         <ConfidenceBadge
           level="probable"
           label={s.probable}
-          help={s.help[kind](cited)}
+          help={first ? s.help[first.method](first.cited) : undefined}
         />
       ),
       link: by('probable'),

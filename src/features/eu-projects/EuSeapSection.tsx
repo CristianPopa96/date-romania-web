@@ -22,7 +22,7 @@ import { Winners } from '#/features/contracts'
 import { useI18n } from '#/i18n/context'
 import { rich } from '#/i18n/rich'
 import type { EntityRef } from '#/lib/api'
-import type { EuSeapOf } from '#/features/eu-projects/api'
+import type { EuSeapContract, EuSeapOf } from '#/features/eu-projects/api'
 import { PAGE_SIZE } from '#/lib/api'
 import { euSeapQuery } from '#/features/eu-projects/queries'
 
@@ -57,11 +57,14 @@ export function EuSeapSection({
       </Flex>
     )
   }
-  const badge = (record: 'notice' | 'purchase', cited: string) => (
+  const badge = (
+    record: 'notice' | 'purchase',
+    { method, cited }: Pick<EuSeapContract, 'method' | 'cited'>,
+  ) => (
     <ConfidenceBadge
       level="probable"
-      label={s.badge[of.kind][record]}
-      help={s.help[of.kind](cited)}
+      label={s.badge[method][record]}
+      help={s.help[method](cited)}
     />
   )
   // Only against a beneficiary we hold: with none, the lead's own rows would read as bought
@@ -95,7 +98,7 @@ export function EuSeapSection({
             {s.contracts(links.contracts_total, f.count(links.contracts_total))}
           </Heading>
           <SeapTable caption={s.contractsCaption} first={s.contract}>
-            {links.contracts.map(({ contract, cited }) => (
+            {links.contracts.map(({ contract, ...link }) => (
               <Table.Row key={contract.id}>
                 <Table.Cell>
                   <Record
@@ -132,7 +135,7 @@ export function EuSeapSection({
                     </Text>
                   )}
                 </Table.Cell>
-                <Table.Cell>{badge('notice', cited)}</Table.Cell>
+                <Table.Cell>{badge('notice', link)}</Table.Cell>
               </Table.Row>
             ))}
           </SeapTable>
@@ -153,7 +156,7 @@ export function EuSeapSection({
             )}
           </Heading>
           <SeapTable caption={s.purchasesCaption} first={s.purchase}>
-            {links.purchases.map(({ purchase, cited }) => (
+            {links.purchases.map(({ purchase, ...link }) => (
               <Table.Row key={purchase.id}>
                 <Table.Cell>
                   <Record
@@ -188,7 +191,7 @@ export function EuSeapSection({
                     f.lei(purchase.value)
                   )}
                 </Table.Cell>
-                <Table.Cell>{badge('purchase', cited)}</Table.Cell>
+                <Table.Cell>{badge('purchase', link)}</Table.Cell>
               </Table.Row>
             ))}
           </SeapTable>
