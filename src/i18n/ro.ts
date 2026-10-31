@@ -16,6 +16,7 @@ import { pnrr } from '#/features/pnrr/i18n'
 import { programme } from '#/features/programme/i18n'
 import { projects } from '#/features/projects/i18n'
 import { rankings } from '#/features/rankings/i18n'
+import { road } from '#/features/sources/road-i18n'
 
 export const ro = {
   common: {
@@ -151,6 +152,9 @@ export const ro = {
       'local-budgets': 'bugetele primăriilor și consiliilor județene',
       anaf: 'registrul contribuabililor',
       onrc: 'Registrul Comerțului, firmele înregistrate',
+      pnrr: 'tabloul de bord PNRR',
+      'eu-projects': 'listele de proiecte contractate',
+      'eu-map': 'harta proiectelor 2021–2027',
     } as Record<string, string | undefined>,
     name: (publisher: string, what: string) => `${publisher} · ${what}`,
     // What the count of a source counts, where the word "records" is not enough.
@@ -195,11 +199,16 @@ export const ro = {
         'bugetul executat al fiecărei primării și al fiecărui consiliu județean, și populația fiecărei localități, de la MDLPA',
       anaf: 'județul și localitatea sediului fiecărei instituții și firme',
       onrc: 'denumirea oficială, forma juridică, sediul și starea fiecărei firme, și a celor radiate',
+      pnrr: 'fiecare contract de finanțare PNRR, cu măsura lui, și fiecare plată, cu data ei',
+      'eu-projects':
+        'proiectele programelor 2014–2020 și ale programelor naționale 2021–2027, cu valoarea și cât s-a plătit, și plățile Programului Sănătate',
+      'eu-map':
+        'proiectele programelor regionale și ale Programului Transport 2021–2027, și CUI-ul beneficiarilor din liste',
     } as Record<string, string | undefined>,
     limitsOf: {
       'seap-direct': [
         'fără linie bugetară',
-        'fără produsele cumpărate și condițiile de plată, încă',
+        'produsele cumpărate și condițiile de plată doar pentru o parte, de la cele mai mari',
       ],
       'seap-awards': [
         'fără linie bugetară',
@@ -226,6 +235,18 @@ export const ro = {
       anaf: [
         'doar județul și localitatea, niciodată strada',
         'întrebat o dată pentru fiecare CUI',
+      ],
+      pnrr: [
+        'o ediție a tabloului, înlocuită de următoarea',
+        'progresul e cel raportat, nu calculat din plăți',
+      ],
+      'eu-projects': [
+        'fiecare program are lista lui, la data ei',
+        'plățile au doar totalul până la acea dată, fără ziua fiecăreia (în afară de Programul Sănătate)',
+      ],
+      'eu-map': [
+        'plățile validate nu sunt același lucru cu plățile din liste',
+        'un proiect dintr-o listă rămâne al listei',
       ],
       onrc: [
         'doar firmele, niciodată persoanele fizice autorizate, întreprinderile individuale sau familiale',
@@ -260,6 +281,18 @@ export const ro = {
     anafFound: (count: string) => `${count} găsite la ANAF`,
     companiesHeld: (n: number, text: string) =>
       counted(n, text, 'o firmă', 'firme'),
+    pnrrHeld: (n: number, text: string) =>
+      counted(n, text, 'un contract de finanțare', 'contracte de finanțare'),
+    pnrrPayments: (count: string, day: string) =>
+      `și ${count} plăți · ediția din ${day}`,
+    euHeld: (n: number, text: string) =>
+      counted(n, text, 'un proiect', 'proiecte'),
+    euPrograms: (programmes: string) =>
+      `din ${programmes} programe, fiecare la data listei lui`,
+    mapHeld: (n: number, text: string) =>
+      `${counted(n, text, 'un proiect', 'proiecte')} fără listă`,
+    mapListed: (count: string, day: string) =>
+      `și CUI-ul pentru ${count} proiecte din liste · ediția din ${day}`,
     companiesDeleted: (count: string, day: string) =>
       `din care ${count} radiate · ediția din ${day}`,
     daysRead: (full: string, expected: number, expectedText: string) =>
@@ -286,10 +319,6 @@ export const ro = {
         name: 'Execuția bugetară (Forexebug)',
         brings:
           'cât a cheltuit fiecare instituție, alta decât primăriile și consiliile județene, pe capitole de buget. Portalul Ministerului Finanțelor cere un cod de verificare la fiecare căutare, așa că datele vor fi cerute ministerului.',
-      },
-      {
-        name: 'MIPE · fonduri europene',
-        brings: 'cât s-a plătit din fiecare program',
       },
       {
         name: 'TED',
@@ -364,7 +393,7 @@ export const ro = {
     vat: 'Toate sumele sunt în lei, fără TVA, așa cum le publică SEAP.',
     personalTitle: 'Date personale',
     personal:
-      'O persoană fizică autorizată poate apărea în SEAP cu codul numeric personal. Îl ascundem în toate datele de pe site: apare ca [CNP].',
+      'O persoană fizică autorizată poate apărea în SEAP cu codul numeric personal. Îl ascundem în toate datele de pe site: apare ca [CNP]. Persoanele fizice care primesc bani din PNRR sau din fonduri europene nu sunt numite pe site: o listă sau un total care le cuprinde spune doar câte sunt. Din Registrul Comerțului nu citim deloc persoanele fizice autorizate și întreprinderile individuale sau familiale.',
     rawTitle: 'Păstrăm originalul',
     raw: (n: number, text: string) =>
       `Fiecare răspuns primit de la o sursă e păstrat neschimbat, cu amprenta lui, înainte de a fi citit. Copia nu este publică, pentru că poate conține coduri numerice personale. Până acum sunt ${counted(n, text, 'un răspuns', 'răspunsuri')}.`,
@@ -481,6 +510,7 @@ export const ro = {
   },
 
   rankings,
+  road,
 
   list,
   purchaseList,

@@ -4,6 +4,7 @@ import { DownloadIcon } from '@radix-ui/react-icons'
 import { Button, Container, Flex, Heading, Text } from '@radix-ui/themes'
 
 import { Corrections } from '#/features/sources/Corrections'
+import { DataRoad } from '#/features/sources/DataRoad'
 import { Methodology } from '#/features/sources/Methodology'
 import { Unavailable } from '#/components/Notes'
 import { ReportForm } from '#/components/ReportForm'
@@ -12,17 +13,26 @@ import { UrlTabs } from '#/components/UrlTabs'
 import { messagesFor } from '#/i18n'
 import { useI18n } from '#/i18n/context'
 import { pageTitle } from '#/lib/copy'
-import { correctionsQuery, datasetsQuery } from '#/features/sources/queries'
+import {
+  correctionsQuery,
+  dataRoadQuery,
+  datasetsQuery,
+} from '#/features/sources/queries'
 import { validateSourcesSearch } from '#/features/sources/urls'
 
 // Where the data comes from: the sources we hold, the ones still to come, how the
 // figures are counted, and what readers reported and we corrected.
 export const Route = createFileRoute('/surse')({
   validateSearch: validateSourcesSearch,
-  loader: ({ context }) =>
+  loaderDeps: ({ search }) => ({ fila: search.fila }),
+  loader: ({ context, deps }) =>
     Promise.all([
       context.queryClient.ensureQueryData(datasetsQuery),
       context.queryClient.ensureQueryData(correctionsQuery),
+      // The road's figures are read only for its tab.
+      deps.fila === 'drum'
+        ? context.queryClient.ensureQueryData(dataRoadQuery)
+        : null,
     ]),
   head: ({ match }) => ({
     meta: [
@@ -64,6 +74,7 @@ function Sources() {
                 label: t.sources.tabSources(f.count(datasets.length)),
               },
               { value: 'metodologie', label: t.sources.tabMethod },
+              { value: 'drum', label: t.road.tab },
               {
                 value: 'corecturi',
                 label:
@@ -103,6 +114,8 @@ function Sources() {
               </>
             ) : tab === 'metodologie' ? (
               <Methodology datasets={datasets} />
+            ) : tab === 'drum' ? (
+              <Road datasets={datasets} />
             ) : (
               <Corrections items={corrections} />
             )}
@@ -111,4 +124,14 @@ function Sources() {
       </Flex>
     </Container>
   )
+}
+
+// The road's figures, read when its tab is open.
+function Road({
+  datasets,
+}: {
+  datasets: Parameters<typeof DataRoad>[0]['datasets']
+}) {
+  const { data } = useSuspenseQuery(dataRoadQuery)
+  return <DataRoad road={data} datasets={datasets} />
 }

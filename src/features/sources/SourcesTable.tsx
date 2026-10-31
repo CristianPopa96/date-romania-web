@@ -203,6 +203,22 @@ function Held({ dataset }: { dataset: Dataset }) {
       s.anafHeld(dataset.records, f.count(dataset.records)),
       s.anafFound(f.count(n('found'))),
     ],
+    pnrr: [
+      s.pnrrHeld(dataset.records, f.count(dataset.records)),
+      dataset.last_day
+        ? s.pnrrPayments(f.count(n('payments')), f.day(dataset.last_day))
+        : '',
+    ],
+    'eu-projects': [
+      s.euHeld(dataset.records, f.count(dataset.records)),
+      s.euPrograms(f.count(n('programmes'))),
+    ],
+    'eu-map': [
+      s.mapHeld(dataset.records, f.count(dataset.records)),
+      dataset.last_day
+        ? s.mapListed(f.count(n('listed')), f.day(dataset.last_day))
+        : '',
+    ],
     onrc: [
       s.companiesHeld(dataset.records, f.count(dataset.records)),
       dataset.last_day
