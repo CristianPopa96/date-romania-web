@@ -2999,7 +2999,7 @@ export interface components {
             town_halls: number;
             /**
              * Builders
-             * @description Builders named by tax ID.
+             * @description Builders whose tax ID is found: given by a payment file, by a newer payment of the project for the same name, or by the trade register for the name.
              */
             builders: number;
             /**
@@ -4111,6 +4111,11 @@ export interface components {
             /** @description Set when the company has a page. */
             entity: components["schemas"]["EntityRef"] | null;
             /**
+             * Found By
+             * @description Where its tax ID comes from: a payment file; a newer payment of the project that gives the same name one; or the trade register, where one company carries the name. Null with no tax ID.
+             */
+            found_by: ("file" | "project" | "register") | null;
+            /**
              * Payments
              * @description The payments of the project that name this builder.
              */
@@ -4170,7 +4175,7 @@ export interface components {
             confidence: "probable" | "possible";
             /**
              * Method
-             * @description What the link rests on.
+             * @description What the link rests on: 'builder-cui+...' (the payment's own tax ID), 'builder-cui-of-project+...' or 'builder-name-in-register+...' (the builder found by name), then how the town hall was matched.
              */
             method: string;
             /**

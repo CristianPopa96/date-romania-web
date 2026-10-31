@@ -125,13 +125,16 @@ export function ProjectChain({
           </>
         ),
       note: first?.cui
-        ? rich(p.namedInFile, {
-            cui: (
-              <Code key="cui" variant="ghost">
-                {first.cui}
-              </Code>
-            ),
-          })
+        ? rich(
+            first.found_by === 'register' ? p.namedInRegister : p.namedInFile,
+            {
+              cui: (
+                <Code key="cui" variant="ghost">
+                  {first.cui}
+                </Code>
+              ),
+            },
+          )
         : p.noTaxId,
       link: by('published'),
     }

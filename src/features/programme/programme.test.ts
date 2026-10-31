@@ -39,6 +39,7 @@ function builder(more: Partial<TraceBuilder> = {}): TraceBuilder {
     cui: 17886786,
     name: 'ALFA CONSTRUCT S.R.L.',
     entity: null,
+    found_by: 'file',
     payments: 3,
     amount: 5_400_000,
     match: 'one',
