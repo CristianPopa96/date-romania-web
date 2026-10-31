@@ -22,12 +22,17 @@ function beneficiary(patch: Partial<EuBeneficiary>): EuBeneficiary {
 }
 
 describe('beneficiaryTie', () => {
-  it('is sure only when the list gives the CUI', () => {
+  it('is sure only when the list, or else the map, gives the CUI', () => {
     expect(
       beneficiaryTie(
         beneficiary({ entity, confidence: 'sure', method: 'cui-in-list' }),
       ),
     ).toEqual({ level: 'sure', label: 'cui' })
+    expect(
+      beneficiaryTie(
+        beneficiary({ entity, confidence: 'sure', method: 'cui-in-map' }),
+      ),
+    ).toEqual({ level: 'sure', label: 'map' })
   })
 
   it('names the evidence of a tie made by us', () => {

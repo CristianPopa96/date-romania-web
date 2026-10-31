@@ -1643,11 +1643,11 @@ export interface components {
             entity: components["schemas"]["EntityRef"] | null;
             /**
              * Confidence
-             * @description sure: the list gives the tax ID; probable: tied by name and place.
+             * @description sure: the list, or else MIPE's map, gives the tax ID; probable: tied by name and place.
              */
             confidence: ("sure" | "probable") | null;
             /** Method */
-            method: ("cui-in-list" | "administration-name+place" | "name+place" | "company-name") | null;
+            method: ("cui-in-list" | "cui-in-map" | "administration-name+place" | "name+place" | "company-name") | null;
         };
         /**
          * EuBeneficiaryFunds
@@ -1731,8 +1731,14 @@ export interface components {
              */
             paid: number | null;
             /**
+             * Paid As
+             * @description cumulative: what the programme's list calls paid, up to its cut-off; validated: the payments validated to the beneficiary that MIPE's map gives up to its edition's day, for a programme with no list of its own, a different measure.
+             * @enum {string}
+             */
+            paid_as: "cumulative" | "validated";
+            /**
              * Cut Off
-             * @description The day the programme's newest list describes.
+             * @description The day the programme's newest list describes, or the map's edition.
              */
             cut_off: string | null;
             /**
@@ -1791,8 +1797,14 @@ export interface components {
              */
             paid: number | null;
             /**
+             * Paid As
+             * @description cumulative: what the programme's list calls paid, up to its cut-off; validated: the payments validated to the beneficiary that MIPE's map gives up to its edition's day, for a programme with no list of its own, a different measure.
+             * @enum {string}
+             */
+            paid_as: "cumulative" | "validated";
+            /**
              * Cut Off
-             * @description The day the programme's newest list describes.
+             * @description The day the programme's newest list describes, or the map's edition.
              */
             cut_off: string | null;
         };
@@ -1814,6 +1826,12 @@ export interface components {
             total: number | null;
             /** Paid */
             paid: number | null;
+            /**
+             * Paid As
+             * @description cumulative: what the programme's list calls paid, up to its cut-off; validated: the payments validated to the beneficiary that MIPE's map gives up to its edition's day, for a programme with no list of its own, a different measure.
+             * @enum {string}
+             */
+            paid_as: "cumulative" | "validated";
             /** Status */
             status: ("in_progress" | "finished" | "terminated") | null;
             /**
@@ -1919,6 +1937,12 @@ export interface components {
             total: number | null;
             /** Paid */
             paid: number | null;
+            /**
+             * Paid As
+             * @description cumulative: what the programme's list calls paid, up to its cut-off; validated: the payments validated to the beneficiary that MIPE's map gives up to its edition's day, for a programme with no list of its own, a different measure.
+             * @enum {string}
+             */
+            paid_as: "cumulative" | "validated";
             /** Status */
             status: ("in_progress" | "finished" | "terminated") | null;
             /**
@@ -3058,13 +3082,13 @@ export interface components {
             paid: number | null;
             /**
              * Paid As
-             * @description files: the Anghel Saligny payment files' sums for these projects; beneficiary: every PNRR payment to the beneficiary, over all its measures; cumulative: the cohesion list's paid figure up to its cut-off.
+             * @description files: the Anghel Saligny payment files' sums for these projects; beneficiary: every PNRR payment to the beneficiary, over all its measures; cumulative: the cohesion list's paid figure up to its cut-off; validated: the payments validated to the beneficiary that MIPE's map gives, for a programme with no list of its own.
              * @enum {string}
              */
-            paid_as: "files" | "beneficiary" | "cumulative";
+            paid_as: "files" | "beneficiary" | "cumulative" | "validated";
             /**
              * Day
-             * @description The last payment file's day, the PNRR edition, or the list's cut-off.
+             * @description The last payment file's day, the PNRR edition, or the list's cut-off (the map's edition for a programme with no list).
              */
             day: string | null;
         };
@@ -4205,8 +4229,14 @@ export interface components {
             /** Paid */
             paid: number | null;
             /**
+             * Paid As
+             * @description cumulative: what the programme's list calls paid, up to its cut-off; validated: the payments validated to the beneficiary that MIPE's map gives up to its edition's day, for a programme with no list of its own, a different measure.
+             * @enum {string}
+             */
+            paid_as: "cumulative" | "validated";
+            /**
              * Cut Off
-             * @description The day its list counts `paid` up to.
+             * @description The day its list, or the map, counts `paid` up to.
              */
             cut_off: string | null;
         };

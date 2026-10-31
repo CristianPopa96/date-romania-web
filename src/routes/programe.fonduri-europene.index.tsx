@@ -157,6 +157,11 @@ function EuFundsView({ funds }: { funds: EuFunds }) {
                     </Table.Cell>
                     <Table.Cell justify="end">
                       {money(programme.paid)}
+                      {programme.paid_as === 'validated' && (
+                        <Text as="div" size="1" color="gray">
+                          {e.paidValidated}
+                        </Text>
+                      )}
                     </Table.Cell>
                     <Table.Cell>
                       {programme.cut_off ? (
@@ -173,12 +178,9 @@ function EuFundsView({ funds }: { funds: EuFunds }) {
           <Text size="2" color="gray">
             {e.programmesNote}
           </Text>
-          <Flex align="center" gap="2" wrap="wrap">
-            <Text size="2" color="gray">
-              {e.notCollectedRegional}
-            </Text>
-            <DataState kind="notCollected" />
-          </Flex>
+          <Text size="2" color="gray">
+            {e.mapNote}
+          </Text>
           <SourceLine source={funds.source} />
         </Flex>
 

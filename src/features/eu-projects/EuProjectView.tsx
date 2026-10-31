@@ -109,11 +109,21 @@ function ProjectView({
               note: share === null ? undefined : f.percent(share),
             },
             {
-              label: project.cut_off
-                ? e.paidUntil(f.day(project.cut_off))
-                : e.paidAll,
+              label:
+                project.paid_as === 'validated'
+                  ? project.cut_off
+                    ? e.validatedUntil(f.day(project.cut_off))
+                    : e.validatedAll
+                  : project.cut_off
+                    ? e.paidUntil(f.day(project.cut_off))
+                    : e.paidAll,
               value: money(project.paid),
-              note: payments ? e.paidUntilDated : e.paidUntilDetail,
+              note:
+                project.paid_as === 'validated'
+                  ? e.validatedDetail
+                  : payments
+                    ? e.paidUntilDated
+                    : e.paidUntilDetail,
             },
             {
               label: e.rate,
@@ -297,7 +307,9 @@ function CohesionRoad({
             role: e.roadPayments,
             name: f.leiShort(project.paid),
             note: project.cut_off
-              ? e.roadUntil(f.day(project.cut_off))
+              ? (project.paid_as === 'validated'
+                  ? e.roadValidatedUntil
+                  : e.roadUntil)(f.day(project.cut_off))
               : e.roadNoCutOff,
             link: by('published'),
           }
