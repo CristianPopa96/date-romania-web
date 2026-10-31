@@ -61,6 +61,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/data-road": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Data Road
+         * @description Each step of the road from a public source to a page, in figures.
+         */
+        get: operations["data_road_v1_data_road_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/search": {
         parameters: {
             query?: never;
@@ -1449,6 +1469,16 @@ export interface components {
             /** Items */
             items: components["schemas"]["Correction"][];
         };
+        /** Counted */
+        Counted: {
+            /**
+             * Key
+             * @description A table ('direct_purchase'), or a kind of project ('AS').
+             */
+            key: string;
+            /** Count */
+            count: number;
+        };
         /** Counties */
         Counties: {
             /** Items */
@@ -1537,6 +1567,47 @@ export interface components {
             name: string | null;
             /** Count */
             count: number;
+        };
+        /**
+         * DataRoad
+         * @description Each step, in figures: the answers kept whole, the rows read from them, the links
+         *     made between them, and the projects the site shows.
+         */
+        DataRoad: {
+            /**
+             * Documents
+             * @description Answers and files kept whole in the raw store.
+             */
+            documents: number;
+            /** Stored Bytes */
+            stored_bytes: number;
+            /**
+             * Rejected Rows
+             * @description Rows the parsers could not read, logged.
+             */
+            rejected_rows: number;
+            /**
+             * Read
+             * @description Rows read, by table.
+             */
+            read: components["schemas"]["Counted"][];
+            /** Links */
+            links: components["schemas"]["LinkCount"][];
+            /**
+             * Entities
+             * @description Institutions and companies held.
+             */
+            entities: number;
+            /**
+             * Projects
+             * @description Projects shown, by kind of programme.
+             */
+            projects: components["schemas"]["Counted"][];
+            /**
+             * Reach
+             * @description Projects by how far their money is followed ('beneficiary', 'payments', 'purchases', 'companies').
+             */
+            reach: components["schemas"]["Counted"][];
         };
         /**
          * Dataset
@@ -2080,6 +2151,26 @@ export interface components {
              * @enum {string}
              */
             value: "anghel_saligny" | "pnrr" | "cohesion";
+            /** Count */
+            count: number;
+        };
+        /** LinkCount */
+        LinkCount: {
+            /**
+             * Rule
+             * @description What is tied to what: 'eu-beneficiary' (an EU project to its beneficiary), 'anghel-saligny-contract' (a payment to a SEAP contract), 'eu-seap' (a SEAP record to an EU project), 'pnrr-payment-contract' (a PNRR payment to its contract), 'entity-place' (an institution or company to its UAT).
+             */
+            rule: string;
+            /**
+             * Method
+             * @description How, as the rule names it ('cui-in-list', 'smis-in-text').
+             */
+            method: string;
+            /**
+             * Confidence
+             * @description sure, probable or possible; null for a fact.
+             */
+            confidence: string | null;
             /** Count */
             count: number;
         };
@@ -4371,6 +4462,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Datasets"];
+                };
+            };
+        };
+    };
+    data_road_v1_data_road_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataRoad"];
                 };
             };
         };

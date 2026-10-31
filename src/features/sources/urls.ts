@@ -1,9 +1,10 @@
 import { sitePath } from '#/lib/reports'
 
-// /surse?fila=metodologie; the sources themselves are the page's plain address.
+// /surse?fila=metodologie (or drum, corecturi); the sources themselves are the page's plain
+// address.
 // `despre` is the page a reader came from to report an error: /surse?despre=/contracte/9001.
 export type SourcesSearch = {
-  fila?: 'metodologie' | 'corecturi'
+  fila?: 'metodologie' | 'drum' | 'corecturi'
   despre?: string
 }
 
@@ -12,7 +13,9 @@ export function validateSourcesSearch(
 ): SourcesSearch {
   return {
     fila:
-      search.fila === 'metodologie' || search.fila === 'corecturi'
+      search.fila === 'metodologie' ||
+      search.fila === 'drum' ||
+      search.fila === 'corecturi'
         ? search.fila
         : undefined,
     despre: sitePath(search.despre),

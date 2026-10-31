@@ -1134,6 +1134,48 @@ for (const path of [
   })
 }
 
+test('the road of the data shows each step in figures, one lane at a time', async ({
+  page,
+}) => {
+  await page.goto('/surse')
+  const main = page.getByRole('main')
+  await main.getByRole('tab', { name: 'Drumul datelor' }).click()
+  await expect(page).toHaveURL(/\/surse\?fila=drum$/)
+  await expect(
+    main.getByRole('heading', {
+      name: 'De la sursa publică la pagina de pe site',
+    }),
+  ).toBeVisible()
+  for (const step of [
+    'Surse publice',
+    'Păstrăm originalul',
+    'Citim',
+    'Legăm',
+    'Pe site',
+  ]) {
+    await expect(
+      main.getByRole('heading', { name: step, exact: true }),
+    ).toBeVisible()
+  }
+  await expect(
+    main.getByText('6 achiziții directe', { exact: true }),
+  ).toBeVisible()
+  await expect(
+    main.getByText('proiect european → beneficiarul lui'),
+  ).toBeVisible()
+  // A lane lights its own path; the rest fades but stays readable.
+  await main.getByRole('button', { name: 'PNRR', exact: true }).click()
+  await expect(
+    main.getByRole('button', { name: 'PNRR', exact: true }),
+  ).toHaveAttribute('aria-pressed', 'true')
+  // The details name the tables a technical reader can check.
+  await expect(main.getByText('direct_purchase', { exact: true })).toHaveCount(
+    0,
+  )
+  await main.getByText('Arată detaliile tehnice').click()
+  await expect(main.getByText('direct_purchase', { exact: true })).toBeVisible()
+})
+
 test('the sources page says what is held, what is to come and how it is counted', async ({
   page,
 }) => {
@@ -1175,7 +1217,17 @@ test('the sources page says what is held, what is to come and how it is counted'
     .filter({ hasText: 'data.gov.ro · exporturi de contracte SEAP' })
   await expect(exports).toContainText('5 rânduri')
   await expect(exports).toContainText('nu intră în totaluri și clasamente')
-  await expect(main.getByRole('tab', { name: 'Surse (5)' })).toBeVisible()
+  // The EU money is held: the PNRR edition and the programmes' lists are sources too.
+  const pnrr = main
+    .getByRole('row')
+    .filter({ hasText: 'MIPE · tabloul de bord PNRR' })
+  await expect(pnrr).toContainText('6 contracte de finanțare')
+  await expect(pnrr).toContainText('și 7 plăți · ediția din 15.10.2026')
+  const lists = main
+    .getByRole('row')
+    .filter({ hasText: 'MIPE · listele de proiecte contractate' })
+  await expect(lists).toContainText('5 proiecte')
+  await expect(main.getByRole('tab', { name: 'Surse (7)' })).toBeVisible()
 
   // Rows the parser could not read, per source; not counted yet is the dotted state.
   const errors = (row: typeof direct) => row.getByRole('cell').nth(3)
@@ -1192,6 +1244,8 @@ test('the sources page says what is held, what is to come and how it is counted'
   const budget = main.getByRole('row').filter({ hasText: 'Forexebug' })
   await expect(budget).toContainText('Încă necolectat')
   await expect(budget).toContainText('cere un cod de verificare')
+  // Nor are MIPE's EU funds.
+  await expect(main.getByText('MIPE · fonduri europene')).toHaveCount(0)
   // ANAF is held now, so it is no longer among them.
   await expect(main.getByRole('row').filter({ hasText: /^ANAF/ })).toHaveCount(
     0,
@@ -1217,7 +1271,7 @@ test('the sources page says what is held, what is to come and how it is counted'
     ),
   ).toBeVisible()
   await expect(main.getByText('anexa 2 a Legii 98/2016')).toBeVisible()
-  await expect(main.getByText('Până acum sunt 6 răspunsuri.')).toBeVisible()
+  await expect(main.getByText('Până acum sunt 15 răspunsuri.')).toBeVisible()
   await expect(main.getByText(/vinovat|ascuns/)).toHaveCount(0)
 
   await expect(
