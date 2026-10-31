@@ -150,6 +150,7 @@ export const ro = {
       'public-entities': 'lista entităților publice',
       'local-budgets': 'bugetele primăriilor și consiliilor județene',
       anaf: 'registrul contribuabililor',
+      onrc: 'Registrul Comerțului, firmele înregistrate',
     } as Record<string, string | undefined>,
     name: (publisher: string, what: string) => `${publisher} · ${what}`,
     // What the count of a source counts, where the word "records" is not enough.
@@ -193,6 +194,7 @@ export const ro = {
       'local-budgets':
         'bugetul executat al fiecărei primării și al fiecărui consiliu județean, și populația fiecărei localități, de la MDLPA',
       anaf: 'județul și localitatea sediului fiecărei instituții și firme',
+      onrc: 'denumirea oficială, forma juridică, sediul și starea fiecărei firme, și a celor radiate',
     } as Record<string, string | undefined>,
     limitsOf: {
       'seap-direct': [
@@ -225,6 +227,11 @@ export const ro = {
         'doar județul și localitatea, niciodată strada',
         'întrebat o dată pentru fiecare CUI',
       ],
+      onrc: [
+        'doar firmele, niciodată persoanele fizice autorizate, întreprinderile individuale sau familiale',
+        'doar județul și localitatea sediului, niciodată strada',
+        'o ediție pe trimestru: schimbarea stării are doar data ediției',
+      ],
     } as Record<string, Array<string> | undefined>,
     files: (n: number, text: string) =>
       counted(n, text, 'un fișier', 'fișiere'),
@@ -251,6 +258,10 @@ export const ro = {
     anafHeld: (n: number, text: string) =>
       counted(n, text, 'un CUI întrebat', 'CUI-uri întrebate'),
     anafFound: (count: string) => `${count} găsite la ANAF`,
+    companiesHeld: (n: number, text: string) =>
+      counted(n, text, 'o firmă', 'firme'),
+    companiesDeleted: (count: string, day: string) =>
+      `din care ${count} radiate · ediția din ${day}`,
     daysRead: (full: string, expected: number, expectedText: string) =>
       `${full} din ${counted(expected, expectedText, 'o zi', 'zile')} citite complet`,
     daysPartial: (n: number, text: string) =>
@@ -403,6 +414,11 @@ export const ro = {
     tabPurchases: 'Achiziții directe',
     purchasesCount: (n: number, text: string) =>
       counted(n, text, 'o achiziție', 'achiziții'),
+    // What the trade register says of a company, under its name.
+    register: 'Registrul Comerțului',
+    registeredOn: (day: string) => `înregistrată ${day}`,
+    state: (states: string) => `stare: ${states}`,
+    stateSince: (day: string) => `din ediția ${day}`,
   },
 
   // The two ends of public money on an institution's page (GapPanel in the design

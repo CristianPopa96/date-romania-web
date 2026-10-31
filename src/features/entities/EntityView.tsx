@@ -9,6 +9,7 @@ import {
 } from '#/features/contracts'
 import { EntityProjects, projectListQuery } from '#/features/projects'
 import { EntityFigures } from '#/features/entities/EntityFigures'
+import { RegisterLine } from '#/features/entities/RegisterLine'
 import {
   BudgetTab,
   InstitutionHeader,
@@ -95,6 +96,9 @@ export function EntityView({
           <Heading size="7">{data.entity.name}</Heading>
           {role === 'institutions' ? (
             <InstitutionHeader entity={data.entity} />
+          ) : null}
+          {data.trade_register ? (
+            <RegisterLine register={data.trade_register} />
           ) : null}
         </Flex>
 

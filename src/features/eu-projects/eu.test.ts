@@ -59,6 +59,15 @@ describe('beneficiaryTie', () => {
         }),
       ),
     ).toEqual({ level: 'probable', label: 'companyName' })
+    expect(
+      beneficiaryTie(
+        beneficiary({
+          entity,
+          confidence: 'probable',
+          method: 'register-name',
+        }),
+      ),
+    ).toEqual({ level: 'probable', label: 'register' })
   })
 
   it('marks no tie when no entity was found', () => {

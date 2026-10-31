@@ -79,6 +79,7 @@ export const eu = {
     administration: 'Nume și localitate',
     namePlace: 'Nume și localitate',
     companyName: 'Nume de firmă',
+    register: 'Nume în Registrul Comerțului',
     none: 'Fără legătură',
   },
   tieHelp: {
@@ -90,6 +91,8 @@ export const eu = {
       'Legat de noi: lista dă doar numele, iar o singură instituție sau firmă dintre cele pe care le avem poartă acest nume în județul sau localitatea proiectului.',
     companyName:
       'Legat de noi: lista dă doar numele, iar o singură firmă dintre cele pe care le avem poartă acest nume. Numele firmelor sunt unice în Registrul Comerțului.',
+    register:
+      'Legat de noi: lista dă doar numele, iar o singură firmă din Registrul Comerțului poartă acest nume, în țară sau în județul proiectului.',
     none: 'Lista dă doar numele, și nu l-am putut lega de o instituție sau firmă.',
   },
 

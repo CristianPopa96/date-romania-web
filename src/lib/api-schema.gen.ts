@@ -1612,6 +1612,8 @@ export interface components {
         /** EntityPage */
         EntityPage: {
             entity: components["schemas"]["EntityOut"];
+            /** @description Set for a company the trade register lists. */
+            trade_register: components["schemas"]["RegisterFacts"] | null;
             direct_purchases: components["schemas"]["Summary"];
             /**
              * Partners
@@ -1643,11 +1645,11 @@ export interface components {
             entity: components["schemas"]["EntityRef"] | null;
             /**
              * Confidence
-             * @description sure: the list, or else MIPE's map, gives the tax ID; probable: tied by name and place.
+             * @description sure: the list, or else MIPE's map, gives the tax ID; probable: tied by name and place, or by a name one company of the trade register carries.
              */
             confidence: ("sure" | "probable") | null;
             /** Method */
-            method: ("cui-in-list" | "cui-in-map" | "administration-name+place" | "name+place" | "company-name") | null;
+            method: ("cui-in-list" | "cui-in-map" | "administration-name+place" | "name+place" | "company-name" | "register-name") | null;
         };
         /**
          * EuBeneficiaryFunds
@@ -3850,6 +3852,46 @@ export interface components {
             value: "beneficiary" | "payments" | "purchases" | "companies";
             /** Count */
             count: number;
+        };
+        /**
+         * RegisterFacts
+         * @description What the trade register says of a company, at its newest edition held.
+         */
+        RegisterFacts: {
+            /**
+             * Registration
+             * @description 'J40/1116/1991' or 'J2023001161055'.
+             */
+            registration: string;
+            /**
+             * Legal Form
+             * @description 'SRL', 'SA', 'SNC'...
+             */
+            legal_form: string;
+            /** Registered On */
+            registered_on: string | null;
+            /**
+             * States
+             * @description As the register writes them: 'funcțiune', 'radiată'.
+             */
+            states: string[];
+            /**
+             * Deleted
+             * @description Struck off the register ('radiată').
+             */
+            deleted: boolean;
+            /**
+             * Since
+             * @description The edition its states were first seen in, when they changed after the first edition held; the register gives no date of its own.
+             */
+            since: string | null;
+            /**
+             * Edition
+             * Format: date
+             * @description The day of the newest edition that lists it.
+             */
+            edition: string;
+            source: components["schemas"]["Source"];
         };
         /**
          * ReportIn

@@ -203,6 +203,12 @@ function Held({ dataset }: { dataset: Dataset }) {
       s.anafHeld(dataset.records, f.count(dataset.records)),
       s.anafFound(f.count(n('found'))),
     ],
+    onrc: [
+      s.companiesHeld(dataset.records, f.count(dataset.records)),
+      dataset.last_day
+        ? s.companiesDeleted(f.count(n('deleted')), f.day(dataset.last_day))
+        : '',
+    ],
   }
   const found = lines[dataset.key]
   if (found) {
