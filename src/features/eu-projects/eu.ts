@@ -4,12 +4,13 @@
 
 import type { EuBeneficiary } from '#/features/eu-projects/api'
 // How the tie between a project and its beneficiary is marked (the ConfidenceBadge of the
-// design system): 'sure' when the list gives the CUI, 'probable' when we tied it by name.
-// `label` names the evidence: 'cui', 'administration' (the town hall or council of the
-// place an administration's name governs), 'namePlace' or 'companyName'.
+// design system): 'sure' when the list, or else MIPE's map, gives the CUI, 'probable' when
+// we tied it by name. `label` names the evidence: 'cui' (the list's), 'map', 'administration'
+// (the town hall or council of the place an administration's name governs), 'namePlace' or
+// 'companyName'.
 export type BeneficiaryTie = {
   level: 'sure' | 'probable' | 'none'
-  label: 'cui' | 'administration' | 'namePlace' | 'companyName' | 'none'
+  label: 'cui' | 'map' | 'administration' | 'namePlace' | 'companyName' | 'none'
 }
 
 // The words for each way we tie by name; a way added later reads as name and place.
@@ -21,7 +22,11 @@ const PROBABLE_LABELS: Partial<Record<string, BeneficiaryTie['label']>> = {
 
 export function beneficiaryTie(beneficiary: EuBeneficiary): BeneficiaryTie {
   if (!beneficiary.entity) return { level: 'none', label: 'none' }
-  if (beneficiary.confidence === 'sure') return { level: 'sure', label: 'cui' }
+  if (beneficiary.confidence === 'sure')
+    return {
+      level: 'sure',
+      label: beneficiary.method === 'cui-in-map' ? 'map' : 'cui',
+    }
   return {
     level: 'probable',
     label: PROBABLE_LABELS[beneficiary.method ?? ''] ?? 'namePlace',

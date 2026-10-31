@@ -173,12 +173,9 @@ function EuFundsView({ funds }: { funds: EuFunds }) {
           <Text size="2" color="gray">
             {e.programmesNote}
           </Text>
-          <Flex align="center" gap="2" wrap="wrap">
-            <Text size="2" color="gray">
-              {e.notCollectedRegional}
-            </Text>
-            <DataState kind="notCollected" />
-          </Flex>
+          <Text size="2" color="gray">
+            {e.mapNote}
+          </Text>
           <SourceLine source={funds.source} />
         </Flex>
 

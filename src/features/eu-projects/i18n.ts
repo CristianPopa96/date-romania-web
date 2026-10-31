@@ -8,7 +8,7 @@ export const eu = {
   name: 'Fonduri europene',
   eyebrow: 'Fonduri de coeziune · MIPE',
   title: 'Proiecte cu fonduri europene',
-  lead: 'Proiectele finanțate din programele operaționale 2014–2020 și din programele naționale 2021–2027, din listele de proiecte contractate pe care le publică MIPE. Fiecare listă dă valoarea proiectului și cât s-a plătit până la data ei, nu și data fiecărei plăți.',
+  lead: 'Proiectele finanțate din programele operaționale 2014–2020 și din programele 2021–2027, din listele de proiecte contractate pe care le publică MIPE și din harta MIPE a proiectelor 2021–2027. Fiecare dă valoarea proiectului și cât s-a plătit până la data ei, nu și data fiecărei plăți.',
   // The source line of one project names its list and the day it describes.
   listOn: (record: string, day: string) => `${record}, ${day}`,
 
@@ -22,8 +22,9 @@ export const eu = {
   value: 'Valoare',
   paid: 'Plătit',
   cutOff: 'La data',
-  notCollectedRegional:
-    'Programele regionale 2021–2027 nu sunt încă colectate.',
+  // Where the 2021-2027 projects come from: a list where the programme has one, else the map.
+  mapNote:
+    'Programele regionale și Programul Transport 2021–2027 nu au o listă de proiecte contractate: proiectele lor vin din harta MIPE a proiectelor 2021–2027, la data ediției ei.',
 
   // The list's columns.
   state: 'Stare',
@@ -71,6 +72,7 @@ export const eu = {
   // How a project's beneficiary is tied to an institution or a company we hold.
   tie: {
     cui: 'CUI în listă',
+    map: 'CUI pe harta MIPE',
     // The design's medium label covers both ties by name and place.
     administration: 'Nume și localitate',
     namePlace: 'Nume și localitate',
@@ -79,6 +81,7 @@ export const eu = {
   },
   tieHelp: {
     cui: 'Lista MIPE dă CUI-ul beneficiarului.',
+    map: 'Harta MIPE a proiectelor 2021–2027 dă CUI-ul beneficiarului.',
     administration:
       'Legat de noi: lista dă doar numele unei administrații (de pildă „UAT Comuna Albac”), iar noi l-am legat de primăria sau consiliul județean al acelei localități, din județul proiectului.',
     namePlace:

@@ -1643,11 +1643,11 @@ export interface components {
             entity: components["schemas"]["EntityRef"] | null;
             /**
              * Confidence
-             * @description sure: the list gives the tax ID; probable: tied by name and place.
+             * @description sure: the list, or else MIPE's map, gives the tax ID; probable: tied by name and place.
              */
             confidence: ("sure" | "probable") | null;
             /** Method */
-            method: ("cui-in-list" | "administration-name+place" | "name+place" | "company-name") | null;
+            method: ("cui-in-list" | "cui-in-map" | "administration-name+place" | "name+place" | "company-name") | null;
         };
         /**
          * EuBeneficiaryFunds
