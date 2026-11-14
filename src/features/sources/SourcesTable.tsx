@@ -219,6 +219,14 @@ function Held({ dataset }: { dataset: Dataset }) {
         ? s.mapListed(f.count(n('listed')), f.day(dataset.last_day))
         : '',
     ],
+    'budget-execution': [
+      s.executionHeld(dataset.records, f.count(dataset.records)),
+      s.executionMonths(n('months'), f.count(n('months'))),
+    ],
+    'eurostat-cofog': [
+      s.cofogHeld(dataset.records, f.count(dataset.records)),
+      s.cofogYears(n('years'), f.count(n('years'))),
+    ],
     onrc: [
       s.companiesHeld(dataset.records, f.count(dataset.records)),
       dataset.last_day

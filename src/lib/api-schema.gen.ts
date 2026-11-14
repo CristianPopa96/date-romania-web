@@ -61,6 +61,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/national": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * National
+         * @description The country's budget against what our data shows. Official figures and ours each
+         *     keep their own source and period; a difference is given only where both measure the
+         *     same thing over the same period (`comparable`), and every check says why they differ.
+         *     Amounts are lei: official ones as the ministry gives them (cash, with VAT where paid),
+         *     ours without VAT.
+         */
+        get: operations["national_v1_national_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/data-road": {
         parameters: {
             query?: never;
@@ -1203,6 +1227,39 @@ export interface components {
             count: number;
         };
         /**
+         * Budget
+         * @description Block 1 ("Bugetul țării") and block 2 ("Ce parte din acești bani putem urmări").
+         */
+        Budget: {
+            /** Year */
+            year: number;
+            /** @description Total spending planned; null if not entered. */
+            planned: components["schemas"]["Planned"] | null;
+            planned_revenue: components["schemas"]["Planned"] | null;
+            /** @description Null until the year's execution is held. */
+            executed: components["schemas"]["Executed"] | null;
+            /**
+             * Executed Share
+             * @description Executed spending over planned, 0 to 1: the same measure for one year.
+             */
+            executed_share: number | null;
+            /**
+             * Categories
+             * @description Largest first, `other` last.
+             */
+            categories: components["schemas"]["Category"][];
+            /**
+             * Band
+             * @description In this order: not_procurement, procurement, rest.
+             */
+            band: components["schemas"]["Segment"][];
+            /**
+             * Ours
+             * @description Our figures for the year, beside the band: never subtracted from it.
+             */
+            ours: components["schemas"]["Ours"][];
+        };
+        /**
          * Capital
          * @description Capital spending executed in a year, by town halls (and a county's council).
          */
@@ -1218,6 +1275,16 @@ export interface components {
             places: number;
             source: components["schemas"]["Source"];
         };
+        /** Category */
+        Category: {
+            /**
+             * Key
+             * @description A group of spending lines; `other` holds the lines not named.
+             */
+            key: string;
+            /** Amount */
+            amount: number;
+        };
         /** ChapterAmount */
         ChapterAmount: {
             /**
@@ -1227,6 +1294,57 @@ export interface components {
             chapter: "general_services" | "defence_order" | "education" | "health" | "culture" | "social" | "housing" | "environment" | "economic_affairs" | "energy" | "agriculture" | "transport" | "other_economic";
             /** Amount */
             amount: number;
+        };
+        /**
+         * Check
+         * @description An official figure against ours. `difference` only when `comparable`.
+         */
+        Check: {
+            /** Key */
+            key: string;
+            official: components["schemas"]["Figure"];
+            ours: components["schemas"]["Figure"];
+            /** Comparable */
+            comparable: boolean;
+            /**
+             * Difference
+             * @description Ours minus official, in lei.
+             */
+            difference: number | null;
+            /**
+             * Difference Share
+             * @description `difference` over the official figure.
+             */
+            difference_share: number | null;
+            /**
+             * Paid Share
+             * @description For a plan against its payments: paid over planned, 0 to 1.
+             */
+            paid_share: number | null;
+            /**
+             * Reason
+             * @description Why they differ or do not compare; always given.
+             */
+            reason: string;
+            /** Parts */
+            parts: components["schemas"]["CheckPart"][];
+        };
+        /** CheckPart */
+        CheckPart: {
+            /**
+             * Key
+             * @description Our chapter, by `local_money.CHAPTERS`.
+             */
+            key: string;
+            /**
+             * Divisions
+             * @description The COFOG divisions it is set against.
+             */
+            divisions: string[];
+            /** Official */
+            official: number;
+            /** Ours */
+            ours: number;
         };
         /**
          * Contract
@@ -1663,6 +1781,50 @@ export interface components {
         Datasets: {
             /** Items */
             items: components["schemas"]["Dataset"][];
+        };
+        /** Division */
+        Division: {
+            /** Cofog */
+            cofog: string;
+            /**
+             * Label
+             * @description Eurostat's English label; the site words it.
+             */
+            label: string;
+            /**
+             * Total
+             * @description All of public administration, lei.
+             */
+            total: number;
+            /**
+             * Local
+             * @description Local government, lei.
+             */
+            local: number;
+            /**
+             * Local Share
+             * @description Local over total, 0 to 1, both from COFOG.
+             */
+            local_share: number;
+        };
+        /**
+         * Domains
+         * @description Block 4 ("Pe domenii"): COFOG by division, largest first.
+         */
+        Domains: {
+            /** Year */
+            year: number;
+            /** Total */
+            total: number;
+            /**
+             * Updated On
+             * Format: date
+             * @description When Eurostat last updated the table, its own day.
+             */
+            updated_on: string;
+            /** Divisions */
+            divisions: components["schemas"]["Division"][];
+            source: components["schemas"]["Source"];
         };
         /** EntityOut */
         EntityOut: {
@@ -2107,6 +2269,71 @@ export interface components {
             confidence: "sure" | "probable";
             purchase: components["schemas"]["Purchase"];
         };
+        /**
+         * Executed
+         * @description The execution of the consolidated general budget from 1 January, cash.
+         */
+        Executed: {
+            /**
+             * Period Start
+             * Format: date
+             */
+            period_start: string;
+            /**
+             * Period End
+             * Format: date
+             */
+            period_end: string;
+            /**
+             * Months
+             * @description How many months of the year the execution covers.
+             */
+            months: number;
+            /**
+             * Spending
+             * @description Lei.
+             */
+            spending: number;
+            /**
+             * Revenue
+             * @description Lei.
+             */
+            revenue: number;
+            source: components["schemas"]["Source"];
+        };
+        /**
+         * Figure
+         * @description One figure with its own period and source; our figures are without VAT.
+         */
+        Figure: {
+            /**
+             * Amount
+             * @description Lei.
+             */
+            amount: number | null;
+            /**
+             * Count
+             * @description Records behind the figure.
+             */
+            count: number | null;
+            /**
+             * Unit
+             * @default lei
+             * @enum {string}
+             */
+            unit: "lei" | "contracts";
+            /** Period Start */
+            period_start: string | null;
+            /** Period End */
+            period_end: string | null;
+            /**
+             * Collected
+             * @description False while we do not hold this figure.
+             * @default true
+             */
+            collected: boolean;
+            source: components["schemas"]["Source"] | null;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -2307,6 +2534,18 @@ export interface components {
             /** Count */
             count: number;
         };
+        /** National */
+        National: {
+            /** @description Null until the budget execution is held. */
+            budget: components["schemas"]["Budget"] | null;
+            /**
+             * Checks
+             * @description Comparable checks first, largest official figure first; then the rest.
+             */
+            checks: components["schemas"]["Check"][];
+            /** @description Null until COFOG is held. */
+            domains: components["schemas"]["Domains"] | null;
+        };
         /**
          * NearLimitPair
          * @description One buyer and one supplier with repeated accepted purchases just under a limit.
@@ -2461,6 +2700,38 @@ export interface components {
             /** Value */
             value: number;
         };
+        /** Ours */
+        Ours: {
+            /**
+             * Amount
+             * @description Lei.
+             */
+            amount: number | null;
+            /**
+             * Count
+             * @description Records behind the figure.
+             */
+            count: number | null;
+            /**
+             * Unit
+             * @default lei
+             * @enum {string}
+             */
+            unit: "lei" | "contracts";
+            /** Period Start */
+            period_start: string | null;
+            /** Period End */
+            period_end: string | null;
+            /**
+             * Collected
+             * @description False while we do not hold this figure.
+             * @default true
+             */
+            collected: boolean;
+            source: components["schemas"]["Source"] | null;
+            /** Key */
+            key: string;
+        };
         /** Partner */
         Partner: {
             /** Cui */
@@ -2577,6 +2848,39 @@ export interface components {
         PlaceResults: {
             /** Items */
             items: components["schemas"]["PlaceHit"][];
+        };
+        /**
+         * Planned
+         * @description A figure of the planned year, entered by hand from its document.
+         */
+        Planned: {
+            /**
+             * Amount
+             * @description Lei.
+             */
+            amount: number;
+            /**
+             * Document
+             * @description The document's title.
+             */
+            document: string;
+            /**
+             * Act
+             * @description The act it goes with, as the site names it.
+             */
+            act: string;
+            /**
+             * Published On
+             * Format: date
+             */
+            published_on: string;
+            /**
+             * Page
+             * @description The page of the PDF the figure is printed on.
+             */
+            page: number;
+            /** Url */
+            url: string;
         };
         /**
          * PnrrBeneficiaryBar
@@ -4032,6 +4336,26 @@ export interface components {
             /** Items */
             items: components["schemas"]["EntityOut"][];
         };
+        /** Segment */
+        Segment: {
+            /**
+             * Key
+             * @enum {string}
+             */
+            key: "not_procurement" | "procurement" | "rest";
+            /** Amount */
+            amount: number;
+            /**
+             * Share
+             * @description Whole percent of the total; the three add up to 100.
+             */
+            share: number;
+            /**
+             * Lines
+             * @description The execution's lines it holds; empty for `rest`.
+             */
+            lines: string[];
+        };
         /**
          * Source
          * @description Where a figure comes from, so the site can show it next to the figure.
@@ -4462,6 +4786,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Datasets"];
+                };
+            };
+        };
+    };
+    national_v1_national_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["National"];
                 };
             };
         };

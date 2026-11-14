@@ -83,6 +83,37 @@ function build(locale: Locale) {
     return euro(value)
   }
 
+  const twoDecimals = new Intl.NumberFormat(tag, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })
+  const signedTwo = new Intl.NumberFormat(tag, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+    signDisplay: 'exceptZero',
+  })
+  const signedShare = new Intl.NumberFormat(tag, {
+    style: 'percent',
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+    signDisplay: 'exceptZero',
+  })
+
+  // The national budget in billions with two decimals, as the Finance Ministry writes
+  // it: "864,28 mld. lei".
+  function leiBillions(value: number) {
+    return money.billion(twoDecimals.format(value / 1e9))
+  }
+
+  // A difference, with its sign: "−11,52 mld. lei", and its share: "−7,2 %".
+  function leiBillionsSigned(value: number) {
+    return money.billion(signedTwo.format(value / 1e9))
+  }
+
+  function percentSigned(value: number) {
+    return signedShare.format(value)
+  }
+
   function leiShort(value: number) {
     if (value >= 1e9) return money.billion(oneDecimal.format(value / 1e9))
     if (value >= 1e6) return money.million(oneDecimal.format(value / 1e6))
@@ -155,6 +186,9 @@ function build(locale: Locale) {
     lei,
     leiExact,
     leiShort,
+    leiBillions,
+    leiBillionsSigned,
+    percentSigned,
     euro,
     euroShort,
     day,

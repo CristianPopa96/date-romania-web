@@ -6,6 +6,7 @@
 // the place as `{part}` and is filled with `rich()`. Data is never translated.
 
 import { budget } from '#/features/budget/i18n'
+import { national } from '#/features/national/i18n'
 import { counted, plural } from '#/i18n/ro-plural'
 import { list } from '#/i18n/ro-list'
 import { purchaseList } from '#/features/purchases/i18n'
@@ -74,6 +75,8 @@ export const ro = {
 
   budget,
 
+  national,
+
   places,
 
   notFound: {
@@ -117,7 +120,7 @@ export const ro = {
   home: {
     headline: 'Urmărește banii publici, de la buget la contract.',
     // Only what the site holds today; it grows with each source added.
-    lead: 'Contracte și achiziții publicate de instituțiile statului, puse cap la cap. Unde datele se opresc, îți arătăm ce lipsește.',
+    lead: 'Cât a programat statul să cheltuie, cât a cheltuit și ce parte din acești bani putem urmări până la cine i-a primit.',
     examples: 'Exemple:',
     // Words that find something in any period: kinds of institution, not names.
     exampleSearches: [
@@ -126,22 +129,10 @@ export const ro = {
       'spitalul județean',
       'universitatea',
     ],
-    directPurchases: 'Achiziții directe',
-    acceptedValue: 'Valoare acceptată',
-    acceptedPurchases: 'Achiziții acceptate',
-    institutions: 'Instituții',
-    suppliers: 'Furnizori',
-    seeRankings: 'Vezi clasamentele',
-    seeSources: 'Vezi sursele și cum numărăm',
   },
 
-  // What the site is built on, one row per source.
+  // The name of each source, where it is listed.
   datasets: {
-    title: 'Ce date avem',
-    source: 'Sursa',
-    period: 'Perioada',
-    records: 'Înregistrări',
-    fetched: 'Preluat ultima dată',
     names: {
       'seap-direct': 'achiziții directe',
       'seap-awards': 'anunțuri de atribuire',
@@ -155,16 +146,11 @@ export const ro = {
       pnrr: 'tabloul de bord PNRR',
       'eu-projects': 'listele de proiecte contractate',
       'eu-map': 'harta proiectelor 2021–2027',
+      'budget-execution': 'execuția bugetului general consolidat',
+      'eurostat-cofog':
+        'cheltuielile administrației publice pe domenii (COFOG)',
     } as Record<string, string | undefined>,
     name: (publisher: string, what: string) => `${publisher} · ${what}`,
-    // What the count of a source counts, where the word "records" is not enough.
-    counts: {
-      'seap-awards': 'contracte semnate în perioadă',
-      'pnias-payments': 'plăți',
-      'seap-exports': 'rânduri, doar ale constructorilor din program',
-    } as Record<string, string | undefined>,
-    complete: 'completă',
-    incomplete: 'listă incompletă',
   },
 
   // The sources page: what we hold, what is still to come, how the data may be used.
@@ -175,6 +161,15 @@ export const ro = {
     tabSources: (count: string) => `Surse (${count})`,
     tabMethod: 'Metodologie',
     heldTitle: 'Surse preluate',
+    // What the direct purchases held add up to (on the home page until design round 18).
+    directFigures: {
+      title: 'Achiziții directe',
+      acceptedValue: 'Valoare acceptată',
+      acceptedPurchases: 'Achiziții acceptate',
+      institutions: 'Instituții',
+      suppliers: 'Furnizori',
+      seeRankings: 'Vezi clasamentele',
+    },
     source: 'Sursa',
     period: 'Perioada',
     fetched: 'Preluat ultima dată',
@@ -204,6 +199,10 @@ export const ro = {
         'proiectele programelor 2014–2020 și ale programelor naționale 2021–2027, cu valoarea și cât s-a plătit, și plățile Programului Sănătate',
       'eu-map':
         'proiectele programelor regionale și ale Programului Transport 2021–2027, și CUI-ul beneficiarilor din liste',
+      'budget-execution':
+        'cât a cheltuit și a încasat tot statul de la 1 ianuarie până la sfârșitul fiecărei luni, pe tipuri de cheltuieli și pe bugete, de la Ministerul Finanțelor',
+      'eurostat-cofog':
+        'cât a cheltuit administrația publică în fiecare an pe educație, sănătate, transport și celelalte domenii, și cât din asta administrația locală',
     } as Record<string, string | undefined>,
     limitsOf: {
       'seap-direct': [
@@ -253,6 +252,15 @@ export const ro = {
         'doar județul și localitatea sediului, niciodată strada',
         'o ediție pe trimestru: schimbarea stării are doar data ediției',
       ],
+      'budget-execution': [
+        'doar totaluri: nicio plată și niciun furnizor',
+        'fără împărțire pe domenii',
+        'fiecare lună apare la circa patru săptămâni după ce se încheie',
+      ],
+      'eurostat-cofog': [
+        'doar ani întregi, cu doi ani în urmă',
+        'conturi naționale, nu plăți: nu se scade din execuția bugetară',
+      ],
     } as Record<string, Array<string> | undefined>,
     files: (n: number, text: string) =>
       counted(n, text, 'un fișier', 'fișiere'),
@@ -279,6 +287,14 @@ export const ro = {
     anafHeld: (n: number, text: string) =>
       counted(n, text, 'un CUI întrebat', 'CUI-uri întrebate'),
     anafFound: (count: string) => `${count} găsite la ANAF`,
+    executionHeld: (n: number, text: string) =>
+      counted(n, text, 'o cifră', 'cifre'),
+    executionMonths: (n: number, text: string) =>
+      `din ${counted(n, text, 'o lună', 'luni')}, fiecare de la 1 ianuarie`,
+    cofogHeld: (n: number, text: string) =>
+      counted(n, text, 'o cifră', 'cifre'),
+    cofogYears: (n: number, text: string) =>
+      `pe ${counted(n, text, 'un an', 'ani')}, pe domenii și niveluri de administrație`,
     companiesHeld: (n: number, text: string) =>
       counted(n, text, 'o firmă', 'firme'),
     pnrrHeld: (n: number, text: string) =>

@@ -1,39 +1,28 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { Link as RouterLink, createFileRoute } from '@tanstack/react-router'
-import { ArrowRightIcon } from '@radix-ui/react-icons'
-import {
-  Badge,
-  Container,
-  Flex,
-  Grid,
-  Heading,
-  Link,
-  Text,
-} from '@radix-ui/themes'
+import { Badge, Container, Flex, Heading, Text } from '@radix-ui/themes'
 
-import { DatasetTable } from '#/features/sources/DatasetTable'
-import { Figure } from '#/components/Figure'
-import { AboveLimitNote, PeriodNote, Unavailable } from '#/components/Notes'
 import { SearchBox } from '#/components/SearchBox'
-import { SourceLine } from '#/components/SourceLine'
+import {
+  BudgetCard,
+  CheckTable,
+  DomainsCard,
+  TraceableCard,
+  nationalQuery,
+} from '#/features/national'
 import { useI18n } from '#/i18n/context'
-import { datasetsQuery } from '#/features/sources/queries'
-import { statsQuery } from '#/lib/queries'
 
+// The home page (ScreenHome, design round 18): the search at the top, then the country's
+// budget against what our data shows. Four blocks: the budget, the part of it we can
+// follow, the official figures checked against ours, and spending by purpose.
 export const Route = createFileRoute('/')({
-  loader: ({ context }) =>
-    Promise.all([
-      context.queryClient.ensureQueryData(statsQuery),
-      context.queryClient.ensureQueryData(datasetsQuery),
-    ]),
+  loader: ({ context }) => context.queryClient.ensureQueryData(nationalQuery),
   component: Home,
 })
 
 function Home() {
-  const { data: stats } = useSuspenseQuery(statsQuery)
-  const { data: datasets } = useSuspenseQuery(datasetsQuery)
-  const { t, f } = useI18n()
-  const summary = stats?.direct_purchases
+  const { data: national } = useSuspenseQuery(nationalQuery)
+  const { t } = useI18n()
 
   return (
     <Container size="3" px="5" py="9">
@@ -60,61 +49,12 @@ function Home() {
           </Flex>
         </Flex>
 
-        {stats && summary && summary.purchases > 0 ? (
-          <Flex direction="column" gap="3">
-            <Heading size="4">{t.home.directPurchases}</Heading>
-            <Grid columns={{ initial: '2', sm: '4' }} gap="3">
-              <Figure
-                size="5"
-                label={t.home.acceptedValue}
-                value={f.leiShort(summary.value)}
-                detail={f.lei(summary.value)}
-              />
-              <Figure
-                size="5"
-                label={t.home.acceptedPurchases}
-                value={f.count(summary.accepted)}
-              />
-              <Figure
-                size="5"
-                label={t.home.institutions}
-                value={f.count(stats.institutions)}
-              />
-              <Figure
-                size="5"
-                label={t.home.suppliers}
-                value={f.count(stats.suppliers)}
-              />
-            </Grid>
-            <PeriodNote summary={summary} />
-            <AboveLimitNote summary={summary} />
-            <Flex justify="between" align="center" gap="3" wrap="wrap">
-              <SourceLine source={stats.source} />
-              <Link asChild size="2">
-                <RouterLink to="/clasamente">
-                  <Flex align="center" gap="1">
-                    {t.home.seeRankings}
-                    <ArrowRightIcon />
-                  </Flex>
-                </RouterLink>
-              </Link>
-            </Flex>
-          </Flex>
-        ) : (
-          <Unavailable />
-        )}
-
-        <Flex direction="column" gap="3" align="start">
-          <DatasetTable datasets={datasets} />
-          <Link asChild size="2">
-            <RouterLink to="/surse">
-              <Flex align="center" gap="1">
-                {t.home.seeSources}
-                <ArrowRightIcon />
-              </Flex>
-            </RouterLink>
-          </Link>
-        </Flex>
+        <BudgetCard budget={national?.budget ?? null} />
+        <TraceableCard budget={national?.budget ?? null} />
+        {national && national.checks.length > 0 ? (
+          <CheckTable checks={national.checks} />
+        ) : null}
+        <DomainsCard domains={national?.domains ?? null} />
       </Flex>
     </Container>
   )

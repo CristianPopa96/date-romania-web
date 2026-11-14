@@ -8,7 +8,7 @@ import type { Locator } from '@playwright/test'
 
 const TOWN_HALL = 'Comuna Țânțăreni (Primăria Țânțăreni)'
 
-test('the home page shows the totals, their period and their source', async ({
+test('the home page sets the country budget beside what our data shows', async ({
   page,
 }) => {
   await page.goto('/')
@@ -20,6 +20,62 @@ test('the home page shows the totals, their period and their source', async ({
       name: 'Urmărește banii publici, de la buget la contract.',
     }),
   ).toBeVisible()
+  // Block 1: what was planned, what was spent, and the share between them.
+  await expect(
+    main.getByRole('heading', { name: 'Bugetul țării în 2026' }),
+  ).toBeVisible()
+  await expect(main.getByText('864,28 mld. lei')).toBeVisible()
+  await expect(main.getByText('Cheltuit până la 30.09.2026')).toBeVisible()
+  await expect(main.getByText('727,32 mld. lei').first()).toBeVisible()
+  await expect(
+    main.getByText(
+      /84,2\s%\sdin suma programată, după nouă luni din douăsprezece/,
+    ),
+  ).toBeVisible()
+  // Block 2: the band, said in one sentence to a screen reader, and our own figures
+  // beside it, with what is not collected marked as such.
+  await expect(
+    main.getByRole('img', { name: /nu trec prin achiziții/ }),
+  ).toBeVisible()
+  await expect(main.getByText('Ce avem noi')).toBeVisible()
+  await expect(main.getByText('Contracte semnate în 2026')).toBeVisible()
+  await expect(
+    main.getByText('execuția pe instituție nu numește furnizorul'),
+  ).toBeVisible()
+  // The direct purchase figures and the list of sources moved to the sources page.
+  await expect(main.getByText('Ce date avem')).toHaveCount(0)
+})
+
+test('the official figures are checked against ours, a difference only where they compare', async ({
+  page,
+}) => {
+  await page.goto('/')
+  const main = page.getByRole('main')
+
+  const local = main.getByRole('row').filter({ hasText: 'Bugetele locale' })
+  await expect(local).toContainText('157,11 mld. lei')
+  await expect(local).toContainText('-157,10 mld. lei')
+  await expect(local).toContainText('Școlile, spitalele')
+  const pnrr = main.getByRole('row').filter({ hasText: 'Proiecte PNRR' })
+  await expect(pnrr).toContainText('Nu se compară încă')
+  await expect(pnrr).toContainText('6 contracte')
+  const eu = main.getByRole('row').filter({ hasText: 'Proiecte cu fonduri UE' })
+  await expect(eu).toContainText('Încă necolectat')
+  const saligny = main.getByRole('row').filter({ hasText: 'Anghel Saligny' })
+  await expect(saligny).toContainText('din credite')
+
+  // Block 4: COFOG by purpose, the local share from COFOG itself.
+  await expect(main.getByRole('heading', { name: 'Pe domenii' })).toBeVisible()
+  await expect(main.getByText('Protecție socială')).toBeVisible()
+  await expect(main.getByText('doar administrația centrală')).toBeVisible()
+})
+
+test('the sources page holds the direct purchase totals and what the site is built on', async ({
+  page,
+}) => {
+  await page.goto('/surse')
+  const main = page.getByRole('main')
+
   await expect(main.getByText('4.200 lei').first()).toBeVisible()
   await expect(main.getByText('05.10.2026 – 07.10.2026')).toBeVisible()
   // The purchase above the limit is told apart, as a fact and not as an accusation.
@@ -27,28 +83,10 @@ test('the home page shows the totals, their period and their source', async ({
     main.getByText('Nu este inclusă în total: 5.000.000 lei'),
   ).toBeVisible()
   await expect(main.getByText('Tipar observat, nu o acuzație')).toBeVisible()
-  await expect(main.getByText('Sursa: SEAP · preluat 07.10.2026')).toBeVisible()
-})
-
-test('the home page says what data the site is built on', async ({ page }) => {
-  await page.goto('/')
-  const main = page.getByRole('main')
-
-  await expect(
-    main.getByRole('heading', { name: 'Ce date avem' }),
-  ).toBeVisible()
-  const direct = main.getByRole('row').filter({ hasText: 'achiziții directe' })
-  await expect(direct).toContainText('SEAP · achiziții directe')
-  await expect(direct).toContainText('05.10–07.10.2026')
-  await expect(direct).toContainText('completă')
-  await expect(direct).toContainText('07.10.2026')
-  // Notices are held in full; the contracts of the period in them never are.
-  const awards = main
+  const execution = main
     .getByRole('row')
-    .filter({ hasText: 'anunțuri de atribuire' })
-  await expect(awards).toContainText('listă incompletă')
-  // How the site itself is doing is not something a reader came for.
-  await expect(main.getByText('Starea sistemului')).toHaveCount(0)
+    .filter({ hasText: 'execuția bugetului general consolidat' })
+  await expect(execution).toContainText('Ministerul Finanțelor')
 })
 
 test('the top bar lists only what exists, and searches from every page but home', async ({
@@ -600,7 +638,10 @@ test('Clasamente opens on every contract, the largest first', async ({
   page,
 }) => {
   await page.goto('/')
-  await page.getByRole('link', { name: 'Vezi clasamentele' }).click()
+  await page
+    .getByRole('navigation', { name: 'Secțiuni' })
+    .getByRole('link', { name: 'Clasamente' })
+    .click()
 
   await expect(page).toHaveURL(/\/clasamente$/)
   await expect(page).toHaveTitle('Clasamente · Date România')
@@ -969,7 +1010,7 @@ test('the source of one record opens a panel; a total says what it is added up f
   ).toHaveAttribute('href', '/surse?despre=%2Fachizitii-directe%2F4#raporteaza')
 
   // A total has no panel: its line counts the answers and leads to the sources page.
-  await page.goto('/')
+  await page.goto('/surse')
   const home = page.getByRole('main')
   await expect(
     home.getByText(
@@ -1180,7 +1221,10 @@ test('the sources page says what is held, what is to come and how it is counted'
   page,
 }) => {
   await page.goto('/')
-  await page.getByRole('link', { name: 'Vezi sursele și cum numărăm' }).click()
+  await page
+    .getByRole('navigation', { name: 'Secțiuni' })
+    .getByRole('link', { name: 'Surse' })
+    .click()
   await expect(page).toHaveURL(/\/surse$/)
   await expect(page).toHaveTitle('De unde vin datele · Date România')
   const main = page.getByRole('main')
@@ -1227,7 +1271,7 @@ test('the sources page says what is held, what is to come and how it is counted'
     .getByRole('row')
     .filter({ hasText: 'MIPE · listele de proiecte contractate' })
   await expect(lists).toContainText('5 proiecte')
-  await expect(main.getByRole('tab', { name: 'Surse (7)' })).toBeVisible()
+  await expect(main.getByRole('tab', { name: 'Surse (9)' })).toBeVisible()
 
   // Rows the parser could not read, per source; not counted yet is the dotted state.
   const errors = (row: typeof direct) => row.getByRole('cell').nth(3)
@@ -1271,7 +1315,7 @@ test('the sources page says what is held, what is to come and how it is counted'
     ),
   ).toBeVisible()
   await expect(main.getByText('anexa 2 a Legii 98/2016')).toBeVisible()
-  await expect(main.getByText('Până acum sunt 15 răspunsuri.')).toBeVisible()
+  await expect(main.getByText('Până acum sunt 18 răspunsuri.')).toBeVisible()
   await expect(main.getByText(/vinovat|ascuns/)).toHaveCount(0)
 
   await expect(

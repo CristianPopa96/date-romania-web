@@ -1,7 +1,7 @@
 import { Link as RouterLink } from '@tanstack/react-router'
 import { Card, Flex, Grid, Heading, Link, Text } from '@radix-ui/themes'
 
-import { AmountBars } from '#/features/budget/AmountBars'
+import { AmountBars } from '#/components/AmountBars'
 import { DataState } from '#/components/DataState'
 import { SourceLine } from '#/components/SourceLine'
 import { useI18n } from '#/i18n/context'

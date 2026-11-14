@@ -79,7 +79,14 @@ function SourcePanel({ source, text }: { source: Source; text: string }) {
           variant="ghost"
           color="gray"
           size="1"
-          style={{ textDecoration: 'underline dotted' }}
+          // A long line wraps inside a narrow cell instead of running over the next one.
+          style={{
+            textDecoration: 'underline dotted',
+            whiteSpace: 'normal',
+            maxWidth: '100%',
+            height: 'auto',
+            textAlign: 'left',
+          }}
         >
           {text}
         </Button>
