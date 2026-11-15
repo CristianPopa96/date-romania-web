@@ -27,7 +27,7 @@ function Counties() {
   const { data } = useSuspenseQuery(countiesQuery)
 
   return (
-    <Container size="3" px="5" py="7">
+    <Container size="4" px="5" py="7">
       <Flex direction="column" gap="5">
         <Flex direction="column" gap="2">
           <Heading size="7">{p.title}</Heading>

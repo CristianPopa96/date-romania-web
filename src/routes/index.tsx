@@ -26,7 +26,7 @@ function Home() {
   const { t } = useI18n()
 
   return (
-    <Container size="3" px="5" py="9">
+    <Container size="4" px="5" py="7">
       <Flex direction="column" gap="7">
         <Flex direction="column" gap="4">
           <Heading size="8" weight="bold">
