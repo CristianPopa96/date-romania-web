@@ -3,13 +3,18 @@ import { Box, Flex, Text } from '@radix-ui/themes'
 import { useI18n } from '#/i18n/context'
 
 // Labels with their amount, each over a bar scaled to the largest in the list (BarList
-// in the design system, for lines that are not entities: budget lines, chapters).
+// in the design system, for lines that are not entities: budget lines, chapters, the
+// national budget's kinds of spending).
+// `format` writes each amount; whole lei unless given.
 export function AmountBars({
   rows,
+  format,
 }: {
   rows: Array<{ key: string; label: string; value: number }>
+  format?: (value: number) => string
 }) {
   const { f } = useI18n()
+  const write = format ?? f.lei
   const largest = Math.max(...rows.map((row) => row.value), 1)
 
   return (
@@ -20,7 +25,7 @@ export function AmountBars({
             <Flex justify="between" align="baseline" gap="3">
               <Text size="2">{row.label}</Text>
               <Text size="2" weight="medium" style={{ whiteSpace: 'nowrap' }}>
-                {f.lei(row.value)}
+                {write(row.value)}
               </Text>
             </Flex>
             <Box

@@ -5,6 +5,7 @@ import { Button, Container, Flex, Heading, Text } from '@radix-ui/themes'
 
 import { Corrections } from '#/features/sources/Corrections'
 import { DataRoad } from '#/features/sources/DataRoad'
+import { DirectPurchaseFigures } from '#/features/sources/DirectPurchaseFigures'
 import { Methodology } from '#/features/sources/Methodology'
 import { Unavailable } from '#/components/Notes'
 import { ReportForm } from '#/components/ReportForm'
@@ -13,6 +14,7 @@ import { UrlTabs } from '#/components/UrlTabs'
 import { messagesFor } from '#/i18n'
 import { useI18n } from '#/i18n/context'
 import { pageTitle } from '#/lib/copy'
+import { statsQuery } from '#/lib/queries'
 import {
   correctionsQuery,
   dataRoadQuery,
@@ -29,6 +31,7 @@ export const Route = createFileRoute('/surse')({
     Promise.all([
       context.queryClient.ensureQueryData(datasetsQuery),
       context.queryClient.ensureQueryData(correctionsQuery),
+      context.queryClient.ensureQueryData(statsQuery),
       // The road's figures are read only for its tab.
       deps.fila === 'drum'
         ? context.queryClient.ensureQueryData(dataRoadQuery)
@@ -48,6 +51,7 @@ function Sources() {
   const navigate = Route.useNavigate()
   const { data: datasets } = useSuspenseQuery(datasetsQuery)
   const { data: corrections } = useSuspenseQuery(correctionsQuery)
+  const { data: stats } = useSuspenseQuery(statsQuery)
   const tab = fila ?? 'surse'
 
   return (
@@ -96,6 +100,7 @@ function Sources() {
             {tab === 'surse' ? (
               <>
                 <SourcesTable datasets={datasets} />
+                <DirectPurchaseFigures stats={stats} />
                 <SourcesToCome />
                 <Flex direction="column" gap="2" align="start">
                   <Heading size="5">{t.sources.reuseTitle}</Heading>

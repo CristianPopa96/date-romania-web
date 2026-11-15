@@ -17,7 +17,7 @@ import {
   Text,
 } from '@radix-ui/themes'
 
-import { AmountBars } from '#/features/budget/AmountBars'
+import { AmountBars } from '#/components/AmountBars'
 import { EntityLink } from '#/components/EntityLink'
 import { PlaceOverview } from '#/features/places/PlaceOverview'
 import { InstitutionsTable } from '#/features/places/PlaceLists'

@@ -30,11 +30,28 @@ section: you reach it from search, a list, a ranking or another record.
 
 What you see: a headline ("Urmărește banii publici, de la buget la contract"), a large
 search box with example searches (primăria, consiliul județean, spitalul județean,
-universitatea), the headline figures for direct purchases (accepted value, number of
-accepted purchases, institutions, suppliers), and "Ce date avem", a table of each source
-held with its period, number of records and the day it was last read.
+universitatea), then the country's budget set beside what our data shows, in four blocks:
 
-What you can do: search, or jump to the rankings or the sources.
+- **Bugetul țării**: what the budget law planned for the year, what was spent so far
+  (the Finance Ministry's monthly execution), the share between them, and what it was
+  spent on.
+- **Ce parte din acești bani putem urmări**: the same spending in three parts: what never
+  goes through procurement (pensions and other social help, salaries, interest), what
+  can, and the rest. Beside it, our own figures (contracts signed, direct purchases,
+  Anghel Saligny payments), each with its own period. They are never subtracted from the
+  official figure.
+- **Cifrele oficiale, verificate cu ale noastre**: a table of official figures against ours.
+  A difference is given only where both measure the same thing over the same period.
+  Two different measures say "Nu se compară" (Eurostat's spending by domain counts what
+  was owed, our budgets what was paid); a figure we do not hold in a form that compares
+  says "Nu se compară încă". Every row says why the two differ, and the line under each
+  figure opens where it was read.
+- **Pe domenii**: Eurostat's spending by purpose (education, health…), and how much of
+  each goes through local government.
+
+The direct purchase totals and the list of sources are on the sources page.
+
+What you can do: search, open a source document, or jump to the sections in the top bar.
 
 ## Search
 
