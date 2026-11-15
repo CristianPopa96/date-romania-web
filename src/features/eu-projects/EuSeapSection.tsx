@@ -63,7 +63,11 @@ export function EuSeapSection({
   ) => (
     <ConfidenceBadge
       level="probable"
-      label={s.badge[method][record]}
+      label={
+        method === 'pnrr-measure+buyer' && cited === 'PNRR'
+          ? s.badgePnrrOnly[record]
+          : s.badge[method][record]
+      }
       help={s.help[method](cited)}
     />
   )

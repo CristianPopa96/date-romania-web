@@ -4,12 +4,14 @@ import { Flex, Text, Tooltip } from '@radix-ui/themes'
 // mark and the words carry the meaning; the colour only repeats it.
 //   sure      solid green dot     published: the same CUI on both records
 //   probable  half-filled amber   tied by us on evidence that makes it probable
+//   possible  dashed gray ring    tied by us on name, amount and period only
 //   none      empty gray ring     no link found
-export type Confidence = 'sure' | 'probable' | 'none'
+export type Confidence = 'sure' | 'probable' | 'possible' | 'none'
 
 const COLORS: Record<Confidence, string> = {
   sure: 'var(--green-9)',
   probable: 'var(--amber-9)',
+  possible: 'var(--gray-9)',
   none: 'var(--gray-9)',
 }
 
@@ -27,6 +29,7 @@ function Mark({ level }: { level: Confidence }) {
         fill={level === 'sure' ? color : 'none'}
         stroke={color}
         strokeWidth="1.5"
+        strokeDasharray={level === 'possible' ? '2 1.5' : undefined}
       />
     </svg>
   )
@@ -37,10 +40,13 @@ export function ConfidenceBadge({
   level,
   label,
   help,
+  wrap = false,
 }: {
   level: Confidence
   label: string
   help?: string
+  // In a narrow box (a hop of a chain) the words may wrap rather than run over the next.
+  wrap?: boolean
 }) {
   const badge = (
     <Flex
@@ -50,7 +56,11 @@ export function ConfidenceBadge({
       tabIndex={help ? 0 : undefined}
     >
       <Mark level={level} />
-      <Text size="1" weight="medium" style={{ whiteSpace: 'nowrap' }}>
+      <Text
+        size="1"
+        weight="medium"
+        style={{ whiteSpace: wrap ? 'normal' : 'nowrap' }}
+      >
         {label}
       </Text>
     </Flex>

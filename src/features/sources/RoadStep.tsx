@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import { ArrowDownIcon, ArrowRightIcon } from '@radix-ui/react-icons'
 import { Box, Card, Code, Flex, Heading, Text } from '@radix-ui/themes'
 
@@ -51,18 +51,36 @@ export function Step({
   )
 }
 
-// One thing a step holds. Off the lane chosen it fades, so the lane's path stands out.
+// One thing a step holds (design D27): with no lane chosen, plain; on the lane chosen,
+// lit with an indigo ground and a left rule; off it, gray text on no ground. Never faded:
+// every item stays readable.
+export type ItemMark = 'plain' | 'lit' | 'unlit'
+
+const MARKS: Record<ItemMark, CSSProperties> = {
+  plain: { borderLeft: '2px solid transparent' },
+  lit: {
+    background: 'var(--indigo-3)',
+    borderLeft: '2px solid var(--indigo-9)',
+  },
+  unlit: { borderLeft: '2px solid transparent', color: 'var(--slate-9)' },
+}
+
 export function Item({
-  lit,
+  mark,
   tech,
   children,
 }: {
-  lit: boolean
+  mark: ItemMark
   tech?: string | null
   children: ReactNode
 }) {
   return (
-    <Box style={{ opacity: lit ? 1 : 0.35, transition: 'opacity 150ms' }}>
+    <Box
+      data-mark={mark}
+      px="2"
+      py="1"
+      style={{ ...MARKS[mark], borderRadius: 'var(--radius-1)' }}
+    >
       <Text as="div" size="1">
         {children}
       </Text>

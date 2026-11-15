@@ -23,7 +23,7 @@ export const PAGES: ReadonlyArray<Page> = [
   'records',
 ]
 
-type Path = {
+export type Path = {
   sources: ReadonlyArray<string>
   tables: ReadonlyArray<string>
   rules: ReadonlyArray<string>
@@ -73,6 +73,11 @@ const PATHS: Record<Lane, Path> = {
     rules: ['entity-place', 'eu-beneficiary', 'anghel-saligny-contract'],
     pages: ['entities', 'places'],
   },
+}
+
+// A lane's path, by the API's names, to say it in words.
+export function lanePath(lane: Lane): Path {
+  return PATHS[lane]
 }
 
 // Whether a step's item is on the lane chosen; every item is when none is.

@@ -107,6 +107,10 @@ export function ProjectChain({
 
   function builderHop(): TraceHop {
     const others = builders.length - 1
+    // A builder found by its name in the register is a link we made, not one the file
+    // published (design D26): dashed amber, "Probabil · după nume". Green only where a
+    // payment file gives the CUI.
+    const byName = first?.cui != null && first.found_by === 'register'
     return {
       role: p.companiesHop,
       name:
@@ -136,7 +140,15 @@ export function ProjectChain({
             },
           )
         : p.noTaxId,
-      link: by('published'),
+      badge: byName ? (
+        <ConfidenceBadge
+          level="probable"
+          label={p.foundByName}
+          help={p.foundByNameHelp}
+          wrap
+        />
+      ) : undefined,
+      link: by(byName ? 'probable' : 'published'),
     }
   }
 
