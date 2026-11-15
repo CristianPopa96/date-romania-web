@@ -179,6 +179,12 @@ line, charts, sortable columns and the pager. What differs:
 
 The same layout, flipped: a company as a **seller**.
 
+- Right under its name, what the trade register (ONRC) says of it: "Registrul
+  Comerțului `J18/200/2020` · SRL · înregistrată 14.08.2020 · stare: funcțiune", with
+  its source line. A state other than "funcțiune" ("radiată", "dizolvare" and so on) is
+  a gray outlined badge in the register's own word, a fact rather than a warning. The
+  register gives no day for a state, so a state that changed after the first edition
+  held says "din ediția {day}".
 - Figures: "Câștigate singur" (contracts won alone), "Câștigate în asociere" (won as part
   of an association, at the full value of the contract) and "Achiziții directe
   acceptate". They sit side by side and are never added, because a contract won in an
@@ -371,12 +377,19 @@ contract, total value, the state budget share, progress, designer and builder, a
 contract**. Each hop says where it comes from and how sure it is. The project's payments
 are listed below. A project has one of four states:
 
-| State                              | Meaning                                                              |
-| ---------------------------------- | -------------------------------------------------------------------- |
-| "Probabil un singur contract"      | One contract fits; the chain is complete                             |
-| "Mai multe contracte posibile"     | Several contracts fit; all are shown, none is picked                 |
-| "Niciun contract găsit"            | The chain stops at the builder; likely reasons are listed            |
-| "Constructor numit doar cu numele" | The file gives only the builder's name, no CUI, so no search is made |
+| State                              | Meaning                                                           |
+| ---------------------------------- | ----------------------------------------------------------------- |
+| "Probabil un singur contract"      | One contract fits; the chain is complete                          |
+| "Mai multe contracte posibile"     | Several contracts fit; all are shown, none is picked              |
+| "Niciun contract găsit"            | The chain stops at the builder; likely reasons are listed         |
+| "Constructor numit doar cu numele" | The file gives only the builder's name, and no CUI could be found |
+
+The older payment files name the builder without a CUI. A newer payment of the same
+project that names the same company gives it its CUI. Otherwise, when one company in the
+trade register carries the builder's name, the chain names it "numită în fișierul de
+plăți fără CUI · CUI {cui} din Registrul Comerțului, după nume"; its link is dashed amber
+and the builder carries "Probabil · după nume". When the name leads to no single company,
+the chain says so.
 
 From a project you can open the builder's page, the town hall's page and the SEAP
 notice; the builder's page lists every project it was paid through.
@@ -413,13 +426,20 @@ notice; the builder's page lists every project it was paid through.
 ![The EU funds page](images/eu-funds.png)
 
 `/programe/fonduri-europene`, from the lists of contracted projects that MIPE (the
-ministry for EU funds) publishes for each programme: the 2014–2020 operational
-programmes and the national programmes of 2021–2027. The regional programmes of
-2021–2027 are not collected yet, and the page says so.
+ministry for EU funds) publishes for each programme (the 2014–2020 operational
+programmes and the national programmes of 2021–2027) and from MIPE's map of the
+2021–2027 projects. The regional programmes and the Transport programme of 2021–2027
+have no list of their own, so their projects come from the map, at its edition's day; a
+gray note on the page says so.
 
 - "Programele": one row per programme with its projects, value, paid so far and the day
   its list describes. Each programme has its own list and its own day, so the programmes
   are never added together.
+- The map's paid figure is validated payments, which is not what a list calls paid. For
+  the programmes that come from the map it reads "Plăți validate până la {day}" (the
+  map's edition; its payments have no days), and "plăți validate, pe harta MIPE" in the
+  tables. A project the map adds to a programme that has a list shows "Nepublicat" for
+  paid until the list holds it.
 - "Proiectele": the list of every project fixed to the cohesion programmes, by
   programme, status ("În implementare", "Finalizat", "Reziliat") or words in the title,
   the beneficiary's name or the SMIS code. It has no chart: the table above already
@@ -430,17 +450,20 @@ programmes and the national programmes of 2021–2027. The regional programmes o
 **Project page** (`/proiecte/fonduri-europene/{smis}`): the title, value, the
 EU share, "Plătit până la {day}" (what was paid up to the day of the list; the lists give
 no payment days), status, dates, place, partners and the beneficiary with how it was
-tied ("CUI în listă" or "Nume și localitate"). Projects of the Health programme also
+tied ("CUI în listă", "CUI pe harta MIPE", "Nume și localitate", "Nume de firmă" or
+"Nume în Registrul Comerțului"; see [Reading the figures](Reading-the-Figures)). Projects of the Health programme also
 list their payments one by one, with their days, since that programme publishes them.
 
 **Contracts and purchases that cite a project.** On both kinds of project page (a
 cohesion project and a PNRR contract), "Contracte și achiziții care citează acest
 proiect" lists the SEAP contracts and the direct purchases whose text cites the project.
 For a cohesion project the text cites its SMIS code. For a PNRR contract it cites the
-financing contract number, and only purchases by the contract's own beneficiary count.
-SEAP has no field for the project: the buyer writes it in free text, when it does. So
-every such link is "probabil" (badges "SMIS în anunț", "Nr. finanțare în anunț" and so
-on), and the list may be incomplete. Contracts and direct purchases are in two tables,
+financing contract number, or the PNRR measure when the buyer has only this contract on
+it, and only purchases by the contract's own beneficiary count. SEAP has no field for
+the project: the buyer writes it in free text, when it does. So every such link is
+"probabil" (badges "SMIS în anunț", "Nr. finanțare în anunț", "Măsura PNRR în anunț",
+"PNRR în anunț" when the text names no measure, each "în achiziție" on a purchase), and
+the list may be incomplete. Contracts and direct purchases are in two tables,
 never added. A row bought by a partner rather than the beneficiary says "cumpărat de …".
 
 ![The SEAP contracts that cite a project](images/eu-seap.png)
@@ -449,15 +472,29 @@ never added. A row bought by a partner rather than the beneficiary says "cumpăr
 
 ![The sources page](images/sources.png)
 
-Three tabs:
+Four tabs:
 
 - **"Surse"**: one row per source held, with the period, the day it was last read, what
   is held in the source's own units, "Erori" (rows that could not be read: logged, kept,
-  never counted) and its known limits. A second table lists public sources not collected
-  yet. A link exports every contract of the period as CSV.
+  never counted) and its known limits. MIPE has three rows (the PNRR dashboard, the
+  project lists, the map); the trade register reads "ONRC · Registrul Comerțului,
+  firmele înregistrate", with how many companies, how many struck off and its edition.
+  The direct purchase figures that used to be on the home page are here too. A second
+  table lists public sources not collected yet. A link exports every contract of the
+  period as CSV.
 - **"Metodologie"**: "Cum numărăm", the counting rules in plain words. See
   [Reading the figures](Reading-the-Figures).
 - **"Corecturi"**: corrections made after readers' reports.
+- **"Drumul datelor"** (`/surse?fila=drum`): how what is collected becomes what the site
+  shows, with today's figures, in five cards: "Surse publice", "Păstrăm originalul",
+  "Citim", "Legăm" and "Pe site". "Urmărește o sursă" (SEAP, Anghel Saligny, PNRR,
+  Fonduri europene, Firme și localități) lights the items of one family's path in every
+  card and turns the rest gray, and a sentence under the cards says that path in words.
+  "Legăm" counts each rule's links with the sure, probable and possible marks. "Arată
+  detaliile tehnice" adds the names of the tables and rules, for a reader who wants to
+  check them in the code.
+
+![The data road, following PNRR](images/data-road.png)
 
 **Reporting an error.** Every page's footer has "Raportează o eroare". The form takes
 the page address, what is wrong and, optionally, a link to evidence. A person reads each
