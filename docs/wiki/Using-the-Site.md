@@ -494,6 +494,8 @@ Four tabs:
   detaliile tehnice" adds the names of the tables and rules, for a reader who wants to
   check them in the code.
 
+![The data road, following PNRR](images/data-road.png)
+
 **Reporting an error.** Every page's footer has "Raportează o eroare". The form takes
 the page address, what is wrong and, optionally, a link to evidence. A person reads each
 report before anything changes; only the reviewer's description of an accepted
