@@ -4,6 +4,7 @@ import { Badge, Card, Flex, Heading, Link, Table, Text } from '@radix-ui/themes'
 import { DataState } from '#/components/DataState'
 import { SourceLine } from '#/components/SourceLine'
 import type { Check, CheckFigure } from '#/features/national/api'
+import type { Source } from '#/lib/api'
 import {
   checkPeriod,
   differenceCell,
@@ -15,10 +16,12 @@ import { useI18n } from '#/i18n/context'
 
 export const DOMAINS_ANCHOR = 'pe-domenii'
 
-// CheckTable (D24, design round 18): official figures against ours, one pair a row, in
-// the order the API gives (comparable first, largest official figure first). A
-// difference only where both measure the same thing over the same period; otherwise the
-// cell says they do not compare yet, and "De ce" always says why. No total row.
+// CheckTable (D24, design rounds 18 and 19): official figures against ours, one pair a
+// row, in the order the API gives (comparable, then different measures, then not yet;
+// each the largest official figure first). A difference only where both measure the same
+// thing over the same period; otherwise the cell says they never compare or do not
+// compare yet, and "De ce" always says why. Each figure has one line under it, saying
+// what was read, which opens its source panel. No total row.
 export function CheckTable({ checks }: { checks: Array<Check> }) {
   const { t } = useI18n()
   const words = t.national.checks
@@ -111,21 +114,17 @@ function CheckRow({ check, sticky }: { check: Check; sticky: CSSProperties }) {
       </Table.RowHeaderCell>
       <Table.Cell>
         <FigureCell figure={check.official} muted={false} />
-        <Text as="div" size="1" color="gray">
-          {words.officialSource[check.key]?.(month)}
-        </Text>
-        {check.official.source ? (
-          <SourceLine source={check.official.source} />
-        ) : null}
+        <ReadLine
+          text={words.officialSource[check.key]?.(month)}
+          source={check.official.source}
+        />
       </Table.Cell>
       <Table.Cell>
-        <FigureCell figure={check.ours} muted={!check.comparable} />
-        <Text as="div" size="1" color="gray">
-          {words.oursSource[check.key]?.(oursDetail)}
-        </Text>
-        {check.ours.collected && check.ours.source ? (
-          <SourceLine source={check.ours.source} />
-        ) : null}
+        <FigureCell figure={check.ours} muted={check.state !== 'comparable'} />
+        <ReadLine
+          text={words.oursSource[check.key]?.(oursDetail)}
+          source={check.ours.collected ? check.ours.source : null}
+        />
       </Table.Cell>
       <Table.Cell>
         <Text style={{ whiteSpace: 'nowrap' }}>
@@ -133,9 +132,11 @@ function CheckRow({ check, sticky }: { check: Check; sticky: CSSProperties }) {
         </Text>
       </Table.Cell>
       <Table.Cell>
-        {cell.kind === 'notComparable' ? (
+        {cell.kind === 'differentMeasures' || cell.kind === 'notYet' ? (
           <Badge color="gray" variant="outline">
-            {words.notComparable}
+            {cell.kind === 'differentMeasures'
+              ? words.differentMeasures
+              : words.notYet}
           </Badge>
         ) : (
           <Text
@@ -152,6 +153,11 @@ function CheckRow({ check, sticky }: { check: Check; sticky: CSSProperties }) {
                   )}
           </Text>
         )}
+        {cell.kind === 'paid' && cell.over ? (
+          <Text as="div" size="1" color="gray" style={{ maxWidth: '26ch' }}>
+            {words.overCredits}
+          </Text>
+        ) : null}
       </Table.Cell>
       <Table.Cell>
         <Text as="div" size="1" color="gray" style={{ maxWidth: '34ch' }}>
@@ -164,6 +170,24 @@ function CheckRow({ check, sticky }: { check: Check; sticky: CSSProperties }) {
         </Text>
       </Table.Cell>
     </Table.Row>
+  )
+}
+
+// The one line under a figure: what was read, opening its source panel where there is
+// a source.
+function ReadLine({
+  text,
+  source,
+}: {
+  text: string | undefined
+  source: Source | null | undefined
+}) {
+  if (!text) return null
+  if (source) return <SourceLine source={source} label={text} />
+  return (
+    <Text as="div" size="1" color="gray">
+      {text}
+    </Text>
   )
 }
 

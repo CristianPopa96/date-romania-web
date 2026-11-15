@@ -55,7 +55,21 @@ test('the official figures are checked against ours, a difference only where the
   const local = main.getByRole('row').filter({ hasText: 'Bugetele locale' })
   await expect(local).toContainText('157,11 mld. lei')
   await expect(local).toContainText('-157,10 mld. lei')
-  await expect(local).toContainText('Școlile, spitalele')
+  await expect(local).toContainText('toate bugetele locale')
+  // One line under each figure, and it opens the source panel.
+  await local.getByRole('button', { name: /execuția BGC/ }).click()
+  await expect(
+    page
+      .getByRole('dialog')
+      .getByText('Ministerul Finanțelor · bgc31122024.xlsx'),
+  ).toBeVisible()
+  await page.keyboard.press('Escape')
+  // Two different measures: never a difference.
+  const domains = main
+    .getByRole('row')
+    .filter({ hasText: 'Cheltuieli locale pe domenii' })
+  await expect(domains).toContainText(/Nu se compară(?! încă)/)
+  await expect(domains).toContainText('ce s-a plătit')
   const pnrr = main.getByRole('row').filter({ hasText: 'Proiecte PNRR' })
   await expect(pnrr).toContainText('Nu se compară încă')
   await expect(pnrr).toContainText('6 contracte')

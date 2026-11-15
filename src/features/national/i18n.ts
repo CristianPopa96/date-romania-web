@@ -153,12 +153,16 @@ export const national = {
       counted(n, text, 'un contract', 'contracte'),
     difference: (amount: string, share: string) => `${amount} · ${share}`,
     paid: (share: string) => `plătit ${share} din credite`,
-    notComparable: 'Nu se compară încă',
+    // Payments above the credits of the law (design D24, Q92).
+    overCredits:
+      'Plățile depășesc creditele din lege: creditele pot crește în cursul anului, prin rectificare.',
+    differentMeasures: 'Nu se compară',
+    notYet: 'Nu se compară încă',
     reasons: {
       local_scope:
-        'Fișierul nostru ține doar primăriile și consiliile județene. Școlile, spitalele și serviciile cu buget propriu sunt în cifra oficială, nu în a noastră.',
-      classifications_close:
-        'Clasificările sunt apropiate, nu identice: un capitol bugetar nu cade mereu în același domeniu COFOG.',
+        'Fișierul nostru ține doar primăriile și consiliile județene; cifra oficială cuprinde toate bugetele locale.',
+      accrual_not_cash:
+        'Eurostat numără ce s-a datorat în an; noi numărăm ce s-a plătit.',
       credits_for_the_year:
         'Creditele sunt pentru tot anul; plățile sunt până la ultimul fișier publicat.',
       contracts_not_payments:

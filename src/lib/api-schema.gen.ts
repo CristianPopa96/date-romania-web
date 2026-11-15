@@ -72,7 +72,7 @@ export interface paths {
          * National
          * @description The country's budget against what our data shows. Official figures and ours each
          *     keep their own source and period; a difference is given only where both measure the
-         *     same thing over the same period (`comparable`), and every check says why they differ.
+         *     same thing over the same period (`state`), and every check says why they differ.
          *     Amounts are lei: official ones as the ministry gives them (cash, with VAT where paid),
          *     ours without VAT.
          */
@@ -1297,15 +1297,19 @@ export interface components {
         };
         /**
          * Check
-         * @description An official figure against ours. `difference` only when `comparable`.
+         * @description An official figure against ours. `difference` only when `state` is comparable.
          */
         Check: {
             /** Key */
             key: string;
             official: components["schemas"]["Figure"];
             ours: components["schemas"]["Figure"];
-            /** Comparable */
-            comparable: boolean;
+            /**
+             * State
+             * @description comparable: same measure, same period, a difference is given; different_measures: never compared; not_yet: a side is not held in a form that compares.
+             * @enum {string}
+             */
+            state: "comparable" | "different_measures" | "not_yet";
             /**
              * Difference
              * @description Ours minus official, in lei.

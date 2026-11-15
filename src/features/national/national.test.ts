@@ -29,7 +29,7 @@ const check = (more: Partial<Check> = {}): Check => ({
   key: 'local_budgets',
   official: figure(),
   ours: figure({ amount: 90 }),
-  comparable: true,
+  state: 'comparable',
   difference: -10,
   difference_share: -0.1,
   paid_share: null,
@@ -77,12 +77,31 @@ describe('the difference cell', () => {
       difference_share: null,
       paid_share: 0.47,
     })
-    expect(differenceCell(plan)).toEqual({ kind: 'paid', share: 0.47 })
+    expect(differenceCell(plan)).toEqual({
+      kind: 'paid',
+      share: 0.47,
+      over: false,
+    })
+  })
+
+  it('marks payments that pass the credits, and keeps the share as it is', () => {
+    const plan = check({ difference: null, paid_share: 1.04 })
+    expect(differenceCell(plan)).toEqual({
+      kind: 'paid',
+      share: 1.04,
+      over: true,
+    })
+  })
+
+  it('never compares two different measures, whatever figures they hold', () => {
+    expect(differenceCell(check({ state: 'different_measures' }))).toEqual({
+      kind: 'differentMeasures',
+    })
   })
 
   it('says a check does not compare yet, whatever figures it holds', () => {
-    expect(differenceCell(check({ comparable: false }))).toEqual({
-      kind: 'notComparable',
+    expect(differenceCell(check({ state: 'not_yet' }))).toEqual({
+      kind: 'notYet',
     })
   })
 })

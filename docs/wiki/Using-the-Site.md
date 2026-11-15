@@ -41,8 +41,11 @@ universitatea), then the country's budget set beside what our data shows, in fou
   Anghel Saligny payments), each with its own period. They are never subtracted from the
   official figure.
 - **Cifrele oficiale, verificate cu ale noastre**: a table of official figures against ours.
-  A difference is given only where both measure the same thing over the same period;
-  every row says why the two differ.
+  A difference is given only where both measure the same thing over the same period.
+  Two different measures say "Nu se compară" (Eurostat's spending by domain counts what
+  was owed, our budgets what was paid); a figure we do not hold in a form that compares
+  says "Nu se compară încă". Every row says why the two differ, and the line under each
+  figure opens where it was read.
 - **Pe domenii**: Eurostat's spending by purpose (education, health…), and how much of
   each goes through local government.
 

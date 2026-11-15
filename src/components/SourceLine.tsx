@@ -19,14 +19,19 @@ import type { Source } from '#/lib/api'
 // `of` names what the source is for, where two of them stand side by side.
 // The source of one record opens the source panel. A total has no panel: its line says
 // how many stored answers it is added up from and leads to the sources page.
+// With `label`, the line is that text alone and always opens the panel, which then says
+// whatever the source holds (a table cell has room for one line, design D24).
 export function SourceLine({
   source,
   of,
+  label,
 }: {
   source: Source
   of?: 'contracts' | 'purchases' | 'payments' | 'purchase' | 'items'
+  label?: string
 }) {
   const { t, f } = useI18n()
+  if (label) return <SourcePanel source={source} text={label} />
   const parts = [
     source.publisher,
     source.record,
@@ -66,7 +71,8 @@ export function SourceLine({
 
 // "De unde e cifra asta?": where one record was read, the hash of the stored answer and
 // the parser that read it. Our copy is private (it may hold personal codes), so the way
-// to the original is the publisher's own page.
+// to the original is the publisher's own page. A total says how many stored answers it
+// is added up from instead, and leads to the sources page.
 function SourcePanel({ source, text }: { source: Source; text: string }) {
   const { t, f } = useI18n()
   const words = t.source.panel
@@ -119,14 +125,27 @@ function SourcePanel({ source, text }: { source: Source; text: string }) {
                 <DataList.Value>{f.day(source.fetched_at)}</DataList.Value>
               </DataList.Item>
             ) : null}
-            <DataList.Item>
-              <DataList.Label>{words.hash}</DataList.Label>
-              <DataList.Value>
-                <Code variant="ghost" style={{ wordBreak: 'break-all' }}>
-                  {source.sha256}
-                </Code>
-              </DataList.Value>
-            </DataList.Item>
+            {source.sha256 ? (
+              <DataList.Item>
+                <DataList.Label>{words.hash}</DataList.Label>
+                <DataList.Value>
+                  <Code variant="ghost" style={{ wordBreak: 'break-all' }}>
+                    {source.sha256}
+                  </Code>
+                </DataList.Value>
+              </DataList.Item>
+            ) : null}
+            {source.documents ? (
+              <DataList.Item>
+                <DataList.Label>{words.documents}</DataList.Label>
+                <DataList.Value>
+                  {t.source.addedUp(
+                    source.documents,
+                    f.count(source.documents),
+                  )}
+                </DataList.Value>
+              </DataList.Item>
+            ) : null}
             {source.parser_version ? (
               <DataList.Item>
                 <DataList.Label>{words.parser}</DataList.Label>
@@ -134,9 +153,11 @@ function SourcePanel({ source, text }: { source: Source; text: string }) {
               </DataList.Item>
             ) : null}
           </DataList.Root>
-          <Text size="1" color="gray">
-            {words.private}
-          </Text>
+          {source.sha256 ? (
+            <Text size="1" color="gray">
+              {words.private}
+            </Text>
+          ) : null}
           <Flex gap="3" align="center" wrap="wrap">
             {source.url ? (
               <Button asChild size="1" variant="soft">
@@ -145,6 +166,11 @@ function SourcePanel({ source, text }: { source: Source; text: string }) {
                   {words.open}
                 </a>
               </Button>
+            ) : null}
+            {source.documents ? (
+              <Link asChild size="1">
+                <RouterLink to="/surse">{t.source.sources}</RouterLink>
+              </Link>
             ) : null}
             <Link asChild size="1">
               <RouterLink

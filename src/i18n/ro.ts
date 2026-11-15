@@ -111,6 +111,7 @@ export const ro = {
       fetched: 'Preluat',
       hash: 'Amprenta (SHA-256)',
       parser: 'Versiunea parserului',
+      documents: 'Totalul',
       open: 'Deschide la sursă',
       private:
         'Copia noastră a răspunsului nu e publică: poate conține coduri numerice personale nemascate.',

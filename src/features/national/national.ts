@@ -30,16 +30,21 @@ export function monthOf(f: Format, day: string) {
 }
 
 // What the "Diferența" cell holds. Only a comparable check has a figure there: a plan
-// against its payments as a share, any other as ours minus the official, with its sign
-// and its percent of the official figure. The rest say they do not compare yet.
+// against its payments as a share (`over` when the payments pass the credits), any other
+// as ours minus the official, with its sign and its percent of the official figure. Two
+// different measures never compare; the rest do not compare yet.
 export type DifferenceCell =
-  | { kind: 'paid'; share: number }
+  | { kind: 'paid'; share: number; over: boolean }
   | { kind: 'difference'; amount: number; share: number | null }
-  | { kind: 'notComparable' }
+  | { kind: 'differentMeasures' }
+  | { kind: 'notYet' }
 
 export function differenceCell(check: Check): DifferenceCell {
-  if (!check.comparable) return { kind: 'notComparable' }
-  if (check.paid_share != null) return { kind: 'paid', share: check.paid_share }
+  if (check.state === 'different_measures') return { kind: 'differentMeasures' }
+  if (check.state !== 'comparable') return { kind: 'notYet' }
+  if (check.paid_share != null) {
+    return { kind: 'paid', share: check.paid_share, over: check.paid_share > 1 }
+  }
   if (check.difference != null) {
     return {
       kind: 'difference',
@@ -47,7 +52,7 @@ export function differenceCell(check: Check): DifferenceCell {
       share: check.difference_share ?? null,
     }
   }
-  return { kind: 'notComparable' }
+  return { kind: 'notYet' }
 }
 
 // The period both sides of a check cover: the official one when they are comparable;
