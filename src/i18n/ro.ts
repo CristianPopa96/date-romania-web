@@ -44,6 +44,8 @@ export const ro = {
     euro: (amount: string) => `${amount} euro`,
     euroMillion: (amount: string) => `${amount} mil. euro`,
     euroBillion: (amount: string) => `${amount} mld. euro`,
+    // A share too small to write at one decimal: "sub 0,1 %".
+    under: (amount: string) => `sub ${amount}`,
   },
 
   site: {

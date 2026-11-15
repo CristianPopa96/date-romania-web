@@ -40,7 +40,12 @@ export function TraceableCard({ budget }: { budget: NationalBudget | null }) {
     ) ?? ''
   const part = (key: string) => band.find((segment) => segment.key === key)
   const can = part('procurement')
-  const amount = (key: string) => f.leiBillions(part(key)?.amount ?? 0)
+  // A part as a screen reader hears it: its amount and its share, "360,81 mld. lei, 60 %".
+  const amount = (key: string) =>
+    words.said(
+      f.leiBillions(part(key)?.amount ?? 0),
+      f.percent((part(key)?.share ?? 0) / 100),
+    )
 
   return (
     <Card size="3">

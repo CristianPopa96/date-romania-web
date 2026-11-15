@@ -95,12 +95,13 @@ function CheckRow({ check, sticky }: { check: Check; sticky: CSSProperties }) {
     check.ours.period_end,
     t.national.span,
   )
-  const oursDetail =
+  const places = check.ours.collected ? (check.ours.count ?? null) : null
+  const oursText =
     check.key === 'local_budgets'
-      ? f.count(check.ours.count ?? 0)
+      ? words.oursPlaces(places, places == null ? '' : f.count(places))
       : check.key === 'anghel_saligny'
-        ? (oursPeriod ?? '')
-        : ''
+        ? words.oursPayments(oursPeriod)
+        : words.oursSource[check.key]
 
   return (
     <Table.Row style={{ verticalAlign: 'top' }}>
@@ -122,7 +123,7 @@ function CheckRow({ check, sticky }: { check: Check; sticky: CSSProperties }) {
       <Table.Cell>
         <FigureCell figure={check.ours} muted={check.state !== 'comparable'} />
         <ReadLine
-          text={words.oursSource[check.key]?.(oursDetail)}
+          text={oursText}
           source={check.ours.collected ? check.ours.source : null}
         />
       </Table.Cell>
@@ -144,7 +145,7 @@ function CheckRow({ check, sticky }: { check: Check; sticky: CSSProperties }) {
             style={{ whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}
           >
             {cell.kind === 'paid'
-              ? words.paid(f.percent(cell.share))
+              ? words.paid(f.percentOf(cell.share))
               : cell.share == null
                 ? f.leiBillionsSigned(cell.amount)
                 : words.difference(

@@ -22,7 +22,7 @@ import { useI18n } from '#/i18n/context'
 export function BudgetCard({ budget }: { budget: NationalBudget | null }) {
   const { t, f } = useI18n()
   const n = t.national
-  if (!budget?.executed) {
+  if (!budget) {
     return (
       <Card size="3">
         <Flex direction="column" gap="3">
@@ -39,14 +39,13 @@ export function BudgetCard({ budget }: { budget: NationalBudget | null }) {
       </Card>
     )
   }
+  // The plan comes from the law, the execution from the ministry: either can be held
+  // without the other.
   const { executed, planned } = budget
   const year = String(budget.year)
-  const period = periodText(
-    f,
-    executed.period_start,
-    executed.period_end,
-    n.span,
-  )
+  const period = executed
+    ? periodText(f, executed.period_start, executed.period_end, n.span)
+    : null
 
   return (
     <Card size="3">
@@ -99,17 +98,29 @@ export function BudgetCard({ budget }: { budget: NationalBudget | null }) {
               </Flex>
             )}
           </Flex>
-          <Flex direction="column" gap="1">
-            <Text size="2" color="gray">
-              {n.budget.spent(f.day(executed.period_end))}
-            </Text>
-            <Text size="7" weight="bold">
-              {f.leiBillions(executed.spending)}
-            </Text>
-            <SourceLine source={executed.source} />
-          </Flex>
+          {executed ? (
+            <Flex direction="column" gap="1">
+              <Text size="2" color="gray">
+                {n.budget.spent(f.day(executed.period_end))}
+              </Text>
+              <Text size="7" weight="bold">
+                {f.leiBillions(executed.spending)}
+              </Text>
+              <SourceLine source={executed.source} />
+            </Flex>
+          ) : (
+            <Flex direction="column" gap="1" align="start">
+              <Text size="2" color="gray">
+                {n.budget.spentNone}
+              </Text>
+              <DataState kind="notCollected" />
+              <Text size="1" color="gray">
+                {n.fills.execution}
+              </Text>
+            </Flex>
+          )}
         </Grid>
-        {budget.executed_share != null ? (
+        {executed && budget.executed_share != null ? (
           <Flex direction="column" gap="2">
             <Progress
               value={Math.min(budget.executed_share * 100, 100)}
@@ -124,19 +135,21 @@ export function BudgetCard({ budget }: { budget: NationalBudget | null }) {
             </Text>
           </Flex>
         ) : null}
-        <Flex direction="column" gap="3">
-          <Heading as="h3" size="3">
-            {n.budget.spentOn(period ?? '')}
-          </Heading>
-          <AmountBars
-            rows={budget.categories.map((category) => ({
-              key: category.key,
-              label: n.budget.categories[category.key] ?? category.key,
-              value: category.amount,
-            }))}
-            format={f.leiBillions}
-          />
-        </Flex>
+        {executed ? (
+          <Flex direction="column" gap="3">
+            <Heading as="h3" size="3">
+              {n.budget.spentOn(period ?? '')}
+            </Heading>
+            <AmountBars
+              rows={budget.categories.map((category) => ({
+                key: category.key,
+                label: n.budget.categories[category.key] ?? category.key,
+                value: category.amount,
+              }))}
+              format={f.leiBillions}
+            />
+          </Flex>
+        ) : null}
       </Flex>
     </Card>
   )

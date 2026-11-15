@@ -3,7 +3,7 @@ import { Box, Card, Flex, Heading, Text } from '@radix-ui/themes'
 import { DataState } from '#/components/DataState'
 import type { Domains } from '#/features/national/api'
 import { DOMAINS_ANCHOR } from '#/features/national/CheckTable'
-import { localWidth } from '#/features/national/national'
+import { barWidth, localWidth } from '#/features/national/national'
 import { useI18n } from '#/i18n/context'
 
 // Block 4, "Pe domenii": COFOG by division, largest first. Each bar is the division's
@@ -13,6 +13,10 @@ import { useI18n } from '#/i18n/context'
 export function DomainsCard({ domains }: { domains: Domains | null }) {
   const { t, f } = useI18n()
   const words = t.national.domains
+  const largest = Math.max(
+    0,
+    ...(domains?.divisions ?? []).map((division) => division.total),
+  )
 
   return (
     <Card size="3" id={DOMAINS_ANCHOR}>
@@ -59,7 +63,7 @@ export function DomainsCard({ domains }: { domains: Domains | null }) {
                           height: 8,
                           borderRadius: 'var(--radius-1)',
                           overflow: 'hidden',
-                          width: `${Math.max((division.total / domains.divisions[0].total) * 100, 1)}%`,
+                          width: barWidth(division.total, largest),
                           background: 'var(--indigo-5)',
                         }}
                       >

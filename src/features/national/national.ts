@@ -87,6 +87,12 @@ export function oursCell(figure: CheckFigure): OursCell {
 }
 
 // The darker part of a division's bar: local government's share, from COFOG itself.
+// A division's bar against the largest; nothing drawn when there is nothing to scale by.
+export function barWidth(total: number, largest: number) {
+  if (!(largest > 0) || !(total > 0)) return '0%'
+  return `${Math.max(Math.min(total / largest, 1) * 100, 1)}%`
+}
+
 export function localWidth(share: number) {
   return `${Math.min(Math.max(share, 0), 1) * 100}%`
 }

@@ -10,6 +10,7 @@ const {
   leiBillionsSigned,
   leiExact,
   leiShort,
+  percentOf,
   percentSigned,
   period,
   quantity,
@@ -65,6 +66,20 @@ describe('the national budget', () => {
     expect(leiBillionsSigned(2_000_000_000)).toBe('+2,00 mld. lei')
     // A no-break space before the sign, as Intl writes it.
     expect(percentSigned(-0.072)).toBe('-7,2 %')
+  })
+
+  it('never writes a small difference as an exact match', () => {
+    expect(leiBillionsSigned(-4_000_000)).toBe('-4,0 mil. lei')
+    expect(leiBillionsSigned(12_000)).toBe('+12.000 lei')
+    expect(leiBillionsSigned(0)).toBe('0,00 mld. lei')
+    expect(percentSigned(-0.0003)).toBe('sub 0,1 %')
+    expect(percentSigned(0)).toBe('0,0 %')
+  })
+
+  it('writes a share of a plan, never "0 %" for something paid', () => {
+    expect(percentOf(1.04)).toBe('104 %')
+    expect(percentOf(0.0012)).toBe('0,1 %')
+    expect(percentOf(0.0001)).toBe('sub 0,1 %')
   })
 })
 

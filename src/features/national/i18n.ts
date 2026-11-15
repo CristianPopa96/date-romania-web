@@ -38,6 +38,7 @@ export const national = {
     titleNone: 'Bugetul țării',
     lead: 'Bugetul general consolidat: tot ce cheltuie statul, de la pensii la drumuri.',
     planned: (year: string) => `Programat pentru ${year}`,
+    spentNone: 'Cheltuit până acum',
     plannedSource: (act: string, day: string, page: string) =>
       `${act} · MO ${day} · raportul guvernului, p. ${page}`,
     openDocument: 'Deschide documentul',
@@ -75,6 +76,7 @@ export const national = {
       },
     },
     value: (amount: string, share: string) => `${amount} · ${share}`,
+    said: (amount: string, share: string) => `${amount} (${share})`,
     // The band for a screen reader, in one sentence.
     aria: (
       total: string,
@@ -141,14 +143,19 @@ export const national = {
         `MF · execuția BGC la ${month}, proiecte cu finanțare UE`,
     } as Record<string, ((month: string) => string) | undefined>,
     oursSource: {
-      local_budgets: (places: string) =>
-        `MDLPA · ${places} primării și consilii județene`,
-      local_domains: () => 'MDLPA · capitolele bugetelor locale',
-      anghel_saligny: (period: string) =>
-        `MDLPA · fișierele de plăți, ${period}`,
-      pnrr: () => 'MIPE · tabloul de bord PNRR',
-      eu_funds: () => 'plățile pe proiect nu sunt colectate',
-    } as Record<string, ((detail: string) => string) | undefined>,
+      local_domains: 'MDLPA · capitolele bugetelor locale',
+      pnrr: 'MIPE · tabloul de bord PNRR',
+      eu_funds: 'plățile pe proiect nu sunt colectate',
+    } as Record<string, string | undefined>,
+    // How many town halls and county councils are added up, when it is known.
+    oursPlaces: (places: number | null, text: string) =>
+      places == null
+        ? 'MDLPA · primăriile și consiliile județene'
+        : `MDLPA · ${counted(places, text, 'o primărie sau un consiliu județean', 'primării și consilii județene')}`,
+    oursPayments: (period: string | null) =>
+      period
+        ? `MDLPA · fișierele de plăți, ${period}`
+        : 'MDLPA · fișierele de plăți',
     contracts: (n: number, text: string) =>
       counted(n, text, 'un contract', 'contracte'),
     difference: (amount: string, share: string) => `${amount} · ${share}`,

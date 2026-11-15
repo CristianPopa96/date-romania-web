@@ -2,6 +2,7 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { Link as RouterLink, createFileRoute } from '@tanstack/react-router'
 import { Badge, Container, Flex, Heading, Text } from '@radix-ui/themes'
 
+import { Unavailable } from '#/components/Notes'
 import { SearchBox } from '#/components/SearchBox'
 import {
   BudgetCard,
@@ -49,12 +50,18 @@ function Home() {
           </Flex>
         </Flex>
 
-        <BudgetCard budget={national?.budget ?? null} />
-        <TraceableCard budget={national?.budget ?? null} />
-        {national && national.checks.length > 0 ? (
-          <CheckTable checks={national.checks} />
-        ) : null}
-        <DomainsCard domains={national?.domains ?? null} />
+        {national === 'failed' ? (
+          <Unavailable />
+        ) : (
+          <>
+            <BudgetCard budget={national.budget ?? null} />
+            <TraceableCard budget={national.budget ?? null} />
+            {national.checks.length > 0 ? (
+              <CheckTable checks={national.checks} />
+            ) : null}
+            <DomainsCard domains={national.domains ?? null} />
+          </>
+        )}
       </Flex>
     </Container>
   )

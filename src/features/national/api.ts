@@ -16,6 +16,15 @@ export type Ours = Schemas['Ours']
 export type Segment = Schemas['Segment']
 export type Domains = Schemas['Domains']
 
-export const getNational = createServerFn({ method: 'GET' }).handler(() =>
-  getJson<National>('/v1/national'),
+// 'failed' when the API did not answer, or has no such route (a site deployed before
+// it): the home page stays up, its search usable, and says the figures could not be
+// read, never that they are not collected.
+export const getNational = createServerFn({ method: 'GET' }).handler(
+  async (): Promise<National | 'failed'> => {
+    try {
+      return (await getJson<National>('/v1/national')) ?? 'failed'
+    } catch {
+      return 'failed'
+    }
+  },
 )

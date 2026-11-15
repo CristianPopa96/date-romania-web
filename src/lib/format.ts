@@ -105,13 +105,41 @@ function build(locale: Locale) {
     return money.billion(twoDecimals.format(value / 1e9))
   }
 
-  // A difference, with its sign: "−11,52 mld. lei", and its share: "−7,2 %".
+  const signedOne = new Intl.NumberFormat(tag, {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+    signDisplay: 'exceptZero',
+  })
+  const signedWhole = new Intl.NumberFormat(tag, {
+    maximumFractionDigits: 0,
+    signDisplay: 'exceptZero',
+  })
+
+  // A difference, with its sign: "-11,52 mld. lei", and its share: "-7,2 %". A gap that
+  // would round to "0,00 mld." is written in millions, or in lei, so it never reads as
+  // an exact match; a share under 0,05 % is "sub 0,1 %", its sign left to the amount.
   function leiBillionsSigned(value: number) {
-    return money.billion(signedTwo.format(value / 1e9))
+    const size = Math.abs(value)
+    if (value === 0 || size >= 5e6) {
+      return money.billion(signedTwo.format(value / 1e9))
+    }
+    if (size >= 5e4) return money.million(signedOne.format(value / 1e6))
+    return money.lei(signedWhole.format(value))
   }
 
   function percentSigned(value: number) {
+    if (value !== 0 && Math.abs(value) < 0.0005) {
+      return money.under(percent(0.001, 1))
+    }
     return signedShare.format(value)
+  }
+
+  // A share of a plan, whole above 1 %, with one decimal below it, never "0 %" for
+  // something paid: "104 %", "0,1 %", "sub 0,1 %".
+  function percentOf(value: number) {
+    if (value >= 0.01 || value === 0) return percent(value)
+    if (value >= 0.0005) return percent(value, 1)
+    return money.under(percent(0.001, 1))
   }
 
   function leiShort(value: number) {
@@ -189,6 +217,7 @@ function build(locale: Locale) {
     leiBillions,
     leiBillionsSigned,
     percentSigned,
+    percentOf,
     euro,
     euroShort,
     day,

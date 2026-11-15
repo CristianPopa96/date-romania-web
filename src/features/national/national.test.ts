@@ -4,6 +4,7 @@ import type { Check, CheckFigure } from '#/features/national/api'
 import {
   checkPeriod,
   differenceCell,
+  barWidth,
   localWidth,
   monthOf,
   oursCell,
@@ -124,6 +125,15 @@ describe('our side of a check', () => {
 
   it('writes an amount', () => {
     expect(oursCell(figure())).toEqual({ kind: 'amount', amount: 100 })
+  })
+})
+
+describe('the bar of a division', () => {
+  it('is drawn against the largest, never from a zero', () => {
+    expect(barWidth(50, 100)).toBe('50%')
+    expect(barWidth(0.1, 100)).toBe('1%')
+    expect(barWidth(10, 0)).toBe('0%')
+    expect(barWidth(0, 100)).toBe('0%')
   })
 })
 
