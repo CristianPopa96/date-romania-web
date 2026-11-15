@@ -50,17 +50,34 @@ In the Anghel Saligny trace, no link from a payment to a contract is ever "sure"
 payment files do not name the contract. Headline figures count only payments tied to
 exactly one contract.
 
+The older payment files name the builder without a tax ID. Such a payment still gets
+one in two ways, both shown on the project page:
+
+- a newer payment of the same project names the same company with its CUI, and that CUI
+  is used;
+- otherwise, when exactly one company in the trade register (Registrul Comerțului)
+  carries the builder's name, in the whole country, the payment takes its CUI. The link
+  from the payments to that builder is drawn dashed amber and marked "Probabil · după
+  nume"; a solid green link means the payment file itself gives the CUI.
+
 EU money has links of its own:
 
 - **A project and its beneficiary.** "Sure" when the programme's list gives the
-  beneficiary's tax ID. "Probable" when it gives only a name, which Date România matched
-  to the one town hall, institution or company of that name in the project's place (or,
-  for a company, in the country). Pages that count an institution's projects say how
-  many were matched by name.
-- **A SEAP contract or purchase and a project.** Always "probable": the buyer wrote the
-  project's SMIS code, or the number of its own PNRR financing contract, in the text of
-  the notice or purchase. SEAP does not check that text, and many buyers leave it out,
-  so these lists may be incomplete.
+  beneficiary's tax ID ("CUI în listă"), or MIPE's map of the 2021–2027 projects does
+  ("CUI pe harta MIPE"). "Probable" when it gives only a name, which Date România
+  matched to the one town hall, institution or company of that name in the project's
+  place ("Nume și localitate"), to the one company of that name held ("Nume de firmă"),
+  or to the one company of that name in the trade register, in the country or the
+  project's county ("Nume în Registrul Comerțului"). Pages that count an institution's
+  projects say how many were matched by name.
+- **A SEAP contract or purchase and a project.** Always "probable": the buyer wrote, in
+  the text of the notice or purchase, the project's SMIS code ("SMIS în anunț"), the
+  number of its own PNRR financing contract ("Nr. finanțare în anunț"), or the PNRR
+  measure of its only financing contract on that measure ("Măsura PNRR în anunț"). When
+  the text says only "PNRR" and the buyer has one PNRR financing contract, the badge is
+  "PNRR în anunț": it names the only evidence there is. "în achiziție" replaces "în
+  anunț" on a direct purchase. SEAP does not check that text, and many buyers leave it
+  out, so these lists may be incomplete.
 
 ## What counts as money
 

@@ -1,7 +1,7 @@
 # Features and roadmap
 
 The site is planned as ten user flows, built in releases. This page is the state as of
-30.10.2026.
+15.11.2026.
 
 ## Built
 
@@ -26,29 +26,38 @@ The site is planned as ten user flows, built in releases. This page is the state
 | 4       | Browse every project of every programme in one list, each with how far its money is followed, and open each project's page                |
 | 4       | See every project of an institution, of a company (with how it was paid through it) and of a commune or county                            |
 | 4       | Browse every contract and every accepted direct purchase, and rank companies and institutions by either, filtered by county               |
+| 4       | See every company's entry in the trade register (form, registration, state) and the EU projects of the regional programmes                |
+| 4       | Follow the road of the data from each public source to the pages, with today's figures ("Drumul datelor")                                 |
+| —       | On the home page, set the country's budget (planned and spent so far) beside what our data shows, and see which figures can be compared   |
 
 ## The data behind it
 
 Purchases and contracts are held for **every day from 1 January 2026**, and a new day
-is collected each morning (as of 20.10.2026).
+is collected each morning (as of 15.11.2026).
 
-- **Direct purchases**: 1,808,179, every day complete (1,719,358 accepted, 15.1 billion
-  lei).
-- **Award notices**: 34,445 notices published or republished in the period, with
-  246,883 contracts. Only the 76,281 contracts signed inside the period are counted,
-  and the newest days are always incomplete (contracts appear weeks after signing).
-- **Anghel Saligny**: six payment files (18 May to 27 August 2026) and SEAP's quarterly
-  contract exports from 2021, used only to trace the programme.
+- **Direct purchases**: 2,013,306 to 14 November 2026, every day complete (1,914,608
+  accepted, 16.7 billion lei).
+- **Award notices**: 39,396 notices published or republished in the period, with
+  343,078 contracts. Only the contracts signed inside the period are counted, and the
+  newest days are always incomplete (contracts appear weeks after signing).
+- **Anghel Saligny**: eight payment files (18 May to 30 October 2026, 3,955 payments)
+  and SEAP's quarterly contract exports from 2021, used only to trace the programme.
 - **Places and local budgets**: SIRUTA (every county, town hall and village), the
   Finance Ministry's list of 13,485 public entities, the 2024 executed budget of every
   town hall and county council and the population of every town hall area (Ministry of
-  Development), and ANAF's record of all 87,472 institutions and companies held. All
-  but two have their county and town hall area.
+  Development), and ANAF's record of the 102,210 institutions and companies held.
+- **Companies**: the trade register (ONRC), 2,741,689 companies (the edition of
+  19.10.2026), read once a quarter. Natural persons in it are never read.
 - **EU money**: MIPE's PNRR dashboard (every financing contract, with the dated
-  payments to each beneficiary; the edition of 15.10.2026), and MIPE's lists of
-  contracted projects for 13 cohesion programmes (22,326 projects), with the Health
-  programme's payments one by one. 57% of the cohesion projects are tied to an
-  institution or company held, by tax ID or by name.
+  payments to each beneficiary; the edition of 15.10.2026), MIPE's lists of contracted
+  projects for 13 cohesion programmes, with the Health programme's payments one by one,
+  and MIPE's map of the 2021–2027 projects, which adds the regional programmes and
+  Transport: 29,131 projects in all. 90% are tied to an institution or company, by tax
+  ID or by name.
+- **The country's budget**: the Finance Ministry's monthly budget execution (every
+  month from January 2024 to September 2026), Eurostat's government spending by purpose
+  (COFOG, 2015 to 2024), and the 2026 budget law's planned figures, entered by hand with
+  the page each is printed on.
 
 ## Not built yet
 
@@ -61,8 +70,8 @@ is collected each morning (as of 20.10.2026).
 
 Also waiting:
 
-- A new search page with suggestions, that also finds projects.
-- The EU projects of the regional programmes of 2021–2027 (left out for now).
+- The budget rectification of 2026 (OUG 41/2026): the home page's planned figure is the
+  budget law's until a document gives the new consolidated total.
 - Placing a national beneficiary's projects where the work is, rather than where the
   beneficiary is registered.
 

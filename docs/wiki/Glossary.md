@@ -18,6 +18,10 @@ Romanian words and acronyms you meet on the site, with what they mean here.
 | **MIPE**                    | Ministerul Investițiilor și Proiectelor Europene, the ministry for EU funds; publishes the lists of EU projects and the PNRR dashboard       |
 | **PNRR**                    | Planul Național de Redresare și Reziliență, the EU recovery plan: measures, financing contracts and payments to beneficiaries                |
 | **Fonduri de coeziune**     | EU cohesion funds, paid through programmes (POR, POIM, PEO…), each with its own list of projects                                             |
+| **Harta MIPE**              | MIPE's map of the 2021–2027 projects; the source of the regional programmes and Transport, which have no list of their own                   |
+| **ONRC**                    | Oficiul Național al Registrului Comerțului, which keeps the trade register (Registrul Comerțului) of every company                           |
+| **Execuția bugetară**       | The Finance Ministry's monthly report of what the general government budget took in and spent; the home page's "spent so far"                |
+| **Eurostat COFOG**          | Government spending by purpose (education, health…), as the EU's statistics office publishes it; counts what was owed in the year            |
 | **TED**                     | The EU's Official Journal tenders database; not collected yet                                                                                |
 | **Primăria**                | Town hall                                                                                                                                    |
 | **Consiliul Județean**      | County council                                                                                                                               |
@@ -86,6 +90,14 @@ Romanian words and acronyms you meet on the site, with what they mean here.
 | **CUI în listă · Nume și localitate**      | How a project was tied to its beneficiary: tax ID given, or matched by name |
 | **Legat de noi după nume**                 | "Tied by us by name": matched by name, so only probable                     |
 | **Citează acest proiect**                  | "Cites this project": a SEAP record whose text names the project            |
+| **CUI pe harta MIPE**                      | The beneficiary's tax ID is given by MIPE's map: a sure tie                 |
+| **Nume în Registrul Comerțului**           | Tied by name to the one company of that name in the trade register          |
+| **Probabil · după nume**                   | A builder named without a CUI, found by name in the trade register          |
+| **Măsura PNRR în anunț / PNRR în anunț**   | The SEAP text cites the PNRR measure / only the word "PNRR"                 |
+| **Plăți validate**                         | Payments validated, as MIPE's map counts them; not the same as "plătit"     |
+| **Funcțiune · radiată**                    | A company's state in the trade register: active · struck off                |
+| **Nu se compară (încă)**                   | Two figures measure different things (or cannot be compared yet)            |
+| **Drumul datelor**                         | "The road of the data", from a public source to a page, on "Surse"          |
 
 ## Laws mentioned
 
