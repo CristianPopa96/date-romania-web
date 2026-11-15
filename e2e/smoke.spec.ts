@@ -1218,11 +1218,22 @@ test('the road of the data shows each step in figures, one lane at a time', asyn
   await expect(
     main.getByText('proiect european → beneficiarul lui'),
   ).toBeVisible()
-  // A lane lights its own path; the rest fades but stays readable.
+  // A lane lights its own path, says it in words, and nothing is faded.
+  await expect(main.getByText(/Alege o sursă de mai sus/)).toBeVisible()
   await main.getByRole('button', { name: 'PNRR', exact: true }).click()
   await expect(
     main.getByRole('button', { name: 'PNRR', exact: true }),
   ).toHaveAttribute('aria-pressed', 'true')
+  await expect(main.getByText(/^Drumul „PNRR”: luăm/)).toContainText(
+    'plăți PNRR',
+  )
+  const unlit = main
+    .locator('[data-mark="unlit"]')
+    .filter({ hasText: 'achiziții directe' })
+    .first()
+  await expect(unlit).toBeVisible()
+  await expect(unlit).toHaveCSS('opacity', '1')
+  await expect(main.locator('[data-mark="lit"]').first()).toBeVisible()
   // The details name the tables a technical reader can check.
   await expect(main.getByText('direct_purchase', { exact: true })).toHaveCount(
     0,

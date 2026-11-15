@@ -208,10 +208,16 @@ export const eu = {
         notice: 'Nr. finanțare în anunț',
         purchase: 'Nr. finanțare în achiziție',
       },
+      // The measure the text cites decided (design Q82); 'PNRR' alone, when the text names
+      // no measure and the buyer has one PNRR contract, is below.
       'pnrr-measure+buyer': {
-        notice: 'PNRR în anunț',
-        purchase: 'PNRR în achiziție',
+        notice: 'Măsura PNRR în anunț',
+        purchase: 'Măsura PNRR în achiziție',
       },
+    },
+    badgePnrrOnly: {
+      notice: 'PNRR în anunț',
+      purchase: 'PNRR în achiziție',
     },
     failed:
       'Nu am putut citi acum contractele și achizițiile din SEAP. Încearcă din nou mai târziu.',

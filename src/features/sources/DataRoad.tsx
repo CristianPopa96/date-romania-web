@@ -1,14 +1,17 @@
 import { useState } from 'react'
 import { Badge, Button, Flex, Heading, Switch, Text } from '@radix-ui/themes'
 
+import { ConfidenceBadge } from '#/components/ConfidenceBadge'
 import { Unavailable } from '#/components/Notes'
 import { Arrow, Item, Step } from '#/features/sources/RoadStep'
+import type { ItemMark } from '#/features/sources/RoadStep'
 import { useI18n } from '#/i18n/context'
 import type { DataRoad as Road, Dataset } from '#/features/sources/api'
 import {
   LANES,
   PAGES,
   gigabytes,
+  lanePath,
   laneSources,
   onLane,
   ruleCounts,
@@ -16,8 +19,9 @@ import {
 import type { Lane } from '#/features/sources/road'
 
 // How a public source becomes a page, in five steps, with the figures of now. A lane
-// (one family of sources) lights its own path; the details switch adds, under every
-// item, the names a technical reader can check in the code.
+// (one family of sources) lights its own path, said in one sentence under the cards; no
+// lines are drawn between them (design D27). The details switch adds, under every item,
+// the names a technical reader can check in the code.
 export function DataRoad({
   road,
   datasets,
@@ -36,6 +40,19 @@ export function DataRoad({
   const projects = road.projects.reduce((sum, each) => sum + each.count, 0)
   const rows = road.read.reduce((sum, each) => sum + each.count, 0)
   const s = r.steps
+  const mark = (on: boolean): ItemMark =>
+    lane === null ? 'plain' : on ? 'lit' : 'unlit'
+  // The chosen path in words, for screen readers and phones: no lines are drawn.
+  const path = lane ? lanePath(lane) : null
+  const pathText = path
+    ? r.pathSentence(
+        r.lane[lane as Lane],
+        f.list(path.sources.map((key) => t.datasets.names[key] ?? key)),
+        f.list(path.tables.map((key) => r.tables[key] ?? key)),
+        f.list(path.rules.map((key) => r.rules[key] ?? key)),
+        f.list(path.pages.map((key) => r.pages[key])),
+      )
+    : r.pathNone
 
   return (
     <Flex direction="column" gap="5">
@@ -93,7 +110,7 @@ export function DataRoad({
           {sources.map((each) => (
             <Item
               key={each.key}
-              lit={onLane(lane, 'sources', each.key)}
+              mark={mark(onLane(lane, 'sources', each.key))}
               tech={tech ? `${each.key} · ${f.count(each.documents)}` : null}
             >
               {t.datasets.name(
@@ -111,7 +128,7 @@ export function DataRoad({
           tech={tech && s.kept.tech}
           figure={s.kept.count(road.documents, f.count(road.documents))}
         >
-          <Item lit>
+          <Item mark={mark(true)}>
             {s.kept.size(f.quantity(gigabytes(road.stored_bytes)))}
           </Item>
         </Step>
@@ -123,19 +140,19 @@ export function DataRoad({
           tech={tech && s.read.tech}
           figure={s.read.count(rows, f.count(rows))}
         >
-          <Item lit>
+          <Item mark={mark(true)}>
             {s.read.rejected(road.rejected_rows, f.count(road.rejected_rows))}
           </Item>
           {road.read.map((each) => (
             <Item
               key={each.key}
-              lit={onLane(lane, 'tables', each.key)}
+              mark={mark(onLane(lane, 'tables', each.key))}
               tech={tech ? each.key : null}
             >
               {f.count(each.count)} {r.tables[each.key] ?? each.key}
             </Item>
           ))}
-          <Item lit={onLane(lane, 'tables', 'register_company')}>
+          <Item mark={mark(onLane(lane, 'tables', 'register_company'))}>
             {s.read.skipped}
           </Item>
         </Step>
@@ -149,7 +166,7 @@ export function DataRoad({
           {rules.map((rule) => (
             <Item
               key={rule.rule}
-              lit={onLane(lane, 'rules', rule.rule)}
+              mark={mark(onLane(lane, 'rules', rule.rule))}
               tech={
                 tech
                   ? rule.methods
@@ -166,18 +183,12 @@ export function DataRoad({
                   ) : null}
                   {(['sure', 'probable', 'possible'] as const).map((level) =>
                     rule.byConfidence[level] ? (
-                      <Badge
+                      // The ConfidenceBadge looks only: no orange anywhere.
+                      <ConfidenceBadge
                         key={level}
-                        color={
-                          level === 'sure'
-                            ? 'green'
-                            : level === 'probable'
-                              ? 'amber'
-                              : 'orange'
-                        }
-                      >
-                        {f.count(rule.byConfidence[level])} {s.linked[level]}
-                      </Badge>
+                        level={level}
+                        label={`${f.count(rule.byConfidence[level])} ${s.linked[level]}`}
+                      />
                     ) : null,
                   )}
                 </Flex>
@@ -198,16 +209,24 @@ export function DataRoad({
           tech={tech && s.shown.tech}
           figure={s.shown.projects(projects, f.count(projects))}
         >
-          <Item lit>
+          <Item mark={mark(true)}>
             {s.shown.entities(road.entities, f.count(road.entities))}
           </Item>
           {PAGES.map((page) => (
-            <Item key={page} lit={onLane(lane, 'pages', page)}>
+            <Item key={page} mark={mark(onLane(lane, 'pages', page))}>
               {r.pages[page]}
             </Item>
           ))}
         </Step>
       </Flex>
+      <Text
+        size="2"
+        color="gray"
+        aria-live="polite"
+        style={{ maxWidth: '70ch' }}
+      >
+        {pathText}
+      </Text>
 
       <Flex direction="column" gap="2">
         <Heading size="3">{r.reachTitle}</Heading>

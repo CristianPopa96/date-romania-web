@@ -18,6 +18,17 @@ export const road = {
     register: 'Firme și localități',
   },
   techSwitch: 'Arată detaliile tehnice',
+  // The chosen path in words, under the cards (design D27).
+  pathSentence: (
+    lane: string,
+    sources: string,
+    tables: string,
+    rules: string,
+    pages: string,
+  ) =>
+    `Drumul „${lane}”: luăm ${sources}, păstrăm originalul, citim ${tables}, legăm ${rules} și le arătăm în ${pages}.`,
+  pathNone:
+    'Alege o sursă de mai sus ca să vezi, în cuvinte, drumul ei de la sursă la pagină.',
 
   steps: {
     sources: {

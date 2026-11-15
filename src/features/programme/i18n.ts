@@ -120,6 +120,10 @@ export const programme = {
   // A builder the payment files name without a tax ID, found by its name.
   namedInRegister:
     'numită în fișierul de plăți fără CUI · CUI {cui} din Registrul Comerțului, după nume',
+  // A builder found by name is a link we made (design D26).
+  foundByName: 'Probabil · după nume',
+  foundByNameHelp:
+    'Legat de noi: fișierul de plăți numește constructorul fără CUI, iar o singură firmă din Registrul Comerțului poartă acest nume.',
   purchasesHop: 'Achiziții',
   ofProjectValue: (share: string) => `${share} din valoarea proiectului`,
   confidenceShort: {

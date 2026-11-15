@@ -94,11 +94,12 @@ export function EntityView({
             </Text>
           </Flex>
           <Heading size="7">{data.entity.name}</Heading>
-          {role === 'institutions' ? (
-            <InstitutionHeader entity={data.entity} />
-          ) : null}
+          {/* Right under the name, before the ANAF badges (design Q86). */}
           {data.trade_register ? (
             <RegisterLine register={data.trade_register} />
+          ) : null}
+          {role === 'institutions' ? (
+            <InstitutionHeader entity={data.entity} />
           ) : null}
         </Flex>
 
