@@ -91,7 +91,7 @@ function Footer() {
   return (
     <Box asChild style={{ borderTop: '1px solid var(--gray-a5)' }}>
       <footer>
-        <Container size="3" px="5" py="4">
+        <Container size="4" px="5" py="4">
           <Flex direction="column" gap="1">
             <Text size="1" color="gray">
               {t.site.footerData}
@@ -141,7 +141,7 @@ function Footer() {
 function NotFound() {
   const { t } = useI18n()
   return (
-    <Container size="3" px="5" py="9">
+    <Container size="4" px="5" py="9">
       <Flex direction="column" gap="2">
         <Heading size="6">{t.notFound.title}</Heading>
         <Text size="2" color="gray">
@@ -154,7 +154,7 @@ function NotFound() {
 
 function Failed() {
   return (
-    <Container size="3" px="5" py="9">
+    <Container size="4" px="5" py="9">
       <Unavailable />
     </Container>
   )

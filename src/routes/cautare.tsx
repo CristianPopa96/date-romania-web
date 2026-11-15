@@ -93,7 +93,7 @@ function Search() {
       : ofKind(found, kind).length + (kind ? 0 : places.length)
 
   return (
-    <Container size="3" px="5" py="7">
+    <Container size="4" px="5" py="7">
       <Flex direction="column" gap="5">
         <Heading size="6">{t.search.title}</Heading>
         {/* The key resets the box when the address changes, e.g. on Back. */}
